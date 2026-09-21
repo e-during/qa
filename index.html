@@ -15,17 +15,18 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  html, body { height: 100%; background: #060b1c; color: #fff; }
+  html { height: 100%; background: #060b1c; }
   body {
-    min-height: 100vh; min-height: 100dvh;
+    min-height: 100%; min-height: 100dvh;
     display: flex; flex-direction: column;
-    background: #060b1c;
-    overflow-x: hidden;
+    background: #060b1c; color: #fff;
+    overflow-x: hidden; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ---------- 히어로 (사진 + 텍스트 오버레이) ---------- */
   .hero {
-    position: relative; width: 100%; height: 32vh; min-height: 210px; max-height: 300px;
+    position: relative; width: 100%; height: 24vh; min-height: 160px; max-height: 220px;
     padding-top: env(safe-area-inset-top);
   }
   .hero img {
@@ -46,19 +47,19 @@
   }
   .status-pill i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.7); }
 
-  .hero-text { text-align: center; padding: 20px 20px 0; }
-  .hero-sub { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #e0b060; }
-  .hero-team { margin-top: 8px; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: .3px; }
+  .hero-text { text-align: center; padding: 12px 20px 0; }
+  .hero-sub { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; color: #e0b060; }
+  .hero-team { margin-top: 5px; font-size: 17px; font-weight: 900; color: #fff; letter-spacing: .3px; }
 
   /* ---------- 본문 ---------- */
-  .content { flex: 1; display: flex; flex-direction: column; padding: 20px 20px calc(env(safe-area-inset-bottom) + 20px); }
+  .content { flex: 1; display: flex; flex-direction: column; padding: 12px 20px calc(env(safe-area-inset-bottom) + 10px); }
 
   .menu { width: 100%; max-width: 440px; margin: 0 auto; }
 
   .dash-btn {
     position: relative; overflow: hidden;
     display: flex; align-items: center; gap: 14px;
-    padding: 20px 20px 20px 18px; border-radius: 20px; text-decoration: none;
+    padding: 15px 18px 15px 16px; border-radius: 18px; text-decoration: none;
     background: linear-gradient(160deg, #1b2a54 0%, #12203f 60%, #0c1730 100%);
     border: 1px solid rgba(255,255,255,.10);
     box-shadow: 0 16px 36px rgba(0,0,0,.5);
@@ -66,17 +67,17 @@
   }
   .dash-btn:active { transform: scale(.98); }
   .dash-btn .icon {
-    flex: none; width: 46px; height: 46px; border-radius: 13px;
+    flex: none; width: 40px; height: 40px; border-radius: 12px;
     background: linear-gradient(135deg, rgba(224,176,96,.22), rgba(224,176,96,.06));
     display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 0 0 1px rgba(224,176,96,.3);
   }
-  .dash-btn .icon svg { width: 24px; height: 24px; }
+  .dash-btn .icon svg { width: 21px; height: 21px; }
   .dash-btn .text { flex: 1; min-width: 0; }
-  .dash-btn .label { font-size: 17px; font-weight: 900; color: #fff; letter-spacing: .1px; }
-  .dash-btn .desc { margin-top: 3px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.45); }
+  .dash-btn .label { font-size: 15.5px; font-weight: 900; color: #fff; letter-spacing: .1px; }
+  .dash-btn .desc { margin-top: 2px; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.45); }
   .dash-btn .arrow {
-    flex: none; width: 40px; height: 40px; border-radius: 50%;
+    flex: none; width: 36px; height: 36px; border-radius: 50%;
     background: linear-gradient(135deg, #ff7a2f, #ff5500);
     color: #fff; display: flex; align-items: center; justify-content: center;
     font-weight: 800; font-size: 16px;
@@ -90,42 +91,42 @@
   /* ---------- 가치 4개 (카드 안에 통합, 버튼 아님) ---------- */
   .values {
     display: grid; grid-template-columns: repeat(4, 1fr);
-    margin: 14px auto 0; width: 100%; max-width: 440px;
+    margin: 10px auto 0; width: 100%; max-width: 440px;
     background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07);
-    border-radius: 18px; padding: 16px 4px;
+    border-radius: 16px; padding: 11px 4px;
   }
   .value-item { text-align: center; position: relative; padding: 0 2px; }
   .value-item + .value-item::before {
-    content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 1px;
+    content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 1px;
     background: rgba(255,255,255,.08);
   }
-  .value-item .vi { width: 30px; height: 30px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
-  .value-item .vi svg { width: 18px; height: 18px; stroke: #e0b060; opacity: .85; }
-  .value-item .vt { font-size: 12px; font-weight: 800; color: #fff; }
-  .value-item .vd { margin-top: 3px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
+  .value-item .vi { width: 24px; height: 24px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; }
+  .value-item .vi svg { width: 15px; height: 15px; stroke: #e0b060; opacity: .85; }
+  .value-item .vt { font-size: 11px; font-weight: 800; color: #fff; }
+  .value-item .vd { margin-top: 2px; font-size: 8px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.3; }
 
   /* ---------- 개발 중인 추가 기능 미리보기 ---------- */
-  .soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px auto 0; width: 100%; max-width: 440px; }
+  .soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px auto 0; width: 100%; max-width: 440px; }
   .soon-card {
-    position: relative; padding: 18px 14px 16px; border-radius: 18px;
+    position: relative; padding: 12px 12px 11px; border-radius: 15px;
     background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08);
   }
   .soon-badge {
-    display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .3px;
+    display: inline-block; font-size: 8px; font-weight: 800; letter-spacing: .3px;
     color: #e0b060; background: rgba(224,176,96,.12); border: 1px solid rgba(224,176,96,.3);
-    border-radius: 999px; padding: 3px 8px; margin-bottom: 10px;
+    border-radius: 999px; padding: 2px 6px; margin-bottom: 7px;
   }
   .soon-card .si {
-    width: 34px; height: 34px; border-radius: 10px; margin-bottom: 10px;
+    width: 26px; height: 26px; border-radius: 8px; margin-bottom: 7px;
     background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center;
   }
-  .soon-card .si svg { width: 18px; height: 18px; stroke: rgba(255,255,255,.6); }
-  .soon-card .st { font-size: 14px; font-weight: 800; color: #fff; }
-  .soon-card .sd { margin-top: 4px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.5; }
+  .soon-card .si svg { width: 14px; height: 14px; stroke: rgba(255,255,255,.6); }
+  .soon-card .st { font-size: 12.5px; font-weight: 800; color: #fff; }
+  .soon-card .sd { margin-top: 2px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
 
-  .credit { margin-top: auto; padding-top: 26px; text-align: center; }
-  .credit .line { width: 34px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 12px; }
-  .credit p { font-size: 10.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.7; letter-spacing: .2px; }
+  .credit { margin-top: auto; padding-top: 12px; text-align: center; }
+  .credit .line { width: 30px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 8px; }
+  .credit p { font-size: 9.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.5; letter-spacing: .2px; }
   .credit a { color: rgba(255,255,255,.35); text-decoration: none; }
 </style>
 </head>
