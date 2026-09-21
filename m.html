@@ -47,84 +47,89 @@
   }
   .status-pill i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.7); }
 
-  .hero-text { text-align: center; padding: 12px 20px 0; }
+  .hero-text { text-align: center; padding: 16px 20px 0; }
   .hero-sub { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; color: #e0b060; }
-  .hero-team { margin-top: 6px; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: .3px; }
+  .hero-team { margin-top: 8px; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: .3px; }
 
   /* ---------- 본문 ---------- */
-  .content { flex: 1; display: flex; flex-direction: column; padding: 12px 20px calc(env(safe-area-inset-bottom) + 10px); }
+  .content { flex: 1; display: flex; flex-direction: column; padding: 16px 20px calc(env(safe-area-inset-bottom) + 8px); }
 
   .menu { width: 100%; max-width: 440px; margin: 0 auto; }
 
   .dash-btn {
     position: relative; overflow: hidden;
-    display: flex; align-items: center; gap: 14px;
-    padding: 21px 20px 21px 18px; border-radius: 20px; text-decoration: none;
-    background: linear-gradient(160deg, #1b2a54 0%, #12203f 60%, #0c1730 100%);
-    border: 1px solid rgba(255,255,255,.10);
-    box-shadow: 0 16px 36px rgba(0,0,0,.5);
-    transition: transform .15s ease;
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 20px 20px 16px; border-radius: 16px; text-decoration: none;
+    background: #101c38;
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+    transition: transform .15s ease, border-color .15s ease;
   }
   .dash-btn:active { transform: scale(.98); }
   .dash-btn .icon {
-    flex: none; width: 46px; height: 46px; border-radius: 14px;
-    background: linear-gradient(135deg, rgba(224,176,96,.22), rgba(224,176,96,.06));
+    flex: none; width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(224,176,96,.10);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 0 0 1px rgba(224,176,96,.3);
+    box-shadow: inset 0 0 0 1px rgba(224,176,96,.25);
   }
-  .dash-btn .icon svg { width: 24px; height: 24px; }
+  .dash-btn .icon svg { width: 22px; height: 22px; }
   .dash-btn .text { flex: 1; min-width: 0; }
-  .dash-btn .label { font-size: 17px; font-weight: 900; color: #fff; letter-spacing: .1px; }
-  .dash-btn .desc { margin-top: 3px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.45); }
+  .dash-btn .label { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: .1px; }
+  .dash-btn .desc { margin-top: 4px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.4); }
   .dash-btn .arrow {
-    flex: none; width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, #ff7a2f, #ff5500);
-    color: #fff; display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 16px;
-    box-shadow: 0 8px 18px rgba(255,85,0,.4);
+    flex: none; display: flex; align-items: center; gap: 3px;
+    color: #e0b060; font-weight: 700; font-size: 11px; letter-spacing: .2px;
+    transition: transform .15s ease;
   }
+  .dash-btn .arrow svg { width: 14px; height: 14px; transition: transform .15s ease; }
+  .dash-btn:hover .arrow svg, .dash-btn:active .arrow svg { transform: translateX(3px); }
   .dash-btn .watermark {
-    position: absolute; bottom: 6px; right: 14px;
-    font-size: 8px; font-weight: 800; letter-spacing: 1.5px; color: rgba(255,255,255,.12);
+    position: absolute; bottom: 8px; right: 16px;
+    font-size: 8px; font-weight: 800; letter-spacing: 1.5px; color: rgba(255,255,255,.10);
   }
 
   /* ---------- 가치 4개 (카드 안에 통합, 버튼 아님) ---------- */
   .values {
     display: grid; grid-template-columns: repeat(4, 1fr);
-    margin: 10px auto 0; width: 100%; max-width: 440px;
+    margin: 16px auto 0; width: 100%; max-width: 440px;
     background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07);
-    border-radius: 16px; padding: 11px 4px;
+    border-radius: 16px; padding: 12px 4px;
   }
   .value-item { text-align: center; position: relative; padding: 0 2px; }
   .value-item + .value-item::before {
     content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 1px;
     background: rgba(255,255,255,.08);
   }
-  .value-item .vi { width: 24px; height: 24px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; }
+  .value-item .vi { width: 24px; height: 24px; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; }
   .value-item .vi svg { width: 15px; height: 15px; stroke: #e0b060; opacity: .85; }
   .value-item .vt { font-size: 11px; font-weight: 800; color: #fff; }
   .value-item .vd { margin-top: 2px; font-size: 8px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.3; }
 
-  /* ---------- 개발 중인 추가 기능 미리보기 ---------- */
-  .soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px auto 0; width: 100%; max-width: 440px; }
+  /* ---------- 추가 기능 카드 (메인 카드와 동일 디자인 시스템) ---------- */
+  .soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px auto 0; width: 100%; max-width: 440px; }
   .soon-card {
-    position: relative; padding: 12px 12px 11px; border-radius: 15px;
-    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08);
+    position: relative; padding: 14px 12px 12px; border-radius: 16px;
+    background: #101c38; border: 1px solid rgba(255,255,255,.08);
+    display: block; text-decoration: none;
+    transition: transform .15s ease;
   }
+  .soon-card:active { transform: scale(.98); }
   .soon-badge {
-    display: inline-block; font-size: 8px; font-weight: 800; letter-spacing: .3px;
-    color: #e0b060; background: rgba(224,176,96,.12); border: 1px solid rgba(224,176,96,.3);
-    border-radius: 999px; padding: 2px 6px; margin-bottom: 7px;
+    display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: .3px;
+    color: rgba(255,255,255,.5); background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px; padding: 2px 6px; margin-bottom: 8px;
   }
+  .soon-badge.live { color: #e0b060; background: rgba(224,176,96,.10); border-color: rgba(224,176,96,.25); }
   .soon-card .si {
-    width: 26px; height: 26px; border-radius: 8px; margin-bottom: 7px;
-    background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 8px; margin-bottom: 8px;
+    background: rgba(224,176,96,.10); display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(224,176,96,.2);
   }
-  .soon-card .si svg { width: 14px; height: 14px; stroke: rgba(255,255,255,.6); }
+  .soon-card .si svg { width: 13px; height: 13px; stroke: #e0b060; opacity: .9; }
   .soon-card .st { font-size: 12.5px; font-weight: 800; color: #fff; }
-  .soon-card .sd { margin-top: 2px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
+  .soon-card .sd { margin-top: 3px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
 
-  .credit { margin-top: 18px; text-align: center; }
+  .credit { margin-top: 16px; text-align: center; }
   .credit .line { width: 30px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 8px; }
   .credit p { font-size: 9.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.5; letter-spacing: .2px; }
   .credit a { color: rgba(255,255,255,.35); text-decoration: none; }
@@ -157,7 +162,7 @@
           <div class="label">실시간 대시보드 접속</div>
           <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
         </div>
-        <div class="arrow">→</div>
+        <div class="arrow">바로가기<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
         <div class="watermark">REAL-TIME<br>DASHBOARD</div>
       </a>
     </div>
@@ -186,12 +191,12 @@
     </div>
 
     <div class="soon-grid">
-      <div class="soon-card">
-        <div class="soon-badge">개발 중</div>
+      <a class="soon-card" href="calc.html">
+        <div class="soon-badge live">바로가기</div>
         <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg></div>
         <div class="st">계산기</div>
-        <div class="sd">단위 변환 · 공차 계산</div>
-      </div>
+        <div class="sd">위치도 · MMC 공차 계산</div>
+      </a>
       <div class="soon-card">
         <div class="soon-badge">개발 중</div>
         <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8Z"></path><path d="M14 2v6h6"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg></div>
