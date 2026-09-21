@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script>
+    (function () {
+      try {
+        if (/[?&]desktop=1(&|$)/.test(location.search)) {
+          sessionStorage.setItem('forceDesktop', '1');
+        } else if (sessionStorage.getItem('forceDesktop') !== '1') {
+          var ua = navigator.userAgent || '';
+          if (/Android.+Mobile|iPhone|iPod|Windows Phone/i.test(ua)) {
+            location.replace('m.html');
+          }
+        }
+      } catch (e) {}
+    })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DURING - SMART QUALITY PLATFORM</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            background-color: #000000;
+            color: #1a1a1a;
+            scroll-behavior: smooth;
+        }
+
+        body.scroll-locked {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* --------------------------------------------------
+           [상단 고정 네비게이션 바]
+        -------------------------------------------------- */
+        .kai-gnb {
+            position: fixed;
+            top: -70px;
+            left: 0;
+            width: 100vw;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4vw;
+            z-index: 10000;
+            /* Glassmorphism: 은은한 다크 톤 반투명 + 블러로, 배경(영상/이미지)이
+               밝든 어둡든 항상 메뉴 텍스트가 또렷하게 읽히도록 한다.
+               backdrop-filter 미지원 브라우저에서도 뒤 배경 rgba(0,0,0,.78)가
+               그대로 폴백 배경으로 작동한다. */
+            background: rgba(10, 10, 12, 0.78);
+            -webkit-backdrop-filter: blur(16px) saturate(150%);
+            backdrop-filter: blur(16px) saturate(150%);
+            border-bottom: 1px solid rgba(196, 143, 58, 0.55);
+            box-shadow: 0 1px 0 rgba(196, 143, 58, 0.2), 0 4px 20px rgba(0, 0, 0, 0.35);
+            transition: top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .kai-gnb::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 1px;
+            background: linear-gradient(90deg,
+                rgba(196, 143, 58, 0) 0%,
+                rgba(196, 143, 58, 0.9) 20%,
+                rgba(222, 168, 84, 1) 50%,
+                rgba(196, 143, 58, 0.9) 80%,
+                rgba(196, 143, 58, 0) 100%);
+            pointer-events: none;
+        }
+
+        .kai-gnb.visible {
+            top: 0;
+        }
+
+        .gnb-slogan {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 3px;
+            position: relative;
+            padding-left: 14px;
+        }
+
+        /* 로고 왼쪽의 짧은 금색 포인트 바 - 시선을 붙잡고 브랜드 마크처럼 보이게 */
+        .gnb-slogan::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 26px;
+            background: linear-gradient(180deg, #e0b060, #c8952e 50%, #8a5f1f);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(196, 143, 58, 0.6);
+        }
+
+        .gnb-slogan-main {
+            background: linear-gradient(90deg, #ffffff 0%, #ffffff 55%, #e0b060 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #ffffff; /* 그라데이션 미지원 브라우저 대비 */
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 12px rgba(196, 143, 58, 0.25);
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+            line-height: 1.1;
+            transition: letter-spacing 0.3s ease;
+        }
+
+        .gnb-slogan-sub {
+            color: #d1a250;
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 2.4px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+        }
+
+        .gnb-slogan:hover .gnb-slogan-main {
+            letter-spacing: 2px;
+        }
+
+        .gnb-menus {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .gnb-menus a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+            transition: color 0.3s ease;
+            position: relative;
+            padding-bottom: 6px;
+        }
+
+        .gnb-menus a:hover {
+            color: #ff5500;
+        }
+
+        /* 호버 시 중앙에서 양옆으로 퍼지는 골드 언더라인 */
+        .gnb-menus a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 1.5px;
+            background: linear-gradient(90deg, #d4af37, #fcf6ba);
+            transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(-50%);
+            box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+        }
+
+        .gnb-menus a:hover::after {
+            width: 100%;
+        }
+
+        .gnb-menus a.external-qms {
+            color: #f39c12;
+        }
+
+        .gnb-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .lang-btn {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 20px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+            cursor: pointer;
+        }
+
+
+        /* --------------------------------------------------
+           [섹션 2] 인트로 화면 (video2 단독, 로딩→메뉴→스크롤 순서 노출)
+        -------------------------------------------------- */
+        .section-second {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding-top: 70px;
+        }
+
+        /* 로딩 오버레이: 영상은 그대로 보이되, 그 위에 반투명 톤 + 로딩 표시만 얹어서
+           7초 동안 메뉴가 노출되지 않았음을 알려준다 (영상 자체를 가리지 않음) */
+        .intro-loading {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.12);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+        }
+
+        .intro-loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-spinner {
+            width: 34px;
+            height: 34px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ff5500;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+
+        .bg-blur-wrapper {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .bg-blur-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(35px) brightness(0.65) saturate(1.1);
+            transform: scale(1.15);
+            transition: filter 1s ease;
+        }
+
+        .second-video {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 70px);
+            object-fit: contain;
+            z-index: 3;
+            transition: filter 1s ease, opacity .18s ease;
+        }
+
+        /* 마지막 장면(로고+텍스트, 대칭 구도) 전환 시 풀스크린으로 채운다.
+           JS의 switchToLoop()에서 붙인다. */
+        .second-video.fs-cover {
+            object-fit: cover;
+        }
+
+        /* 2번째 영상이 종료되었을 때 부드럽게 밝아지는 스타일 */
+        .second-video.ended {
+            filter: brightness(1.08) contrast(1.02);
+        }
+
+        .bg-blur-video.ended {
+            filter: blur(35px) brightness(0.8) saturate(1.2);
+        }
+
+        /* 로고/문구 오버레이(logo-overlay.png)는 더 이상 쓰지 않는다.
+           video2_loop.mp4 자체에 로고·문구가 합성되어 있고, 부메랑 루프로
+           재인코딩해 줌인 튐 없이 끝-시작이 완벽히 이어지므로 별도 PNG
+           레이어가 필요 없다. */
+
+        .scroll-guide-btn {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        /* 배경이 밝은 금색 톤일 때도 아이콘이 묻히지 않도록,
+           아이콘 뒤에 은은한 다크 후광(비네트)을 깔아 항상 대비를 확보한다.
+           특정 색으로 덮는 게 아니라 "배경을 살짝 어둡게" 만드는 방식이라
+           어떤 영상 프레임 위에 있어도 자연스럽게 보인다. */
+        .scroll-guide-btn::before {
+            content: '';
+            position: absolute;
+            top: -22px; left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 130px;
+            background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0) 75%);
+            filter: blur(3px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .scroll-guide-btn.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-guide-text {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85), 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .scroll-mouse {
+            width: 24px;
+            height: 38px;
+            border: 2px solid #d1a250;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            padding-top: 6px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.55), 0 0 12px rgba(196, 143, 58, .35);
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+        }
+
+        .scroll-mouse-wheel {
+            width: 3px;
+            height: 8px;
+            background: #d1a250;
+            border-radius: 2px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+            animation: scrollWheel 1.6s infinite;
+        }
+
+        @keyframes scrollWheel {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(10px); }
+        }
+
+
+        /* --------------------------------------------------
+           [섹션 3] 세 번째 화면
+        -------------------------------------------------- */
+        .section-dashboard {
+            width: 100vw;
+            height: 100vh;
+            background-color: #f4f6f9;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 85px 2vw 2vh 2vw;
+            overflow: hidden;
+        }
+
+        .platform-container {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 2vh;
+        }
+
+        .brand-title {
+            font-size: clamp(24px, 3.2vw, 36px);
+            font-weight: 900;
+            color: #111;
+            letter-spacing: 2.5px;
+            margin-bottom: 3px;
+        }
+
+        .brand-subtitle {
+            font-size: clamp(11px, 1.2vw, 14px);
+            font-weight: 600;
+            color: #a87c3f;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .main-grid {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(16px, 2vw, 24px);
+            width: 100%;
+        }
+
+        .portal-card {
+            width: clamp(210px, 19vw, 250px);
+            height: clamp(330px, 48vh, 400px);
+            background: #ffffff;
+            border: 1px solid #e1e4e8;
+            border-radius: 18px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            text-decoration: none;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: #e1e4e8;
+            transition: background 0.3s ease;
+        }
+
+        .portal-top .portal-num {
+            font-size: 13px; font-weight: 700; color: #ff5500; margin-bottom: 8px; letter-spacing: 1px;
+        }
+        .portal-top h3 {
+            font-size: clamp(18px, 2vw, 22px); font-weight: 800; color: #111; margin-bottom: 4px;
+        }
+        .portal-top .portal-en {
+            font-size: 11px; font-weight: 600; color: #888; letter-spacing: 0.5px; line-height: 1.3;
+        }
+
+        .portal-bottom { display: flex; flex-direction: column; gap: 10px; }
+        .portal-role { font-size: 11px; font-weight: 700; color: #555; letter-spacing: 0.5px; }
+        .portal-action {
+            width: 36px; height: 36px; border-radius: 50%; background: #f7f9fc;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; color: #111; transition: all 0.3s ease;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-6px);
+            border-color: #ff5500;
+            box-shadow: 0 20px 40px rgba(255, 85, 0, 0.12);
+        }
+        .portal-card:hover::before { background: #ff5500; }
+        .portal-card:hover .portal-action { background: #ff5500; color: #ffffff; transform: translateX(4px); }
+
+        .center-portal {
+            width: clamp(500px, 50vw, 680px);
+            height: clamp(350px, 50vh, 420px);
+            background: #111;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .center-video {
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.5s ease, filter 0.5s ease;
+            filter: brightness(1.12) contrast(1.03) saturate(1.08);
+        }
+
+        .center-overlay-default {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 45%);
+            display: flex; flex-direction: column; justify-content: space-between; padding: 22px 26px; z-index: 2;
+        }
+
+        .live-badge {
+            align-self: flex-end; background: rgba(255, 85, 0, 0.9); color: white;
+            font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .live-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 6px #fff; }
+
+        .default-text h2 { color: #fff; font-size: clamp(20px, 2.2vw, 25px); font-weight: 800; margin-bottom: 3px; }
+        .default-text p { color: rgba(255, 255, 255, 0.7); font-size: 12px; letter-spacing: 1px; }
+
+        .center-overlay-hover {
+            position: absolute; inset: 0;
+            background: rgba(10, 13, 18, 0.82); backdrop-filter: blur(8px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+            opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; transform: scale(0.98); z-index: 3; padding: 20px; text-align: center;
+        }
+
+        .center-portal:hover .center-overlay-hover { opacity: 1; transform: scale(1); }
+        .center-portal:hover .center-video { transform: scale(1.05); }
+
+        .hover-box-title { color: rgba(255, 255, 255, 0.6); font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+        .hover-box-main { color: #ffffff; font-size: clamp(22px, 2.8vw, 28px); font-weight: 900; }
+        .hover-enter-btn {
+            margin-top: 6px; background: #ff5500; color: #ffffff; font-size: 14px; font-weight: 700;
+            padding: 10px 24px; border-radius: 30px; display: inline-flex; align-items: center; gap: 8px;
+        }
+
+        .system-status-bar {
+            width: 100%; max-width: 1300px; display: flex; justify-content: center; align-items: center;
+            gap: 30px; padding: 10px 0; font-size: 11px; font-weight: 600; color: #666;
+            letter-spacing: 1px; border-top: 1px solid #e1e4e8; margin-top: 1.5vh;
+        }
+        .status-item { display: flex; align-items: center; gap: 6px; }
+        .status-dot { width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+
+        @media (max-width: 900px) {
+            .portal-card { display: none; }
+            .center-portal { width: 100%; max-width: 550px; }
+            .gnb-menus { display: none; }
+        }
+
+        /* --------------------------------------------------
+           [점검 모드] 임시점검 화면 / 관리자 인증 모달
+        -------------------------------------------------- */
+        .section-maintenance {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .section-maintenance.active {
+            display: flex;
+        }
+
+        .maint-icon {
+            font-size: 44px;
+            margin-bottom: 18px;
+            opacity: 0.9;
+        }
+
+        .maint-title {
+            color: #ffffff;
+            font-size: clamp(22px, 3vw, 32px);
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .maint-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            line-height: 1.7;
+            letter-spacing: 0.3px;
+        }
+
+        .maint-desc b {
+            color: #d1a250;
+        }
+
+        /* 관리자 인증 모달 (한/영 버튼을 통해서만 진입) */
+        .admin-pw-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+        }
+
+        .admin-pw-overlay.show {
+            display: flex;
+        }
+
+        .admin-pw-box {
+            width: 280px;
+            background: #111418;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 22px 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .admin-pw-label {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .admin-pw-box input {
+            width: 100%;
+            background: #1b1f26;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 14px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .admin-pw-box input:focus {
+            border-color: #d1a250;
+        }
+
+        .admin-pw-error {
+            display: none;
+            color: #ff5555;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .admin-pw-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .admin-pw-actions button {
+            flex: 1;
+            padding: 9px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        #adminPwCancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        #adminPwConfirm {
+            background: #c8952e;
+            color: #fff;
+        }
+
+        /* 점검 모드 중: 한/영 버튼(=숨은 관리자 진입점)만 남기고 GNB 메뉴는 숨김
+           (수입검사/정밀측정 카드는 계속 그대로 노출) */
+        body.maintenance-mode .gnb-menus {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body class="scroll-locked">
+
+    <!-- [상단 고정 네비게이션 바] -->
+    <header class="kai-gnb" id="kaiGnb">
+        <a href="#" class="gnb-slogan">
+            <span class="gnb-slogan-main">품질경영팀 PORTAL</span>
+            <span class="gnb-slogan-sub">SMART QUALITY PLATFORM</span>
+        </a>
+        <ul class="gnb-menus">
+            <li><a href="preview.html?section=team">TEAM</a></li>
+            <li><a href="preview.html?section=quality">QUALITY</a></li>
+            <li><a href="preview.html?section=viewer3d">PRODUCT</a></li>
+            <li><a href="measure.html">MEASUREMENT</a></li>
+            <li><a href="https://qms.e-during.co.kr/" target="_blank" class="external-qms">QMS ↗</a></li>
+            <li><a href="uncertainty.html">UNCERTAINTY</a></li>
+            <li><a href="preview.html?section=notice">NOTICEBOARD</a></li>
+            <li><a href="#sectionDashboard">DASHBOARD</a></li>
+        </ul>
+        <div class="gnb-right">
+            <button class="lang-btn">KR / EN</button>
+        </div>
+    </header>
+
+    <!-- [인트로 섹션] video2 단독 재생: 0~7초 로딩 → 9초 메뉴 → 14초 스크롤 노출 -->
+    <section class="section-second active" id="sectionSecond">
+        <div class="bg-blur-wrapper">
+            <!-- 노트북/키보드가 나오는 인트로 장면은 빼고, 처음부터 로고+웨이브
+                 장면(video2_loop.mp4)으로 바로 시작한다. 배경 블러용도 같은
+                 파일을 사용한다(별도 저용량 버전 없음). -->
+            <video class="bg-blur-video" id="bgVid2" src="video/video2_loop.mp4" muted playsinline preload="auto" poster="video/video2_loop_poster.jpg"></video>
+        </div>
+
+        <video class="second-video fs-cover" id="vid2" src="video/video2_loop.mp4" playsinline preload="auto" poster="video/video2_loop_poster.jpg">
+            브라우저가 비디오를 지원하지 않습니다.
+        </video>
+
+        <div class="intro-loading" id="introLoading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">LOADING</div>
+        </div>
+
+        <a href="#sectionDashboard" class="scroll-guide-btn" id="scrollBtn">
+            <span class="scroll-guide-text">SCROLL DOWN</span>
+            <span class="scroll-mouse"><span class="scroll-mouse-wheel"></span></span>
+        </a>
+    </section>
+
+    <!-- [점검 모드 화면] 인트로 영상 대신 노출 -->
+    <section class="section-maintenance" id="sectionMaintenance">
+        <div class="maint-icon">🛠</div>
+        <h1 class="maint-title">임시점검중입니다</h1>
+        <p class="maint-desc">현재 시스템 점검이 진행 중입니다.<br><b>대시보드는 정상적으로 이용하실 수 있습니다.</b></p>
+        <a href="#sectionDashboard" class="scroll-guide-btn active" id="maintScrollBtn">
+            <span class="scroll-guide-text">SCROLL DOWN</span>
+            <span class="scroll-mouse"><span class="scroll-mouse-wheel"></span></span>
+        </a>
+    </section>
+
+    <!-- 관리자 인증 모달 (상단 한/영 버튼 클릭 시 노출) -->
+    <div class="admin-pw-overlay" id="adminPwOverlay">
+        <div class="admin-pw-box">
+            <div class="admin-pw-label">관리자 인증</div>
+            <input type="password" id="adminPwInput" placeholder="비밀번호 입력" autocomplete="off">
+            <div class="admin-pw-error" id="adminPwError">⚠️ 비밀번호가 일치하지 않습니다.</div>
+            <div class="admin-pw-actions">
+                <button id="adminPwCancel" type="button">취소</button>
+                <button id="adminPwConfirm" type="button">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [섹션 3] 세 번째 화면 -->
+    <section class="section-dashboard" id="sectionDashboard">
+        <div class="platform-container">
+            <header class="header-section">
+                <h1 class="brand-title">DURING</h1>
+                <div class="brand-subtitle">Smart Quality Platform</div>
+            </header>
+
+            <main class="main-grid">
+                <!-- 01 QUALITY 카드 -->
+                <a href="admin_inspection.html" class="portal-card">
+                    <div class="portal-top">
+                        <div class="portal-num">01</div>
+                        <h3>수입검사</h3>
+                        <div class="portal-en">QUALITY<br>MANAGEMENT</div>
+                    </div>
+                    <div class="portal-bottom">
+                        <div class="portal-role">ADMINISTRATOR</div>
+                        <div class="portal-action">→</div>
+                    </div>
+                </a>
+
+                <!-- 가운데 라이브 포털 카드 (DASHBOARD) -->
+                <a href="dashboard.html" class="center-portal">
+                    <video class="center-video" src="video/video3.mp4" autoplay muted loop playsinline preload="metadata"></video>
+                    <div class="center-overlay-default">
+                        <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+                        <div class="default-text">
+                            <h2>REALTIME DASHBOARD</h2>
+                            <p>DURING QUALITY CONTROL CENTER</p>
+                        </div>
+                    </div>
+                    <div class="center-overlay-hover">
+                        <span class="hover-box-title">Smart Quality Control Center</span>
+                        <div class="hover-box-main">실시간 대시보드</div>
+                        <div class="hover-enter-btn"><span>▶ ENTER DASHBOARD</span></div>
+                    </div>
+                </a>
+
+                <!-- 02 MEASUREMENT 카드 -->
+                <a href="admin_measure.html" class="portal-card">
+                    <div class="portal-top">
+                        <div class="portal-num">02</div>
+                        <h3>정밀측정</h3>
+                        <div class="portal-en">MEASUREMENT<br>CONTROL</div>
+                    </div>
+                    <div class="portal-bottom">
+                        <div class="portal-role">ADMINISTRATOR</div>
+                        <div class="portal-action">→</div>
+                    </div>
+                </a>
+            </main>
+        </div>
+
+        <footer class="system-status-bar">
+            <div class="status-item"><span class="status-dot"></span>SYSTEM ONLINE</div>
+            <div class="status-item"><span class="status-dot"></span>DATABASE CONNECTED</div>
+            <div class="status-item"><span class="status-dot"></span>MONITORING ACTIVE</div>
+        </footer>
+    </section>
+
+    <script src="js/gitlab-config.js"></script>
+    <script src="js/gitlab-sync.js"></script>
+    <script>
+      (async function () {
+        // ⚠️ 최우선 안전장치: 아래 어떤 코드에서 에러가 나더라도(영상 로직 등)
+        // 이 코드는 스크립트 맨 앞이라 무조건 먼저 실행되고, 13초 뒤에는
+        // 무조건 scroll-locked를 풀어준다.
+        setTimeout(() => {
+            document.body.classList.remove('scroll-locked');
+        }, 13000);
+
+        const sectionSecond = document.getElementById('sectionSecond');
+        const vid2 = document.getElementById('vid2');
+        const bgVid2 = document.getElementById('bgVid2');
+        const introLoading = document.getElementById('introLoading');
+        const scrollBtn = document.getElementById('scrollBtn');
+        const gnb = document.getElementById('kaiGnb');
+
+        // 전체적으로 장면 전환이 너무 빠르다는 피드백에 따라, 영상 자체를 살짝
+        // 느리게(0.80배속) 재생해 각 장면이 조금 더 여유 있게 느껴지도록 한다.
+        const PLAYBACK_RATE = 0.80;
+        vid2.playbackRate = PLAYBACK_RATE;
+        bgVid2.playbackRate = PLAYBACK_RATE;
+
+        // 소리 켜기 버튼은 제거하고, 처음부터 음소거로 재생한다.
+        // vid2는 최초 1회만 loop=false로 재생해 'ended' 이벤트로 메뉴/스크롤
+        // 노출 타이밍을 잡고, 그 뒤로는 switchToLoop()에서 네이티브 loop로 전환한다.
+        const startIntroPlayback = () => {
+            vid2.muted = true;
+            vid2.playbackRate = PLAYBACK_RATE;
+            vid2.loop = false;
+            vid2.play().catch(() => {});
+        };
+
+        // 노트북/키보드가 나오는 인트로 장면은 빼고, 처음부터 로고+웨이브
+        // (video2_loop.mp4)만 재생한다. LOADING 화면을 짧게 띄워뒀다가
+        // 걷어내면서 메뉴·SCROLL DOWN을 순서대로 노출한다.
+        const LOADING_END_MS = 1600;
+        const MENU_SHOW_MS = 1600;
+
+        const LOOP_SRC = 'video/video2_loop.mp4';
+
+        let introTimers = [];
+        const clearIntroTimers = () => {
+            introTimers.forEach(clearTimeout);
+            introTimers = [];
+        };
+
+
+        // v3(재업로드): 새로 만든 video2_loop.mp4는 시작/끝 프레임이 자연스럽게
+        // 이어지는 seamless 루프라서, 더 이상 "끝나면 검게 페이드아웃 →
+        // 되감기 → 페이드인"하는 수동 트릭(끊길 때 화면이 잠깐 깜빡이는,
+        // 마치 정전됐다 켜지는 듯한 효과)이 필요 없다. 그냥 video.loop = true로
+        // 네이티브 루프에 맡기면 끊김 없이 이어진다.
+
+        // 전체화면 로고 + 흐르는 웨이브(LOOP_SRC)로 전환해 무한 반복시킨다.
+        // 마지막 장면(로고+텍스트, 중앙 정렬 대칭 구도)은 화면비가 어떻든 잘려도
+        // 의미 있는 내용이 잘릴 위험이 없어 fs-cover(풀스크린)를 적용한다.
+        // 영상 파일 자체가 바뀌는 경우(다른 소스 → LOOP_SRC)에만 살짝
+        // 페이드아웃했다가 페이드인하는 것으로 감싸서 자연스럽게 이어지게 한다.
+        // 이미 LOOP_SRC로 재생 중이라면(현재 구조에서는 항상 그렇다) 전환 없이
+        // loop 속성만 켜준다.
+        const LOOP_FADE_MS = 260;
+        const switchToLoop = (video) => {
+            const alreadyLoop = video.src.endsWith(LOOP_SRC);
+            const applyLoopState = () => {
+                if (!alreadyLoop) {
+                    video.removeAttribute('poster');
+                    video.src = LOOP_SRC;
+                }
+                video.loop = true;
+                video.muted = true;
+                video.playbackRate = PLAYBACK_RATE;
+                video.classList.add('fs-cover');
+                video.play().catch(() => {});
+            };
+
+            if (alreadyLoop) {
+                applyLoopState();
+                return;
+            }
+
+            video.style.transition = `opacity ${LOOP_FADE_MS}ms ease`;
+            video.style.opacity = '0';
+            setTimeout(() => {
+                applyLoopState();
+                requestAnimationFrame(() => {
+                    video.style.opacity = '1';
+                });
+            }, LOOP_FADE_MS);
+        };
+
+        // 로고("품질경영팀 PORTAL") 클릭 시: 인트로 재생 중(스크롤 잠김) 이더라도
+        // 무조건 잠금을 풀고 즉시 맨 위로 스크롤한다.
+        // (대시보드 등 다른 페이지에서 파라미터 없이 index.html로 돌아왔을 때
+        //  인트로가 처음부터 재생되며 스크롤이 잠겨있는 상태에서도 항상 동작하도록)
+        // 인트로 섹션을 "끝난 직후" 상태로 고정한다: 배경(bgVid2)·메인(vid2) 둘 다
+        // LOOP_SRC로 전환해 전체화면 로고 장면을 무한 반복 — 다른 복귀 경로와 동일한 연출.
+        const freezeSectionSecondAtEnd = () => {
+            switchToLoop(bgVid2);
+            switchToLoop(vid2);
+            vid2.classList.add('ended');
+            bgVid2.classList.add('ended');
+        };
+
+        const gnbSlogan = document.querySelector('.gnb-slogan');
+        if (gnbSlogan) {
+            gnbSlogan.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // 점검 모드 중에는 영상 섹션을 되살리지 말고, 점검 화면(맨 위)으로만 이동
+                if (maintenanceActive) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+
+                clearIntroTimers();
+                introLoading.classList.add('hidden');
+
+                // skip=true로 진입해 인트로 섹션(section-second)이 display:none으로
+                // 완전히 사라진 상태였다면, 다시 보이도록 복원한다.
+                // (사라진 상태에서는 "맨 위로 스크롤"해봐야 갈 곳이 없어서 안 움직이는 것처럼 보임)
+                if (sectionSecond.style.display === 'none') {
+                    sectionSecond.style.display = '';
+                    freezeSectionSecondAtEnd();
+                }
+
+                document.body.classList.remove('scroll-locked');
+                gnb.classList.add('visible');
+                scrollBtn.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // v2(재업로드): 노트북→웨이브 전환 후 "DURING SMART QUALITY PLATFORM" 정지 화면은
+        // LOOP_SRC(video2_loop.mp4) 한 파일로 미리 잘라뒀으므로, 네이티브 loop 속성만
+        // 켜주면 된다 — 위쪽 switchToLoop()가 그 역할을 한다 (별도 함수 불필요).
+
+        // 수입검사/정밀측정 등 하위 페이지에서 "돌아가기"로 넘어온 경우
+        // (index.html?skip=true) 인트로를 건너뛰고 바로 카드 선택 화면(섹션3)으로 이동
+        //
+        // preview.html(품질경영팀 PORTAL 콘텐츠 페이지)의 "← PORTAL" 버튼으로
+        // 돌아온 경우 (index.html?skip=video2) 에는 카드 선택 화면까지 건너뛰지 않고,
+        // 인트로 영상이 끝난 직후의 "사용화면"(밝아진 정지화면 + SCROLL DOWN 안내)으로
+        // 바로 복귀시킨다.
+        const urlParams = new URLSearchParams(window.location.search);
+        const skipParam = urlParams.get('skip');
+        const skipIntro = skipParam === 'true';
+        const returnFromPreview = skipParam === 'video2';
+
+        // --------------------------------------------------
+        // [점검 모드 확인] GitLab data/site_status.json 조회
+        // 실패 시(토큰 미설정/네트워크 오류 등)에는 안전하게
+        // "점검 아님(false)"으로 처리하여 정상 화면이 뜨도록 함
+        //
+        // ⚠️ 로컬 테스트용 폴백: GitLab 연결이 안 되는 동안에도
+        // (토큰 미설정 등) 이 브라우저에서 최소한 동작을 확인해볼 수
+        // 있도록 localStorage에도 상태를 저장/조회한다.
+        // GitLab이 정상 연결되면 이 폴백은 쓰이지 않는다(진짜 공유 저장소가 우선).
+        // --------------------------------------------------
+        const LOCAL_MAINT_KEY = 'site_maintenance_status_fallback';
+        let gitlabSiteStatusOk = true;
+        window.addEventListener('gitlab-sync-error', (e) => {
+            if (e.detail && e.detail.name === 'site_status.json') {
+                gitlabSiteStatusOk = false;
+            }
+        });
+
+        const sectionMaintenance = document.getElementById('sectionMaintenance');
+        let maintenanceActive = false;
+        try {
+            const status = await GitLabSync.pullJSON('site_status.json', { maintenance: false });
+            maintenanceActive = !!(status && status.maintenance);
+        } catch (e) {
+            maintenanceActive = false;
+        }
+
+        if (!gitlabSiteStatusOk) {
+            // GitLab 연결 실패 → 이 브라우저에 저장된 로컬 폴백 값으로 대체
+            try {
+                const local = JSON.parse(localStorage.getItem(LOCAL_MAINT_KEY) || 'null');
+                if (local && typeof local.maintenance === 'boolean') {
+                    maintenanceActive = local.maintenance;
+                }
+            } catch (e) { /* 무시 */ }
+        }
+
+        if (maintenanceActive) {
+            // 인트로 영상 대신 점검 화면 노출, 대시보드는 스크롤로 접근 가능
+            clearIntroTimers();
+            document.body.classList.add('maintenance-mode');
+            introLoading.classList.add('hidden');
+            sectionSecond.style.display = 'none';
+            sectionMaintenance.classList.add('active');
+
+            document.body.classList.remove('scroll-locked');
+            gnb.classList.add('visible');
+            window.scrollTo(0, 0);
+        } else if (skipIntro) {
+            // 인트로 섹션을 완전히 숨겨서 스크롤 흐름에서 제외
+            sectionSecond.style.display = 'none';
+
+            // 카드 선택 화면 즉시 노출 + 스크롤 잠금 해제 + 상단 GNB 표시
+            document.body.classList.remove('scroll-locked');
+            gnb.classList.add('visible');
+            window.scrollTo(0, 0);
+        } else if (returnFromPreview) {
+            // 로딩 화면은 즉시 제거
+            introLoading.classList.add('hidden');
+
+            // 배경(bgVid2)·메인(vid2) 둘 다 곧바로 루프 화면으로 전환한다.
+            switchToLoop(bgVid2);
+            switchToLoop(vid2);
+
+            vid2.classList.add('ended');
+            bgVid2.classList.add('ended');
+            scrollBtn.classList.add('active');
+
+            // 스크롤 잠금 해제 + 상단 GNB 표시 (카드 선택 화면으로는 건너뛰지 않음)
+            document.body.classList.remove('scroll-locked');
+            gnb.classList.add('visible');
+            window.scrollTo(0, 0);
+        } else {
+            // 일반 진입: video2 재생 시작과 동시에 로딩 화면 노출
+            startIntroPlayback();
+            // 배경용 bgVid2는 UI 노출 타이밍과 무관하므로 처음부터 네이티브 loop로 재생
+            bgVid2.loop = true;
+            bgVid2.play().catch(() => {});
+
+            introTimers.push(setTimeout(() => {
+                introLoading.classList.add('hidden');
+            }, LOADING_END_MS));
+
+            // 메뉴가 먼저 나오고, 그 직후(0.5초 뒤) SCROLL DOWN이 나오도록 순서를 맞춘다.
+            introTimers.push(setTimeout(() => {
+                gnb.classList.add('visible');
+            }, MENU_SHOW_MS));
+
+            introTimers.push(setTimeout(() => {
+                scrollBtn.classList.add('active');
+                document.body.classList.remove('scroll-locked');
+            }, MENU_SHOW_MS + 500));
+        }
+
+        // 영상 종료 시: 정지 화면 대신 마지막 로고 확장 구간을 무한 반복시킨다.
+        // (스크롤/메뉴 노출 등 UI 전환은 최초 1회만 실행)
+        let introEndedOnce = false;
+        vid2.addEventListener('ended', () => {
+            if (!introEndedOnce) {
+                introEndedOnce = true;
+                clearIntroTimers();
+
+                vid2.classList.add('ended');
+                bgVid2.classList.add('ended');
+
+                introLoading.classList.add('hidden');
+                gnb.classList.add('visible');
+                scrollBtn.classList.add('active');
+                document.body.classList.remove('scroll-locked');
+
+                switchToLoop(bgVid2);
+                switchToLoop(vid2);
+            }
+        });
+        scrollBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.body.classList.remove('scroll-locked');
+            document.getElementById('sectionDashboard').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > window.innerHeight * 0.4) {
+                gnb.classList.add('visible');
+            }
+        });
+
+        // --------------------------------------------------
+        // [숨은 관리자 진입점] 상단 "KR / EN" 버튼
+        // 겉모습은 그대로 두고, 클릭 시 비밀번호를 입력하면
+        // 점검 모드를 ON/OFF 토글한다.
+        // --------------------------------------------------
+        const ADMIN_PASSWORD = '920312';
+        const langBtn = document.querySelector('.lang-btn');
+        const pwOverlay = document.getElementById('adminPwOverlay');
+        const pwInput = document.getElementById('adminPwInput');
+        const pwError = document.getElementById('adminPwError');
+        const pwConfirm = document.getElementById('adminPwConfirm');
+        const pwCancel = document.getElementById('adminPwCancel');
+
+        function openPwModal() {
+            pwError.style.display = 'none';
+            pwInput.value = '';
+            pwOverlay.classList.add('show');
+            setTimeout(() => pwInput.focus(), 50);
+        }
+
+        function closePwModal() {
+            pwOverlay.classList.remove('show');
+        }
+
+        async function submitAdminPw() {
+            if (pwInput.value !== ADMIN_PASSWORD) {
+                pwError.style.display = 'block';
+                pwInput.value = '';
+                pwInput.focus();
+                return;
+            }
+            const nextState = !maintenanceActive;
+            pwConfirm.disabled = true;
+
+            gitlabSiteStatusOk = true; // 이번 시도 결과를 새로 판단하기 위해 초기화
+            await GitLabSync.pushJSON(
+                'site_status.json',
+                { maintenance: nextState, updatedAt: new Date().toISOString() },
+                nextState ? '점검모드 ON' : '점검모드 OFF'
+            );
+
+            // 실제로 GitLab에 반영됐는지 다시 읽어서 검증한다.
+            // (파일이 없어서 404가 나는 "정상" 상황과, 쓰기 권한 부족 등으로
+            //  커밋 자체가 실패한 "비정상" 상황을 이 방법으로 구분한다.)
+            let verified = false;
+            try {
+                const check = await GitLabSync.pullJSON('site_status.json', null);
+                verified = !!(check && check.maintenance === nextState);
+            } catch (e) {
+                verified = false;
+            }
+
+            if (!verified) {
+                // GitLab 저장 실패 → 로컬 테스트용 폴백으로 이 브라우저에만 저장
+                try {
+                    localStorage.setItem(LOCAL_MAINT_KEY, JSON.stringify({ maintenance: nextState }));
+                } catch (e) { /* 무시 */ }
+                console.warn('[점검모드] GitLab 저장 실패 - 이 브라우저에만 임시 반영됨(로컬 폴백)');
+
+                pwError.textContent = '⚠️ GitLab 저장 실패 — 이 브라우저에만 임시 반영됩니다. 토큰의 쓰기 권한(write_repository, Developer 이상)을 확인해주세요.';
+                pwError.style.color = '#ffb020';
+                pwError.style.display = 'block';
+
+                setTimeout(() => {
+                    closePwModal();
+                    location.reload();
+                }, 2200);
+                return;
+            }
+
+            closePwModal();
+            location.reload();
+        }
+
+        if (langBtn) {
+            langBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openPwModal();
+            });
+        }
+        pwCancel.addEventListener('click', closePwModal);
+        pwOverlay.addEventListener('click', (e) => {
+            if (e.target === pwOverlay) closePwModal();
+        });
+        pwConfirm.addEventListener('click', submitAdminPw);
+        pwInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') submitAdminPw();
+        });
+      })();
+    </script>
+
+</body>
+</html>
