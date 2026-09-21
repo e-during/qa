@@ -19,44 +19,36 @@
   body {
     min-height: 100vh; min-height: 100dvh;
     display: flex; flex-direction: column;
-    background: #060b1c;
+    padding: calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 22px);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(70,100,190,.32) 0%, rgba(6,11,28,0) 55%),
+      linear-gradient(180deg, #0b1636 0%, #081026 55%, #060b1c 100%);
     overflow-x: hidden;
   }
 
-  /* ---------- 히어로 (풀블리드 이미지) ---------- */
-  .hero {
-    position: relative; width: 100%; height: 42vh; min-height: 260px; max-height: 380px;
-    padding-top: env(safe-area-inset-top);
-  }
-  .hero img {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-    filter: saturate(1.05);
-  }
-  .hero::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(180deg, rgba(6,11,28,.15) 0%, rgba(6,11,28,.05) 40%, #060b1c 100%);
-  }
+  .top-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
   .status-pill {
-    position: absolute; top: calc(env(safe-area-inset-top) + 14px); right: 16px; z-index: 2;
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(6,11,28,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
-    padding: 7px 12px; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.85);
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px; padding: 7px 12px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.8);
   }
   .status-pill i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.7); }
 
-  /* ---------- 본문 ---------- */
-  .content {
-    flex: 1; display: flex; flex-direction: column;
-    margin-top: -34px; position: relative; z-index: 1;
-    padding: 0 20px calc(env(safe-area-inset-bottom) + 22px);
+  /* 사진을 자르지 않고 그대로 보여주는 카드 */
+  .hero-card {
+    width: 100%; border-radius: 20px; overflow: hidden;
+    background: #0d1730;
+    box-shadow: 0 16px 36px rgba(0,0,0,.45);
+    border: 1px solid rgba(255,255,255,.08);
   }
+  .hero-card img { display: block; width: 100%; height: auto; }
 
-  .brand { text-align: center; }
-  .brand-sub { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; opacity: 0; animation: fadeUp .6s ease .05s forwards; }
-  .brand-team { margin-top: 8px; font-size: 19px; font-weight: 900; color: #fff; letter-spacing: .3px; opacity: 0; animation: fadeUp .6s ease .15s forwards; }
+  .brand { text-align: center; margin-top: 22px; }
+  .brand-sub { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; }
+  .brand-team { margin-top: 8px; font-size: 19px; font-weight: 900; color: #fff; letter-spacing: .3px; }
 
-  .menu { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; margin: 26px auto 0; width: 100%; max-width: 460px; }
+  .menu { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; margin: 24px auto 0; width: 100%; max-width: 460px; }
 
   .dash-btn {
     position: relative; overflow: hidden;
@@ -67,7 +59,6 @@
     border: 1px solid rgba(255,255,255,.14);
     box-shadow: 0 20px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);
     transition: transform .18s ease, box-shadow .18s ease;
-    opacity: 0; animation: fadeUp .6s ease .28s forwards;
   }
   .dash-btn:active { transform: scale(.97); box-shadow: 0 10px 24px rgba(0,0,0,.5); }
   .dash-btn .icon {
@@ -90,47 +81,40 @@
   .sparkle.s1 { top: 16px; right: 18px; width: 14px; height: 14px; }
   .sparkle.s2 { bottom: 44px; right: 30px; width: 9px; height: 9px; opacity: .4; animation-delay: 1.1s; }
 
-  .foot { text-align: center; margin-top: 16px; opacity: 0; animation: fadeUp .6s ease .4s forwards; }
-  .foot a { color: rgba(255,255,255,.42); font-size: 12px; font-weight: 700; text-decoration: none; padding: 8px 14px; display: inline-block; }
-
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes twinkle { 0%,100% { opacity: .25; transform: scale(.85); } 50% { opacity: .85; transform: scale(1); } }
 </style>
 </head>
 <body>
 
-  <div class="hero">
-    <img src="images/hero.jpg" alt="DURING 사옥 전경">
+  <div class="top-row">
     <div class="status-pill"><i></i>SYSTEM ONLINE</div>
   </div>
 
-  <div class="content">
-    <div class="brand">
-      <div class="brand-sub">SMART QUALITY PLATFORM</div>
-      <div class="brand-team">품질경영팀 PORTAL</div>
-    </div>
+  <div class="hero-card">
+    <img src="images/hero.jpg" alt="DURING 사옥 전경">
+  </div>
 
-    <div class="menu">
-      <a class="dash-btn" href="m_dashboard.html">
-        <svg class="sparkle s1" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#e0b060"/></svg>
-        <svg class="sparkle s2" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#ffffff"/></svg>
-        <div class="icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
-            <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
-            <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
-            <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
-          </svg>
-        </div>
-        <div class="label">실시간 대시보드 접속</div>
-        <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
-        <div class="arrow">→</div>
-      </a>
-    </div>
+  <div class="brand">
+    <div class="brand-sub">SMART QUALITY PLATFORM</div>
+    <div class="brand-team">품질경영팀 PORTAL</div>
+  </div>
 
-    <div class="foot">
-      <a href="index.html?desktop=1">PC 버전으로 보기</a>
-    </div>
+  <div class="menu">
+    <a class="dash-btn" href="m_dashboard.html">
+      <svg class="sparkle s1" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#e0b060"/></svg>
+      <svg class="sparkle s2" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#ffffff"/></svg>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+          <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+          <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+        </svg>
+      </div>
+      <div class="label">실시간 대시보드 접속</div>
+      <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
+      <div class="arrow">→</div>
+    </a>
   </div>
 
 </body>
