@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>품질경영팀 PORTAL</title>
+<meta name="theme-color" content="#0b1636">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="품질경영팀">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html, body { height: 100%; background: #060b1c; color: #fff; }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 22px);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(70,100,190,.32) 0%, rgba(6,11,28,0) 55%),
+      linear-gradient(180deg, #0b1636 0%, #081026 55%, #060b1c 100%);
+    overflow-x: hidden;
+  }
+
+  .top-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px; padding: 7px 12px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.8);
+  }
+  .status-pill i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.7); }
+
+  /* 사진을 자르지 않고 그대로 보여주는 카드 */
+  .hero-card {
+    width: 100%; border-radius: 20px; overflow: hidden;
+    background: #0d1730;
+    box-shadow: 0 16px 36px rgba(0,0,0,.45);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .hero-card img { display: block; width: 100%; height: auto; }
+
+  .brand { text-align: center; margin-top: 22px; }
+  .brand-sub { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; }
+  .brand-team { margin-top: 8px; font-size: 19px; font-weight: 900; color: #fff; letter-spacing: .3px; }
+
+  .menu { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; margin: 24px auto 0; width: 100%; max-width: 460px; }
+
+  .dash-btn {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 32px 22px 28px; border-radius: 26px; text-decoration: none;
+    background: linear-gradient(160deg, rgba(44,65,128,.55) 0%, rgba(20,30,63,.55) 60%, rgba(11,21,51,.6) 100%);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 20px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .dash-btn:active { transform: scale(.97); box-shadow: 0 10px 24px rgba(0,0,0,.5); }
+  .dash-btn .icon {
+    width: 48px; height: 48px; border-radius: 15px;
+    background: linear-gradient(135deg, rgba(224,176,96,.22), rgba(224,176,96,.06));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(224,176,96,.35);
+  }
+  .dash-btn .icon svg { width: 25px; height: 25px; }
+  .dash-btn .label { font-size: 17.5px; font-weight: 800; letter-spacing: .3px; color: #fff; }
+  .dash-btn .desc { margin-top: -6px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: .2px; }
+  .dash-btn .arrow {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff7a2f, #ff5500);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 17px;
+    box-shadow: 0 8px 20px rgba(255,85,0,.45);
+  }
+  .sparkle { position: absolute; opacity: .7; animation: twinkle 2.6s ease-in-out infinite; }
+  .sparkle.s1 { top: 16px; right: 18px; width: 14px; height: 14px; }
+  .sparkle.s2 { bottom: 44px; right: 30px; width: 9px; height: 9px; opacity: .4; animation-delay: 1.1s; }
+
+  @keyframes twinkle { 0%,100% { opacity: .25; transform: scale(.85); } 50% { opacity: .85; transform: scale(1); } }
+</style>
+</head>
+<body>
+
+  <div class="top-row">
+    <div class="status-pill"><i></i>SYSTEM ONLINE</div>
+  </div>
+
+  <div class="hero-card">
+    <img src="images/hero.jpg" alt="DURING 사옥 전경">
+  </div>
+
+  <div class="brand">
+    <div class="brand-sub">SMART QUALITY PLATFORM</div>
+    <div class="brand-team">품질경영팀 PORTAL</div>
+  </div>
+
+  <div class="menu">
+    <a class="dash-btn" href="m_dashboard.html">
+      <svg class="sparkle s1" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#e0b060"/></svg>
+      <svg class="sparkle s2" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#ffffff"/></svg>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+          <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+          <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+        </svg>
+      </div>
+      <div class="label">실시간 대시보드 접속</div>
+      <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
+      <div class="arrow">→</div>
+    </a>
+  </div>
+
+</body>
+</html>
