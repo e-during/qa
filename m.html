@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>품질경영팀 PORTAL</title>
+<meta name="theme-color" content="#0a0a0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="품질경영팀">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html, body { height: 100%; background: #0a0a0c; color: #fff; }
+  body {
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: calc(env(safe-area-inset-top) + 28px) 22px calc(env(safe-area-inset-bottom) + 22px);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(196,143,58,.28) 0%, rgba(196,143,58,0) 60%),
+      #0a0a0c;
+  }
+  .brand { text-align: center; margin-top: 8vh; }
+  .brand-bar { width: 44px; height: 3px; margin: 0 auto 18px; border-radius: 2px; background: linear-gradient(90deg, #e0b060, #c8952e, #8a5f1f); box-shadow: 0 0 10px rgba(196,143,58,.6); }
+  .brand-main { font-size: 30px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(90deg, #fff 0%, #fff 55%, #e0b060 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #fff; }
+  .brand-sub { margin-top: 8px; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; }
+  .brand-team { margin-top: 26px; font-size: 15px; font-weight: 700; color: rgba(255,255,255,.75); letter-spacing: .5px; }
+
+  .menu { display: flex; flex-direction: column; gap: 12px; margin: 0 auto; width: 100%; max-width: 420px; }
+  .menu-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: 76px; padding: 0 22px; border-radius: 16px; text-decoration: none;
+    background: #ffffff; color: #111; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    transition: transform .15s ease;
+  }
+  .menu-btn:active { transform: scale(.98); }
+  .menu-btn .en { font-size: 10.5px; font-weight: 800; letter-spacing: 1.4px; color: #a87c3f; }
+  .menu-btn .ko { margin-top: 3px; font-size: 19px; font-weight: 900; }
+  .menu-btn .arrow { width: 38px; height: 38px; border-radius: 50%; background: #ff5500; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; }
+  .menu-note { text-align: center; font-size: 11.5px; color: rgba(255,255,255,.5); font-weight: 600; line-height: 1.6; margin-top: 4px; }
+
+  .foot { text-align: center; }
+  .foot a { color: rgba(255,255,255,.45); font-size: 12px; font-weight: 700; text-decoration: none; padding: 10px 14px; display: inline-block; }
+  .status { margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: rgba(255,255,255,.4); font-weight: 700; letter-spacing: 1px; }
+  .status i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.6); }
+</style>
+</head>
+<body>
+
+  <div class="brand">
+    <div class="brand-bar"></div>
+    <div class="brand-main">DURING</div>
+    <div class="brand-sub">SMART QUALITY PLATFORM</div>
+    <div class="brand-team">품질경영팀 PORTAL</div>
+  </div>
+
+  <div class="menu">
+    <a class="menu-btn" href="m_dashboard.html">
+      <div>
+        <div class="en">REALTIME DASHBOARD</div>
+        <div class="ko">실시간 대시보드</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+    <div class="menu-note">엑셀 업로드·관리 기능은 PC에서만 사용할 수 있습니다.</div>
+  </div>
+
+  <div class="foot">
+    <a href="index.html?desktop=1">PC 버전으로 보기</a><br>
+    <span class="status"><i></i>SYSTEM ONLINE</span>
+  </div>
+
+</body>
+</html>

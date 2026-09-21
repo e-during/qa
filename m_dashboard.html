@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>품질경영팀 대시보드</title>
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="품질경영팀">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root {
+    --bg: #f2f3f5; --card: #fff; --line: #e6e6e6;
+    --text: #111; --sub: #777; --red: #e62e2d;
+    --precision: #6b4fd6; --inspection: #0091a8;
+    --safe-b: env(safe-area-inset-bottom);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--text); padding-bottom: calc(96px + var(--safe-b)); overflow-x: hidden; }
+
+  /* 상단 고정 헤더 */
+  .app-head {
+    position: sticky; top: 0; z-index: 50;
+    background: #111; color: #fff;
+    padding: calc(env(safe-area-inset-top) + 10px) 16px 12px;
+  }
+  .head-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .home-btn { color: #fff; text-decoration: none; font-size: 12px; font-weight: 800; padding: 8px 12px; border: 1px solid rgba(255,255,255,.3); border-radius: 18px; white-space: nowrap; }
+  .head-title { flex: 1; text-align: center; min-width: 0; }
+  .head-title .s { font-size: 9px; font-weight: 800; letter-spacing: 1.2px; color: #d1a250; }
+  .head-title .m { font-size: 15px; font-weight: 900; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .live { font-size: 10px; font-weight: 900; color: #ff6b6a; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(.85); opacity: .75; } 50% { transform: scale(1.15); opacity: 1; } }
+
+  .seg { display: flex; margin-top: 12px; background: #2a2a2c; border-radius: 12px; padding: 3px; }
+  .seg button { flex: 1; min-height: 40px; border: none; background: transparent; color: #aaa; font-size: 14px; font-weight: 800; border-radius: 10px; }
+  .seg button.active { color: #fff; }
+  .seg button[data-dept="precision"].active { background: var(--precision); }
+  .seg button[data-dept="inspection"].active { background: var(--inspection); }
+
+  .wrap { padding: 14px 14px 0; }
+
+  .sync { font-size: 11px; color: #888; font-weight: 600; line-height: 1.7; margin-bottom: 12px; }
+  .sync .warn { color: var(--red); font-weight: 800; display: block; }
+
+  /* 측정기 가동상태 (읽기 전용) */
+  .equip { display: flex; gap: 8px; margin-bottom: 12px; }
+  .equip-chip { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .equip-chip .n { font-size: 11px; font-weight: 800; color: #333; }
+  .equip-chip .st { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 900; }
+  .equip-chip .st::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .equip-chip .st.run { color: #1a9247; }
+  .equip-chip .st.run::before { box-shadow: 0 0 0 3px rgba(26,146,71,.18); animation: pulse 1.2s ease-in-out infinite; }
+  .equip-chip .st.stop { color: var(--red); }
+  .equip-chip .t { font-size: 10px; color: #aaa; font-weight: 600; margin-left: 4px; }
+
+  /* TODAY SUMMARY */
+  .summary { background: #fff; border: 1px solid #1a1a1a; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+  .summary-head { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; font-weight: 800; color: var(--sub); letter-spacing: .5px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; text-align: center; }
+  .summary-grid .l { font-size: 11px; font-weight: 700; color: var(--sub); }
+  .summary-grid .v { margin-top: 3px; font-size: 20px; font-weight: 900; }
+  .summary-grid .acc .l, .summary-grid .acc .v { color: var(--red); }
+
+  /* KPI */
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 13px 14px; }
+  .kpi-title { font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+  .kpi-val { display: flex; align-items: baseline; gap: 2px; margin-bottom: 9px; }
+  .kpi-val b { font-size: 26px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+  .kpi-val span { font-size: 13px; font-weight: 800; }
+  .kpi-val.acc b, .kpi-val.acc span { color: var(--red); }
+  .bar { height: 5px; background: #ececec; border-radius: 3px; overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 3px; background: #111; }
+  .bar i.acc { background: linear-gradient(90deg, #ff5a58, var(--red)); }
+
+  /* 필터 */
+  .filters { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 4px; margin-bottom: 14px; }
+  .f-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .f-label { flex: 0 0 52px; font-size: 12px; font-weight: 800; color: var(--sub); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { min-height: 36px; padding: 0 14px; border: none; background: #ebebeb; color: #444; font-size: 13px; font-weight: 800; border-radius: 18px; }
+  .chip.active { background: #222; color: #fff; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; min-height: 40px; padding: 0 14px; border: 1px solid #ddd; background: #fff; color: #555; font-size: 13px; font-weight: 800; border-radius: 20px; white-space: nowrap; }
+  .tab .badge { margin-left: 5px; background: #e0e0e0; color: #333; font-size: 11px; padding: 2px 7px; border-radius: 10px; }
+  .tab.active { background: #111; color: #fff; border-color: #111; }
+  .tab.active .badge { background: #fff; color: #111; }
+
+  /* 업무 카드 */
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .item { background: #fff; border: 1px solid #ececec; border-radius: 12px; padding: 12px 14px; }
+  .item.urgent { border-left: 4px solid var(--red); }
+  .item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .badge-st { display: inline-block; padding: 4px 9px; font-size: 11px; font-weight: 800; border-radius: 5px; white-space: nowrap; }
+  .badge-st.urgent { background: #ffebeb; color: var(--red); }
+  .badge-st.ing { background: #e8f4ff; color: #0066cc; }
+  .badge-st.hold { background: #fff4e5; color: #ff9800; }
+  .badge-st.done { background: #e7f9ee; color: #1a9247; }
+  .prio { font-size: 11.5px; font-weight: 800; color: #666; }
+  .prio.hi { color: var(--red); }
+  .item-name { margin-top: 8px; font-size: 14.5px; font-weight: 800; line-height: 1.4; word-break: break-all; }
+  .item-meta { margin-top: 3px; font-size: 12px; color: var(--sub); font-weight: 500; word-break: break-all; }
+  .item-foot { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #555; }
+  .empty { text-align: center; padding: 34px 0; color: var(--sub); font-weight: 700; font-size: 13px; background: #fff; border-radius: 12px; border: 1px solid #ececec; }
+  .more-note { text-align: center; font-size: 11.5px; color: #999; font-weight: 600; margin-top: 10px; }
+
+  .pc-link { display: block; text-align: center; margin: 22px 0 8px; font-size: 12.5px; font-weight: 700; color: #888; text-decoration: none; padding: 10px; }
+
+  /* 챗봇 (바텀시트) */
+  .chat-fab {
+    position: fixed; right: 16px; bottom: calc(16px + var(--safe-b)); z-index: 90;
+    height: 54px; padding: 0 20px 0 16px; border-radius: 28px; border: none;
+    background: #111; color: #fff; font-size: 14px; font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.3);
+  }
+  .chat-fab .ic { font-size: 20px; }
+  .chat-dim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 95; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+  .chat-dim.open { opacity: 1; pointer-events: auto; }
+  .chat-panel {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    height: 82vh; height: 82dvh; background: #fff;
+    border-radius: 18px 18px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.2);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(105%); transition: transform .25s ease;
+  }
+  .chat-panel.open { transform: translateY(0); }
+  .chat-head { padding: 14px 16px; border-bottom: 2px solid #000; display: flex; justify-content: space-between; align-items: center; }
+  .chat-sub { font-size: 9.5px; font-weight: 800; color: #888; letter-spacing: .5px; margin-bottom: 3px; }
+  .chat-main { font-size: 15px; font-weight: 800; }
+  .chat-actions { display: flex; gap: 8px; }
+  .chat-icon-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid #ccc; background: #fff; font-size: 15px; color: #333; }
+  .chat-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #fafafa; }
+  .chat-options { padding: 12px 14px calc(12px + var(--safe-b)); border-top: 1px solid #e0e0e0; background: #fff; display: flex; gap: 8px; flex-wrap: wrap; max-height: 34vh; overflow-y: auto; }
+
+  .cw-msg-row { display: flex; }
+  .cw-msg-row.bot { justify-content: flex-start; }
+  .cw-msg-row.user { justify-content: flex-end; }
+  .cw-bubble { max-width: 90%; padding: 11px 14px; font-size: 14px; line-height: 1.55; font-weight: 600; word-break: break-all; }
+  .cw-bubble.bot { background: #f0f0f0; color: #111; border-radius: 4px 14px 14px 14px; }
+  .cw-bubble.user { background: #111; color: #fff; border-radius: 14px 4px 14px 14px; }
+  .cw-bubble b { font-weight: 900; }
+  .cw-bubble b.accent { color: var(--red); }
+  .cw-stat-list, .cw-rank-list { list-style: none; margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .cw-stat-list li { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 9px 11px; font-size: 13px; font-weight: 700; }
+  .cw-stat-sub { display: block; font-size: 11.5px; color: var(--sub); font-weight: 500; margin-top: 2px; }
+  .cw-stat-more { margin-top: 6px; font-size: 12px; color: var(--sub); font-weight: 600; }
+  .cw-chart-box { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 6px 4px 2px; margin-top: 10px; overflow-x: auto; max-width: 100%; }
+  .cw-chart-box svg, .cw-chart-box canvas, .cw-chart-box img { max-width: 100%; height: auto; }
+  .cw-rank-list li { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 9px 11px; font-size: 13px; font-weight: 800; }
+  .cw-rank-list .medal { font-size: 15px; width: 20px; text-align: center; }
+  .cw-rank-list .rname { flex: 1; }
+  .cw-rank-list .rcount { color: var(--red); font-weight: 900; }
+  .cw-empty-note { margin-top: 8px; font-size: 12px; color: var(--sub); font-weight: 600; background: #fff8f2; border: 1px dashed #e0c9b8; border-radius: 8px; padding: 8px 10px; }
+  .cw-typing-dots { display: inline-flex; gap: 4px; align-items: center; padding: 4px 2px; }
+  .cw-typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #999; animation: blink 1.2s infinite ease-in-out; }
+  .cw-typing-dots span:nth-child(2) { animation-delay: .2s; }
+  .cw-typing-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100% { opacity: .25; } 40% { opacity: 1; } }
+  .cw-opt-btn { min-height: 42px; background: #ebebeb; border: none; color: #333; padding: 0 16px; font-size: 13.5px; font-weight: 700; border-radius: 21px; }
+  .cw-opt-btn:active { background: #dcdcdc; }
+  .cw-opt-btn.primary { background: #111; color: #fff; }
+</style>
+</head>
+<body>
+
+<header class="app-head">
+  <div class="head-row">
+    <a class="home-btn" href="m.html">← 홈</a>
+    <div class="head-title">
+      <div class="s">QUALITY MANAGEMENT TEAM</div>
+      <div class="m">품질경영팀 업무 현황</div>
+    </div>
+    <span class="live">LIVE</span>
+  </div>
+  <div class="seg" id="deptGroup">
+    <button data-dept="precision" class="active">정밀 측정</button>
+    <button data-dept="inspection">수입검사</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="sync" id="syncInfo"></div>
+
+  <div class="equip" id="equipBox">
+    <div class="equip-chip"><div class="n">3차원 측정기 #1</div><div class="st run" data-eq="m1">가동중</div><span class="t" data-eq-t="m1"></span></div>
+    <div class="equip-chip"><div class="n">3차원 측정기 #2</div><div class="st run" data-eq="m2">가동중</div><span class="t" data-eq-t="m2"></span></div>
+  </div>
+
+  <section class="summary">
+    <div class="summary-head"><span>TODAY SUMMARY</span></div>
+    <div class="summary-grid">
+      <div><div class="l" id="sumLabel1">오늘예정</div><div class="v" id="sumVal1">-</div></div>
+      <div><div class="l" id="sumLabel2">진행중</div><div class="v" id="sumVal2">-</div></div>
+      <div class="acc"><div class="l" id="sumLabel3">긴급 대응</div><div class="v" id="sumVal3">-</div></div>
+    </div>
+  </section>
+
+  <section class="kpi-grid" id="kpiGrid"></section>
+
+  <section class="filters">
+    <div class="f-row">
+      <div class="f-label">상태</div>
+      <div class="chips" id="statusGroup">
+        <button class="chip active" data-status="all">전체</button>
+        <button class="chip" data-status="pending">진행중</button>
+        <button class="chip" data-status="done">완료</button>
+      </div>
+    </div>
+    <div class="f-row">
+      <div class="f-label">우선순위</div>
+      <div class="chips" id="prioGroup">
+        <button class="chip active" data-prio="all">전체</button>
+        <button class="chip" data-prio="urgent">긴급</button>
+        <button class="chip" data-prio="normal">보통</button>
+      </div>
+    </div>
+  </section>
+
+  <nav class="tabs" id="tabHeader">
+    <button class="tab active" data-tab="todo"><span class="tl">오늘 해야할 업무</span><span class="badge" id="badge-todo">0</span></button>
+    <button class="tab" data-tab="overdue"><span class="tl">장기미완</span><span class="badge" id="badge-overdue">0</span></button>
+    <button class="tab" data-tab="done"><span class="tl">최근완료</span><span class="badge" id="badge-done">0</span></button>
+    <button class="tab" data-tab="history"><span class="tl">전체 이력</span><span class="badge" id="badge-history">0</span></button>
+  </nav>
+
+  <section class="list" id="list"></section>
+
+  <a class="pc-link" href="dashboard.html?desktop=1">PC 버전으로 보기</a>
+</main>
+
+<!-- 챗봇 -->
+<div class="chat-dim" id="chatDim" onclick="toggleChat(false)"></div>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div>
+      <div class="chat-sub">QUALITY MANAGEMENT BOT</div>
+      <div class="chat-main">🤖 업무 챗봇</div>
+    </div>
+    <div class="chat-actions">
+      <button class="chat-icon-btn" onclick="restartChat()" title="처음부터">↺</button>
+      <button class="chat-icon-btn" onclick="toggleChat(false)" title="닫기">✕</button>
+    </div>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-options" id="optionsWrap"></div>
+</div>
+<button class="chat-fab" id="chatFab" onclick="toggleChat(true)"><span class="ic">💬</span>챗봇</button>
+
+<script>
+  // chatbot-core.js에 대시보드 위젯과 동일한 CSS 클래스명을 알려준다 (스타일만 모바일용으로 재정의)
+  window.QC_CHATBOT_UI = {
+    msgRow: 'cw-msg-row', bubble: 'cw-bubble', chartBox: 'cw-chart-box',
+    statList: 'cw-stat-list', statSub: 'cw-stat-sub', statMore: 'cw-stat-more',
+    rankList: 'cw-rank-list', emptyNote: 'cw-empty-note', typingDots: 'cw-typing-dots', optBtn: 'cw-opt-btn'
+  };
+</script>
+<script src="js/github-config.js"></script>
+<script src="js/github-sync.js"></script>
+<script src="js/gitlab-storage.js"></script>
+<script src="js/chatbot-core.js"></script>
+
+<script>
+  // ============================================================
+  //  유틸 (dashboard.html과 동일 로직)
+  // ============================================================
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toYmd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function getMonday(d){ const x=new Date(d); x.setHours(0,0,0,0); const day=x.getDay(); x.setDate(x.getDate()+(day===0?-6:1-day)); return x; }
+  function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
+  function daysBetween(a,b){ return Math.floor((new Date(b)-new Date(a))/86400000); }
+  function loadJsonLocal(key){ try{ return JSON.parse(localStorage.getItem(key))||[]; }catch(e){ return []; } }
+
+  // 모바일은 외부망 접속을 고려해 GitHub(외부용 저장소)를 먼저 조회하고,
+  // 응답이 없을 때만(사내망에 있을 때 등) 기존 GitLab을 대체로 조회합니다.
+  const GITLAB_MEASURE_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('measure.json', null)) || gitlabLoadLatestVersionedSync('data/measure');
+  const GITLAB_INSPECTION_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('inspection.json', null)) || gitlabLoadLatestVersionedSync('data/inspection');
+  const GITLAB_SYNC_OK = !!(GITLAB_MEASURE_DATA || GITLAB_INSPECTION_DATA);
+
+  function loadJson(key){
+    switch(key){
+      case 'qc_qms_data_v1': return (GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.qms) || loadJsonLocal(key);
+      case 'qc_provisional_v1': return (GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.prov) || loadJsonLocal(key);
+      case 'qi_qms_data_v1': return (GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.qms) || loadJsonLocal(key);
+      default: return loadJsonLocal(key);
+    }
+  }
+
+  const now = new Date();
+  const today = toYmd(now);
+  const thisMonday = getMonday(now);
+  const weekStart = toYmd(thisMonday);
+  const weekEnd = toYmd(addDays(thisMonday,4));
+  const curMonthPrefix = today.slice(0,7);
+
+  function fmtTime(iso){
+    if(!iso) return ''; const d=new Date(iso); if(isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false});
+  }
+  function fmtDateTime(iso){
+    if(!iso) return '--.-- --:--'; const d=new Date(iso); if(isNaN(d.getTime())) return '--.-- --:--';
+    const p=n=>String(n).padStart(2,'0');
+    return `${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+
+  document.getElementById('syncInfo').innerHTML =
+    `📊 정밀 엑셀 ${fmtDateTime(GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.updatedAt)} · 📋 수입 엑셀 ${fmtDateTime(GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.updatedAt)}`
+    + (GITLAB_SYNC_OK ? '' : '<span class="warn">⚠ 서버 연결 실패 (이 기기의 로컬 캐시 표시 중)</span>');
+
+  // ============================================================
+  //  정밀측정 데이터
+  // ============================================================
+  const qcQms = loadJson('qc_qms_data_v1');
+  const qcProv = loadJson('qc_provisional_v1');
+
+  const pcAll = [
+    ...qcQms.filter(r => !(r.item||'').includes('삭제')).map(r => ({customer:r.customer,item:r.item,dueDate:r.dueDate,completeDate:r.completeDate,assignee:r.assignee,urgent:false})),
+    ...qcProv.map(p => ({customer:p.customer,item:p.item,dueDate:p.dueDate||p.planDate,completeDate:p.completed?p.completedAt:'',assignee:p.assignee,urgent:!!p.urgent&&!p.completed}))
+  ];
+  const pcIncomplete = pcAll.filter(r => !r.completeDate);
+  const pcComplete = pcAll.filter(r => !!r.completeDate);
+  const pcToday = pcIncomplete.filter(r => r.dueDate === today);
+  const pcProgress = pcIncomplete;
+  const pcRegistered = qcProv.filter(p => !p.completed).length;
+  const pcUrgent = pcIncomplete.filter(r => r.urgent);
+  const pcOverdue = pcIncomplete.filter(r => r.dueDate && daysBetween(r.dueDate, today) >= 30);
+  const pcDoneWeek = pcComplete.filter(r => r.completeDate >= weekStart && r.completeDate <= weekEnd).length;
+  const pcProgWeek = pcIncomplete.filter(r => r.dueDate >= weekStart && r.dueDate <= weekEnd).length;
+  const pcDelayWeek = pcIncomplete.filter(r => r.dueDate && r.dueDate < today).length;
+  const pcWeekTotal = pcDoneWeek + pcProgWeek + pcDelayWeek;
+  const pcWeekRate = pcWeekTotal > 0 ? Math.round((pcDoneWeek/pcWeekTotal)*100) : 0;
+  const pcRecentDone = [...pcComplete].sort((a,b)=>(b.completeDate||'').localeCompare(a.completeDate||'')).slice(0,20);
+
+  const pcUrgentKeys = new Set(pcUrgent.map(r => r.customer+r.item));
+  const pcTodayOnly = pcToday.filter(r => !pcUrgentKeys.has(r.customer+r.item));
+  const pcShownKeys = new Set([...pcUrgent, ...pcTodayOnly].map(r => r.customer+r.item));
+  const pcProgOnly = pcProgress.filter(r => r.dueDate >= weekStart && r.dueDate <= weekEnd && !pcShownKeys.has(r.customer+r.item));
+  const pcTodoCombined = [
+    ...pcUrgent.map(r => ({...r, tag:'urgent'})),
+    ...pcTodayOnly.map(r => ({...r, tag:'today'})),
+    ...pcProgOnly.map(r => ({...r, tag:'prog'}))
+  ].slice(0,20);
+
+  // ============================================================
+  //  수입검사 데이터
+  // ============================================================
+  const qiQms = loadJson('qi_qms_data_v1');
+  let qiManual = (GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.manual) || null;
+  if (!qiManual) { try{ qiManual = JSON.parse(localStorage.getItem('qi_manual_complete_v1'))||{}; }catch(e){ qiManual = {}; } }
+  function qiRowKey(r){ return `${r.sheetName||''}|${r.no}|${r.partNo}|${r.lot}|${r.receiveDate}`; }
+  function qiComplete(r){ return !!r.inspectDate || !!qiManual[qiRowKey(r)]; }
+  function qiCompletedAt(r){ return r.inspectDate || (qiManual[qiRowKey(r)] ? qiManual[qiRowKey(r)].completedAt : ''); }
+
+  const qiMonthTarget = qiQms.filter(r => (r.receiveDate||'').startsWith(curMonthPrefix));
+  const qiMonthDone = qiMonthTarget.filter(r => qiComplete(r));
+  const qiMonthPending = qiMonthTarget.filter(r => !qiComplete(r));
+  const qiWeekDone = qiQms.filter(r => qiComplete(r) && qiCompletedAt(r) >= weekStart && qiCompletedAt(r) <= weekEnd)
+    .sort((a,b)=>qiCompletedAt(b).localeCompare(qiCompletedAt(a)));
+  const qiTodayIn = qiQms.filter(r => r.receiveDate === today);
+  const qiMonthRate = qiMonthTarget.length > 0 ? Math.round((qiMonthDone.length/qiMonthTarget.length)*100) : 0;
+  const qiUrgent = qiMonthPending.filter(r => r.receiveDate && daysBetween(r.receiveDate, today) >= 5);
+
+  // ============================================================
+  //  상태 / 렌더링
+  // ============================================================
+  let currentDept = 'precision';
+  let currentTab = 'todo';
+  let statusFilter = 'all';
+  let prioFilter = 'all';
+
+  function scaledBar(v,max){ return Math.max(4, Math.min(100, Math.round((v/max)*100))); }
+  function kpiCard(tone,value,unit,label,pct){
+    const acc = tone === 'accent';
+    return `<div class="kpi-card"><div class="kpi-title">${label}</div>
+      <div class="kpi-val ${acc?'acc':''}"><b>${value}</b><span>${unit}</span></div>
+      <div class="bar"><i class="${acc?'acc':''}" style="width:${pct}%"></i></div></div>`;
+  }
+
+  function renderKpi(){
+    const g = document.getElementById('kpiGrid');
+    if (currentDept === 'precision'){
+      g.innerHTML = [
+        kpiCard('n', pcToday.length,'건','오늘 예정',scaledBar(pcToday.length,10)),
+        kpiCard('n', pcProgress.length,'건','진행중',scaledBar(pcProgress.length,30)),
+        kpiCard('n', pcRegistered,'건','가등록',scaledBar(pcRegistered,10)),
+        kpiCard('accent', pcUrgent.length,'건','긴급',scaledBar(pcUrgent.length,10)),
+        kpiCard('n', pcOverdue.length,'건','장기미완',scaledBar(pcOverdue.length,10)),
+        kpiCard('accent', pcWeekRate,'%','이번주 완료율',pcWeekRate)
+      ].join('');
+    } else {
+      g.innerHTML = [
+        kpiCard('n', qiMonthTarget.length,'건','이번 달 대상',scaledBar(qiMonthTarget.length,50)),
+        kpiCard('n', qiWeekDone.length,'건','이번 주 완료',scaledBar(qiWeekDone.length,30)),
+        kpiCard('n', qiMonthPending.length,'건','미완료',scaledBar(qiMonthPending.length,30)),
+        kpiCard('accent', qiMonthRate,'%','완료율',qiMonthRate)
+      ].join('');
+    }
+  }
+
+  function renderSummary(){
+    const set = (i,l,v) => { document.getElementById('sumLabel'+i).textContent = l; document.getElementById('sumVal'+i).textContent = v + '건'; };
+    if (currentDept === 'precision'){ set(1,'오늘예정',pcToday.length); set(2,'진행중',pcProgress.length); set(3,'긴급 대응',pcUrgent.length); }
+    else { set(1,'오늘입고',qiTodayIn.length); set(2,'이번주완료',qiWeekDone.length); set(3,'이번달 미완료',qiMonthPending.length); }
+  }
+
+  function buildRows(){
+    if (currentDept === 'precision'){
+      return {
+        todo: pcTodoCombined.map(r => ({
+          statusClass: r.tag==='urgent'?'urgent':'ing', statusLabel: r.tag==='urgent'?'긴급':(r.tag==='today'?'오늘예정':'진행중'),
+          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent: r.tag==='urgent', completed:false })),
+        overdue: pcOverdue.map(r => ({
+          statusClass:'hold', statusLabel:'장기미완', name: r.item||'(품명없음)',
+          meta: `${r.customer||'-'} · ${daysBetween(r.dueDate,today)}일 경과`, assignee: r.assignee||'-', date: r.dueDate||'-', urgent:true, completed:false })),
+        done: pcRecentDone.map(r => ({
+          statusClass:'done', statusLabel:'완료', name: r.item||'(품명없음)', meta: r.customer||'-',
+          assignee: r.assignee||'-', date: r.completeDate||'-', urgent:false, completed:true })),
+        history: [...pcAll].sort((a,b)=>(b.dueDate||'').localeCompare(a.dueDate||'')).map(r => ({
+          statusClass: r.completeDate?'done':'hold', statusLabel: r.completeDate?'완료':'미완료',
+          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent:!!r.urgent, completed:!!r.completeDate }))
+      };
+    }
+    const vm = r => [r.customer, r.vendor].filter(Boolean).join(' · ') || '-';
+    return {
+      todo: qiTodayIn.map(r => ({
+        statusClass: qiComplete(r)?'done':'ing', statusLabel: qiComplete(r)?'완료':'미완료', name: r.item||'(품명없음)', meta: vm(r),
+        assignee: r.assignee||'-', date: r.receiveDate||'-', urgent: qiUrgent.includes(r), completed: qiComplete(r) })),
+      overdue: qiMonthPending.map(r => ({
+        statusClass:'hold', statusLabel:'미완료', name: r.item||'(품명없음)', meta: vm(r),
+        assignee: r.assignee||'-', date: r.receiveDate||'-', urgent: qiUrgent.includes(r), completed:false })),
+      done: qiWeekDone.map(r => ({
+        statusClass:'done', statusLabel:'완료', name: r.item||'(품명없음)', meta: vm(r),
+        assignee: r.assignee||'-', date: qiCompletedAt(r)||'-', urgent:false, completed:true })),
+      history: [...qiQms].sort((a,b)=>(b.receiveDate||'').localeCompare(a.receiveDate||'')).map(r => ({
+        statusClass: qiComplete(r)?'done':'hold', statusLabel: qiComplete(r)?'완료':'미완료', name: r.item||'(품명없음)',
+        meta: [r.partNo, r.customer, r.vendor].filter(Boolean).join(' · ') || '-', assignee: r.assignee||'-', date: r.receiveDate||'-',
+        urgent: qiMonthPending.includes(r) && qiUrgent.includes(r), completed: qiComplete(r) }))
+    };
+  }
+
+  function updateTabs(rowsByTab){
+    const labels = currentDept === 'precision'
+      ? { todo:'오늘 해야할 업무', overdue:'장기미완', done:'최근완료', history:'전체 이력' }
+      : { todo:'오늘 입고', overdue:'이번달 미완료', done:'이번주 완료', history:'전체 이력' };
+    document.querySelectorAll('#tabHeader .tab').forEach(btn => {
+      const k = btn.dataset.tab;
+      btn.querySelector('.tl').textContent = labels[k];
+      document.getElementById('badge-'+k).textContent = rowsByTab[k].length;
+    });
+  }
+
+  function applyFilters(rows){
+    return rows.filter(r => {
+      if (statusFilter === 'pending' && r.completed) return false;
+      if (statusFilter === 'done' && !r.completed) return false;
+      if (prioFilter === 'urgent' && !r.urgent) return false;
+      if (prioFilter === 'normal' && r.urgent) return false;
+      return true;
+    });
+  }
+
+  const MAX_ROWS = 40;
+  function renderList(){
+    const rowsByTab = buildRows();
+    updateTabs(rowsByTab);
+    const all = applyFilters(rowsByTab[currentTab]);
+    const rows = all.slice(0, MAX_ROWS);
+    const list = document.getElementById('list');
+    if (!rows.length){ list.innerHTML = '<div class="empty">표시할 데이터가 없습니다.</div>'; return; }
+    const dateLabel = currentTab === 'done' ? '완료일' : (currentDept === 'precision' ? '완료요청일' : '입고일');
+    list.innerHTML = rows.map(r => `
+      <div class="item ${r.urgent?'urgent':''}">
+        <div class="item-top">
+          <span class="badge-st ${r.statusClass}">${esc(r.statusLabel)}</span>
+          <span class="prio ${r.urgent?'hi':''}">${r.urgent?'우선순위 높음':'우선순위 보통'}</span>
+        </div>
+        <div class="item-name">${esc(r.name)}</div>
+        <div class="item-meta">${esc(r.meta)}</div>
+        <div class="item-foot"><span>👤 ${esc(r.assignee)}</span><span>${dateLabel} ${esc(r.date)}</span></div>
+      </div>`).join('')
+      + (all.length > MAX_ROWS ? `<div class="more-note">최근 ${MAX_ROWS}건만 표시 (전체 ${all.length}건)</div>` : '');
+  }
+
+  function renderAll(){ renderKpi(); renderSummary(); renderList(); }
+
+  // 측정기 가동상태: 읽기 전용 표시
+  function renderEquip(){
+    let s = {};
+    try { s = (GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.equipStatus) || JSON.parse(localStorage.getItem('qc_equip_status_v1') || '{}'); } catch(e){ s = {}; }
+    ['m1','m2'].forEach(m => {
+      const st = s[m] === 'stop' ? 'stop' : 'run';
+      const el = document.querySelector(`[data-eq="${m}"]`);
+      el.className = 'st ' + st;
+      el.textContent = st === 'run' ? '가동중' : '비가동';
+      const t = fmtTime(s[m+'_at']);
+      document.querySelector(`[data-eq-t="${m}"]`).textContent = t ? `(${t})` : '';
+    });
+  }
+
+  // ============================================================
+  //  이벤트
+  // ============================================================
+  function bindGroup(id, sel, onPick){
+    document.querySelectorAll(`#${id} ${sel}`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll(`#${id} ${sel}`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        onPick(btn);
+      });
+    });
+  }
+  bindGroup('deptGroup','button', b => {
+    currentDept = b.dataset.dept; currentTab = 'todo';
+    document.querySelectorAll('#tabHeader .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'todo'));
+    renderAll();
+  });
+  bindGroup('statusGroup','.chip', b => { statusFilter = b.dataset.status; renderList(); });
+  bindGroup('prioGroup','.chip', b => { prioFilter = b.dataset.prio; renderList(); });
+  bindGroup('tabHeader','.tab', b => { currentTab = b.dataset.tab; renderList(); });
+
+  // 챗봇 열기/닫기 (대화 로직은 chatbot-core.js, 처음 열 때 restartChat() 1회 호출)
+  let chatInited = false;
+  function toggleChat(force){
+    const panel = document.getElementById('chatPanel');
+    const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+    panel.classList.toggle('open', open);
+    document.getElementById('chatDim').classList.toggle('open', open);
+    document.getElementById('chatFab').style.display = open ? 'none' : 'flex';
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (open && !chatInited){ chatInited = true; restartChat(); }
+  }
+
+  renderEquip();
+  renderAll();
+
+  // ============================================================
+  //  자동 새로고침 (60초) — 챗봇이 열려 있거나 화면이 백그라운드일 땐 건너뜀
+  // ============================================================
+  const REFRESH_INTERVAL_MS = 60000;
+  window.__loadedAt = Date.now();
+  function refreshIfIdle(){
+    if (document.hidden) return;
+    if (document.getElementById('chatPanel').classList.contains('open')) return;
+    location.reload();
+  }
+  setInterval(refreshIfIdle, REFRESH_INTERVAL_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && Date.now() - window.__loadedAt > REFRESH_INTERVAL_MS) refreshIfIdle();
+  });
+</script>
+</body>
+</html>
