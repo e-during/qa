@@ -104,6 +104,25 @@
   .value-item .vt { font-size: 12px; font-weight: 800; color: #fff; }
   .value-item .vd { margin-top: 3px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
 
+  /* ---------- 개발 중인 추가 기능 미리보기 ---------- */
+  .soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px auto 0; width: 100%; max-width: 440px; }
+  .soon-card {
+    position: relative; padding: 18px 14px 16px; border-radius: 18px;
+    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08);
+  }
+  .soon-badge {
+    display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .3px;
+    color: #e0b060; background: rgba(224,176,96,.12); border: 1px solid rgba(224,176,96,.3);
+    border-radius: 999px; padding: 3px 8px; margin-bottom: 10px;
+  }
+  .soon-card .si {
+    width: 34px; height: 34px; border-radius: 10px; margin-bottom: 10px;
+    background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center;
+  }
+  .soon-card .si svg { width: 18px; height: 18px; stroke: rgba(255,255,255,.6); }
+  .soon-card .st { font-size: 14px; font-weight: 800; color: #fff; }
+  .soon-card .sd { margin-top: 4px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.5; }
+
   .credit { margin-top: auto; padding-top: 26px; text-align: center; }
   .credit .line { width: 34px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 12px; }
   .credit p { font-size: 10.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.7; letter-spacing: .2px; }
@@ -162,6 +181,21 @@
         <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5"></path><path d="M10 20c0-3 2.5-5 6-5s6 2 6 5"></path></svg></div>
         <div class="vt">함께</div>
         <div class="vd">더 나은 발전</div>
+      </div>
+    </div>
+
+    <div class="soon-grid">
+      <div class="soon-card">
+        <div class="soon-badge">개발 중</div>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg></div>
+        <div class="st">계산기</div>
+        <div class="sd">단위 변환 · 공차 계산</div>
+      </div>
+      <div class="soon-card">
+        <div class="soon-badge">개발 중</div>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8Z"></path><path d="M14 2v6h6"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg></div>
+        <div class="st">계측기 리스트</div>
+        <div class="sd">보유 장비 · 이력 조회</div>
       </div>
     </div>
 
