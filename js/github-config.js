@@ -2,6 +2,6 @@ window.GITHUB_CONFIG = {
   owner: 'e-during',
   repo: 'during-mobile-data',
   branch: 'main',
-  token: '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',
+  token: '', // 공개(public) 저장소라 읽기 전용으로는 토큰 불필요. 절대 여기에 토큰을 다시 넣지 마세요(넣는 순간 GitHub가 자동 폐기시킴).
   dataDir: 'data'
 };
