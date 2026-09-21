@@ -78,6 +78,29 @@
   .kpi-val span { font-size: 13px; font-weight: 800; }
   .kpi-val.acc b, .kpi-val.acc span { color: var(--red); }
   .bar { height: 5px; background: #ececec; border-radius: 3px; overflow: hidden; }
+
+  /* ---------- 접속 게이트 ---------- */
+  .gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #0b1636; display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .gate.hidden { display: none; }
+  .gate-box { width: 100%; max-width: 300px; text-align: center; }
+  .gate-title { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .gate-desc { font-size: 12px; color: rgba(255,255,255,.5); margin-bottom: 20px; }
+  .gate-box input {
+    width: 100%; padding: 14px 16px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06);
+    color: #fff; font-size: 15px; text-align: center; margin-bottom: 10px; font-family: inherit;
+  }
+  .gate-box input:focus { outline: none; border-color: #e0b060; }
+  .gate-box button {
+    width: 100%; padding: 14px; border-radius: 12px; border: none;
+    background: #e0b060; color: #1a1200; font-weight: 900; font-size: 14px;
+  }
+  .gate-err { margin-top: 10px; font-size: 11px; color: #ff6b6a; display: none; }
+  .gate-err.show { display: block; }
   .bar i { display: block; height: 100%; border-radius: 3px; background: #111; }
   .bar i.acc { background: linear-gradient(90deg, #ff5a58, var(--red)); }
 
@@ -174,6 +197,44 @@
 </style>
 </head>
 <body>
+
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <div class="gate-title">품질경영팀 대시보드</div>
+    <div class="gate-desc">접속 비밀번호를 입력하세요</div>
+    <input type="password" id="gatePw" inputmode="numeric" placeholder="비밀번호" autocomplete="off">
+    <button id="gateBtn" type="button">입장</button>
+    <div id="gateErr" class="gate-err">비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+<script>
+(function(){
+  // 관리자용: 이 값만 바꾸면 비밀번호가 바뀝니다.
+  var PASSWORD = 'qa123';
+  var gate = document.getElementById('gate');
+  var pwInput = document.getElementById('gatePw');
+  var btn = document.getElementById('gateBtn');
+  var err = document.getElementById('gateErr');
+
+  if (localStorage.getItem('qms_gate_ok') === '1') {
+    gate.classList.add('hidden');
+  }
+
+  function tryUnlock(){
+    if (pwInput.value === PASSWORD) {
+      localStorage.setItem('qms_gate_ok', '1');
+      gate.classList.add('hidden');
+      err.classList.remove('show');
+    } else {
+      err.classList.add('show');
+      pwInput.value = '';
+      pwInput.focus();
+    }
+  }
+  btn.addEventListener('click', tryUnlock);
+  pwInput.addEventListener('keydown', function(e){ if (e.key === 'Enter') tryUnlock(); });
+})();
+</script>
 
 <header class="app-head">
   <div class="head-row">
