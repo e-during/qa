@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>품질경영팀 PORTAL</title>
-<meta name="theme-color" content="#0a0a0c">
+<meta name="theme-color" content="#0b1636">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,62 +15,116 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  html, body { height: 100%; background: #0a0a0c; color: #fff; }
+  html, body { height: 100%; background: #0b1636; color: #fff; }
   body {
     min-height: 100vh; min-height: 100dvh;
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(env(safe-area-inset-top) + 28px) 22px calc(env(safe-area-inset-bottom) + 22px);
+    display: flex; flex-direction: column;
+    padding: calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 24px);
     background:
-      radial-gradient(ellipse at 50% 0%, rgba(196,143,58,.28) 0%, rgba(196,143,58,0) 60%),
-      #0a0a0c;
+      radial-gradient(ellipse at 50% 0%, rgba(70,100,190,.35) 0%, rgba(11,22,54,0) 55%),
+      linear-gradient(180deg, #0b1636 0%, #081026 60%, #060b1c 100%);
+    overflow-x: hidden;
   }
-  .brand { text-align: center; margin-top: 8vh; }
-  .brand-bar { width: 44px; height: 3px; margin: 0 auto 18px; border-radius: 2px; background: linear-gradient(90deg, #e0b060, #c8952e, #8a5f1f); box-shadow: 0 0 10px rgba(196,143,58,.6); }
-  .brand-main { font-size: 30px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(90deg, #fff 0%, #fff 55%, #e0b060 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #fff; }
-  .brand-sub { margin-top: 8px; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; }
-  .brand-team { margin-top: 26px; font-size: 15px; font-weight: 700; color: rgba(255,255,255,.75); letter-spacing: .5px; }
 
-  .menu { display: flex; flex-direction: column; gap: 12px; margin: 0 auto; width: 100%; max-width: 420px; }
-  .menu-btn {
-    display: flex; align-items: center; justify-content: space-between;
-    min-height: 76px; padding: 0 22px; border-radius: 16px; text-decoration: none;
-    background: #ffffff; color: #111; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  /* 상단 로고 배지 */
+  .logo-badge {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border-radius: 14px; padding: 8px 12px 8px 8px;
+    width: fit-content; box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    margin-bottom: 18px;
+  }
+  .logo-badge .mark {
+    width: 30px; height: 30px; border-radius: 8px; background: #e11d2e;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 16px; font-style: italic;
+  }
+  .logo-badge .word { font-weight: 900; font-size: 13px; letter-spacing: .5px; color: #111; }
+
+  /* 히어로 이미지 카드 */
+  .hero-card {
+    width: 100%; border-radius: 22px; overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0,0,0,.45);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .hero-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+
+  .brand { text-align: center; margin-top: 22px; }
+  .brand-main { font-size: 27px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(90deg, #fff 0%, #fff 55%, #e0b060 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #fff; }
+  .brand-sub { margin-top: 6px; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; }
+  .brand-team { margin-top: 14px; font-size: 15px; font-weight: 700; color: rgba(255,255,255,.78); letter-spacing: .5px; }
+
+  .menu { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; margin: 28px auto 0; width: 100%; max-width: 460px; }
+
+  .dash-btn {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 30px 22px 26px; border-radius: 22px; text-decoration: none;
+    background: linear-gradient(160deg, #1c2b57 0%, #101c3f 60%, #0b1533 100%);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: 0 16px 34px rgba(0,0,0,.45);
     transition: transform .15s ease;
   }
-  .menu-btn:active { transform: scale(.98); }
-  .menu-btn .en { font-size: 10.5px; font-weight: 800; letter-spacing: 1.4px; color: #a87c3f; }
-  .menu-btn .ko { margin-top: 3px; font-size: 19px; font-weight: 900; }
-  .menu-btn .arrow { width: 38px; height: 38px; border-radius: 50%; background: #ff5500; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; }
-  .menu-note { text-align: center; font-size: 11.5px; color: rgba(255,255,255,.5); font-weight: 600; line-height: 1.6; margin-top: 4px; }
+  .dash-btn:active { transform: scale(.98); }
+  .dash-btn .icon {
+    width: 46px; height: 46px; border-radius: 14px;
+    background: linear-gradient(135deg, #2c4180, #1a2a55);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+  }
+  .dash-btn .icon svg { width: 24px; height: 24px; }
+  .dash-btn .label { font-size: 17px; font-weight: 800; letter-spacing: .3px; color: #fff; }
+  .dash-btn .arrow {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff7a2f, #ff5500);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px;
+    box-shadow: 0 6px 16px rgba(255,85,0,.4);
+  }
+  .sparkle { position: absolute; opacity: .8; }
+  .sparkle.s1 { top: 14px; right: 20px; width: 16px; height: 16px; }
+  .sparkle.s2 { bottom: 40px; right: 34px; width: 10px; height: 10px; opacity: .5; }
 
-  .foot { text-align: center; }
-  .foot a { color: rgba(255,255,255,.45); font-size: 12px; font-weight: 700; text-decoration: none; padding: 10px 14px; display: inline-block; }
-  .status { margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: rgba(255,255,255,.4); font-weight: 700; letter-spacing: 1px; }
+  .foot { text-align: center; margin-top: 18px; }
+  .foot a { color: rgba(255,255,255,.45); font-size: 12px; font-weight: 700; text-decoration: none; padding: 8px 14px; display: inline-block; }
+  .status { margin-top: 2px; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: rgba(255,255,255,.4); font-weight: 700; letter-spacing: 1px; }
   .status i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.6); }
 </style>
 </head>
 <body>
 
+  <div class="logo-badge">
+    <div class="mark">R</div>
+    <div class="word">DURING</div>
+  </div>
+
+  <div class="hero-card">
+    <img src="images/hero.jpg" alt="DURING 사옥 전경">
+  </div>
+
   <div class="brand">
-    <div class="brand-bar"></div>
     <div class="brand-main">DURING</div>
     <div class="brand-sub">SMART QUALITY PLATFORM</div>
     <div class="brand-team">품질경영팀 PORTAL</div>
   </div>
 
   <div class="menu">
-    <a class="menu-btn" href="m_dashboard.html">
-      <div>
-        <div class="en">REALTIME DASHBOARD</div>
-        <div class="ko">실시간 대시보드</div>
+    <a class="dash-btn" href="m_dashboard.html">
+      <svg class="sparkle s1" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#e0b060"/></svg>
+      <svg class="sparkle s2" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#ffffff"/></svg>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+          <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+          <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+        </svg>
       </div>
+      <div class="label">실시간대시보드 접속</div>
       <div class="arrow">→</div>
     </a>
-    <div class="menu-note">엑셀 업로드·관리 기능은 PC에서만 사용할 수 있습니다.</div>
   </div>
 
   <div class="foot">
-    <a href="index.html?desktop=1">PC 버전으로 보기</a><br>
     <span class="status"><i></i>SYSTEM ONLINE</span>
   </div>
 
