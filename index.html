@@ -15,117 +15,122 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  html, body { height: 100%; background: #0b1636; color: #fff; }
+  html, body { height: 100%; background: #060b1c; color: #fff; }
   body {
     min-height: 100vh; min-height: 100dvh;
     display: flex; flex-direction: column;
-    padding: calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 24px);
-    background:
-      radial-gradient(ellipse at 50% 0%, rgba(70,100,190,.35) 0%, rgba(11,22,54,0) 55%),
-      linear-gradient(180deg, #0b1636 0%, #081026 60%, #060b1c 100%);
+    background: #060b1c;
     overflow-x: hidden;
   }
 
-  /* 상단 로고 배지 */
-  .logo-badge {
-    display: flex; align-items: center; gap: 8px;
-    background: #fff; border-radius: 14px; padding: 8px 12px 8px 8px;
-    width: fit-content; box-shadow: 0 6px 18px rgba(0,0,0,.35);
-    margin-bottom: 18px;
+  /* ---------- 히어로 (풀블리드 이미지) ---------- */
+  .hero {
+    position: relative; width: 100%; height: 42vh; min-height: 260px; max-height: 380px;
+    padding-top: env(safe-area-inset-top);
   }
-  .logo-badge .mark {
-    width: 30px; height: 30px; border-radius: 8px; background: #e11d2e;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: 900; font-size: 16px; font-style: italic;
+  .hero img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    filter: saturate(1.05);
   }
-  .logo-badge .word { font-weight: 900; font-size: 13px; letter-spacing: .5px; color: #111; }
-
-  /* 히어로 이미지 카드 */
-  .hero-card {
-    width: 100%; border-radius: 22px; overflow: hidden;
-    box-shadow: 0 18px 40px rgba(0,0,0,.45);
-    border: 1px solid rgba(255,255,255,.08);
+  .hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(6,11,28,.15) 0%, rgba(6,11,28,.05) 40%, #060b1c 100%);
   }
-  .hero-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+  .status-pill {
+    position: absolute; top: calc(env(safe-area-inset-top) + 14px); right: 16px; z-index: 2;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(6,11,28,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
+    padding: 7px 12px; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.85);
+  }
+  .status-pill i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.7); }
 
-  .brand { text-align: center; margin-top: 22px; }
-  .brand-main { font-size: 27px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(90deg, #fff 0%, #fff 55%, #e0b060 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #fff; }
-  .brand-sub { margin-top: 6px; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; }
-  .brand-team { margin-top: 14px; font-size: 15px; font-weight: 700; color: rgba(255,255,255,.78); letter-spacing: .5px; }
+  /* ---------- 본문 ---------- */
+  .content {
+    flex: 1; display: flex; flex-direction: column;
+    margin-top: -34px; position: relative; z-index: 1;
+    padding: 0 20px calc(env(safe-area-inset-bottom) + 22px);
+  }
 
-  .menu { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; margin: 28px auto 0; width: 100%; max-width: 460px; }
+  .brand { text-align: center; }
+  .brand-sub { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d1a250; opacity: 0; animation: fadeUp .6s ease .05s forwards; }
+  .brand-team { margin-top: 8px; font-size: 19px; font-weight: 900; color: #fff; letter-spacing: .3px; opacity: 0; animation: fadeUp .6s ease .15s forwards; }
+
+  .menu { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; margin: 26px auto 0; width: 100%; max-width: 460px; }
 
   .dash-btn {
     position: relative; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; gap: 12px;
-    padding: 30px 22px 26px; border-radius: 22px; text-decoration: none;
-    background: linear-gradient(160deg, #1c2b57 0%, #101c3f 60%, #0b1533 100%);
-    border: 1px solid rgba(255,255,255,.10);
-    box-shadow: 0 16px 34px rgba(0,0,0,.45);
-    transition: transform .15s ease;
+    padding: 32px 22px 28px; border-radius: 26px; text-decoration: none;
+    background: linear-gradient(160deg, rgba(44,65,128,.55) 0%, rgba(20,30,63,.55) 60%, rgba(11,21,51,.6) 100%);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,.14);
+    box-shadow: 0 20px 44px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);
+    transition: transform .18s ease, box-shadow .18s ease;
+    opacity: 0; animation: fadeUp .6s ease .28s forwards;
   }
-  .dash-btn:active { transform: scale(.98); }
+  .dash-btn:active { transform: scale(.97); box-shadow: 0 10px 24px rgba(0,0,0,.5); }
   .dash-btn .icon {
-    width: 46px; height: 46px; border-radius: 14px;
-    background: linear-gradient(135deg, #2c4180, #1a2a55);
+    width: 48px; height: 48px; border-radius: 15px;
+    background: linear-gradient(135deg, rgba(224,176,96,.22), rgba(224,176,96,.06));
     display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+    box-shadow: inset 0 0 0 1px rgba(224,176,96,.35);
   }
-  .dash-btn .icon svg { width: 24px; height: 24px; }
-  .dash-btn .label { font-size: 17px; font-weight: 800; letter-spacing: .3px; color: #fff; }
+  .dash-btn .icon svg { width: 25px; height: 25px; }
+  .dash-btn .label { font-size: 17.5px; font-weight: 800; letter-spacing: .3px; color: #fff; }
+  .dash-btn .desc { margin-top: -6px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: .2px; }
   .dash-btn .arrow {
-    width: 40px; height: 40px; border-radius: 50%;
+    width: 42px; height: 42px; border-radius: 50%;
     background: linear-gradient(135deg, #ff7a2f, #ff5500);
     color: #fff; display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 16px;
-    box-shadow: 0 6px 16px rgba(255,85,0,.4);
+    font-weight: 800; font-size: 17px;
+    box-shadow: 0 8px 20px rgba(255,85,0,.45);
   }
-  .sparkle { position: absolute; opacity: .8; }
-  .sparkle.s1 { top: 14px; right: 20px; width: 16px; height: 16px; }
-  .sparkle.s2 { bottom: 40px; right: 34px; width: 10px; height: 10px; opacity: .5; }
+  .sparkle { position: absolute; opacity: .7; animation: twinkle 2.6s ease-in-out infinite; }
+  .sparkle.s1 { top: 16px; right: 18px; width: 14px; height: 14px; }
+  .sparkle.s2 { bottom: 44px; right: 30px; width: 9px; height: 9px; opacity: .4; animation-delay: 1.1s; }
 
-  .foot { text-align: center; margin-top: 18px; }
-  .foot a { color: rgba(255,255,255,.45); font-size: 12px; font-weight: 700; text-decoration: none; padding: 8px 14px; display: inline-block; }
-  .status { margin-top: 2px; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: rgba(255,255,255,.4); font-weight: 700; letter-spacing: 1px; }
-  .status i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.6); }
+  .foot { text-align: center; margin-top: 16px; opacity: 0; animation: fadeUp .6s ease .4s forwards; }
+  .foot a { color: rgba(255,255,255,.42); font-size: 12px; font-weight: 700; text-decoration: none; padding: 8px 14px; display: inline-block; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes twinkle { 0%,100% { opacity: .25; transform: scale(.85); } 50% { opacity: .85; transform: scale(1); } }
 </style>
 </head>
 <body>
 
-  <div class="logo-badge">
-    <div class="mark">R</div>
-    <div class="word">DURING</div>
-  </div>
-
-  <div class="hero-card">
+  <div class="hero">
     <img src="images/hero.jpg" alt="DURING 사옥 전경">
+    <div class="status-pill"><i></i>SYSTEM ONLINE</div>
   </div>
 
-  <div class="brand">
-    <div class="brand-main">DURING</div>
-    <div class="brand-sub">SMART QUALITY PLATFORM</div>
-    <div class="brand-team">품질경영팀 PORTAL</div>
-  </div>
+  <div class="content">
+    <div class="brand">
+      <div class="brand-sub">SMART QUALITY PLATFORM</div>
+      <div class="brand-team">품질경영팀 PORTAL</div>
+    </div>
 
-  <div class="menu">
-    <a class="dash-btn" href="m_dashboard.html">
-      <svg class="sparkle s1" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#e0b060"/></svg>
-      <svg class="sparkle s2" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#ffffff"/></svg>
-      <div class="icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
-          <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
-          <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
-          <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
-        </svg>
-      </div>
-      <div class="label">실시간대시보드 접속</div>
-      <div class="arrow">→</div>
-    </a>
-  </div>
+    <div class="menu">
+      <a class="dash-btn" href="m_dashboard.html">
+        <svg class="sparkle s1" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#e0b060"/></svg>
+        <svg class="sparkle s2" viewBox="0 0 24 24" fill="none"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" fill="#ffffff"/></svg>
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+          </svg>
+        </div>
+        <div class="label">실시간 대시보드 접속</div>
+        <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
+        <div class="arrow">→</div>
+      </a>
+    </div>
 
-  <div class="foot">
-    <span class="status"><i></i>SYSTEM ONLINE</span>
+    <div class="foot">
+      <a href="index.html?desktop=1">PC 버전으로 보기</a>
+    </div>
   </div>
 
 </body>
