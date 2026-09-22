@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<title>현장 마킹</title>
+<meta name="theme-color" content="#0b1636">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html { height: 100%; background: #060b1c; }
+  body {
+    min-height: 100%; min-height: 100dvh;
+    background: #060b1c; color: #fff;
+    display: flex; flex-direction: column;
+    overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+
+  header {
+    position: relative;
+    padding: calc(env(safe-area-inset-top) + 14px) 18px 12px;
+    display: flex; align-items: center;
+    background: linear-gradient(180deg, #0d1836 0%, #0b1636 100%);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    flex-shrink: 0;
+  }
+  header .back { position: absolute; left: 18px; top: calc(env(safe-area-inset-top) + 14px); width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center; text-decoration: none; color: #fff; font-size: 15px; z-index: 1; }
+  header .title { flex: 1; text-align: center; }
+  header .title .t1 { font-size: 15.5px; font-weight: 900; color: #fff; }
+  header .title .t2 { margin-top: 1px; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #e0b060; }
+
+  main { flex: 1; padding: 16px 16px calc(env(safe-area-inset-bottom) + 24px); max-width: 480px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ---------- 시작 화면 ---------- */
+  #startScreen { display: flex; flex-direction: column; gap: 12px; margin-top: 8vh; }
+  .start-hint { text-align: center; font-size: 12.5px; color: rgba(255,255,255,.4); font-weight: 600; margin-bottom: 6px; line-height: 1.6; }
+  .pick-btn {
+    display: flex; align-items: center; gap: 14px; padding: 18px 16px; border-radius: 18px;
+    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08);
+    text-decoration: none; color: #fff; cursor: pointer;
+  }
+  .pick-btn:active { background: rgba(255,255,255,.07); }
+  .pick-btn .pi { flex: none; width: 46px; height: 46px; border-radius: 13px; background: rgba(224,176,96,.12); border: 1px solid rgba(224,176,96,.35); display: flex; align-items: center; justify-content: center; }
+  .pick-btn .pi svg { width: 22px; height: 22px; stroke: #e0b060; }
+  .pick-btn .pt { font-size: 14.5px; font-weight: 800; }
+  .pick-btn .pd { margin-top: 2px; font-size: 11px; color: rgba(255,255,255,.4); font-weight: 600; }
+  .pick-btn.primary { border-color: rgba(224,176,96,.4); background: rgba(224,176,96,.08); }
+
+  /* ---------- 마킹 화면 ---------- */
+  #markScreen { display: none; flex-direction: column; gap: 12px; }
+  .canvas-wrap { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #0c1730; line-height: 0; }
+  #markCanvas { width: 100%; display: block; touch-action: manipulation; }
+
+  .toolbar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .toolbar button {
+    padding: 11px 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12);
+    background: #0c1730; color: rgba(255,255,255,.7); font-size: 11.5px; font-weight: 800; font-family: inherit;
+  }
+  .toolbar button:active { background: #16233f; }
+
+  .legend { display: flex; flex-direction: column; gap: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); }
+  .legend-item .lnum { flex: none; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #fff; }
+  .legend-item .lnum.ok { background: #16a34a; }
+  .legend-item .lnum.ng { background: #dc2626; }
+  .legend-item .ltxt { flex: 1; min-width: 0; }
+  .legend-item .lv { font-size: 12px; font-weight: 800; }
+  .legend-item .lv.ok { color: #34d399; }
+  .legend-item .lv.ng { color: #fb7185; }
+  .legend-item .lm { margin-top: 1px; font-size: 11px; color: rgba(255,255,255,.45); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend-empty { text-align: center; font-size: 11.5px; color: rgba(255,255,255,.3); padding: 10px; }
+
+  .btn-primary {
+    width: 100%; padding: 15px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff;
+    font-size: 15px; font-weight: 800; font-family: inherit;
+    box-shadow: 0 10px 24px rgba(255,85,0,.35);
+  }
+  .btn-primary:active { transform: scale(.98); }
+  .hint { font-size: 10.5px; color: rgba(255,255,255,.35); line-height: 1.6; text-align: center; }
+
+  /* ---------- 포인트 입력 시트 ---------- */
+  .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 49; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+  .sheet-backdrop.show { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; max-width: 480px; margin: 0 auto;
+    background: #0b1636; border: 1px solid rgba(255,255,255,.1); border-bottom: none;
+    border-radius: 20px 20px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.45);
+    padding: 18px 16px calc(env(safe-area-inset-bottom) + 16px);
+    transform: translateY(100%); transition: transform .22s ease;
+  }
+  .sheet.show { transform: translateY(0); }
+  .sheet .sh-title { font-size: 13px; font-weight: 800; color: #e0b060; margin-bottom: 14px; }
+  .sheet .seg-okng { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .sheet .seg-okng button {
+    padding: 16px 0; border-radius: 14px; border: 1px solid rgba(255,255,255,.12);
+    background: #0c1730; color: rgba(255,255,255,.6); font-size: 15px; font-weight: 900; font-family: inherit;
+  }
+  .sheet .seg-okng button.ok.on { background: rgba(52,211,153,.16); border-color: #34d399; color: #34d399; }
+  .sheet .seg-okng button.ng.on { background: rgba(251,113,133,.16); border-color: #fb7185; color: #fb7185; }
+  .sheet .memo-field { margin-bottom: 16px; }
+  .sheet .memo-field label { display: block; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 6px; }
+  .sheet .memo-field input {
+    width: 100%; background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+    padding: 12px 13px; font-size: 14px; font-weight: 600; color: #fff; font-family: inherit;
+  }
+  .sheet .memo-field input:focus { outline: none; border-color: #e0b060; }
+  .sheet .sheet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sheet .sheet-actions.has-del { grid-template-columns: auto 1fr 1fr; }
+  .sheet .sheet-actions button { padding: 13px 10px; border-radius: 12px; border: none; font-size: 13.5px; font-weight: 800; font-family: inherit; }
+  .sheet .btn-cancel { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
+  .sheet .btn-del { background: rgba(220,38,38,.14); color: #fb7185; border: 1px solid rgba(251,113,133,.3) !important; }
+  .sheet .btn-confirm { background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translate(-50%, 12px);
+    background: rgba(15,23,42,.95); color: #fff; padding: 11px 18px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 700; z-index: 60; opacity: 0; pointer-events: none; transition: all .25s ease;
+    border: 1px solid rgba(255,255,255,.1); white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+
+  <header>
+    <a class="back" href="m.html">←</a>
+    <div class="title">
+      <div class="t1">현장 마킹</div>
+      <div class="t2">QUICK MARKING</div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ 시작 화면 ============ -->
+    <div id="startScreen">
+      <div class="start-hint">사진을 촬영하거나 불러와서<br>터치 몇 번으로 OK/NG 포인트를 표시하세요</div>
+
+      <label class="pick-btn primary">
+        <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
+        <div>
+          <div class="pt">카메라로 촬영</div>
+          <div class="pd">지금 바로 현장 사진 찍기</div>
+        </div>
+        <input type="file" accept="image/*" capture="environment" style="display:none" onchange="loadImage(event)">
+      </label>
+
+      <label class="pick-btn">
+        <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></div>
+        <div>
+          <div class="pt">갤러리에서 선택</div>
+          <div class="pd">이미 찍어둔 사진 불러오기</div>
+        </div>
+        <input type="file" accept="image/*" style="display:none" onchange="loadImage(event)">
+      </label>
+    </div>
+
+    <!-- ============ 마킹 화면 ============ -->
+    <div id="markScreen">
+      <div class="canvas-wrap">
+        <canvas id="markCanvas"></canvas>
+      </div>
+
+      <div class="toolbar">
+        <button onclick="undoMark()">↩ 실행취소</button>
+        <button onclick="clearMarks()">🗑 전체 지우기</button>
+        <button onclick="resetPhoto()">📷 새 사진</button>
+      </div>
+
+      <div class="legend" id="legendList"></div>
+
+      <button class="btn-primary" onclick="saveImage()">완료 · 갤러리에 저장</button>
+      <div class="hint">사진을 탭하면 포인트가 추가됩니다 · 기존 포인트를 탭하면 수정/삭제할 수 있습니다</div>
+    </div>
+
+  </main>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+  <div class="sheet" id="pointSheet">
+    <div class="sh-title" id="sheetTitle">포인트 ① 추가</div>
+    <div class="seg-okng">
+      <button type="button" class="ok on" id="segOk" onclick="setJudge('ok')">✓ OK</button>
+      <button type="button" class="ng" id="segNg" onclick="setJudge('ng')">✕ NG</button>
+    </div>
+    <div class="memo-field">
+      <label>메모 (선택)</label>
+      <input type="text" id="memoInput" placeholder="예: 웰드라인 발생, 데이텀 A 기준">
+    </div>
+    <div class="sheet-actions" id="sheetActions">
+      <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+      <button type="button" class="btn-confirm" onclick="confirmPoint()">확인</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  function id(x){ return document.getElementById(x); }
+
+  const canvas = id('markCanvas');
+  const ctx = canvas.getContext('2d');
+  let baseImg = null;         // 로드된 원본 Image 객체
+  let marks = [];             // { x, y, judge:'ok'|'ng', memo, num }
+  let nextNum = 1;
+  let pendingXY = null;       // 새 포인트 좌표(캔버스 픽셀 기준)
+  let editingIndex = -1;      // 수정 중인 포인트 인덱스(-1이면 신규)
+  let currentJudge = 'ok';
+
+  const JUDGE_COLOR = { ok: '#16a34a', ng: '#dc2626' };
+  const MAX_DIM = 1600; // 저장/작업용 최대 픽셀 크기 (성능·용량 균형)
+
+  // -------- 사진 불러오기 --------
+  function loadImage(evt){
+    const file = evt.target.files && evt.target.files[0];
+    if(!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      baseImg = img;
+      marks = [];
+      nextNum = 1;
+      setupCanvas();
+      id('startScreen').style.display = 'none';
+      id('markScreen').style.display = 'flex';
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = () => { showToast('이미지를 불러오지 못했습니다'); };
+    img.src = url;
+    evt.target.value = '';
+  }
+
+  function setupCanvas(){
+    const ratio = baseImg.naturalWidth / baseImg.naturalHeight;
+    let w = baseImg.naturalWidth, h = baseImg.naturalHeight;
+    if (w > MAX_DIM || h > MAX_DIM){
+      if (w >= h){ w = MAX_DIM; h = Math.round(MAX_DIM / ratio); }
+      else { h = MAX_DIM; w = Math.round(MAX_DIM * ratio); }
+    }
+    canvas.width = w;
+    canvas.height = h;
+    redraw();
+  }
+
+  function redraw(){
+    if(!baseImg) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
+    const r = Math.max(16, canvas.width * 0.022);
+    marks.forEach(m => {
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, r, 0, Math.PI*2);
+      ctx.fillStyle = JUDGE_COLOR[m.judge];
+      ctx.globalAlpha = 0.88;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = Math.max(2, r*0.12);
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `900 ${Math.round(r*1.05)}px -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(m.num), m.x, m.y + r*0.06);
+    });
+    renderLegend();
+  }
+
+  function renderLegend(){
+    const wrap = id('legendList');
+    if (marks.length === 0){
+      wrap.innerHTML = '<div class="legend-empty">아직 표시된 포인트가 없습니다</div>';
+      return;
+    }
+    wrap.innerHTML = marks.map((m, i) => `
+      <div class="legend-item" onclick="openEditSheetByIndex(${i})">
+        <div class="lnum ${m.judge}">${m.num}</div>
+        <div class="ltxt">
+          <div class="lv ${m.judge}">${m.judge === 'ok' ? 'OK' : 'NG'}</div>
+          <div class="lm">${m.memo ? m.memo : '메모 없음'}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // -------- 캔버스 탭 처리 --------
+  canvas.addEventListener('click', (e) => {
+    if(!baseImg) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+
+    const r = Math.max(16, canvas.width * 0.022);
+    const hitIndex = marks.findIndex(m => Math.hypot(m.x - x, m.y - y) <= r + 10);
+    if (hitIndex >= 0){
+      openEditSheetByIndex(hitIndex);
+    } else {
+      pendingXY = { x, y };
+      editingIndex = -1;
+      openNewSheet();
+    }
+  });
+
+  // -------- 포인트 입력 시트 --------
+  function setJudge(j){
+    currentJudge = j;
+    id('segOk').classList.toggle('on', j==='ok');
+    id('segNg').classList.toggle('on', j==='ng');
+  }
+
+  function openNewSheet(){
+    currentJudge = 'ok';
+    setJudge('ok');
+    id('memoInput').value = '';
+    id('sheetTitle').innerText = `포인트 ${nextNum} 추가`;
+    id('sheetActions').classList.remove('has-del');
+    id('sheetActions').innerHTML = `
+      <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+      <button type="button" class="btn-confirm" onclick="confirmPoint()">확인</button>
+    `;
+    showSheet();
+  }
+
+  function openEditSheetByIndex(i){
+    editingIndex = i;
+    const m = marks[i];
+    currentJudge = m.judge;
+    setJudge(m.judge);
+    id('memoInput').value = m.memo || '';
+    id('sheetTitle').innerText = `포인트 ${m.num} 수정`;
+    id('sheetActions').classList.add('has-del');
+    id('sheetActions').innerHTML = `
+      <button type="button" class="btn-del" onclick="deletePoint()">삭제</button>
+      <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+      <button type="button" class="btn-confirm" onclick="confirmPoint()">확인</button>
+    `;
+    showSheet();
+  }
+
+  function showSheet(){
+    id('pointSheet').classList.add('show');
+    id('sheetBackdrop').classList.add('show');
+  }
+  function closeSheet(){
+    id('pointSheet').classList.remove('show');
+    id('sheetBackdrop').classList.remove('show');
+    pendingXY = null;
+    editingIndex = -1;
+  }
+
+  function confirmPoint(){
+    const memo = id('memoInput').value.trim();
+    if (editingIndex >= 0){
+      marks[editingIndex].judge = currentJudge;
+      marks[editingIndex].memo = memo;
+    } else if (pendingXY){
+      marks.push({ x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, num: nextNum });
+      nextNum++;
+    }
+    closeSheet();
+    redraw();
+  }
+
+  function deletePoint(){
+    if (editingIndex >= 0){
+      marks.splice(editingIndex, 1);
+      renumber();
+    }
+    closeSheet();
+    redraw();
+  }
+
+  function renumber(){
+    marks.forEach((m, i) => { m.num = i + 1; });
+    nextNum = marks.length + 1;
+  }
+
+  function undoMark(){
+    if (marks.length === 0) return;
+    marks.pop();
+    renumber();
+    redraw();
+  }
+
+  function clearMarks(){
+    if (marks.length === 0) return;
+    marks = [];
+    nextNum = 1;
+    redraw();
+  }
+
+  function resetPhoto(){
+    baseImg = null;
+    marks = [];
+    nextNum = 1;
+    id('markScreen').style.display = 'none';
+    id('startScreen').style.display = 'flex';
+  }
+
+  // -------- 저장 (이미지 + 범례 합성 후 공유/저장) --------
+  function buildExportCanvas(){
+    const legendLineH = 30;
+    const legendPad = 16;
+    const legendH = marks.length > 0 ? (legendPad*2 + marks.length * legendLineH) : 0;
+    const out = document.createElement('canvas');
+    out.width = canvas.width;
+    out.height = canvas.height + legendH;
+    const octx = out.getContext('2d');
+    octx.fillStyle = '#0b1636';
+    octx.fillRect(0, 0, out.width, out.height);
+    octx.drawImage(canvas, 0, 0);
+
+    if (legendH > 0){
+      let y = canvas.height + legendPad + 14;
+      marks.forEach(m => {
+        octx.beginPath();
+        octx.arc(legendPad + 10, y - 6, 11, 0, Math.PI*2);
+        octx.fillStyle = JUDGE_COLOR[m.judge];
+        octx.fill();
+        octx.fillStyle = '#fff';
+        octx.font = '900 11px -apple-system, sans-serif';
+        octx.textAlign = 'center';
+        octx.textBaseline = 'middle';
+        octx.fillText(String(m.num), legendPad + 10, y - 5);
+
+        octx.textAlign = 'left';
+        octx.fillStyle = m.judge === 'ok' ? '#34d399' : '#fb7185';
+        octx.font = '900 13px -apple-system, sans-serif';
+        const label = m.judge === 'ok' ? 'OK' : 'NG';
+        octx.fillText(label, legendPad + 30, y - 5);
+
+        octx.fillStyle = 'rgba(255,255,255,.65)';
+        octx.font = '600 12px -apple-system, sans-serif';
+        octx.fillText(m.memo || '메모 없음', legendPad + 66, y - 5);
+        y += legendLineH;
+      });
+    }
+    return out;
+  }
+
+  function saveImage(){
+    if(!baseImg) return;
+    const exportCanvas = buildExportCanvas();
+    exportCanvas.toBlob(async (blob) => {
+      if(!blob){ showToast('이미지 생성에 실패했습니다'); return; }
+      const filename = `mark_${Date.now()}.jpg`;
+      const file = new File([blob], filename, { type: 'image/jpeg' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })){
+        try {
+          await navigator.share({ files: [file], title: '현장 마킹 사진' });
+          showToast('공유 시트에서 "사진에 저장"을 선택하세요');
+          return;
+        } catch(e){
+          // 사용자가 공유 취소한 경우 등 — 폴백으로 진행
+        }
+      }
+      // 폴백: 새 탭에 이미지 열기 → 길게 눌러 저장
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      showToast('새 탭에서 이미지를 길게 눌러 "사진에 저장"하세요');
+    }, 'image/jpeg', 0.92);
+  }
+
+  let toastTimer = null;
+  function showToast(msg){
+    const t = id('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+</script>
+</body>
+</html>
