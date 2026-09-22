@@ -61,10 +61,11 @@
         .hub-card:active { transform: scale(0.97); }
         .hub-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
         .hub-card h3 { font-size: 1rem; color: #1E293B; }
-        .hub-card-wide { padding: 18px 20px; display: flex; align-items: center; gap: 14px; text-align: left; }
+        .hub-card-wide { padding: 18px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
         .hub-card-wide .icon { font-size: 2rem; margin-bottom: 0; }
         .hub-card-wide h3 { font-size: 1rem; }
-        .hub-card-wide p { margin-top: 3px; font-size: 11px; color: #64748B; font-weight: 600; }
+        .hub-banner { padding: 4px 24px 24px; }
+        .hub-banner img { width: 100%; display: block; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 
         .sub-header { display: flex; align-items: center; padding: 12px 16px; background: white; border-bottom: 1px solid #E2E8F0; z-index: 10; flex-shrink: 0; }
         .back-btn { background: none; border: none; font-size: 1rem; font-weight: bold; color: #3B82F6; cursor: pointer; display: flex; align-items: center; gap: 4px; }
@@ -249,10 +250,12 @@
                 <div class="hub-card hub-card-wide" onclick="switchView('cmm-view')">
                     <div class="icon">🔮</div>
                     <h3>CMM 측정 납기 예측기</h3>
-                    <p>수량 균등 분할 · 세팅시간 · 납기 여유 자동 계산</p>
                 </div>
             </div>
             <div class="hub-note">신뢰할 수 있는 측정, 지금 이 자리에서</div>
+            <div class="hub-banner">
+                <img src="images/toolbox-banner.jpg" alt="DURING 현장 툴박스" loading="lazy">
+            </div>
         </div>
 
         <!-- 📏 자 모드 -->
@@ -516,13 +519,6 @@
                         <div class="check-group" style="margin-top:14px;">
                             <label><input type="checkbox" id="excludeSat" checked> 🚫 토요일 제외</label>
                             <label><input type="checkbox" id="excludeSun" checked> 🚫 일요일 제외</label>
-                        </div>
-                        <div class="param-row" style="margin-top:12px;">
-                            <label>참고</label>
-                            <span style="font-size:0.78rem; color:#4b5563;">
-                                공휴일 미반영 / 균등분할 ON: 수량을 반반으로 나눠 동시 처리<br>
-                                세팅시간은 각 장비별 1회씩 적용 / 총작업 = (수량×개당시간)+세팅시간
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -1425,35 +1421,14 @@
             html += `<div class="result-card"><h3>📊 전체 측정 예측 (${machineCount}대 처리${splitMode ? ' / 수량 균등 분할' : ''})</h3>`;
             html += `<div class="stat-grid">
                 <div class="stat-item">
-                    <strong>📦 총 측정시간</strong><br>${minutesToHourMin(totalMeasureSum)}<br>
-                    <span class="section-label">세팅 제외 순수 측정</span>
+                    <strong>⚙️ 총 작업량</strong><br>${minutesToHourMin(totalRequiredSum)}<br>
+                    <span class="section-label">효율 ${efficiency}% 적용</span>
                 </div>
                 <div class="stat-item">
-                    <strong>🔩 세팅시간 합계</strong><br>${minutesToHourMin(totalSetupSum)}<br>
-                    <span class="section-label">전체 품목 세팅 합산</span>
-                </div>
-                <div class="stat-item">
-                    <strong>⚙️ 효율 적용 총 작업량</strong><br>${efficiency}% → ${minutesToHourMin(totalRequiredSum)}<br>
-                    <span class="section-label">(측정+세팅) ÷ 효율</span>
-                </div>
-                <div class="stat-item">
-                    <strong>🖨️ 측정기</strong><br>${machineCount}대<br>
-                    <span class="section-label">${machineCount >= 2 ? (splitMode ? '수량 균등 자동 분할' : 'LPT 품목 단위 배분') : '단일 순차'}</span>
+                    <strong>📅 예상 작업일</strong><br>
+                    <span class="workday-badge">${estimatedDays.toFixed(2)} 일</span>
                 </div>
             </div>`;
-
-            html += `<div class="stat-grid">`;
-            for (let i = 0; i < machineCount; i++) {
-                html += `<div class="stat-item">
-                    <strong>🔧 장비 ${i+1} 잔업</strong><br>${perMachineOvertimeHours[i] || 0}시간<br>
-                    <span class="section-label">일일 가동: ${dailyInfos[i] || '-'}</span>
-                </div>`;
-            }
-            html += `<div class="stat-item">
-                <strong>📅 예상 작업일</strong><br>
-                <span class="workday-badge">${estimatedDays.toFixed(2)} 일</span><br>
-                <span class="section-label">총 작업량 ÷ (장비수 × 일일 가동)</span>
-            </div></div>`;
 
             if (machineCount >= 2) {
                 const finishTimes = scheduleResult.machineFinishTimes || [];
@@ -1494,9 +1469,6 @@
                     <th>품목명</th>
                     <th>배정 장비</th>
                     <th>배정 수량</th>
-                    <th>측정시간</th>
-                    <th>세팅(분)</th>
-                    <th>효율 적용</th>
                     <th>완료 예정일시</th>
                 </tr></thead>
                 <tbody>`;
@@ -1512,26 +1484,17 @@
                     if (jobsOfItem.length >= 2) {
                         const machineLabels = jobsOfItem.map(j => `${j.machineNo}호기`).join(' · ');
                         const qtyLabels     = jobsOfItem.map(j => `${j.qty}EA`).join(' / ');
-                        const measureTotal  = jobsOfItem.reduce((s,j) => s + (j.qty * j.perMin), 0);
-                        const reqTotal      = jobsOfItem.reduce((s,j) => s + j.requiredMinutes, 0);
-                        const setupPerMach  = jobsOfItem[0].setupMin || 0;
 
                         html += `<tr style="background:#fffbeb;">
                             <td rowspan="${jobsOfItem.length + 1}"><strong>${escapeHtml(name)}</strong><br><span class="section-label">원본 ${originalQty} EA</span></td>
                             <td><span class="machine-badge-both">🔄 ${machineLabels} 동시</span></td>
                             <td style="text-align:center;">${qtyLabels}</td>
-                            <td style="text-align:center;">${minutesToHourMin(measureTotal)}</td>
-                            <td style="text-align:center; color:#7c3aed;">${setupPerMach > 0 ? '각 '+setupPerMach+'분' : '-'}</td>
-                            <td style="text-align:center;">${minutesToHourMin(reqTotal)}</td>
                             <td><strong style="color:#b91c1c;">${formatDateTime(lastFinish)}</strong><br><span class="section-label">양 장비 중 늦은 쪽 기준</span></td>
                         </tr>`;
                         for (let j of jobsOfItem) {
                             html += `<tr>
                                 <td><span class="machine-badge">${j.machineNo}호기</span></td>
                                 <td style="text-align:center;">${j.qty} EA</td>
-                                <td style="text-align:center;">${minutesToHourMin(j.qty * j.perMin)}</td>
-                                <td style="text-align:center; color:${j.setupMin > 0 ? '#7c3aed' : '#9ca3af'};">${j.setupMin > 0 ? minutesToHourMin(j.setupMin) : '-'}</td>
-                                <td style="text-align:center;">${minutesToHourMin(j.requiredMinutes)}</td>
                                 <td>${formatDateTime(j.finishDate)}</td>
                             </tr>`;
                         }
@@ -1541,9 +1504,6 @@
                             <td><strong>${escapeHtml(name)}</strong></td>
                             <td><span class="machine-badge">${j.machineNo}호기</span></td>
                             <td style="text-align:center;">${j.qty} EA</td>
-                            <td style="text-align:center;">${minutesToHourMin(j.qty * j.perMin)}</td>
-                            <td style="text-align:center; color:${j.setupMin > 0 ? '#7c3aed' : '#9ca3af'};">${j.setupMin > 0 ? minutesToHourMin(j.setupMin) : '-'}</td>
-                            <td style="text-align:center;">${minutesToHourMin(j.requiredMinutes)}</td>
                             <td><strong style="color:#b91c1c;">${formatDateTime(j.finishDate)}</strong></td>
                         </tr>`;
                     }
@@ -1551,33 +1511,17 @@
             } else {
                 const sortedByFinish = [...perItemDetails].sort((a,b) => a.finishDate - b.finishDate);
                 for (let res of sortedByFinish) {
-                    const measureMin = res.qty * res.perMin;
-                    const setupMin   = res.setupMin || 0;
                     const machineInfo = res.machineNo ? `${res.machineNo}호기` : '단일';
                     html += `<tr>
                         <td>${escapeHtml(res.name)}</td>
                         <td><span class="machine-badge">${machineInfo}</span></td>
                         <td style="text-align:center;">${res.qty} EA</td>
-                        <td style="text-align:center;">${minutesToHourMin(measureMin)}</td>
-                        <td style="text-align:center; color:${setupMin > 0 ? '#7c3aed' : '#9ca3af'};">${setupMin > 0 ? minutesToHourMin(setupMin) : '-'}</td>
-                        <td style="text-align:center;">${minutesToHourMin(res.requiredMinutes)}</td>
                         <td><strong style="color:#b91c1c;">${formatDateTime(res.finishDate)}</strong></td>
                     </tr>`;
                 }
             }
 
             html += `</tbody></table></div></div>`;
-
-            html += `<div class="result-card" style="font-size:0.85rem;color:#4b5563;">
-                <p style="margin:0;line-height:2;">
-                    📌 측정기 ${machineCount}대 / 근무 ${workStart}~${workEnd} / 점심 ${lunchStart}~${lunchEnd}<br>
-                    🔩 세팅시간: 전체 ${minutesToHourMin(totalSetupSum)} 포함${splitMode ? ' (균등분할 시 각 장비 1회씩 적용)' : ''}<br>
-                    🕒 잔업: ${machineCount===1 ? `${perMachineOvertimeHours[0]||0}시간` : `장비1: ${perMachineOvertimeHours[0]||0}h / 장비2: ${perMachineOvertimeHours[1]||0}h`}<br>
-                    🗓️ 주말: ${excludeSat ? '토 제외' : '토 포함'} / ${excludeSun ? '일 제외' : '일 포함'}<br>
-                    ⚙️ 분배 방식: ${splitMode ? `수량 균등 자동 분할 (${machineCount}등분) — 모든 품목 동시 처리` : 'LPT 알고리즘 품목 단위 배분'}<br>
-                    💡 공휴일 미반영 / 현장 여유율 고려 시 납기 버퍼 권장
-                </p>
-            </div>`;
 
             resultArea.innerHTML = html;
         }
