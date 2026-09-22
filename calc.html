@@ -49,12 +49,14 @@
   .field:last-child { margin-bottom: 0; }
   .field label { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.55); }
   .field input[type=number], .field input[type=text] {
-    background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+    width: 100%; min-width: 0; background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
     padding: 12px 13px; font-size: 15px; font-weight: 700; color: #fff; font-family: inherit;
     -moz-appearance: textfield;
   }
   .field input:focus { outline: none; border-color: #e0b060; }
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; min-width: 0; }
+  .row2 .field { min-width: 0; }
+  .row2 .field label { font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .seg { display: grid; gap: 8px; }
   .seg.g2 { grid-template-columns: 1fr 1fr; }
@@ -124,8 +126,23 @@
 
   <main>
 
-    <!-- ============ 1. 위치도 / MMC·LMC 계산기 ============ -->
-    <div id="panel-position" class="panel active">
+    <!-- ============ 1. 단위 변환 / 간이 계산기 ============ -->
+    <div id="panel-util" class="panel active">
+      <div class="card">
+        <h2>mm / inch 변환</h2>
+        <div class="field"><label>밀리미터 (mm)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="conv-mm" value="25.4" oninput="convertMmToInch()"></div>
+        <div class="field"><label>인치 (inch)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="conv-inch" value="1.0" oninput="convertInchToMm()"></div>
+      </div>
+      <div class="card">
+        <h2>현장 간이 계산기</h2>
+        <div class="field"><label>수식 (예: 150 / 2 + 0.05)</label><input type="text" id="calc-expr" placeholder="50 + 25 * 2"></div>
+        <button class="btn-primary" onclick="executeQuickCalc()" style="margin-bottom:12px;">계산 실행</button>
+        <div class="result-row"><span class="rl">결과</span><span class="rv" id="calc-result">–</span></div>
+      </div>
+    </div>
+
+    <!-- ============ 2. 위치도 / MMC·LMC 계산기 ============ -->
+    <div id="panel-position" class="panel">
       <div class="card">
         <h2>대상 형체</h2>
         <div class="seg g2">
@@ -170,7 +187,7 @@
       </div>
     </div>
 
-    <!-- ============ 2. 프로브 스캔 시뮬레이터 ============ -->
+    <!-- ============ 3. 프로브 스캔 시뮬레이터 ============ -->
     <div id="panel-probe" class="panel">
       <div class="card">
         <h2>빠른 프리셋</h2>
@@ -200,25 +217,14 @@
       </div>
     </div>
 
-    <!-- ============ 3. 단위 변환 / 간이 계산기 ============ -->
-    <div id="panel-util" class="panel">
-      <div class="card">
-        <h2>mm / inch 변환</h2>
-        <div class="field"><label>밀리미터 (mm)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="conv-mm" value="25.4" oninput="convertMmToInch()"></div>
-        <div class="field"><label>인치 (inch)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="conv-inch" value="1.0" oninput="convertInchToMm()"></div>
-      </div>
-      <div class="card">
-        <h2>현장 간이 계산기</h2>
-        <div class="field"><label>수식 (예: 150 / 2 + 0.05)</label><input type="text" id="calc-expr" placeholder="50 + 25 * 2"></div>
-        <button class="btn-primary" onclick="executeQuickCalc()" style="margin-bottom:12px;">계산 실행</button>
-        <div class="result-row"><span class="rl">결과</span><span class="rv" id="calc-result">–</span></div>
-      </div>
-    </div>
-
   </main>
 
   <nav class="tabbar">
-    <button class="tbtn on" data-tab="position" onclick="switchTab('position')">
+    <button class="tbtn on" data-tab="util" onclick="switchTab('util')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="12" x2="8" y2="12"></line><line x1="12" y1="12" x2="12" y2="12"></line><line x1="16" y1="12" x2="16" y2="12"></line></svg>
+      <span class="tl">단위/간이</span>
+    </button>
+    <button class="tbtn" data-tab="position" onclick="switchTab('position')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="3" x2="12" y2="7"></line><line x1="12" y1="17" x2="12" y2="21"></line><line x1="3" y1="12" x2="7" y2="12"></line><line x1="17" y1="12" x2="21" y2="12"></line></svg>
       <span class="tl">위치도/MMC</span>
     </button>
@@ -226,16 +232,12 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 1 9 9"></path></svg>
       <span class="tl">프로브 시뮬</span>
     </button>
-    <button class="tbtn" data-tab="util" onclick="switchTab('util')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="12" x2="8" y2="12"></line><line x1="12" y1="12" x2="12" y2="12"></line><line x1="16" y1="12" x2="16" y2="12"></line></svg>
-      <span class="tl">단위/간이</span>
-    </button>
   </nav>
 
 <script>
   // -------- 탭 전환 --------
   function switchTab(name){
-    ['position','probe','util'].forEach(t=>{
+    ['util','position','probe'].forEach(t=>{
       document.getElementById('panel-'+t).classList.toggle('active', t===name);
     });
     document.querySelectorAll('.tabbar .tbtn').forEach(b=>{
