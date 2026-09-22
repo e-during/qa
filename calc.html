@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<title>측정 계산기</title>
+<meta name="theme-color" content="#0b1636">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html { height: 100%; background: #060b1c; }
+  body {
+    min-height: 100%; min-height: 100dvh;
+    background: #060b1c; color: #fff;
+    display: flex; flex-direction: column;
+    overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+
+  /* ---------- 헤더 ---------- */
+  header {
+    padding: calc(env(safe-area-inset-top) + 14px) 18px 12px;
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(180deg, #0d1836 0%, #0b1636 100%);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  header .back { flex: none; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center; text-decoration: none; color: #fff; font-size: 15px; }
+  header .title { flex: 1; }
+  header .title .t1 { font-size: 15.5px; font-weight: 900; color: #fff; }
+  header .title .t2 { margin-top: 1px; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #e0b060; }
+
+  /* ---------- 본문 ---------- */
+  main { flex: 1; padding: 16px 16px calc(env(safe-area-inset-bottom) + 84px); max-width: 480px; width: 100%; margin: 0 auto; }
+  .panel { display: none; flex-direction: column; gap: 12px; }
+  .panel.active { display: flex; }
+
+  .card {
+    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px; padding: 16px;
+  }
+  .card h2 { font-size: 12px; font-weight: 800; letter-spacing: .3px; color: #e0b060; margin-bottom: 12px; text-transform: uppercase; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.55); }
+  .field input[type=number], .field input[type=text] {
+    background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+    padding: 12px 13px; font-size: 15px; font-weight: 700; color: #fff; font-family: inherit;
+    -moz-appearance: textfield;
+  }
+  .field input:focus { outline: none; border-color: #e0b060; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .seg { display: grid; gap: 8px; }
+  .seg.g2 { grid-template-columns: 1fr 1fr; }
+  .seg.g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .seg button {
+    padding: 10px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12);
+    background: #0c1730; color: rgba(255,255,255,.6); font-size: 12px; font-weight: 800;
+    font-family: inherit;
+  }
+  .seg button.on { background: rgba(224,176,96,.16); border-color: #e0b060; color: #e0b060; }
+
+  .btn-primary {
+    width: 100%; padding: 14px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff;
+    font-size: 14.5px; font-weight: 800; font-family: inherit;
+    box-shadow: 0 10px 24px rgba(255,85,0,.35);
+  }
+  .btn-primary:active { transform: scale(.98); }
+
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .rl { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.5); }
+  .result-row .rv { font-size: 15px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+  .verdict { text-align: center; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 900; letter-spacing: .5px; margin-top: 4px; }
+  .verdict.pass { background: rgba(16,185,129,.14); color: #34d399; border: 1px solid rgba(52,211,153,.35); }
+  .verdict.fail { background: rgba(244,63,94,.14); color: #fb7185; border: 1px solid rgba(251,113,133,.35); }
+  .hint { font-size: 10.5px; color: rgba(255,255,255,.35); line-height: 1.6; margin-top: 10px; }
+
+  /* ---------- 시뮬레이터 ---------- */
+  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .preset-grid button {
+    padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1);
+    background: #0c1730; color: rgba(255,255,255,.75); font-size: 11px; font-weight: 700; text-align: left; font-family: inherit;
+  }
+  .slider-row { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.55); margin-bottom: 4px; }
+  .slider-row span { color: #e0b060; font-weight: 800; }
+  input[type=range] { width: 100%; accent-color: #e0b060; }
+  canvas { width: 100%; height: 220px; display: block; border-radius: 12px; background: #0c1730; touch-action: none; }
+
+  /* ---------- 하단 탭바 ---------- */
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    padding: 8px 14px calc(env(safe-area-inset-bottom) + 8px);
+    background: rgba(11,22,54,.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex; gap: 6px; max-width: 480px; margin: 0 auto; width: 100%;
+  }
+  .tabbar .tbtn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 4px; border-radius: 12px; background: none; border: none; color: rgba(255,255,255,.4);
+    font-family: inherit;
+  }
+  .tabbar .tbtn.on { color: #e0b060; }
+  .tabbar .tbtn svg { width: 20px; height: 20px; }
+  .tabbar .tbtn .tl { font-size: 9.5px; font-weight: 800; }
+</style>
+</head>
+<body>
+
+  <header>
+    <a class="back" href="m.html">←</a>
+    <div class="title">
+      <div class="t1">측정 계산기</div>
+      <div class="t2">MEASUREMENT TOOLKIT</div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ 1. 위치도 / MMC·LMC 계산기 ============ -->
+    <div id="panel-position" class="panel active">
+      <div class="card">
+        <h2>대상 형체</h2>
+        <div class="seg g2">
+          <button id="ft-hole" class="on" onclick="setFeatureType('hole')">내경 (구멍)</button>
+          <button id="ft-shaft" onclick="setFeatureType('shaft')">외경 (축)</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>측정 편차 (도면 중심 기준)</h2>
+        <div class="row2">
+          <div class="field"><label>X 편차 ΔX (mm)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="pos-dx" value="0.040"></div>
+          <div class="field"><label>Y 편차 ΔY (mm)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="pos-dy" value="0.030"></div>
+        </div>
+        <div class="field"><label>도면 지정 위치도 공차 ⌖ (지름, mm)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="pos-tol" value="0.100"></div>
+      </div>
+
+      <div class="card">
+        <h2>수정기호 (Modifier)</h2>
+        <div class="seg g3">
+          <button id="mmc-none" class="on" onclick="setMmcMode('none')">RFS</button>
+          <button id="mmc-mmc" onclick="setMmcMode('mmc')">Ⓜ MMC</button>
+          <button id="mmc-lmc" onclick="setMmcMode('lmc')">Ⓛ LMC</button>
+        </div>
+        <div id="mmc-inputs" style="display:none; margin-top:12px;">
+          <div class="row2">
+            <div class="field"><label id="lbl-size-max">최대 허용 치수</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="pos-size-max" value="10.05"></div>
+            <div class="field"><label id="lbl-size-min">최소 허용 치수</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="pos-size-min" value="9.95"></div>
+          </div>
+          <div class="field"><label>실제 측정 치수</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="pos-actual" value="10.02"></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="calculatePosition()">판정 계산</button>
+
+      <div class="card">
+        <div class="result-row"><span class="rl">실효 위치도 오차 (2R)</span><span class="rv" id="res-error">–</span></div>
+        <div class="result-row"><span class="rl">보너스 공차</span><span class="rv" id="res-bonus">–</span></div>
+        <div class="result-row"><span class="rl">최종 허용 공차</span><span class="rv" id="res-allow">–</span></div>
+        <div id="res-verdict" class="verdict">계산 대기 중</div>
+        <div class="hint">위치도 오차 = 2 × √(ΔX² + ΔY²). MMC 적용 시 내경은 실제치수가 최소치수(MMC)보다 커진 만큼, 외경은 실제치수가 최대치수(MMC)보다 작아진 만큼 보너스 공차가 가산됩니다.</div>
+      </div>
+    </div>
+
+    <!-- ============ 2. 프로브 스캔 시뮬레이터 ============ -->
+    <div id="panel-probe" class="panel">
+      <div class="card">
+        <h2>빠른 프리셋</h2>
+        <div class="preset-grid">
+          <button onclick="setPreset(100,170,90)">상단원 (100°→170°)</button>
+          <button onclick="setPreset(170,100,90)">상단원 역방향</button>
+          <button onclick="setPreset(85,5,0)">우측원 (60도)</button>
+          <button onclick="setPreset(260,190,90)">하단원 (70도)</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="slider-row"><span>시작 각도 (SA)</span><span id="sa-val">170°</span></div>
+        <input type="range" id="input-sa" min="0" max="360" value="170">
+        <div class="slider-row" style="margin-top:14px;"><span>끝 각도 (EA)</span><span id="ea-val">100°</span></div>
+        <input type="range" id="input-ea" min="0" max="360" value="100">
+      </div>
+      <div class="card">
+        <h2>프로브 인덱싱</h2>
+        <div class="seg g2">
+          <button id="btn-idx-0" onclick="setIndexing(0)">A0° B0°</button>
+          <button id="btn-idx-90" class="on" onclick="setIndexing(90)">A90° B0°</button>
+        </div>
+      </div>
+      <div class="card">
+        <canvas id="simCanvas"></canvas>
+        <div class="hint" id="analysis-text" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
+    <!-- ============ 3. 단위 변환 / 간이 계산기 ============ -->
+    <div id="panel-util" class="panel">
+      <div class="card">
+        <h2>mm / inch 변환</h2>
+        <div class="field"><label>밀리미터 (mm)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="conv-mm" value="25.4" oninput="convertMmToInch()"></div>
+        <div class="field"><label>인치 (inch)</label><input type="text" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*" id="conv-inch" value="1.0" oninput="convertInchToMm()"></div>
+      </div>
+      <div class="card">
+        <h2>현장 간이 계산기</h2>
+        <div class="field"><label>수식 (예: 150 / 2 + 0.05)</label><input type="text" id="calc-expr" placeholder="50 + 25 * 2"></div>
+        <button class="btn-primary" onclick="executeQuickCalc()" style="margin-bottom:12px;">계산 실행</button>
+        <div class="result-row"><span class="rl">결과</span><span class="rv" id="calc-result">–</span></div>
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="tabbar">
+    <button class="tbtn on" data-tab="position" onclick="switchTab('position')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="3" x2="12" y2="7"></line><line x1="12" y1="17" x2="12" y2="21"></line><line x1="3" y1="12" x2="7" y2="12"></line><line x1="17" y1="12" x2="21" y2="12"></line></svg>
+      <span class="tl">위치도/MMC</span>
+    </button>
+    <button class="tbtn" data-tab="probe" onclick="switchTab('probe')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 1 9 9"></path></svg>
+      <span class="tl">프로브 시뮬</span>
+    </button>
+    <button class="tbtn" data-tab="util" onclick="switchTab('util')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="12" x2="8" y2="12"></line><line x1="12" y1="12" x2="12" y2="12"></line><line x1="16" y1="12" x2="16" y2="12"></line></svg>
+      <span class="tl">단위/간이</span>
+    </button>
+  </nav>
+
+<script>
+  // -------- 탭 전환 --------
+  function switchTab(name){
+    ['position','probe','util'].forEach(t=>{
+      document.getElementById('panel-'+t).classList.toggle('active', t===name);
+    });
+    document.querySelectorAll('.tabbar .tbtn').forEach(b=>{
+      b.classList.toggle('on', b.dataset.tab===name);
+    });
+    if(name==='probe') resizeCanvas();
+  }
+
+  // -------- 1. 위치도 / MMC·LMC --------
+  let featureType = 'hole'; // hole(내경) | shaft(외경)
+  let mmcMode = 'none'; // none | mmc | lmc
+
+  function setFeatureType(t){
+    featureType = t;
+    document.getElementById('ft-hole').classList.toggle('on', t==='hole');
+    document.getElementById('ft-shaft').classList.toggle('on', t==='shaft');
+    document.getElementById('lbl-size-max').innerText = t==='hole' ? '최대 허용 치수 (LMC)' : '최대 허용 치수 (MMC)';
+    document.getElementById('lbl-size-min').innerText = t==='hole' ? '최소 허용 치수 (MMC)' : '최소 허용 치수 (LMC)';
+  }
+  setFeatureType('hole');
+
+  function setMmcMode(mode){
+    mmcMode = mode;
+    ['none','mmc','lmc'].forEach(m=>{
+      document.getElementById('mmc-'+m).classList.toggle('on', m===mode);
+    });
+    document.getElementById('mmc-inputs').style.display = mode==='none' ? 'none' : 'block';
+  }
+
+  function calculatePosition(){
+    const dx = parseFloat(document.getElementById('pos-dx').value) || 0;
+    const dy = parseFloat(document.getElementById('pos-dy').value) || 0;
+    const baseTol = parseFloat(document.getElementById('pos-tol').value) || 0;
+    const posError = 2 * Math.sqrt(dx*dx + dy*dy);
+
+    let bonus = 0;
+    if (mmcMode !== 'none'){
+      const sizeMax = parseFloat(document.getElementById('pos-size-max').value) || 0;
+      const sizeMin = parseFloat(document.getElementById('pos-size-min').value) || 0;
+      const actual = parseFloat(document.getElementById('pos-actual').value) || 0;
+      const sizeRange = Math.abs(sizeMax - sizeMin);
+
+      // MMC 크기: 내경(구멍)=최소치수, 외경(축)=최대치수 / LMC 크기: 그 반대
+      const mmcSize = featureType === 'hole' ? sizeMin : sizeMax;
+      const lmcSize = featureType === 'hole' ? sizeMax : sizeMin;
+
+      if (mmcMode === 'mmc'){
+        // 실제 치수가 MMC에서 LMC 방향으로 벗어난 만큼 보너스
+        bonus = featureType === 'hole' ? (actual - mmcSize) : (mmcSize - actual);
+      } else { // lmc
+        bonus = featureType === 'hole' ? (lmcSize - actual) : (actual - lmcSize);
+      }
+      bonus = Math.max(0, Math.min(bonus, sizeRange));
+    }
+
+    const allowable = baseTol + bonus;
+
+    document.getElementById('res-error').innerText = posError.toFixed(4) + ' mm';
+    document.getElementById('res-bonus').innerText = (mmcMode==='none' ? '해당 없음' : ('+' + bonus.toFixed(4) + ' mm'));
+    document.getElementById('res-allow').innerText = allowable.toFixed(4) + ' mm';
+
+    const v = document.getElementById('res-verdict');
+    const margin = allowable - posError;
+    if (posError <= allowable){
+      v.className = 'verdict pass';
+      v.innerText = `PASS · 여유 ${margin.toFixed(4)} mm`;
+    } else {
+      v.className = 'verdict fail';
+      v.innerText = `FAIL · 초과 ${Math.abs(margin).toFixed(4)} mm`;
+    }
+  }
+  calculatePosition();
+
+  // -------- 2. 프로브 스캔 시뮬레이터 --------
+  const saInput = document.getElementById('input-sa');
+  const eaInput = document.getElementById('input-ea');
+  const saValText = document.getElementById('sa-val');
+  const eaValText = document.getElementById('ea-val');
+  const analysisText = document.getElementById('analysis-text');
+  const canvas = document.getElementById('simCanvas');
+  const ctx = canvas.getContext('2d');
+  let currentIndexing = 90;
+
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    drawSimulation();
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  function setPreset(sa,ea,idx){
+    saInput.value = sa; eaInput.value = ea;
+    setIndexing(idx); updateValues();
+  }
+  function setIndexing(deg){
+    currentIndexing = deg;
+    document.getElementById('btn-idx-0').classList.toggle('on', deg===0);
+    document.getElementById('btn-idx-90').classList.toggle('on', deg===90);
+    updateValues();
+  }
+  function updateValues(){
+    const sa = parseInt(saInput.value), ea = parseInt(eaInput.value);
+    saValText.innerText = sa+'°'; eaValText.innerText = ea+'°';
+    const span = Math.abs(sa-ea);
+    analysisText.innerText = `SA=${sa}°, EA=${ea}° (구간 ${span}°) · 프로브 인덱싱 A${currentIndexing}° B0°`;
+    drawSimulation();
+  }
+  saInput.addEventListener('input', updateValues);
+  eaInput.addEventListener('input', updateValues);
+
+  function drawSimulation(){
+    const width = canvas.clientWidth, height = canvas.clientHeight;
+    if(!width || !height) return;
+    ctx.clearRect(0,0,width,height);
+    const cx=width/2, cy=height/2, r=Math.min(width,height)*0.32;
+    const sa=parseInt(saInput.value), ea=parseInt(eaInput.value);
+
+    ctx.strokeStyle='#1e2a4a'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(width,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,height); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI);
+    ctx.strokeStyle='#475569'; ctx.lineWidth=3; ctx.stroke();
+
+    const saRad=sa*Math.PI/180, eaRad=ea*Math.PI/180;
+    ctx.beginPath(); ctx.arc(cx,cy,r,-saRad,-eaRad, sa>ea);
+    ctx.strokeStyle='#e0b060'; ctx.lineWidth=6; ctx.stroke();
+
+    const sX=cx+r*Math.cos(-saRad), sY=cy+r*Math.sin(-saRad);
+    const eX=cx+r*Math.cos(-eaRad), eY=cy+r*Math.sin(-eaRad);
+    ctx.beginPath(); ctx.arc(sX,sY,5,0,2*Math.PI); ctx.fillStyle='#38bdf8'; ctx.fill();
+    ctx.beginPath(); ctx.arc(eX,eY,5,0,2*Math.PI); ctx.fillStyle='#f43f5e'; ctx.fill();
+
+    const midRad=((sa+ea)/2)*Math.PI/180, pd=r+30;
+    const pX=cx+pd*Math.cos(-midRad), pY=cy+pd*Math.sin(-midRad);
+    ctx.beginPath(); ctx.arc(pX,pY,7,0,2*Math.PI); ctx.fillStyle='#ef4444'; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pX,pY);
+    let shX=pX, shY=pY-32;
+    if(currentIndexing===90){ shX=pX+32; shY=pY; }
+    ctx.lineTo(shX,shY); ctx.strokeStyle='#38bdf8'; ctx.lineWidth=3; ctx.stroke();
+  }
+
+  // -------- 3. 단위변환 / 간이계산기 --------
+  function convertMmToInch(){
+    const mm = parseFloat(document.getElementById('conv-mm').value) || 0;
+    document.getElementById('conv-inch').value = (mm/25.4).toFixed(4);
+  }
+  function convertInchToMm(){
+    const inch = parseFloat(document.getElementById('conv-inch').value) || 0;
+    document.getElementById('conv-mm').value = (inch*25.4).toFixed(4);
+  }
+  function executeQuickCalc(){
+    const out = document.getElementById('calc-result');
+    try{
+      const expr = document.getElementById('calc-expr').value.trim();
+      if(!expr){ out.innerText='–'; return; }
+      if(!/^[0-9+\-*/().\s]+$/.test(expr)){ out.innerText='허용 안 된 문자'; return; }
+      const res = Function(`'use strict'; return (${expr})`)();
+      out.innerText = (typeof res === 'number' && isFinite(res)) ? String(Math.round(res*10000)/10000) : '수식 오류';
+    }catch(e){ out.innerText = '수식 오류'; }
+  }
+
+  window.addEventListener('load', ()=>{ resizeCanvas(); updateValues(); });
+</script>
+</body>
+</html>
