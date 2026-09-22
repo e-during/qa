@@ -349,7 +349,7 @@
                 return;
             }
             const currentScale = parseFloat(document.getElementById('scaleRange').value) || 1;
-            let newScale = currentScale * (actual / displayed);
+            let newScale = currentScale * (displayed / actual);
             const min = parseFloat(document.getElementById('scaleRange').min);
             const max = parseFloat(document.getElementById('scaleRange').max);
             newScale = Math.min(max, Math.max(min, newScale));
