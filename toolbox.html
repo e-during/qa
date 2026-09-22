@@ -47,13 +47,24 @@
         .container { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .view { display: none; flex: 1; flex-direction: column; height: 100%; position: absolute; width: 100%; top: 0; left: 0; background: var(--bg-color); }
         .view.active { display: flex; }
+        #home-view { overflow-y: auto; }
 
-        .hub-grid { padding: 24px 24px 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .disclaimer-banner {
+            margin: 20px 24px 0; padding: 10px 14px; border-radius: 12px;
+            background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E;
+            font-size: 11px; font-weight: 600; line-height: 1.5; text-align: center;
+        }
+        .hub-grid { padding: 20px 24px 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; overflow-y: auto; }
+        .hub-grid-wide { padding: 0 24px; }
         .hub-note { padding: 0 24px 20px; font-size: 11.5px; color: #94A3B8; font-weight: 600; text-align: center; overflow-y: auto; }
         .hub-card { background: var(--card-bg); padding: 24px 16px; border-radius: 16px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.1s; border: 1px solid #E2E8F0; }
         .hub-card:active { transform: scale(0.97); }
         .hub-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
         .hub-card h3 { font-size: 1rem; color: #1E293B; }
+        .hub-card-wide { padding: 18px 20px; display: flex; align-items: center; gap: 14px; text-align: left; }
+        .hub-card-wide .icon { font-size: 2rem; margin-bottom: 0; }
+        .hub-card-wide h3 { font-size: 1rem; }
+        .hub-card-wide p { margin-top: 3px; font-size: 11px; color: #64748B; font-weight: 600; }
 
         .sub-header { display: flex; align-items: center; padding: 12px 16px; background: white; border-bottom: 1px solid #E2E8F0; z-index: 10; flex-shrink: 0; }
         .back-btn { background: none; border: none; font-size: 1rem; font-weight: bold; color: #3B82F6; cursor: pointer; display: flex; align-items: center; gap: 4px; }
@@ -128,6 +139,76 @@
         .angle-status { font-size: 1.05rem; margin-bottom: 20px; color: #94A3B8; }
         .level-btn { background: #3B82F6; color: white; border: none; padding: 14px 32px; border-radius: 30px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); margin-bottom: 16px; }
         .level-btn:active { transform: scale(0.95); }
+
+        /* 어두운 컨테이너(각도기/조도계) 안의 보정 박스·버튼 다크 스타일 */
+        .level-container .cal-box { background: #1E293B; }
+        .level-container .cal-box label { color: #E2E8F0; }
+        .level-container .direct-calib-field label { color: #94A3B8; }
+        .level-container .direct-calib-field input,
+        .level-container .cal-box input[type="number"] { background: #0F172A; border-color: #334155; color: white; }
+        .level-container .mini-btn { background: #0F172A; border-color: #334155; color: #E2E8F0; }
+        .level-container .mini-btn.ghost { color: #94A3B8; }
+        .level-container .mini-btn.done { background: var(--accent-color); border-color: var(--accent-color); color: white; }
+
+        /* ⏱️ 사이클타임 스톱워치 */
+        .timer-display { font-size: 2.6rem; font-weight: 900; font-variant-numeric: tabular-nums; color: #0F172A; margin: 8px 0 14px; }
+        .timer-btn-row { display: flex; gap: 6px; width: 100%; max-width: 260px; margin-bottom: 12px; }
+        .timer-btn-row .mini-btn { padding: 12px 6px; font-size: 0.78rem; }
+        .lap-summary { width: 100%; max-width: 260px; font-size: 0.72rem; color: #64748B; margin-bottom: 6px; text-align: left; min-height: 14px; }
+        .lap-list { width: 100%; max-width: 260px; max-height: 140px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; }
+        .lap-item { display: flex; justify-content: space-between; padding: 7px 10px; font-size: 0.78rem; border-bottom: 1px solid #F1F5F9; }
+        .lap-item:last-child { border-bottom: none; }
+        .lap-item.pass { color: #065F46; }
+        .lap-item.fail { color: #991B1B; }
+
+        /* 🔮 CMM 측정 납기 예측기 (기존 데스크톱 도구 이식, .cmm-view로 스코프 처리) */
+        .cmm-scroll { flex: 1; overflow-y: auto; background: #e9ecef; padding: 14px 10px calc(24px + env(safe-area-inset-bottom, 0px)); }
+        .cmm-wrap { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); overflow: hidden; padding: 18px 16px; }
+        .cmm-view h1 { font-size: 1.3rem; font-weight: 700; color: #1e2a3e; margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .cmm-view h1 small { font-size: 0.72rem; font-weight: normal; background: #f1f3f5; padding: 5px 10px; border-radius: 40px; color: #2c3e66; }
+        .cmm-view h3 { font-size: 1.02rem; margin: 0 0 14px 0; padding-left: 6px; border-left: 4px solid #2c7da0; color: #1f3a4b; }
+        .cmm-view .flex-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
+        .cmm-view .card { background: #fefefe; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex: 1 1 260px; }
+        .cmm-view .param-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 12px; gap: 8px; }
+        .cmm-view .param-row label { width: 100px; font-weight: 500; color: #2c3e50; font-size: 0.85rem; }
+        .cmm-view input, .cmm-view select { padding: 7px 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; font-family: inherit; font-size: 0.88rem; }
+        .cmm-view select { cursor: pointer; }
+        .cmm-view input:focus, .cmm-view select:focus { outline: none; border-color: #2c7da0; box-shadow: 0 0 0 2px rgba(44,125,160,0.2); }
+        .cmm-view .check-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+        .cmm-view .check-group label { width: auto; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+        .cmm-view button { background: #2c7da0; border: none; color: white; padding: 8px 14px; border-radius: 40px; font-weight: 500; cursor: pointer; font-size: 0.82rem; }
+        .cmm-view button:active { background: #1f5e7e; }
+        .cmm-view .button-outline { background: white; border: 1px solid #2c7da0; color: #2c7da0; }
+        .cmm-view .button-outline:active { background: #e6f4fa; }
+        .cmm-view .item-table-wrapper { overflow-x: auto; margin: 16px 0 10px; }
+        .cmm-view table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 520px; }
+        .cmm-view th { background: #1e4663; color: white; padding: 10px 6px; font-weight: 500; }
+        .cmm-view td { border: 1px solid #dee2e6; padding: 8px 6px; vertical-align: middle; background: white; }
+        .cmm-view input[type="text"], .cmm-view input[type="number"] { width: 100%; min-width: 60px; }
+        .cmm-view .action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; justify-content: space-between; align-items: center; }
+        .cmm-view .calc-btn { background: #2b6e3c; font-size: 0.95rem; padding: 10px 24px; }
+        .cmm-view .calc-btn:active { background: #1d5229; }
+        .cmm-view .result-area { margin-top: 22px; background: #f8fafc; border-radius: 18px; padding: 14px; border: 1px solid #cbd5e1; }
+        .cmm-view .result-card { background: white; border-radius: 16px; padding: 14px 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .cmm-view .highlight-date { font-size: 1.3rem; font-weight: 800; color: #c7254e; background: #fff0f3; display: inline-block; padding: 7px 16px; border-radius: 60px; margin: 6px 0; }
+        .cmm-view .stat-grid { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+        .cmm-view .stat-item { background: #f1f5f9; border-radius: 16px; padding: 10px 14px; flex: 1; min-width: 130px; font-size: 0.85rem; line-height: 1.6; }
+        .cmm-view .per-item-table th { background: #3a6b4b; }
+        .cmm-view hr { margin: 16px 0; border-color: #e2e8f0; }
+        .cmm-view .machine-badge { background: #e2f0fa; border-radius: 24px; padding: 3px 9px; font-size: 0.76rem; font-weight: 500; color: #1f6392; display: inline-block; }
+        .cmm-view .machine-badge-both { background: #fef3c7; border-radius: 24px; padding: 3px 9px; font-size: 0.76rem; font-weight: 600; color: #92400e; display: inline-block; }
+        .cmm-view .overtime-group { margin-top: 8px; padding: 8px 6px; background: #f9f9fc; border-radius: 14px; }
+        .cmm-view .overtime-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .cmm-view .overtime-item label { width: auto; min-width: 80px; font-size: 0.82rem; }
+        .cmm-view .overtime-item input { width: 80px; }
+        .cmm-view .deadline-ok { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 40px; padding: 7px 16px; font-size: 1rem; font-weight: 700; margin-top: 6px; }
+        .cmm-view .deadline-warn { display: inline-block; background: #fee2e2; color: #991b1b; border-radius: 40px; padding: 7px 16px; font-size: 1rem; font-weight: 700; margin-top: 6px; animation: cmm-blink-warn 1.2s ease-in-out infinite; }
+        @keyframes cmm-blink-warn { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .cmm-view .workday-badge { display: inline-block; background: #ede9fe; color: #4c1d95; border-radius: 40px; padding: 6px 14px; font-size: 0.92rem; font-weight: 600; margin-top: 4px; }
+        .cmm-view .parallel-ok-badge { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 40px; padding: 6px 14px; font-size: 0.85rem; font-weight: 600; }
+        .cmm-view .section-label { font-size: 0.74rem; color: #64748b; margin-top: 4px; font-weight: 400; }
+        .cmm-view .split-option-box { margin-top: 10px; padding: 10px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; font-size: 0.84rem; color: #1e40af; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .cmm-view .split-option-box input[type="checkbox"] { width: auto; min-width: auto; padding: 0; accent-color: #2563eb; }
     </style>
 </head>
 <body>
@@ -143,6 +224,9 @@
     <div class="container">
         <!-- 🏠 메인 허브 -->
         <div id="home-view" class="view active">
+            <div class="disclaimer-banner">
+                ⚠️ 본 간이 측정 도구는 <b>참고용</b>입니다. 실제 검사·판정은 반드시 <b>공인된 검교정 장비</b>를 사용하세요.
+            </div>
             <div class="hub-grid">
                 <div class="hub-card" onclick="switchView('ruler-view')">
                     <div class="icon">📏</div>
@@ -151,6 +235,21 @@
                 <div class="hub-card" onclick="switchView('level-view')">
                     <div class="icon">📐</div>
                     <h3>각도기 / 수평계</h3>
+                </div>
+                <div class="hub-card" onclick="switchView('lux-view')">
+                    <div class="icon">💡</div>
+                    <h3>조도계</h3>
+                </div>
+                <div class="hub-card" onclick="switchView('timer-view')">
+                    <div class="icon">⏱️</div>
+                    <h3>사이클타임</h3>
+                </div>
+            </div>
+            <div class="hub-grid-wide">
+                <div class="hub-card hub-card-wide" onclick="switchView('cmm-view')">
+                    <div class="icon">🔮</div>
+                    <h3>CMM 측정 납기 예측기</h3>
+                    <p>수량 균등 분할 · 세팅시간 · 납기 여유 자동 계산</p>
                 </div>
             </div>
             <div class="hub-note">신뢰할 수 있는 측정, 지금 이 자리에서</div>
@@ -265,6 +364,235 @@
             </div>
             <button class="capture-btn dark" id="levelCaptureBtn" onclick="captureView('level-view', '각도기')" title="화면 캡처 저장">📸</button>
         </div>
+
+        <!-- 💡 조도계 -->
+        <div id="lux-view" class="view" style="background: #0F172A;">
+            <div class="sub-header" style="background: transparent; border-bottom: none;">
+                <button class="back-btn" style="color: #94A3B8;" onclick="switchView('home-view')">〈 허브로 가기</button>
+            </div>
+            <div class="level-container" id="luxContainer">
+                <video id="luxVideo" autoplay playsinline muted style="display:none;"></video>
+                <canvas id="luxCanvas" width="24" height="24" style="display:none;"></canvas>
+                <div class="angle-display" id="luxIndexText">--</div>
+                <div class="angle-status" id="luxSubText">카메라 밝기 측정 준비 중…</div>
+
+                <div class="cal-box">
+                    <label>조도 보정 (럭스미터 실측값으로 환산)</label>
+                    <div class="direct-calib-row">
+                        <div class="direct-calib-field">
+                            <label>실측 조도(lux)</label>
+                            <input type="number" inputmode="decimal" step="1" id="luxActualInput" placeholder="예: 300">
+                        </div>
+                    </div>
+                    <button class="mini-btn done" type="button" onclick="applyLuxCalib()" style="margin-top:8px;">✅ 지금 밝기 기준으로 보정</button>
+                    <button class="mini-btn ghost" type="button" onclick="resetLuxCalib()" style="margin-top:6px; width:100%;">보정 초기화</button>
+                </div>
+
+                <div class="verdict-panel">
+                    <h4>조도 판정 (Go / No-Go)</h4>
+                    <div class="verdict-grid" style="grid-template-columns: 1fr;">
+                        <div class="verdict-field">
+                            <label>기준 조도(lux, 최소)</label>
+                            <input type="number" inputmode="decimal" step="10" id="luxTarget" placeholder="예: 300" oninput="checkLuxVerdict()">
+                        </div>
+                    </div>
+                    <div class="verdict-range" id="luxRange"></div>
+                    <div class="verdict-result" id="luxResult">먼저 보정을 완료하세요</div>
+                </div>
+
+                <div class="memo-box">
+                    <label>현장/특이사항 메모 (선택, 캡처에 포함됨)</label>
+                    <input type="text" id="luxMemo" placeholder="예: 3동 A라인 검사대">
+                </div>
+            </div>
+            <button class="capture-btn dark" id="luxCaptureBtn" onclick="captureView('lux-view', '조도계')" title="화면 캡처 저장">📸</button>
+        </div>
+
+        <!-- ⏱️ 사이클타임 스톱워치 -->
+        <div id="timer-view" class="view">
+            <div class="sub-header">
+                <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
+            </div>
+            <div class="ruler-workspace" style="padding-top: 20px;">
+                <div class="timer-display" id="timerDisplay">00:00.0</div>
+                <div class="timer-btn-row">
+                    <button class="mini-btn done" id="timerStartBtn" type="button" onclick="toggleTimer()">시작</button>
+                    <button class="mini-btn" type="button" onclick="lapTimer()">구간 기록</button>
+                    <button class="mini-btn ghost" type="button" onclick="resetTimer()">초기화</button>
+                </div>
+
+                <div class="verdict-panel" style="margin-top: 4px;">
+                    <h4>목표 사이클타임 비교</h4>
+                    <div class="verdict-grid">
+                        <div class="verdict-field">
+                            <label>목표 시간(초)</label>
+                            <input type="number" inputmode="decimal" step="0.1" id="cycleTarget" placeholder="예: 25.0">
+                        </div>
+                        <div class="verdict-field">
+                            <label>허용오차(±초)</label>
+                            <input type="number" inputmode="decimal" step="0.1" id="cycleTol" placeholder="예: 1.0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lap-summary" id="lapSummary"></div>
+                <div class="lap-list" id="lapList"></div>
+
+                <div class="memo-box">
+                    <label>현장/특이사항 메모 (선택, 캡처에 포함됨)</label>
+                    <input type="text" id="timerMemo" placeholder="예: 2호기 사출 사이클타임 측정">
+                </div>
+            </div>
+            <button class="capture-btn light" id="timerCaptureBtn" onclick="captureView('timer-view', '사이클타임')" title="화면 캡처 저장">📸</button>
+        </div>
+
+        <!-- 🔮 CMM 측정 납기 예측기 -->
+        <div id="cmm-view" class="view cmm-view">
+            <div class="sub-header">
+                <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
+            </div>
+            <div class="cmm-scroll">
+            <div class="cmm-wrap">
+                <h1>
+                    📐 CMM 측정 납기 예측기
+                    <small>수량 자동 균등 분할 · 세팅시간 · 납기여유</small>
+                </h1>
+
+                <div class="flex-grid">
+                    <!-- 왼쪽: 시간 설정 -->
+                    <div class="card">
+                        <h3>⏱️ 작업 시작 & 시간</h3>
+                        <div class="param-row">
+                            <label>시작 일시</label>
+                            <input type="datetime-local" id="startDateTime" value="2026-06-16T08:00">
+                            <button type="button" id="nowBtn" class="button-outline">📆 현재시간</button>
+                        </div>
+                        <div class="param-row">
+                            <label>근무 시작</label>
+                            <input type="time" id="workStart" value="08:00">
+                        </div>
+                        <div class="param-row">
+                            <label>근무 종료</label>
+                            <input type="time" id="workEnd" value="17:00">
+                        </div>
+                        <div class="param-row">
+                            <label>점심 시작</label>
+                            <input type="time" id="lunchStart" value="12:00">
+                        </div>
+                        <div class="param-row">
+                            <label>점심 종료</label>
+                            <input type="time" id="lunchEnd" value="13:00">
+                        </div>
+                        <div class="param-row" style="margin-top:4px;">
+                            <label>🎯 목표 납기일<br><span class="section-label">(선택)</span></label>
+                            <input type="date" id="targetDeadline">
+                        </div>
+                    </div>
+
+                    <!-- 오른쪽: 설비 설정 -->
+                    <div class="card">
+                        <h3>⚙️ 설비 & 병렬 측정기</h3>
+                        <div class="param-row">
+                            <label>설비효율 (%)</label>
+                            <input type="number" id="efficiency" value="100" step="1" min="1" max="200">
+                            <span>%</span>
+                        </div>
+                        <div class="param-row">
+                            <label>📏 측정기 대수</label>
+                            <select id="machineCount">
+                                <option value="1" selected>1대 (단일 순차 작업)</option>
+                                <option value="2">2대 (병렬 / 균등 분할)</option>
+                            </select>
+                        </div>
+                        <!-- 수량 균등 분할 옵션 (2대 선택 시 표시) -->
+                        <div id="splitOptionArea" style="display:none;">
+                            <label class="split-option-box">
+                                <input type="checkbox" id="autoSplitCheck" checked>
+                                ✂️ 수량 균등 자동 분할 <strong>(권장)</strong> — 모든 품목 수량을 장비 수로 나눠 동시 처리
+                            </label>
+                        </div>
+                        <!-- 장비별 잔업 동적 영역 -->
+                        <div id="overtimePerMachineContainer" style="margin-top:12px;"></div>
+                        <div class="check-group" style="margin-top:14px;">
+                            <label><input type="checkbox" id="excludeSat" checked> 🚫 토요일 제외</label>
+                            <label><input type="checkbox" id="excludeSun" checked> 🚫 일요일 제외</label>
+                        </div>
+                        <div class="param-row" style="margin-top:12px;">
+                            <label>참고</label>
+                            <span style="font-size:0.78rem; color:#4b5563;">
+                                공휴일 미반영 / 균등분할 ON: 수량을 반반으로 나눠 동시 처리<br>
+                                세팅시간은 각 장비별 1회씩 적용 / 총작업 = (수량×개당시간)+세팅시간
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 품목 입력 테이블 -->
+                <div class="card" style="padding:18px 20px;">
+                    <h3>📦 품목 작업 리스트</h3>
+                    <div class="item-table-wrapper">
+                        <table id="itemTable">
+                            <thead>
+                                <tr>
+                                    <th>품목명</th>
+                                    <th>수량 (EA)</th>
+                                    <th>개당 측정시간 (분)</th>
+                                    <th>세팅시간 (분)</th>
+                                    <th style="width:70px;">삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemTableBody">
+                                <tr>
+                                    <td><input type="text" placeholder="예: A부품" value="A부품"></td>
+                                    <td><input type="number" value="100" step="1" min="0"></td>
+                                    <td><input type="number" value="15" step="1" min="0"></td>
+                                    <td><input type="number" value="20" step="1" min="0" placeholder="0"></td>
+                                    <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" placeholder="예: B부품" value="B부품"></td>
+                                    <td><input type="number" value="50" step="1" min="0"></td>
+                                    <td><input type="number" value="20" step="1" min="0"></td>
+                                    <td><input type="number" value="15" step="1" min="0" placeholder="0"></td>
+                                    <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" placeholder="예: C부품" value="C부품"></td>
+                                    <td><input type="number" value="80" step="1" min="0"></td>
+                                    <td><input type="number" value="10" step="1" min="0"></td>
+                                    <td><input type="number" value="10" step="1" min="0" placeholder="0"></td>
+                                    <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="action-bar">
+                        <button onclick="addItemRow()">➕ 품목 추가</button>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button id="saveDataBtn" class="button-outline">💾 저장 (JSON)</button>
+                            <button id="loadDataBtn" class="button-outline">📂 불러오기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin:20px 0 10px;">
+                    <button id="calculateBtn" class="calc-btn">🔮 납기 계산 & 예측</button>
+                </div>
+
+                <div id="resultArea" class="result-area">
+                    <div style="text-align:center; color:#6c757d; padding:20px;">
+                        ⏳ 설정 후 [납기 계산] 버튼을 누르세요<br>
+                        <small>수량 균등 분할 · 세팅시간 반영 · 납기 여유 자동 계산</small>
+                    </div>
+                </div>
+
+                <div class="disclaimer-banner" style="margin: 16px 0 0;">
+                    ⚠️ 본 계산 결과는 참고용 예측치입니다. 실제 일정·납기는 현장 여건에 따라 달라질 수 있습니다.
+                </div>
+            </div>
+            </div>
+            <button class="capture-btn light" id="cmmCaptureBtn" onclick="captureView('cmm-view', 'CMM납기예측')" title="화면 캡처 저장">📸</button>
+        </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -276,12 +604,16 @@
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
 
+            // 다른 화면으로 넘어갈 때 센서/카메라 정리
+            if (viewId !== 'level-view') stopSensor();
+            if (viewId !== 'lux-view') stopLux();
+
             if (viewId === 'ruler-view') {
                 initRuler();
             } else if (viewId === 'level-view') {
                 initSensor();
-            } else {
-                stopSensor();
+            } else if (viewId === 'lux-view') {
+                initLux();
             }
         }
 
@@ -510,6 +842,216 @@
             showToast('영점이 설정되었습니다.');
         }
 
+        // 💡 조도계 (카메라 밝기 기반 추정치)
+        let luxStream = null;
+        let luxInterval = null;
+        let luxCurrentIndex = 0;   // 0~100 밝기 지수 (카메라 원본, 보정 전)
+        let luxCalibFactor = null; // lux per 지수 (실측 보정 후 계산)
+
+        function initLux() {
+            const video = document.getElementById('luxVideo');
+            const canvas = document.getElementById('luxCanvas');
+            const ctx = canvas.getContext('2d');
+            const sub = document.getElementById('luxSubText');
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                sub.innerText = '이 브라우저는 카메라를 지원하지 않습니다.';
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+                .then(stream => {
+                    luxStream = stream;
+                    video.srcObject = stream;
+                    loadLuxCalib();
+                    luxInterval = setInterval(() => {
+                        try {
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                            let sum = 0, count = 0;
+                            for (let i = 0; i < data.length; i += 4) {
+                                sum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                                count++;
+                            }
+                            luxCurrentIndex = Math.round((sum / count / 255) * 100);
+                            document.getElementById('luxIndexText').innerText = luxCurrentIndex;
+                            updateLuxEstimate();
+                        } catch (e) { /* 프레임 준비 안됨 - 다음 틱에 재시도 */ }
+                    }, 300);
+                })
+                .catch(() => {
+                    sub.innerText = '카메라 접근이 거부되었습니다. 폰 설정에서 카메라 권한을 허용해주세요.';
+                });
+        }
+
+        function stopLux() {
+            if (luxInterval) { clearInterval(luxInterval); luxInterval = null; }
+            if (luxStream) { luxStream.getTracks().forEach(t => t.stop()); luxStream = null; }
+        }
+
+        function updateLuxEstimate() {
+            const sub = document.getElementById('luxSubText');
+            if (luxCalibFactor) {
+                sub.innerText = `추정 조도: 약 ${Math.round(luxCurrentIndex * luxCalibFactor)} lux (보정됨)`;
+            } else {
+                sub.innerText = '밝기 지수(0~100) · 아래에서 럭스미터 실측값으로 보정하면 lux로 환산됩니다';
+            }
+            checkLuxVerdict();
+        }
+
+        function applyLuxCalib() {
+            const actual = parseFloat(document.getElementById('luxActualInput').value);
+            if (isNaN(actual) || actual <= 0) {
+                showToast('실측 조도값을 입력해주세요');
+                return;
+            }
+            if (luxCurrentIndex <= 0) {
+                showToast('밝기 측정이 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요.');
+                return;
+            }
+            luxCalibFactor = actual / luxCurrentIndex;
+            try { localStorage.setItem('qc_lux_factor', String(luxCalibFactor)); } catch (e) { /* 저장소 사용 불가 시 무시 */ }
+            updateLuxEstimate();
+            showToast('조도 보정이 저장되었습니다 ✅');
+        }
+
+        function resetLuxCalib() {
+            luxCalibFactor = null;
+            try { localStorage.removeItem('qc_lux_factor'); } catch (e) { /* 저장소 사용 불가 시 무시 */ }
+            document.getElementById('luxActualInput').value = '';
+            updateLuxEstimate();
+            showToast('조도 보정이 초기화되었습니다');
+        }
+
+        function loadLuxCalib() {
+            try {
+                const v = localStorage.getItem('qc_lux_factor');
+                if (v) luxCalibFactor = parseFloat(v);
+            } catch (e) { /* 저장소 사용 불가 시 기본값 유지 */ }
+            updateLuxEstimate();
+        }
+
+        function checkLuxVerdict() {
+            const resultEl = document.getElementById('luxResult');
+            const rangeEl = document.getElementById('luxRange');
+            const target = parseFloat(document.getElementById('luxTarget').value);
+
+            if (!luxCalibFactor) {
+                resultEl.className = 'verdict-result';
+                resultEl.innerText = '먼저 보정을 완료하세요';
+                rangeEl.innerText = '';
+                return;
+            }
+            const estLux = luxCurrentIndex * luxCalibFactor;
+            rangeEl.innerText = `현재 추정 조도: 약 ${Math.round(estLux)} lux`;
+
+            if (isNaN(target)) {
+                resultEl.className = 'verdict-result';
+                resultEl.innerText = '기준 조도(최소값)를 입력하세요';
+                return;
+            }
+            if (estLux >= target) {
+                resultEl.className = 'verdict-result pass';
+                resultEl.innerText = '🟢 PASS (기준 이상)';
+            } else {
+                resultEl.className = 'verdict-result fail';
+                resultEl.innerText = '🔴 FAIL (기준 미달)';
+            }
+        }
+
+        // ⏱️ 사이클타임 스톱워치
+        let timerRunning = false;
+        let timerStartTs = 0;
+        let timerElapsedBase = 0; // ms, 정지된 구간까지 누적된 시간
+        let timerInterval = null;
+        let cycleLaps = []; // [{ time: 초, verdict: 'pass'|'fail'|null }]
+
+        function currentElapsedMs() {
+            return timerElapsedBase + (timerRunning ? Date.now() - timerStartTs : 0);
+        }
+
+        function formatTime(ms) {
+            const totalSec = ms / 1000;
+            const m = Math.floor(totalSec / 60);
+            const s = totalSec - m * 60;
+            return `${String(m).padStart(2, '0')}:${s.toFixed(1).padStart(4, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timerDisplay').innerText = formatTime(currentElapsedMs());
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timerStartBtn');
+            if (!timerRunning) {
+                timerRunning = true;
+                timerStartTs = Date.now();
+                timerInterval = setInterval(updateTimerDisplay, 50);
+                btn.innerText = '정지';
+            } else {
+                timerRunning = false;
+                timerElapsedBase += Date.now() - timerStartTs;
+                clearInterval(timerInterval);
+                btn.innerText = '시작';
+            }
+        }
+
+        function lapTimer() {
+            const sec = currentElapsedMs() / 1000;
+            if (sec <= 0) { showToast('먼저 시작을 눌러주세요'); return; }
+
+            const target = parseFloat(document.getElementById('cycleTarget').value);
+            const tolRaw = document.getElementById('cycleTol').value;
+            let verdict = null;
+            if (!isNaN(target)) {
+                const tol = tolRaw === '' ? 0 : Math.abs(parseFloat(tolRaw));
+                verdict = Math.abs(sec - target) <= tol ? 'pass' : 'fail';
+            }
+            cycleLaps.push({ time: sec, verdict });
+            renderLaps();
+
+            // 실행 중이었다면 다음 사이클 측정을 위해 바로 재시작
+            if (timerRunning) {
+                timerElapsedBase = 0;
+                timerStartTs = Date.now();
+            }
+        }
+
+        function renderLaps() {
+            const list = document.getElementById('lapList');
+            list.innerHTML = '';
+            cycleLaps.forEach((lap, idx) => {
+                const div = document.createElement('div');
+                div.className = 'lap-item' + (lap.verdict ? ' ' + lap.verdict : '');
+                const mark = lap.verdict === 'pass' ? ' 🟢' : lap.verdict === 'fail' ? ' 🔴' : '';
+                div.innerHTML = `<span>#${idx + 1}</span><span>${lap.time.toFixed(2)}초${mark}</span>`;
+                list.appendChild(div);
+            });
+
+            const summary = document.getElementById('lapSummary');
+            if (cycleLaps.length === 0) { summary.innerText = ''; return; }
+
+            const times = cycleLaps.map(l => l.time);
+            const avg = times.reduce((a, b) => a + b, 0) / times.length;
+            const min = Math.min(...times);
+            const max = Math.max(...times);
+            const passCount = cycleLaps.filter(l => l.verdict === 'pass').length;
+            const failCount = cycleLaps.filter(l => l.verdict === 'fail').length;
+            const verdictText = (passCount + failCount > 0) ? ` · PASS ${passCount} / FAIL ${failCount}` : '';
+            summary.innerText = `평균 ${avg.toFixed(2)}초 · 최소 ${min.toFixed(2)}초 · 최대 ${max.toFixed(2)}초${verdictText}`;
+        }
+
+        function resetTimer() {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            timerElapsedBase = 0;
+            timerStartTs = 0;
+            cycleLaps = [];
+            document.getElementById('timerDisplay').innerText = '00:00.0';
+            document.getElementById('timerStartBtn').innerText = '시작';
+            renderLaps();
+        }
+
         // 📸 캡처 + 메모 (스냅샷) - 표준 브라우저 다운로드 방식
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -559,6 +1101,583 @@
                 if (btn) { btn.disabled = false; btn.innerText = '📸'; }
             }
         }
+
+        // ─────────────────────────────────────────────
+        // 🔮 CMM 측정 납기 예측기 (기존 데스크톱 도구 이식)
+        // ─────────────────────────────────────────────
+        const startDateTimeInput    = document.getElementById('startDateTime');
+        const workStartInput        = document.getElementById('workStart');
+        const workEndInput          = document.getElementById('workEnd');
+        const lunchStartInput       = document.getElementById('lunchStart');
+        const lunchEndInput         = document.getElementById('lunchEnd');
+        const efficiencyInput       = document.getElementById('efficiency');
+        const machineCountSelect    = document.getElementById('machineCount');
+        const excludeSatCheck       = document.getElementById('excludeSat');
+        const excludeSunCheck       = document.getElementById('excludeSun');
+        const targetDeadlineInput   = document.getElementById('targetDeadline');
+        const calculateBtn          = document.getElementById('calculateBtn');
+        const resultArea            = document.getElementById('resultArea');
+        const nowBtn                = document.getElementById('nowBtn');
+        const saveBtn               = document.getElementById('saveDataBtn');
+        const loadBtn               = document.getElementById('loadDataBtn');
+        const overtimePerMachineDiv = document.getElementById('overtimePerMachineContainer');
+        const tableBody             = document.getElementById('itemTableBody');
+        const splitOptionArea       = document.getElementById('splitOptionArea');
+        const autoSplitCheck        = document.getElementById('autoSplitCheck');
+
+        let machineOvertimes = [0, 0];
+
+        function updateOvertimeUI() {
+            const cnt = parseInt(machineCountSelect.value, 10);
+            let html = `<div class="overtime-group"><strong style="font-size:0.9rem;">⏰ 장비별 잔업 시간</strong><br><br>`;
+            for (let i = 0; i < cnt; i++) {
+                const val = machineOvertimes[i] !== undefined ? machineOvertimes[i] : 0;
+                html += `<div class="overtime-item">
+                    <label>🔧 장비 ${i+1} 잔업</label>
+                    <input type="number" id="machineOvertime_${i}" value="${val}" step="0.5" min="0" style="width:80px;">
+                    <span style="font-size:0.82rem;color:#64748b;">시간</span>
+                </div>`;
+            }
+            html += `</div>`;
+            overtimePerMachineDiv.innerHTML = html;
+            for (let i = 0; i < cnt; i++) {
+                const inp = document.getElementById(`machineOvertime_${i}`);
+                if (inp) {
+                    inp.addEventListener('change', e => {
+                        let v = parseFloat(e.target.value);
+                        machineOvertimes[i] = isNaN(v) ? 0 : v;
+                    });
+                    let v = parseFloat(inp.value);
+                    if (!isNaN(v)) machineOvertimes[i] = v;
+                }
+            }
+        }
+
+        function onMachineCountChange() {
+            const newCount = parseInt(machineCountSelect.value, 10);
+            const newArr = [];
+            for (let i = 0; i < newCount; i++) {
+                newArr[i] = (i < machineOvertimes.length) ? machineOvertimes[i] : 0;
+            }
+            machineOvertimes = newArr;
+            updateOvertimeUI();
+            splitOptionArea.style.display = newCount >= 2 ? 'block' : 'none';
+        }
+
+        machineCountSelect.addEventListener('change', onMachineCountChange);
+
+        function timeToMinutes(t) {
+            if (!t) return 0;
+            const [h, m] = t.split(':').map(Number);
+            return h * 60 + (m || 0);
+        }
+        function minutesToHourMin(m) {
+            const h = Math.floor(m / 60);
+            const min = Math.floor(m % 60);
+            return `${h}시간 ${min}분`;
+        }
+        function formatDateTime(date) {
+            if (!date) return '오류';
+            return date.toLocaleString('ko-KR', { hour12: false });
+        }
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+        function isWorkingDay(date, excludeSat, excludeSun) {
+            const d = date.getDay();
+            if (excludeSun && d === 0) return false;
+            if (excludeSat && d === 6) return false;
+            return true;
+        }
+        function getDailyAvailableMinutes(workStartMin, workEndMin, lunchStartMin, lunchEndMin, overtimeMinutes) {
+            let totalWork = Math.max(0, workEndMin - workStartMin);
+            let lunchDur = 0;
+            if (lunchStartMin >= workStartMin && lunchEndMin <= workEndMin && lunchStartMin < lunchEndMin) {
+                lunchDur = lunchEndMin - lunchStartMin;
+            }
+            return Math.max(0, totalWork - lunchDur) + overtimeMinutes;
+        }
+
+        function calculateFinishDateTime(startDate, totalWorkMinutes, workStartMin, workEndMin, lunchStartMin, lunchEndMin, machineOvertimeHours, excludeSat, excludeSun) {
+            let cur = new Date(startDate);
+            let remaining = totalWorkMinutes;
+            const overtimeMin = machineOvertimeHours * 60;
+            if (getDailyAvailableMinutes(workStartMin, workEndMin, lunchStartMin, lunchEndMin, overtimeMin) <= 0) return new Date(startDate);
+            let maxLoop = 3650;
+            while (remaining > 0 && maxLoop-- > 0) {
+                if (!isWorkingDay(cur, excludeSat, excludeSun)) {
+                    cur.setDate(cur.getDate() + 1);
+                    cur.setHours(0, 0, 0, 0);
+                    cur.setMinutes(workStartMin);
+                    continue;
+                }
+                const dayBase  = new Date(cur); dayBase.setHours(0,0,0,0);
+                const dayStart = new Date(dayBase.getTime() + workStartMin  * 60000);
+                const lchStart = new Date(dayBase.getTime() + lunchStartMin * 60000);
+                const lchEnd   = new Date(dayBase.getTime() + lunchEndMin   * 60000);
+                const dayEnd   = new Date(dayBase.getTime() + (workEndMin + overtimeMin) * 60000);
+                let intervals = [];
+                if (lchStart > dayStart) intervals.push({ start: dayStart, end: lchStart });
+                let afterLunch = lchEnd > dayStart ? lchEnd : dayStart;
+                if (afterLunch < dayEnd) intervals.push({ start: afterLunch, end: dayEnd });
+                for (let iv of intervals) {
+                    if (remaining <= 0) break;
+                    let segStart = cur > iv.start ? cur : iv.start;
+                    if (segStart >= iv.end) continue;
+                    let segDur = (iv.end - segStart) / 60000;
+                    if (segDur <= 0) continue;
+                    let use = Math.min(remaining, segDur);
+                    remaining -= use;
+                    cur = new Date(segStart.getTime() + use * 60000);
+                }
+                if (remaining <= 0) break;
+                let next = new Date(cur); next.setDate(next.getDate()+1); next.setHours(0,0,0,0);
+                cur = new Date(next.getTime() + workStartMin * 60000);
+            }
+            return cur;
+        }
+
+        function scheduleParallelMachines(items, startDate, workConfig, excludeSat, excludeSun, overtimeList, autoSplit) {
+            const { workStartMin, workEndMin, lunchStartMin, lunchEndMin, machineCount } = workConfig;
+
+            if (machineCount <= 1) {
+                const otH = overtimeList[0] || 0;
+                let cursor = new Date(startDate);
+                const results = [];
+                for (let item of items) {
+                    let finish = calculateFinishDateTime(cursor, item.requiredMinutes, workStartMin, workEndMin, lunchStartMin, lunchEndMin, otH, excludeSat, excludeSun);
+                    results.push({ ...item, finishDate: finish, machineNo: 1, isSplit: false });
+                    cursor = new Date(finish);
+                }
+                const finalFinish = results.length > 0 ? results[results.length-1].finishDate : startDate;
+                return {
+                    finalFinish,
+                    perItemResults: results,
+                    machineLoads: [items.reduce((a,b)=>a+b.requiredMinutes,0)],
+                    machineFinishTimes: [finalFinish],
+                    splitMode: false
+                };
+            }
+
+            if (autoSplit) {
+                const N = machineCount;
+                let machineJobQueues = Array.from({length: N}, () => []);
+
+                for (let item of items) {
+                    const baseQty   = Math.floor(item.qty / N);
+                    const remainder = item.qty - baseQty * N;
+
+                    for (let m = 0; m < N; m++) {
+                        const assignQty = baseQty + (m < remainder ? 1 : 0);
+                        if (assignQty <= 0) continue;
+                        const setupForMachine = item.setupMin || 0;
+                        const rawMin  = assignQty * item.perMin + setupForMachine;
+                        const reqMin  = rawMin / workConfig.effFactor;
+                        machineJobQueues[m].push({
+                            name:            item.name,
+                            qty:             assignQty,
+                            perMin:          item.perMin,
+                            setupMin:        setupForMachine,
+                            totalMinutes:    rawMin,
+                            requiredMinutes: reqMin,
+                            originalQty:     item.qty,
+                            isSplit:         true,
+                            machineNo:       m + 1
+                        });
+                    }
+                }
+
+                const perItemDetailed    = [];
+                const machineFinishTimes = [];
+                const machineLoads       = [];
+
+                for (let m = 0; m < N; m++) {
+                    let cursor = new Date(startDate);
+                    const otH  = overtimeList[m] || 0;
+                    let load = 0;
+                    for (let job of machineJobQueues[m]) {
+                        let finish = calculateFinishDateTime(cursor, job.requiredMinutes, workStartMin, workEndMin, lunchStartMin, lunchEndMin, otH, excludeSat, excludeSun);
+                        perItemDetailed.push({ ...job, finishDate: finish });
+                        cursor = new Date(finish);
+                        load += job.requiredMinutes;
+                    }
+                    machineFinishTimes.push(cursor);
+                    machineLoads.push(load);
+                }
+
+                const finalFinish = new Date(Math.max(...machineFinishTimes.map(d => d.getTime())));
+                return { finalFinish, perItemResults: perItemDetailed, machineLoads, machineFinishTimes, splitMode: true };
+            }
+
+            const sorted = [...items].sort((a,b) => b.requiredMinutes - a.requiredMinutes);
+            let loads = [0, 0];
+            let jobs  = [[], []];
+            for (let job of sorted) {
+                const assign = loads[0] <= loads[1] ? 0 : 1;
+                loads[assign] += job.requiredMinutes;
+                jobs[assign].push(job);
+            }
+            const perItemDetailed    = [];
+            const machineFinishTimes = [];
+            for (let m = 0; m < 2; m++) {
+                let cursor = new Date(startDate);
+                const otH = overtimeList[m] || 0;
+                for (let job of jobs[m]) {
+                    let finish = calculateFinishDateTime(cursor, job.requiredMinutes, workStartMin, workEndMin, lunchStartMin, lunchEndMin, otH, excludeSat, excludeSun);
+                    perItemDetailed.push({ ...job, finishDate: finish, machineNo: m+1, isSplit: false });
+                    cursor = new Date(finish);
+                }
+                machineFinishTimes.push(cursor);
+            }
+            const finalFinish = new Date(Math.max(...machineFinishTimes.map(d => d.getTime())));
+            return { finalFinish, perItemResults: perItemDetailed, machineLoads: loads, machineFinishTimes, splitMode: false };
+        }
+
+        function performCalculation() {
+            const startDateStr = startDateTimeInput.value;
+            if (!startDateStr) { alert('시작 일시를 입력하세요.'); return; }
+            const startDate = new Date(startDateStr);
+            if (isNaN(startDate.getTime())) { alert('시작일시 오류'); return; }
+
+            const workStart  = workStartInput.value;
+            const workEnd    = workEndInput.value;
+            const lunchStart = lunchStartInput.value;
+            const lunchEnd   = lunchEndInput.value;
+            const efficiency = parseFloat(efficiencyInput.value) || 100;
+            const effFactor  = efficiency / 100;
+            const machineCount = parseInt(machineCountSelect.value, 10);
+            const excludeSat   = excludeSatCheck.checked;
+            const excludeSun   = excludeSunCheck.checked;
+            const targetDeadlineStr = targetDeadlineInput.value;
+            const autoSplit    = machineCount >= 2 && autoSplitCheck.checked;
+
+            if (effFactor <= 0) { alert('효율은 0보다 커야 합니다.'); return; }
+
+            for (let i = 0; i < machineCount; i++) {
+                const inp = document.getElementById(`machineOvertime_${i}`);
+                if (inp) { let v = parseFloat(inp.value); machineOvertimes[i] = isNaN(v) ? 0 : v; }
+            }
+            const perMachineOvertimeHours = machineOvertimes.slice(0, machineCount);
+
+            const workStartMin  = timeToMinutes(workStart);
+            const workEndMin    = timeToMinutes(workEnd);
+            const lunchStartMin = timeToMinutes(lunchStart);
+            const lunchEndMin   = timeToMinutes(lunchEnd);
+
+            const rows = document.querySelectorAll('#itemTableBody tr');
+            let itemsData = [];
+            for (let row of rows) {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length < 4) continue;
+                const name     = inputs[0].value.trim() || '미지정';
+                const qty      = parseFloat(inputs[1].value) || 0;
+                const perMin   = parseFloat(inputs[2].value) || 0;
+                const setupMin = parseFloat(inputs[3].value) || 0;
+                const totalRaw = qty * perMin + setupMin;
+                itemsData.push({ name, qty, perMin, setupMin, totalMinutes: totalRaw, requiredMinutes: totalRaw / effFactor });
+            }
+            if (itemsData.length === 0) { alert('품목을 최소 1개 입력하세요.'); return; }
+
+            const totalRawSum      = itemsData.reduce((s,it) => s + it.totalMinutes, 0);
+            const totalRequiredSum = itemsData.reduce((s,it) => s + it.requiredMinutes, 0);
+            const totalSetupSum    = itemsData.reduce((s,it) => s + it.setupMin, 0);
+            const totalMeasureSum  = totalRawSum - totalSetupSum;
+
+            const workConfig = { workStartMin, workEndMin, lunchStartMin, lunchEndMin, effFactor, machineCount };
+
+            const scheduleResult  = scheduleParallelMachines(itemsData, startDate, workConfig, excludeSat, excludeSun, perMachineOvertimeHours, autoSplit);
+            const finalFinishDate = scheduleResult.finalFinish;
+            const perItemDetails  = scheduleResult.perItemResults;
+            const splitMode       = scheduleResult.splitMode;
+
+            const dailyInfos = perMachineOvertimeHours.map(ot => {
+                const cap = getDailyAvailableMinutes(workStartMin, workEndMin, lunchStartMin, lunchEndMin, ot * 60);
+                return `${cap}분 (잔업 ${ot}h)`;
+            });
+            const dailyCapMinutes = getDailyAvailableMinutes(workStartMin, workEndMin, lunchStartMin, lunchEndMin, (perMachineOvertimeHours[0] || 0) * 60);
+            const estimatedDays   = dailyCapMinutes > 0 ? (totalRequiredSum / machineCount / dailyCapMinutes) : 0;
+
+            let deadlineHtml = '';
+            if (targetDeadlineStr) {
+                const deadlineDate = new Date(targetDeadlineStr);
+                deadlineDate.setHours(23,59,59,999);
+                const diffMs     = deadlineDate - finalFinishDate;
+                const absDiffMin = Math.abs(diffMs / 60000);
+                const dD = Math.floor(absDiffMin / (60*24));
+                const dH = Math.floor((absDiffMin % (60*24)) / 60);
+                const dM = Math.floor(absDiffMin % 60);
+                if (diffMs >= 0) {
+                    deadlineHtml = `<div style="margin-top:10px;">
+                        <div style="font-size:0.9rem;color:#374151;margin-bottom:4px;">🎯 목표 납기일 : <strong>${new Date(targetDeadlineStr).toLocaleDateString('ko-KR')}</strong></div>
+                        <span class="deadline-ok">✅ 납기 여유 : +${dD}일 ${dH}시간 ${dM}분</span>
+                    </div>`;
+                } else {
+                    deadlineHtml = `<div style="margin-top:10px;">
+                        <div style="font-size:0.9rem;color:#374151;margin-bottom:4px;">🎯 목표 납기일 : <strong>${new Date(targetDeadlineStr).toLocaleDateString('ko-KR')}</strong></div>
+                        <span class="deadline-warn">⚠️ 납기 초과 예상 : -${dD}일 ${dH}시간 ${dM}분</span>
+                    </div>`;
+                }
+            }
+
+            let html = '';
+
+            html += `<div class="result-card"><h3>📊 전체 측정 예측 (${machineCount}대 처리${splitMode ? ' / 수량 균등 분할' : ''})</h3>`;
+            html += `<div class="stat-grid">
+                <div class="stat-item">
+                    <strong>📦 총 측정시간</strong><br>${minutesToHourMin(totalMeasureSum)}<br>
+                    <span class="section-label">세팅 제외 순수 측정</span>
+                </div>
+                <div class="stat-item">
+                    <strong>🔩 세팅시간 합계</strong><br>${minutesToHourMin(totalSetupSum)}<br>
+                    <span class="section-label">전체 품목 세팅 합산</span>
+                </div>
+                <div class="stat-item">
+                    <strong>⚙️ 효율 적용 총 작업량</strong><br>${efficiency}% → ${minutesToHourMin(totalRequiredSum)}<br>
+                    <span class="section-label">(측정+세팅) ÷ 효율</span>
+                </div>
+                <div class="stat-item">
+                    <strong>🖨️ 측정기</strong><br>${machineCount}대<br>
+                    <span class="section-label">${machineCount >= 2 ? (splitMode ? '수량 균등 자동 분할' : 'LPT 품목 단위 배분') : '단일 순차'}</span>
+                </div>
+            </div>`;
+
+            html += `<div class="stat-grid">`;
+            for (let i = 0; i < machineCount; i++) {
+                html += `<div class="stat-item">
+                    <strong>🔧 장비 ${i+1} 잔업</strong><br>${perMachineOvertimeHours[i] || 0}시간<br>
+                    <span class="section-label">일일 가동: ${dailyInfos[i] || '-'}</span>
+                </div>`;
+            }
+            html += `<div class="stat-item">
+                <strong>📅 예상 작업일</strong><br>
+                <span class="workday-badge">${estimatedDays.toFixed(2)} 일</span><br>
+                <span class="section-label">총 작업량 ÷ (장비수 × 일일 가동)</span>
+            </div></div>`;
+
+            if (machineCount >= 2) {
+                const finishTimes = scheduleResult.machineFinishTimes || [];
+                html += `<div class="stat-grid" style="background:#eef2ff;border-radius:20px;padding:12px 16px;margin:4px 0;">`;
+                for (let m = 0; m < machineCount; m++) {
+                    const load = scheduleResult.machineLoads[m] || 0;
+                    const ft   = finishTimes[m] ? formatDateTime(finishTimes[m]) : '-';
+                    html += `<div class="stat-item" style="background:white;">
+                        <strong>🔧 장비 ${m+1} 배정 부하</strong><br>${minutesToHourMin(load)}<br>
+                        <span class="section-label">예상 종료: ${ft}</span>
+                    </div>`;
+                }
+                if (splitMode) {
+                    html += `<div class="stat-item" style="background:white;">
+                        <strong>⚡ 병렬 처리 상태</strong><br>
+                        <span class="parallel-ok-badge">✅ 장비 ${machineCount}대 균등 분배 완료</span><br>
+                        <span class="section-label">모든 품목 수량 ${machineCount}등분 처리</span>
+                    </div>`;
+                } else {
+                    html += `<div class="stat-item" style="background:white;">
+                        <strong>⚡ 병렬 처리 상태</strong><br>
+                        품목 단위 LPT 배분<br>
+                        <span class="section-label">균등분할 사용 시 효율 최대화</span>
+                    </div>`;
+                }
+                html += `</div>`;
+            }
+
+            html += `<div style="margin-top:12px;">
+                <span class="highlight-date">🎯 최종 완료 예정 : ${formatDateTime(finalFinishDate)}</span>
+                ${deadlineHtml}
+            </div></div>`;
+
+            html += `<div class="result-card"><h3>📋 품목별 완료 예정${splitMode ? ' (수량 균등 분할 · 1호기·2호기 동시 처리)' : ' (장비별 배정)'}</h3>
+            <div class="item-table-wrapper">
+            <table class="per-item-table">
+                <thead><tr>
+                    <th>품목명</th>
+                    <th>배정 장비</th>
+                    <th>배정 수량</th>
+                    <th>측정시간</th>
+                    <th>세팅(분)</th>
+                    <th>효율 적용</th>
+                    <th>완료 예정일시</th>
+                </tr></thead>
+                <tbody>`;
+
+            if (splitMode) {
+                const itemNames = [...new Set(itemsData.map(it => it.name))];
+                for (let name of itemNames) {
+                    const jobsOfItem = perItemDetails.filter(j => j.name === name).sort((a,b) => a.machineNo - b.machineNo);
+                    if (jobsOfItem.length === 0) continue;
+                    const lastFinish = new Date(Math.max(...jobsOfItem.map(j => j.finishDate.getTime())));
+                    const originalQty = jobsOfItem[0].originalQty;
+
+                    if (jobsOfItem.length >= 2) {
+                        const machineLabels = jobsOfItem.map(j => `${j.machineNo}호기`).join(' · ');
+                        const qtyLabels     = jobsOfItem.map(j => `${j.qty}EA`).join(' / ');
+                        const measureTotal  = jobsOfItem.reduce((s,j) => s + (j.qty * j.perMin), 0);
+                        const reqTotal      = jobsOfItem.reduce((s,j) => s + j.requiredMinutes, 0);
+                        const setupPerMach  = jobsOfItem[0].setupMin || 0;
+
+                        html += `<tr style="background:#fffbeb;">
+                            <td rowspan="${jobsOfItem.length + 1}"><strong>${escapeHtml(name)}</strong><br><span class="section-label">원본 ${originalQty} EA</span></td>
+                            <td><span class="machine-badge-both">🔄 ${machineLabels} 동시</span></td>
+                            <td style="text-align:center;">${qtyLabels}</td>
+                            <td style="text-align:center;">${minutesToHourMin(measureTotal)}</td>
+                            <td style="text-align:center; color:#7c3aed;">${setupPerMach > 0 ? '각 '+setupPerMach+'분' : '-'}</td>
+                            <td style="text-align:center;">${minutesToHourMin(reqTotal)}</td>
+                            <td><strong style="color:#b91c1c;">${formatDateTime(lastFinish)}</strong><br><span class="section-label">양 장비 중 늦은 쪽 기준</span></td>
+                        </tr>`;
+                        for (let j of jobsOfItem) {
+                            html += `<tr>
+                                <td><span class="machine-badge">${j.machineNo}호기</span></td>
+                                <td style="text-align:center;">${j.qty} EA</td>
+                                <td style="text-align:center;">${minutesToHourMin(j.qty * j.perMin)}</td>
+                                <td style="text-align:center; color:${j.setupMin > 0 ? '#7c3aed' : '#9ca3af'};">${j.setupMin > 0 ? minutesToHourMin(j.setupMin) : '-'}</td>
+                                <td style="text-align:center;">${minutesToHourMin(j.requiredMinutes)}</td>
+                                <td>${formatDateTime(j.finishDate)}</td>
+                            </tr>`;
+                        }
+                    } else {
+                        const j = jobsOfItem[0];
+                        html += `<tr>
+                            <td><strong>${escapeHtml(name)}</strong></td>
+                            <td><span class="machine-badge">${j.machineNo}호기</span></td>
+                            <td style="text-align:center;">${j.qty} EA</td>
+                            <td style="text-align:center;">${minutesToHourMin(j.qty * j.perMin)}</td>
+                            <td style="text-align:center; color:${j.setupMin > 0 ? '#7c3aed' : '#9ca3af'};">${j.setupMin > 0 ? minutesToHourMin(j.setupMin) : '-'}</td>
+                            <td style="text-align:center;">${minutesToHourMin(j.requiredMinutes)}</td>
+                            <td><strong style="color:#b91c1c;">${formatDateTime(j.finishDate)}</strong></td>
+                        </tr>`;
+                    }
+                }
+            } else {
+                const sortedByFinish = [...perItemDetails].sort((a,b) => a.finishDate - b.finishDate);
+                for (let res of sortedByFinish) {
+                    const measureMin = res.qty * res.perMin;
+                    const setupMin   = res.setupMin || 0;
+                    const machineInfo = res.machineNo ? `${res.machineNo}호기` : '단일';
+                    html += `<tr>
+                        <td>${escapeHtml(res.name)}</td>
+                        <td><span class="machine-badge">${machineInfo}</span></td>
+                        <td style="text-align:center;">${res.qty} EA</td>
+                        <td style="text-align:center;">${minutesToHourMin(measureMin)}</td>
+                        <td style="text-align:center; color:${setupMin > 0 ? '#7c3aed' : '#9ca3af'};">${setupMin > 0 ? minutesToHourMin(setupMin) : '-'}</td>
+                        <td style="text-align:center;">${minutesToHourMin(res.requiredMinutes)}</td>
+                        <td><strong style="color:#b91c1c;">${formatDateTime(res.finishDate)}</strong></td>
+                    </tr>`;
+                }
+            }
+
+            html += `</tbody></table></div></div>`;
+
+            html += `<div class="result-card" style="font-size:0.85rem;color:#4b5563;">
+                <p style="margin:0;line-height:2;">
+                    📌 측정기 ${machineCount}대 / 근무 ${workStart}~${workEnd} / 점심 ${lunchStart}~${lunchEnd}<br>
+                    🔩 세팅시간: 전체 ${minutesToHourMin(totalSetupSum)} 포함${splitMode ? ' (균등분할 시 각 장비 1회씩 적용)' : ''}<br>
+                    🕒 잔업: ${machineCount===1 ? `${perMachineOvertimeHours[0]||0}시간` : `장비1: ${perMachineOvertimeHours[0]||0}h / 장비2: ${perMachineOvertimeHours[1]||0}h`}<br>
+                    🗓️ 주말: ${excludeSat ? '토 제외' : '토 포함'} / ${excludeSun ? '일 제외' : '일 포함'}<br>
+                    ⚙️ 분배 방식: ${splitMode ? `수량 균등 자동 분할 (${machineCount}등분) — 모든 품목 동시 처리` : 'LPT 알고리즘 품목 단위 배분'}<br>
+                    💡 공휴일 미반영 / 현장 여유율 고려 시 납기 버퍼 권장
+                </p>
+            </div>`;
+
+            resultArea.innerHTML = html;
+        }
+
+        window.addItemRow = function() {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" placeholder="품목명"></td>
+                <td><input type="number" value="1" step="1" min="0"></td>
+                <td><input type="number" value="10" step="1" min="0"></td>
+                <td><input type="number" value="0" step="1" min="0" placeholder="0"></td>
+                <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
+            `;
+            tableBody.appendChild(row);
+        };
+        window.deleteRow = function(btn) {
+            const row = btn.closest('tr');
+            if (tableBody.children.length > 1) row.remove();
+            else alert('최소 1개 품목은 필요합니다.');
+        };
+
+        nowBtn.addEventListener('click', () => {
+            const now = new Date();
+            const pad = n => String(n).padStart(2,'0');
+            startDateTimeInput.value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        });
+
+        saveBtn.addEventListener('click', () => {
+            const items = [];
+            document.querySelectorAll('#itemTableBody tr').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 4) items.push({ name: inputs[0].value, qty: inputs[1].value, perMin: inputs[2].value, setupMin: inputs[3].value });
+            });
+            const cnt = parseInt(machineCountSelect.value, 10);
+            const savedOvertimes = [];
+            for (let i = 0; i < cnt; i++) savedOvertimes.push(machineOvertimes[i] || 0);
+            const config = {
+                startDateTime: startDateTimeInput.value,
+                workStart: workStartInput.value, workEnd: workEndInput.value,
+                lunchStart: lunchStartInput.value, lunchEnd: lunchEndInput.value,
+                efficiency: efficiencyInput.value, machineCount: machineCountSelect.value,
+                excludeSat: excludeSatCheck.checked, excludeSun: excludeSunCheck.checked,
+                targetDeadline: targetDeadlineInput.value,
+                autoSplit: autoSplitCheck.checked,
+                machineOvertimes: savedOvertimes,
+                items
+            };
+            localStorage.setItem('cmm_v4', JSON.stringify(config));
+            showToast('저장 완료 (cmm_v4) ✅');
+        });
+
+        loadBtn.addEventListener('click', () => {
+            const saved = localStorage.getItem('cmm_v4');
+            if (!saved) { showToast('저장된 데이터 없음'); return; }
+            try {
+                const d = JSON.parse(saved);
+                startDateTimeInput.value = d.startDateTime || startDateTimeInput.value;
+                workStartInput.value  = d.workStart  || '08:00';
+                workEndInput.value    = d.workEnd    || '17:00';
+                lunchStartInput.value = d.lunchStart || '12:00';
+                lunchEndInput.value   = d.lunchEnd   || '13:00';
+                efficiencyInput.value = d.efficiency ?? 100;
+                machineCountSelect.value = d.machineCount ?? '1';
+                excludeSatCheck.checked = d.excludeSat ?? true;
+                excludeSunCheck.checked = d.excludeSun ?? true;
+                targetDeadlineInput.value = d.targetDeadline || '';
+                autoSplitCheck.checked = d.autoSplit ?? true;
+                machineOvertimes = Array.isArray(d.machineOvertimes) ? [...d.machineOvertimes] : [0,0];
+                while (machineOvertimes.length < 2) machineOvertimes.push(0);
+                onMachineCountChange();
+                const cnt = parseInt(machineCountSelect.value, 10);
+                for (let i = 0; i < cnt; i++) {
+                    const inp = document.getElementById(`machineOvertime_${i}`);
+                    if (inp && machineOvertimes[i] !== undefined) inp.value = machineOvertimes[i];
+                }
+                if (d.items && Array.isArray(d.items)) {
+                    tableBody.innerHTML = '';
+                    for (let it of d.items) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><input type="text" value="${escapeHtml(it.name||'')}"></td>
+                            <td><input type="number" value="${it.qty??1}"></td>
+                            <td><input type="number" value="${it.perMin??10}"></td>
+                            <td><input type="number" value="${it.setupMin??0}" placeholder="0"></td>
+                            <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
+                        `;
+                        tableBody.appendChild(row);
+                    }
+                    if (tableBody.children.length === 0) addItemRow();
+                }
+                showToast('불러오기 완료 ✅');
+            } catch(e) { alert('오류: ' + e.message); }
+        });
+
+        calculateBtn.addEventListener('click', performCalculation);
+
+        machineCountSelect.value = '1';
+        machineOvertimes = [0, 0];
+        onMachineCountChange();
+        window.addEventListener('load', () => { performCalculation(); });
     </script>
 </body>
 </html>
