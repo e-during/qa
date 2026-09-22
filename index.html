@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>품질경영팀 PORTAL</title>
+<meta name="theme-color" content="#0b1636">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="품질경영팀">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html { height: 100%; background: #060b1c; }
+  body {
+    min-height: 100%; min-height: 100dvh;
+    display: flex; flex-direction: column;
+    background: #060b1c; color: #fff;
+    overflow-x: hidden; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ---------- 히어로 (사진 + 텍스트 오버레이) ---------- */
+  .hero {
+    position: relative; width: 100%; height: 24vh; min-height: 160px; max-height: 220px;
+    padding-top: env(safe-area-inset-top);
+  }
+  .hero img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    object-position: center 38%;
+    filter: saturate(1.05);
+  }
+  .hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(6,11,28,.1) 0%, rgba(6,11,28,.05) 40%, #060b1c 100%);
+  }
+  .status-pill {
+    position: absolute; top: calc(env(safe-area-inset-top) + 14px); right: 16px; z-index: 2;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(6,11,28,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,.18); border-radius: 999px;
+    padding: 7px 12px; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,.85);
+  }
+  .status-pill i { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,.7); }
+
+  .hero-text { text-align: center; padding: 16px 20px 0; }
+  .hero-sub { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; color: #e0b060; }
+  .hero-team { margin-top: 8px; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: .3px; }
+
+  /* ---------- 본문 ---------- */
+  .content { flex: 1; display: flex; flex-direction: column; padding: 16px 20px calc(env(safe-area-inset-bottom) + 8px); }
+
+  .menu { width: 100%; max-width: 440px; margin: 0 auto; }
+
+  .dash-btn {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 20px 20px 16px; border-radius: 16px; text-decoration: none;
+    background: #101c38;
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .dash-btn:active { transform: scale(.98); }
+  .dash-btn .icon {
+    flex: none; width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(224,176,96,.10);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(224,176,96,.25);
+  }
+  .dash-btn .icon svg { width: 22px; height: 22px; }
+  .dash-btn .text { flex: 1; min-width: 0; }
+  .dash-btn .label { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: .1px; }
+  .dash-btn .desc { margin-top: 4px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.4); }
+  .dash-btn .arrow {
+    flex: none; display: flex; align-items: center; gap: 3px;
+    color: #e0b060; font-weight: 700; font-size: 11px; letter-spacing: .2px;
+    transition: transform .15s ease;
+  }
+  .dash-btn .arrow svg { width: 14px; height: 14px; transition: transform .15s ease; }
+  .dash-btn:hover .arrow svg, .dash-btn:active .arrow svg { transform: translateX(3px); }
+  .dash-btn .watermark {
+    position: absolute; bottom: 8px; right: 16px;
+    font-size: 8px; font-weight: 800; letter-spacing: 1.5px; color: rgba(255,255,255,.10);
+  }
+
+  /* ---------- 가치 4개 (카드 안에 통합, 문구 그대로 · 탭하면 현장 툴박스로 이동) ---------- */
+  .values {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    margin: 16px auto 0; width: 100%; max-width: 440px;
+    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07);
+    border-radius: 16px; padding: 12px 4px 16px;
+    text-decoration: none; transition: transform .15s ease;
+    position: relative;
+  }
+  .values:active { transform: scale(.98); }
+  .value-item { text-align: center; position: relative; padding: 0 2px; }
+  .value-item + .value-item::before {
+    content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 1px;
+    background: rgba(255,255,255,.08);
+  }
+  .value-item .vi { width: 24px; height: 24px; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; }
+  .value-item .vi svg { width: 15px; height: 15px; stroke: #e0b060; opacity: .85; }
+  .value-item .vt { font-size: 11px; font-weight: 800; color: #fff; }
+  .value-item .vd { margin-top: 2px; font-size: 8px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.3; }
+  .tap-hint {
+    position: absolute; left: 50%; bottom: 3px; transform: translateX(-50%);
+    font-size: 12px; line-height: 1; opacity: .35; filter: grayscale(1) brightness(1.8);
+  }
+
+  /* ---------- 추가 기능 카드 (메인 카드와 동일 디자인 시스템) ---------- */
+  .soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px auto 0; width: 100%; max-width: 440px; }
+  .soon-card {
+    position: relative; padding: 14px 12px 12px; border-radius: 16px;
+    background: #101c38; border: 1px solid rgba(255,255,255,.08);
+    display: block; text-decoration: none; text-align: center;
+    transition: transform .15s ease;
+  }
+  .soon-card:active { transform: scale(.98); }
+  .soon-badge {
+    display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: .3px;
+    color: rgba(255,255,255,.5); background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    border-radius: 999px; padding: 2px 6px; margin-bottom: 8px;
+  }
+  .soon-badge.live { color: #e0b060; background: rgba(224,176,96,.10); border-color: rgba(224,176,96,.25); }
+  .soon-card .si {
+    width: 24px; height: 24px; border-radius: 8px; margin: 0 auto 8px;
+    background: rgba(224,176,96,.10); display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(224,176,96,.2);
+  }
+  .soon-card .si svg { width: 13px; height: 13px; stroke: #e0b060; opacity: .9; }
+  .soon-card .st { font-size: 12.5px; font-weight: 800; color: #fff; }
+  .soon-card .sd { margin-top: 3px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
+
+  .credit { margin-top: 16px; text-align: center; }
+  .credit .line { width: 30px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 8px; }
+  .credit p { font-size: 9.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.5; letter-spacing: .2px; }
+  .credit a { color: rgba(255,255,255,.35); text-decoration: none; }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <img src="images/hero.jpg" alt="DURING 사옥 전경">
+    <div class="status-pill"><i></i>SYSTEM ONLINE</div>
+  </div>
+
+  <div class="hero-text">
+    <div class="hero-sub">SMART QUALITY PLATFORM</div>
+    <div class="hero-team">품질경영팀 PORTAL</div>
+  </div>
+
+  <div class="content">
+    <div class="menu">
+      <a class="dash-btn" href="m_dashboard.html">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+          </svg>
+        </div>
+        <div class="text">
+          <div class="label">실시간 대시보드 접속</div>
+          <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
+        </div>
+        <div class="arrow">바로가기<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+        <div class="watermark">REAL-TIME<br>DASHBOARD</div>
+      </a>
+    </div>
+
+    <a class="values" href="toolbox.html">
+      <div class="value-item">
+        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L20 6 V12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 V6 Z"></path></svg></div>
+        <div class="vt">신뢰</div>
+        <div class="vd">철저한 데이터</div>
+      </div>
+      <div class="value-item">
+        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="9"></circle></svg></div>
+        <div class="vt">품질</div>
+        <div class="vd">지속적인 개선</div>
+      </div>
+      <div class="value-item">
+        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 Z"></path></svg></div>
+        <div class="vt">효율</div>
+        <div class="vd">스마트한 운영</div>
+      </div>
+      <div class="value-item">
+        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5"></path><path d="M10 20c0-3 2.5-5 6-5s6 2 6 5"></path></svg></div>
+        <div class="vt">함께</div>
+        <div class="vd">더 나은 발전</div>
+      </div>
+      <div class="tap-hint">👆</div>
+    </a>
+
+    <div class="soon-grid">
+      <a class="soon-card" href="calc.html">
+        <div class="soon-badge live">바로가기</div>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg></div>
+        <div class="st">계산기</div>
+        <div class="sd">위치도 · MMC 공차 계산</div>
+      </a>
+      <div class="soon-card">
+        <div class="soon-badge">개발 중</div>
+        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8Z"></path><path d="M14 2v6h6"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg></div>
+        <div class="st">계측기 리스트</div>
+        <div class="sd">보유 장비 · 이력 조회</div>
+      </div>
+    </div>
+
+    <div class="credit">
+      <div class="line"></div>
+      <p>Developed by 품질경영팀 정충용<br><a href="mailto:cyjeong@e-during.co.kr">cyjeong@e-during.co.kr</a></p>
+    </div>
+  </div>
+
+</body>
+</html>
