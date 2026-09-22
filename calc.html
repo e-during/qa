@@ -65,11 +65,13 @@
   .seg.g2 { grid-template-columns: 1fr 1fr; }
   .seg.g3 { grid-template-columns: 1fr 1fr 1fr; }
   .seg button {
-    padding: 10px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12);
-    background: #0c1730; color: rgba(255,255,255,.6); font-size: 12px; font-weight: 800;
+    padding: 10px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16);
+    background: #0c1730; color: rgba(255,255,255,.72); font-size: 12px; font-weight: 800;
     font-family: inherit;
   }
-  .seg button.on { background: rgba(224,176,96,.16); border-color: #e0b060; color: #e0b060; }
+  /* 선택된 상태는 금색 배경 + 진한 텍스트로 확실하게 대비를 줘서 한눈에 구분되게 한다
+     (기존 "금색 텍스트 + 옅은 금색 배경"은 어두운 화면에서 시인성이 떨어졌음) */
+  .seg button.on { background: #e0b060; border-color: #e0b060; color: #1a1206; font-weight: 900; }
 
   .btn-primary {
     width: 100%; padding: 14px; border-radius: 14px; border: none;
@@ -88,6 +90,18 @@
   .result-row:last-child { border-bottom: none; }
   .result-row .rl { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.5); }
   .result-row .rv { font-size: 15px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+
+  /* ---------- 간이계산기 계산 기록(누적) ---------- */
+  .card-head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .card-head-row h2 { margin-bottom: 0; }
+  .hist-clear-btn { font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.4); background: none; border: none; font-family: inherit; padding: 4px 6px; }
+  .hist-clear-btn:active { color: #fb7185; }
+  .calc-history { display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; }
+  .hist-empty { text-align: center; font-size: 11.5px; color: rgba(255,255,255,.3); padding: 14px 0; }
+  .hist-item { padding: 10px 2px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .hist-item:last-child { border-bottom: none; }
+  .hist-item .he { font-size: 11px; color: rgba(255,255,255,.45); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist-item .hr { margin-top: 2px; font-size: 16px; font-weight: 800; color: #e0b060; font-variant-numeric: tabular-nums; }
   .verdict { text-align: center; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 900; letter-spacing: .5px; margin-top: 4px; }
   .verdict.pass { background: rgba(16,185,129,.14); color: #34d399; border: 1px solid rgba(52,211,153,.35); }
   .verdict.warn { background: rgba(224,176,96,.14); color: #e0b060; border: 1px solid rgba(224,176,96,.35); }
@@ -166,41 +180,91 @@
 
   <main>
 
-    <!-- ============ 2. 환산 (mm/inch · 토크 · 각도 · 온도) ============ -->
+    <!-- ============ 2. 환산 (길이 · 토크/힘 · 열팽창) ============ -->
     <div id="panel-conv" class="panel">
       <div class="card">
-        <h2>변환 종류</h2>
-        <div class="seg g2">
-          <button id="conv-type-mm" class="on" onclick="setConvType('mm')">mm ↔ inch</button>
-          <button id="conv-type-torque" onclick="setConvType('torque')">토크 (kgf·cm↔N·m)</button>
-          <button id="conv-type-angle" onclick="setConvType('angle')">각도 (도↔rad)</button>
-          <button id="conv-type-temp" onclick="setConvType('temp')">온도 (℃↔℉)</button>
+        <h2>환산 종류</h2>
+        <div class="seg g3">
+          <button id="conv-cat-length" class="on" onclick="setConvCategory('length')">길이</button>
+          <button id="conv-cat-torque" onclick="setConvCategory('torque')">토크·힘</button>
+          <button id="conv-cat-thermal" onclick="setConvCategory('thermal')">열팽창</button>
         </div>
       </div>
 
-      <div class="card conv-section" id="conv-sec-mm">
-        <h2>mm / inch 변환</h2>
-        <div class="field"><label>밀리미터 (mm)</label><input type="text" readonly id="conv-mm" value="25.4" oninput="convertMmToInch()" onclick="openKeypad(this)"></div>
-        <div class="field"><label>인치 (inch)</label><input type="text" readonly id="conv-inch" value="1.0" oninput="convertInchToMm()" onclick="openKeypad(this)"></div>
+      <!-- ---- 길이 ---- -->
+      <div class="conv-cat" id="conv-cat-sec-length">
+        <div class="card">
+          <h2>길이 단위</h2>
+          <div class="seg g3">
+            <button id="len-type-mmin" class="on" onclick="setLenType('mmin')">mm↔inch</button>
+            <button id="len-type-mmum" onclick="setLenType('mmum')">mm↔μm</button>
+            <button id="len-type-inmil" onclick="setLenType('inmil')">inch↔mil</button>
+          </div>
+        </div>
+        <div class="card conv-section" id="len-sec-mmin">
+          <h2>mm / inch 변환</h2>
+          <div class="field"><label>밀리미터 (mm)</label><input type="text" readonly id="conv-mm" value="25.4" oninput="convertMmToInch()" onclick="openKeypad(this)"></div>
+          <div class="field"><label>인치 (inch)</label><input type="text" readonly id="conv-inch" value="1.0" oninput="convertInchToMm()" onclick="openKeypad(this)"></div>
+        </div>
+        <div class="card conv-section" id="len-sec-mmum" style="display:none;">
+          <h2>mm / μm 변환</h2>
+          <div class="field"><label>밀리미터 (mm)</label><input type="text" readonly id="conv-mm2" value="0.05" oninput="convertMmToUm()" onclick="openKeypad(this)"></div>
+          <div class="field"><label>마이크로미터 (μm)</label><input type="text" readonly id="conv-um" value="50" oninput="convertUmToMm()" onclick="openKeypad(this)"></div>
+          <div class="hint">측정 편차·공차를 μm 단위로 표기할 때 사용 (1 mm = 1000 μm)</div>
+        </div>
+        <div class="card conv-section" id="len-sec-inmil" style="display:none;">
+          <h2>inch / mil(thou) 변환</h2>
+          <div class="field"><label>인치 (inch)</label><input type="text" readonly id="conv-inch3" value="0.001" oninput="convertInchToMil()" onclick="openKeypad(this)"></div>
+          <div class="field"><label>mil (thou, 1/1000inch)</label><input type="text" readonly id="conv-mil" value="1" oninput="convertMilToInch()" onclick="openKeypad(this)"></div>
+          <div class="hint">해외(인치계) 도면 공차 표기 대응용 (1 mil = 0.001 inch)</div>
+        </div>
       </div>
 
-      <div class="card conv-section" id="conv-sec-torque" style="display:none;">
-        <h2>토크 변환</h2>
-        <div class="field"><label>kgf·cm</label><input type="text" readonly id="conv-kgfcm" value="100" oninput="convertKgfcmToNm()" onclick="openKeypad(this)"></div>
-        <div class="field"><label>N·m</label><input type="text" readonly id="conv-nm" value="9.8067" oninput="convertNmToKgfcm()" onclick="openKeypad(this)"></div>
-        <div class="hint">토크렌치 환산: 1 kgf·cm = 0.0980665 N·m</div>
+      <!-- ---- 토크 · 힘 ---- -->
+      <div class="conv-cat" id="conv-cat-sec-torque" style="display:none;">
+        <div class="card">
+          <h2>토크·힘 단위</h2>
+          <div class="seg g3">
+            <button id="trq-type-nmkgfcm" class="on" onclick="setTrqType('nmkgfcm')">N·m↔kgf·cm</button>
+            <button id="trq-type-nmkgfm" onclick="setTrqType('nmkgfm')">N·m↔kgf·m</button>
+            <button id="trq-type-nkgf" onclick="setTrqType('nkgf')">N↔kgf(힘)</button>
+          </div>
+        </div>
+        <div class="card conv-section" id="trq-sec-nmkgfcm">
+          <h2>토크 변환 (N·m ↔ kgf·cm)</h2>
+          <div class="field"><label>kgf·cm</label><input type="text" readonly id="conv-kgfcm" value="100" oninput="convertKgfcmToNm()" onclick="openKeypad(this)"></div>
+          <div class="field"><label>N·m</label><input type="text" readonly id="conv-nm" value="9.8067" oninput="convertNmToKgfcm()" onclick="openKeypad(this)"></div>
+          <div class="hint">체결 토크스펙 환산: 1 kgf·cm = 0.0980665 N·m</div>
+        </div>
+        <div class="card conv-section" id="trq-sec-nmkgfm" style="display:none;">
+          <h2>토크 변환 (N·m ↔ kgf·m)</h2>
+          <div class="field"><label>kgf·m</label><input type="text" readonly id="conv-kgfm" value="1" oninput="convertKgfmToNm()" onclick="openKeypad(this)"></div>
+          <div class="field"><label>N·m</label><input type="text" readonly id="conv-nm2" value="9.8067" oninput="convertNmToKgfm()" onclick="openKeypad(this)"></div>
+          <div class="hint">큰 토크(체결축력 등) 환산: 1 kgf·m = 9.80665 N·m</div>
+        </div>
+        <div class="card conv-section" id="trq-sec-nkgf" style="display:none;">
+          <h2>힘 변환 (N ↔ kgf)</h2>
+          <div class="field"><label>kgf</label><input type="text" readonly id="conv-kgf" value="1" oninput="convertKgfToN()" onclick="openKeypad(this)"></div>
+          <div class="field"><label>N</label><input type="text" readonly id="conv-n" value="9.8067" oninput="convertNToKgf()" onclick="openKeypad(this)"></div>
+          <div class="hint">인장·압축력, 게이지압 스펙 등 환산: 1 kgf = 9.80665 N</div>
+        </div>
       </div>
 
-      <div class="card conv-section" id="conv-sec-angle" style="display:none;">
-        <h2>각도 변환</h2>
-        <div class="field"><label>도 (°)</label><input type="text" readonly id="conv-deg" value="45" oninput="convertDegToRad()" onclick="openKeypad(this)"></div>
-        <div class="field"><label>라디안 (rad)</label><input type="text" readonly id="conv-rad" value="0.7854" oninput="convertRadToDeg()" onclick="openKeypad(this)"></div>
-      </div>
-
-      <div class="card conv-section" id="conv-sec-temp" style="display:none;">
-        <h2>온도 변환</h2>
-        <div class="field"><label>섭씨 (℃)</label><input type="text" readonly id="conv-c" value="25" oninput="convertCtoF()" onclick="openKeypad(this)"></div>
-        <div class="field"><label>화씨 (℉)</label><input type="text" readonly id="conv-f" value="77" oninput="convertFtoC()" onclick="openKeypad(this)"></div>
+      <!-- ---- 열팽창 (사출부품 길이변화량) ---- -->
+      <div class="conv-cat" id="conv-cat-sec-thermal" style="display:none;">
+        <div class="card">
+          <h2>열팽창에 의한 길이 변화량</h2>
+          <div class="field"><label>기준 길이 L₀ (mm)</label><input type="text" readonly id="th-l0" value="100" onclick="openKeypad(this)"></div>
+          <div class="field"><label>선팽창계수 α (×10⁻⁵/℃)</label><input type="text" readonly id="th-alpha" value="10" onclick="openKeypad(this)"></div>
+          <div class="field"><label>온도 변화 ΔT (℃)</label><input type="text" readonly id="th-dt" value="40" onclick="openKeypad(this)"></div>
+          <div class="hint">α는 실제 사용 소재(PP, POM, PA66+GF30 등)의 물성 스펙시트 값을 입력하세요. 충전재 유무·유동배향 방향에 따라 값 차이가 크므로 임의값을 넣지 마세요.</div>
+        </div>
+        <button class="btn-primary" onclick="calculateThermalExpansion()">변화량 계산</button>
+        <div class="card">
+          <div class="result-row"><span class="rl">길이 변화량 ΔL</span><span class="rv" id="th-res-dl">–</span></div>
+          <div class="result-row"><span class="rl">최종 길이 (L₀+ΔL)</span><span class="rv" id="th-res-lfinal">–</span></div>
+          <div class="hint">ΔL = L₀ × α×10⁻⁵ × ΔT · 금형 수축률과는 별개로, 사출 후 사용 환경 온도변화에 따른 치수변화 추정용입니다.</div>
+        </div>
       </div>
     </div>
 
@@ -212,6 +276,16 @@
         <button class="btn-primary" onclick="executeQuickCalc()" style="margin-bottom:8px;">계산 실행</button>
         <button class="btn-secondary" onclick="resetQuickCalc()" style="margin-bottom:12px;">초기화</button>
         <div class="result-row"><span class="rl">결과</span><span class="rv" id="calc-result">–</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head-row">
+          <h2>계산 기록</h2>
+          <button type="button" class="hist-clear-btn" onclick="clearQuickHistory()">전체 지우기</button>
+        </div>
+        <div class="calc-history" id="calc-history">
+          <div class="hist-empty" id="hist-empty">아직 계산 기록이 없습니다</div>
+        </div>
       </div>
     </div>
 
@@ -286,36 +360,6 @@
       </div>
     </div>
 
-    <!-- ============ 5. 프로브 스캔 시뮬레이터 ============ -->
-    <div id="panel-probe" class="panel">
-      <div class="card">
-        <h2>빠른 프리셋</h2>
-        <div class="preset-grid">
-          <button onclick="setPreset(100,170,90)">상단원 (100°→170°)</button>
-          <button onclick="setPreset(170,100,90)">상단원 역방향</button>
-          <button onclick="setPreset(85,5,0)">우측원 (60도)</button>
-          <button onclick="setPreset(260,190,90)">하단원 (70도)</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="slider-row"><span>시작 각도 (SA)</span><span id="sa-val">170°</span></div>
-        <input type="range" id="input-sa" min="0" max="360" value="170">
-        <div class="slider-row" style="margin-top:14px;"><span>끝 각도 (EA)</span><span id="ea-val">100°</span></div>
-        <input type="range" id="input-ea" min="0" max="360" value="100">
-      </div>
-      <div class="card">
-        <h2>프로브 인덱싱</h2>
-        <div class="seg g2">
-          <button id="btn-idx-0" onclick="setIndexing(0)">A0° B0°</button>
-          <button id="btn-idx-90" class="on" onclick="setIndexing(90)">A90° B0°</button>
-        </div>
-      </div>
-      <div class="card">
-        <canvas id="simCanvas"></canvas>
-        <div class="hint" id="analysis-text" style="margin-top:12px;"></div>
-      </div>
-    </div>
-
   </main>
 
   <nav class="tabbar">
@@ -335,10 +379,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
       <span class="tl">Cpk</span>
     </button>
-    <button class="tbtn" data-tab="probe" onclick="switchTab('probe')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 1 9 9"></path></svg>
-      <span class="tl">프로브</span>
-    </button>
   </nav>
 
   <!-- ============ 커스텀 숫자 키패드 ============ -->
@@ -356,13 +396,12 @@
 
   // -------- 탭 전환 --------
   function switchTab(name){
-    ['quick','conv','position','cpk','probe'].forEach(t=>{
+    ['quick','conv','position','cpk'].forEach(t=>{
       id('panel-'+t).classList.toggle('active', t===name);
     });
     document.querySelectorAll('.tabbar .tbtn').forEach(b=>{
       b.classList.toggle('on', b.dataset.tab===name);
     });
-    if(name==='probe') resizeCanvas();
   }
 
   // -------- 커스텀 숫자 키패드 --------
@@ -488,31 +527,95 @@
   }
 
   // -------- 1. 환산 --------
-  function setConvType(t){
-    ['mm','torque','angle','temp'].forEach(k=>{
-      id('conv-type-'+k).classList.toggle('on', k===t);
-      id('conv-sec-'+k).style.display = (k===t) ? 'block' : 'none';
+  const KGF_TO_N = 9.80665; // 1 kgf = 9.80665 N (힘/토크 환산 공통 상수)
+
+  function setConvCategory(cat){
+    ['length','torque','thermal'].forEach(k=>{
+      id('conv-cat-'+k).classList.toggle('on', k===cat);
+      id('conv-cat-sec-'+k).style.display = (k===cat) ? 'block' : 'none';
     });
   }
+  function setLenType(t){
+    ['mmin','mmum','inmil'].forEach(k=>{
+      id('len-type-'+k).classList.toggle('on', k===t);
+      id('len-sec-'+k).style.display = (k===t) ? 'block' : 'none';
+    });
+  }
+  function setTrqType(t){
+    ['nmkgfcm','nmkgfm','nkgf'].forEach(k=>{
+      id('trq-type-'+k).classList.toggle('on', k===t);
+      id('trq-sec-'+k).style.display = (k===t) ? 'block' : 'none';
+    });
+  }
+
+  // 길이: mm ↔ inch
   function convertMmToInch(){ const mm = parseFloat(id('conv-mm').value) || 0; id('conv-inch').value = (mm/25.4).toFixed(4); }
   function convertInchToMm(){ const inch = parseFloat(id('conv-inch').value) || 0; id('conv-mm').value = (inch*25.4).toFixed(4); }
+  // 길이: mm ↔ μm
+  function convertMmToUm(){ const mm = parseFloat(id('conv-mm2').value) || 0; id('conv-um').value = (mm*1000).toFixed(2); }
+  function convertUmToMm(){ const um = parseFloat(id('conv-um').value) || 0; id('conv-mm2').value = (um/1000).toFixed(5); }
+  // 길이: inch ↔ mil(thou)
+  function convertInchToMil(){ const inch = parseFloat(id('conv-inch3').value) || 0; id('conv-mil').value = (inch*1000).toFixed(3); }
+  function convertMilToInch(){ const mil = parseFloat(id('conv-mil').value) || 0; id('conv-inch3').value = (mil/1000).toFixed(6); }
+
+  // 토크: N·m ↔ kgf·cm
   function convertKgfcmToNm(){ const k = parseFloat(id('conv-kgfcm').value) || 0; id('conv-nm').value = (k*0.0980665).toFixed(4); }
   function convertNmToKgfcm(){ const n = parseFloat(id('conv-nm').value) || 0; id('conv-kgfcm').value = (n/0.0980665).toFixed(4); }
-  function convertDegToRad(){ const d = parseFloat(id('conv-deg').value) || 0; id('conv-rad').value = (d*Math.PI/180).toFixed(4); }
-  function convertRadToDeg(){ const r = parseFloat(id('conv-rad').value) || 0; id('conv-deg').value = (r*180/Math.PI).toFixed(4); }
-  function convertCtoF(){ const c = parseFloat(id('conv-c').value) || 0; id('conv-f').value = (c*9/5+32).toFixed(2); }
-  function convertFtoC(){ const f = parseFloat(id('conv-f').value) || 0; id('conv-c').value = ((f-32)*5/9).toFixed(2); }
+  // 토크: N·m ↔ kgf·m
+  function convertKgfmToNm(){ const k = parseFloat(id('conv-kgfm').value) || 0; id('conv-nm2').value = (k*KGF_TO_N).toFixed(4); }
+  function convertNmToKgfm(){ const n = parseFloat(id('conv-nm2').value) || 0; id('conv-kgfm').value = (n/KGF_TO_N).toFixed(4); }
+  // 힘: N ↔ kgf
+  function convertKgfToN(){ const k = parseFloat(id('conv-kgf').value) || 0; id('conv-n').value = (k*KGF_TO_N).toFixed(4); }
+  function convertNToKgf(){ const n = parseFloat(id('conv-n').value) || 0; id('conv-kgf').value = (n/KGF_TO_N).toFixed(4); }
 
-  // -------- 2. 간이 계산기 --------
+  // 열팽창에 의한 길이 변화량: ΔL = L0 × α×10⁻⁵ × ΔT
+  function calculateThermalExpansion(){
+    const l0 = parseFloat(id('th-l0').value) || 0;
+    const alpha = parseFloat(id('th-alpha').value) || 0;
+    const dt = parseFloat(id('th-dt').value) || 0;
+    const dl = l0 * (alpha * 1e-5) * dt;
+    id('th-res-dl').innerText = (dl >= 0 ? '+' : '') + dl.toFixed(4) + ' mm';
+    id('th-res-lfinal').innerText = (l0 + dl).toFixed(4) + ' mm';
+  }
+  calculateThermalExpansion();
+
+  // -------- 2. 간이 계산기 (실행할 때마다 하단 기록에 누적) --------
+  let quickHistory = [];
+
   function executeQuickCalc(){
     const out = id('calc-result');
+    const expr = id('calc-expr').value.trim();
+    if(!expr){ out.innerText='–'; return; }
+    if(!/^[0-9+\-*/().\s]+$/.test(expr)){ out.innerText='허용 안 된 문자'; return; }
     try{
-      const expr = id('calc-expr').value.trim();
-      if(!expr){ out.innerText='–'; return; }
-      if(!/^[0-9+\-*/().\s]+$/.test(expr)){ out.innerText='허용 안 된 문자'; return; }
       const res = Function(`'use strict'; return (${expr})`)();
-      out.innerText = (typeof res === 'number' && isFinite(res)) ? String(Math.round(res*10000)/10000) : '수식 오류';
+      if(typeof res === 'number' && isFinite(res)){
+        const resultStr = String(Math.round(res*10000)/10000);
+        out.innerText = resultStr;
+        quickHistory.unshift({ expr, result: resultStr });
+        if(quickHistory.length > 50) quickHistory.pop();
+        renderQuickHistory();
+      } else {
+        out.innerText = '수식 오류';
+      }
     }catch(e){ out.innerText = '수식 오류'; }
+  }
+  function renderQuickHistory(){
+    const wrap = id('calc-history');
+    if(quickHistory.length === 0){
+      wrap.innerHTML = '<div class="hist-empty" id="hist-empty">아직 계산 기록이 없습니다</div>';
+      return;
+    }
+    wrap.innerHTML = quickHistory.map(h => `
+      <div class="hist-item">
+        <div class="he">${h.expr} =</div>
+        <div class="hr">${h.result}</div>
+      </div>
+    `).join('');
+  }
+  function clearQuickHistory(){
+    quickHistory = [];
+    renderQuickHistory();
   }
   function resetQuickCalc(){
     id('calc-expr').value = '';
@@ -620,81 +723,6 @@
     }
   }
 
-  // -------- 5. 프로브 스캔 시뮬레이터 --------
-  const saInput = id('input-sa');
-  const eaInput = id('input-ea');
-  const saValText = id('sa-val');
-  const eaValText = id('ea-val');
-  const analysisText = id('analysis-text');
-  const canvas = id('simCanvas');
-  const ctx = canvas.getContext('2d');
-  let currentIndexing = 90;
-
-  function resizeCanvas(){
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * window.devicePixelRatio;
-    canvas.height = rect.height * window.devicePixelRatio;
-    ctx.setTransform(1,0,0,1,0,0);
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    drawSimulation();
-  }
-  window.addEventListener('resize', resizeCanvas);
-
-  function setPreset(sa,ea,idx){
-    saInput.value = sa; eaInput.value = ea;
-    setIndexing(idx); updateValues();
-  }
-  function setIndexing(deg){
-    currentIndexing = deg;
-    id('btn-idx-0').classList.toggle('on', deg===0);
-    id('btn-idx-90').classList.toggle('on', deg===90);
-    updateValues();
-  }
-  function updateValues(){
-    const sa = parseInt(saInput.value), ea = parseInt(eaInput.value);
-    saValText.innerText = sa+'°'; eaValText.innerText = ea+'°';
-    const span = Math.abs(sa-ea);
-    analysisText.innerText = `SA=${sa}°, EA=${ea}° (구간 ${span}°) · 프로브 인덱싱 A${currentIndexing}° B0°`;
-    drawSimulation();
-  }
-  saInput.addEventListener('input', updateValues);
-  eaInput.addEventListener('input', updateValues);
-
-  function drawSimulation(){
-    const width = canvas.clientWidth, height = canvas.clientHeight;
-    if(!width || !height) return;
-    ctx.clearRect(0,0,width,height);
-    const cx=width/2, cy=height/2, r=Math.min(width,height)*0.32;
-    const sa=parseInt(saInput.value), ea=parseInt(eaInput.value);
-
-    ctx.strokeStyle='#1e2a4a'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(width,cy); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,height); ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI);
-    ctx.strokeStyle='#475569'; ctx.lineWidth=3; ctx.stroke();
-
-    const saRad=sa*Math.PI/180, eaRad=ea*Math.PI/180;
-    ctx.beginPath(); ctx.arc(cx,cy,r,-saRad,-eaRad, sa>ea);
-    ctx.strokeStyle='#e0b060'; ctx.lineWidth=6; ctx.stroke();
-
-    const sX=cx+r*Math.cos(-saRad), sY=cy+r*Math.sin(-saRad);
-    const eX=cx+r*Math.cos(-eaRad), eY=cy+r*Math.sin(-eaRad);
-    ctx.beginPath(); ctx.arc(sX,sY,5,0,2*Math.PI); ctx.fillStyle='#38bdf8'; ctx.fill();
-    ctx.beginPath(); ctx.arc(eX,eY,5,0,2*Math.PI); ctx.fillStyle='#f43f5e'; ctx.fill();
-
-    const midRad=((sa+ea)/2)*Math.PI/180, pd=r+30;
-    const pX=cx+pd*Math.cos(-midRad), pY=cy+pd*Math.sin(-midRad);
-    ctx.beginPath(); ctx.arc(pX,pY,7,0,2*Math.PI); ctx.fillStyle='#ef4444'; ctx.fill();
-    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(pX,pY);
-    let shX=pX, shY=pY-32;
-    if(currentIndexing===90){ shX=pX+32; shY=pY; }
-    ctx.lineTo(shX,shY); ctx.strokeStyle='#38bdf8'; ctx.lineWidth=3; ctx.stroke();
-  }
-
-  window.addEventListener('load', ()=>{ resizeCanvas(); updateValues(); });
 </script>
 </body>
 </html>
