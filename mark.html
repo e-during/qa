@@ -521,8 +521,19 @@
   // -------- 캔버스 포인터(탭/드래그) 처리 --------
   let downClient = null; // 탭/드래그 판정은 화면(CSS) 좌표 기준으로 해야 캔버스 확대배율에 안 흔들림
 
+  // 캔버스에서 발생하는 터치를 완전히 우리가 직접 처리(pointer 이벤트)하고,
+  // 브라우저가 터치 이후 뒤늦게 만들어내는 "합성 마우스 클릭(ghost click)"을 원천 차단한다.
+  // 이 합성 클릭이 막 열린 시트의 배경(sheetBackdrop)에 떨어져 시트를 바로 닫아버리는 바람에
+  // "짧게 탭하면 안 먹고, 길게 눌러야만 인식되는" 것처럼 보이는 문제의 원인이었다.
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchend', (e) => { e.preventDefault(); }, { passive: false });
+
   canvas.addEventListener('pointerdown', (e) => {
     if(!baseImg) return;
+    e.preventDefault();
+    // 포인터 캡처를 항상 걸어야 함: 캡처가 없으면 모바일 브라우저가 "탭인지 스크롤/제스처인지"
+    // 판단을 미루면서 짧은 탭의 pointerup을 지연·누락시켜 마치 길게 눌러야만 인식되는 것처럼 보임.
+    canvas.setPointerCapture(e.pointerId);
     downPoint = getCanvasPoint(e);
     downClient = { x: e.clientX, y: e.clientY };
     downHitIndex = hitTest(downPoint);
@@ -531,12 +542,10 @@
       dragShapeType = currentTool;
       dragStart = downPoint;
       dragCurrent = downPoint;
-      canvas.setPointerCapture(e.pointerId);
     } else if (currentTool === 'move' && downHitIndex >= 0){
       movingMark = true;
       moveIndex = downHitIndex;
       moveOrigin = cloneMarkCoords(marks[downHitIndex]);
-      canvas.setPointerCapture(e.pointerId);
     }
   });
 
