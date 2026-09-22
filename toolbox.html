@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>현장 툴박스</title>
+    <meta name="theme-color" content="#0b1636">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <style>
+        :root {
+            --primary-color: #0b1636;
+            --accent-color: #10B981;
+            --gold: #e0b060;
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #334155;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+        body { height: 100%; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; overflow: hidden; }
+
+        header {
+            display: flex; align-items: center; gap: 10px;
+            background: linear-gradient(180deg, #0d1836 0%, #0b1636 100%);
+            color: white; padding: calc(env(safe-area-inset-top) + 14px) 16px 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.25); flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        header .back {
+            flex: none; width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center;
+            text-decoration: none; color: #fff; font-size: 15px;
+        }
+        header .title { flex: 1; }
+        header .title .t1 { font-size: 15.5px; font-weight: 900; color: #fff; }
+        header .title .t2 { margin-top: 1px; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--gold); }
+
+        .container { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .view { display: none; flex: 1; flex-direction: column; height: 100%; position: absolute; width: 100%; top: 0; left: 0; background: var(--bg-color); }
+        .view.active { display: flex; }
+
+        .hub-grid { padding: 24px 24px 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .hub-note { padding: 0 24px 20px; font-size: 11.5px; color: #94A3B8; font-weight: 600; text-align: center; overflow-y: auto; }
+        .hub-card { background: var(--card-bg); padding: 24px 16px; border-radius: 16px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.1s; border: 1px solid #E2E8F0; }
+        .hub-card:active { transform: scale(0.97); }
+        .hub-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .hub-card h3 { font-size: 1rem; color: #1E293B; }
+
+        .sub-header { display: flex; align-items: center; padding: 12px 16px; background: white; border-bottom: 1px solid #E2E8F0; z-index: 10; flex-shrink: 0; }
+        .back-btn { background: none; border: none; font-size: 1rem; font-weight: bold; color: #3B82F6; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+        /* 자 모드 */
+        .ruler-container { flex: 1; display: flex; background: white; position: relative; overflow: hidden; user-select: none; }
+        .ruler-edge { width: 50px; height: 100%; background: #FEF3C7; border-right: 2px solid #D97706; position: relative; }
+        .tick { position: absolute; right: 0; width: 8px; border-top: 1px solid #A16207; }
+        .tick.medium { width: 14px; border-top: 1.4px solid #92400E; }
+        .tick.major { width: 22px; border-top: 2px solid #78350F; }
+        .tick span { position: absolute; right: 26px; top: -6px; font-size: 9px; font-weight: bold; color: #78350F; }
+        .ruler-workspace { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 16px; text-align: center; overflow-y: auto; }
+        .ruler-workspace p { font-size: 0.85rem; color: #64748B; margin-bottom: 12px; }
+        .cal-box { background: #F1F5F9; padding: 12px; border-radius: 8px; width: 100%; max-width: 260px; margin-bottom: 12px; }
+        .cal-box label { font-size: 0.75rem; font-weight: bold; }
+        .cal-box input { width: 100%; margin-top: 8px; }
+
+        .calib-toggle-row { display: flex; gap: 6px; margin-top: 10px; }
+        .mini-btn { flex: 1; background: white; border: 1px solid #CBD5E1; color: #334155; font-size: 0.72rem; font-weight: bold; padding: 7px 6px; border-radius: 6px; cursor: pointer; }
+        .mini-btn.ghost { flex: 0 0 auto; padding: 7px 10px; color: #94A3B8; }
+        .mini-btn.done { width: 100%; background: var(--accent-color); border-color: var(--accent-color); color: white; margin-top: 8px; }
+        .mini-btn:active { transform: scale(0.97); }
+        .calib-guide { display: none; text-align: left; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #CBD5E1; }
+        .calib-guide.open { display: block; }
+        .calib-text { font-size: 0.72rem; color: #475569; line-height: 1.5; }
+
+        .calib-ref-line { position: absolute; right: 0; width: 26px; border-top: 3px solid #EF4444; z-index: 5; }
+        .calib-ref-line span { position: absolute; right: 30px; top: -9px; font-size: 9px; font-weight: bold; color: #EF4444; white-space: nowrap; }
+
+        /* 판정(Go/No-Go) 패널 - 공통 */
+        .verdict-panel { background: #F1F5F9; border-radius: 8px; padding: 12px; width: 100%; max-width: 260px; margin-bottom: 12px; text-align: left; }
+        .verdict-panel h4 { font-size: 0.8rem; font-weight: bold; color: #1E293B; margin-bottom: 8px; }
+        .verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .verdict-field { display: flex; flex-direction: column; gap: 2px; }
+        .verdict-field label { font-size: 0.68rem; color: #64748B; }
+        .verdict-field input { width: 100%; padding: 6px 8px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: white; }
+        .verdict-range { font-size: 0.7rem; color: #64748B; margin-bottom: 6px; min-height: 14px; }
+        .verdict-result { padding: 10px; border-radius: 8px; text-align: center; font-weight: 800; font-size: 0.95rem; background: #E2E8F0; color: #64748B; transition: background .15s, color .15s; }
+        .verdict-result.pass { background: #D1FAE5; color: #065F46; }
+        .verdict-result.fail { background: #FEE2E2; color: #991B1B; }
+
+        .level-container .verdict-panel { background: #1E293B; }
+        .level-container .verdict-panel h4 { color: #E2E8F0; }
+        .level-container .verdict-field label { color: #94A3B8; }
+        .level-container .verdict-field input { background: #0F172A; border-color: #334155; color: white; }
+
+        /* 메모 입력 */
+        .memo-box { width: 100%; max-width: 260px; margin-bottom: 12px; }
+        .memo-box label { font-size: 0.7rem; color: #64748B; display: block; margin-bottom: 4px; text-align: left; }
+        .memo-box input { width: 100%; padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: white; }
+        .level-container .memo-box label { color: #94A3B8; }
+        .level-container .memo-box input { background: #1E293B; border-color: #334155; color: white; }
+
+        /* 캡처 버튼 */
+        .capture-btn { position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom, 16px)); width: 52px; height: 52px; border-radius: 50%; border: none; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; z-index: 20; }
+        .capture-btn.light { background: var(--primary-color); color: white; }
+        .capture-btn.dark { background: #F8FAFC; color: var(--primary-color); }
+        .capture-btn:active { transform: scale(0.93); }
+        .capture-btn[disabled] { opacity: 0.6; cursor: default; }
+
+        .toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom, 24px)); transform: translate(-50%, 12px); background: rgba(15,23,42,0.92); color: white; padding: 10px 18px; border-radius: 20px; font-size: 0.85rem; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 100; }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        /* 각도기/수평계 */
+        .level-container { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 20px; background: #0F172A; color: white; transition: background 0.3s; position: relative; overflow-y: auto; }
+        .level-container.passed { background: #065F46; }
+        .angle-display { font-size: 3.2rem; font-weight: 800; margin-top: 12px; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+        .angle-status { font-size: 1.05rem; margin-bottom: 20px; color: #94A3B8; }
+        .level-btn { background: #3B82F6; color: white; border: none; padding: 14px 32px; border-radius: 30px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); margin-bottom: 16px; }
+        .level-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a class="back" href="m.html">←</a>
+        <div class="title">
+            <div class="t1">현장 툴박스</div>
+            <div class="t2">FIELD TOOLBOX</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 🏠 메인 허브 -->
+        <div id="home-view" class="view active">
+            <div class="hub-grid">
+                <div class="hub-card" onclick="switchView('ruler-view')">
+                    <div class="icon">📏</div>
+                    <h3>스마트 자 모드</h3>
+                </div>
+                <div class="hub-card" onclick="switchView('level-view')">
+                    <div class="icon">📐</div>
+                    <h3>각도기 / 수평계</h3>
+                </div>
+            </div>
+            <div class="hub-note">신뢰할 수 있는 측정, 지금 이 자리에서</div>
+        </div>
+
+        <!-- 📏 자 모드 -->
+        <div id="ruler-view" class="view">
+            <div class="sub-header">
+                <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
+            </div>
+            <div class="ruler-container">
+                <div class="ruler-edge" id="rulerTicks"></div>
+                <div class="ruler-workspace">
+                    <p>휴대폰 왼쪽 끝선에<br>측정물을 밀착시키세요. <span style="color:#94A3B8;">(단위: mm)</span></p>
+                    <div class="cal-box">
+                        <label>오차 보정 (미세 조절)</label>
+                        <input type="range" id="scaleRange" min="0.8" max="1.2" step="0.01" value="1" oninput="updateRuler()">
+                        <div class="calib-toggle-row">
+                            <button class="mini-btn" type="button" onclick="toggleCalibGuide()">💳 카드로 보정하기</button>
+                            <button class="mini-btn ghost" type="button" onclick="resetCalibration()">초기화</button>
+                        </div>
+                        <div class="calib-guide" id="calibGuide">
+                            <p class="calib-text">
+                                ① 신용카드(표준 규격, 폭 85.6mm)를 자 왼쪽 끝 <b>0</b>에 맞춰 대세요.<br>
+                                ② 카드 오른쪽 끝이 아래 빨간 기준선(💳 85.6)에 오도록 위 슬라이더를 조절하세요.<br>
+                                ③ 맞춰지면 완료를 누르세요. 이후에도 자동으로 이 값이 적용됩니다.
+                            </p>
+                            <button class="mini-btn done" type="button" onclick="finishCalibGuide()">✅ 보정 완료</button>
+                        </div>
+                    </div>
+
+                    <div class="verdict-panel">
+                        <h4>치수 판정 (Go / No-Go)</h4>
+                        <div class="verdict-grid">
+                            <div class="verdict-field">
+                                <label>기준치 (Target, mm)</label>
+                                <input type="number" inputmode="decimal" step="0.1" id="rTarget" placeholder="예: 100" oninput="calcVerdict('r')">
+                            </div>
+                            <div class="verdict-field">
+                                <label>실측값 (측정, mm)</label>
+                                <input type="number" inputmode="decimal" step="0.1" id="rMeasured" placeholder="예: 101" oninput="calcVerdict('r')">
+                            </div>
+                            <div class="verdict-field">
+                                <label>+공차 (상한, mm)</label>
+                                <input type="number" inputmode="decimal" step="0.1" id="rTolUp" placeholder="예: 2" oninput="calcVerdict('r')">
+                            </div>
+                            <div class="verdict-field">
+                                <label>−공차 (하한, mm)</label>
+                                <input type="number" inputmode="decimal" step="0.1" id="rTolDown" placeholder="비우면 대칭" oninput="calcVerdict('r')">
+                            </div>
+                        </div>
+                        <div class="verdict-range" id="rRange"></div>
+                        <div class="verdict-result" id="rResult">기준치와 실측값을 입력하세요</div>
+                    </div>
+
+                    <div class="memo-box">
+                        <label>현장/특이사항 메모 (선택, 캡처에 포함됨)</label>
+                        <input type="text" id="rulerMemo" placeholder="예: 3동 A라인 - 배관 외경 확인">
+                    </div>
+                </div>
+                <button class="capture-btn light" id="rulerCaptureBtn" onclick="captureView('ruler-view', '자모드')" title="화면 캡처 저장">📸</button>
+            </div>
+        </div>
+
+        <!-- 📐 각도기 / 수평계 -->
+        <div id="level-view" class="view" style="background: #0F172A;">
+            <div class="sub-header" style="background: transparent; border-bottom: none;">
+                <button class="back-btn" style="color: #94A3B8;" onclick="switchView('home-view')">〈 허브로 가기</button>
+            </div>
+            <div class="level-container" id="levelContainer">
+                <div class="angle-display" id="angleText">0.0°</div>
+                <div class="angle-status" id="statusText">기기를 평면에 놓으세요</div>
+                <button class="level-btn" onclick="setZeroPoint()">영점(Zero) 설정</button>
+
+                <div class="verdict-panel">
+                    <h4>각도 판정 (Go / No-Go)</h4>
+                    <div class="verdict-grid">
+                        <div class="verdict-field">
+                            <label>목표 각도(°)</label>
+                            <input type="number" inputmode="decimal" step="0.1" id="lTarget" value="0" oninput="updateAngleTarget()">
+                        </div>
+                        <div class="verdict-field">
+                            <label>허용오차 (±)</label>
+                            <input type="number" inputmode="decimal" step="0.1" id="lTol" value="0.5" oninput="updateAngleTarget()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="memo-box">
+                    <label>현장/특이사항 메모 (선택, 캡처에 포함됨)</label>
+                    <input type="text" id="levelMemo" placeholder="예: 배관 경사 15도 구간 확인">
+                </div>
+            </div>
+            <button class="capture-btn dark" id="levelCaptureBtn" onclick="captureView('level-view', '각도기')" title="화면 캡처 저장">📸</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script>
+        // 화면 전환 로직
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+
+            if (viewId === 'ruler-view') {
+                initRuler();
+            } else if (viewId === 'level-view') {
+                initSensor();
+            } else {
+                stopSensor();
+            }
+        }
+
+        // 📏 자 모드 눈금 생성
+        // 눈금자 스케일: mm 기준. 1mm = PX_PER_MM 픽셀 (10mm = 1cm ≈ 37.8px 기준)
+        const PX_PER_MM = 3.78;
+
+        function initRuler() {
+            const ruler = document.getElementById('rulerTicks');
+            if (ruler.children.length === 0) {
+                for (let i = 0; i <= 300; i++) { // 0~300mm(30cm)
+                    const tick = document.createElement('div');
+                    let cls = 'tick';
+                    if (i % 10 === 0) cls += ' major';
+                    else if (i % 5 === 0) cls += ' medium';
+                    tick.className = cls;
+                    tick.style.top = (i * PX_PER_MM) + 'px';
+
+                    if (i % 10 === 0) {
+                        const label = document.createElement('span');
+                        label.innerText = i;
+                        tick.appendChild(label);
+                    }
+                    ruler.appendChild(tick);
+                }
+            }
+            loadCalibration();
+        }
+
+        function updateRuler() {
+            const scale = document.getElementById('scaleRange').value;
+            document.getElementById('rulerTicks').style.transform = `scaleY(${scale})`;
+            document.getElementById('rulerTicks').style.transformOrigin = 'top';
+            saveCalibration();
+        }
+
+        // 💳 카드(85.6mm)를 이용한 보정 가이드
+        const CARD_WIDTH_MM = 85.6; // 신용카드 표준 규격(ISO/IEC 7810 ID-1) 폭
+
+        function toggleCalibGuide() {
+            const guide = document.getElementById('calibGuide');
+            const isOpen = guide.classList.contains('open');
+            if (isOpen) {
+                guide.classList.remove('open');
+                removeCalibRefLine();
+            } else {
+                guide.classList.add('open');
+                addCalibRefLine();
+            }
+        }
+
+        function addCalibRefLine() {
+            if (document.getElementById('calibRefLine')) return;
+            const ruler = document.getElementById('rulerTicks');
+            const line = document.createElement('div');
+            line.id = 'calibRefLine';
+            line.className = 'calib-ref-line';
+            line.style.top = (CARD_WIDTH_MM * PX_PER_MM) + 'px';
+            const label = document.createElement('span');
+            label.innerText = '💳 ' + CARD_WIDTH_MM;
+            line.appendChild(label);
+            ruler.appendChild(line);
+        }
+
+        function removeCalibRefLine() {
+            const line = document.getElementById('calibRefLine');
+            if (line) line.remove();
+        }
+
+        function finishCalibGuide() {
+            saveCalibration();
+            document.getElementById('calibGuide').classList.remove('open');
+            removeCalibRefLine();
+            showToast('보정값이 저장되었습니다 ✅');
+        }
+
+        function saveCalibration() {
+            try {
+                localStorage.setItem('qc_ruler_scale', document.getElementById('scaleRange').value);
+            } catch (e) { /* 저장소 사용 불가 시 무시 */ }
+        }
+
+        function loadCalibration() {
+            try {
+                const v = localStorage.getItem('qc_ruler_scale');
+                if (v) {
+                    document.getElementById('scaleRange').value = v;
+                    document.getElementById('rulerTicks').style.transform = `scaleY(${v})`;
+                    document.getElementById('rulerTicks').style.transformOrigin = 'top';
+                }
+            } catch (e) { /* 저장소 사용 불가 시 기본값 유지 */ }
+        }
+
+        function resetCalibration() {
+            document.getElementById('scaleRange').value = 1;
+            updateRuler();
+            document.getElementById('calibGuide').classList.remove('open');
+            removeCalibRefLine();
+            showToast('보정값이 초기화되었습니다');
+        }
+
+        // ✅ 치수 판정 (Go/No-Go) - 자 모드용
+        function calcVerdict(prefix) {
+            const target = parseFloat(document.getElementById(prefix + 'Target').value);
+            const measured = parseFloat(document.getElementById(prefix + 'Measured').value);
+            const tolUpRaw = document.getElementById(prefix + 'TolUp').value;
+            const tolDownRaw = document.getElementById(prefix + 'TolDown').value;
+            const resultEl = document.getElementById(prefix + 'Result');
+            const rangeEl = document.getElementById(prefix + 'Range');
+
+            if (isNaN(target) || isNaN(measured)) {
+                resultEl.className = 'verdict-result';
+                resultEl.innerText = '기준치와 실측값을 입력하세요';
+                rangeEl.innerText = '';
+                return;
+            }
+
+            const tolUp = tolUpRaw === '' ? 0 : Math.abs(parseFloat(tolUpRaw));
+            const tolDown = tolDownRaw === '' ? tolUp : Math.abs(parseFloat(tolDownRaw));
+
+            const lower = target - tolDown;
+            const upper = target + tolUp;
+            rangeEl.innerText = `허용범위: ${lower.toFixed(2)} ~ ${upper.toFixed(2)}`;
+
+            if (measured >= lower && measured <= upper) {
+                resultEl.className = 'verdict-result pass';
+                resultEl.innerText = '🟢 PASS (합격)';
+            } else {
+                resultEl.className = 'verdict-result fail';
+                resultEl.innerText = '🔴 FAIL (불합격)';
+            }
+        }
+
+        // 📐 자이로 센서 (수평계/각도기)
+        let zeroOffset = 0;
+        let lastRawAngle = 0;
+        let watchSensor = false;
+        let targetAngle = 0;
+        let angleTolerance = 0.5;
+
+        function updateAngleTarget() {
+            const t = parseFloat(document.getElementById('lTarget').value);
+            const tol = parseFloat(document.getElementById('lTol').value);
+            targetAngle = isNaN(t) ? 0 : t;
+            angleTolerance = isNaN(tol) || tol < 0 ? 0.5 : tol;
+        }
+
+        function initSensor() {
+            if (typeof window.DeviceOrientationEvent === 'undefined') {
+                alert('이 기기는 자이로 센서를 지원하지 않습니다.');
+                return;
+            }
+
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                }).catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+            watchSensor = true;
+        }
+
+        function stopSensor() {
+            if (watchSensor) {
+                window.removeEventListener('deviceorientation', handleOrientation);
+                watchSensor = false;
+            }
+        }
+
+        function handleOrientation(event) {
+            let rawAngle = event.beta;
+            if (rawAngle === null) return;
+            lastRawAngle = rawAngle;
+
+            let adjustedAngle = rawAngle - zeroOffset;
+            let displayVal = adjustedAngle.toFixed(1);
+            document.getElementById('angleText').innerText = displayVal + '°';
+
+            const container = document.getElementById('levelContainer');
+            const status = document.getElementById('statusText');
+            const diff = adjustedAngle - targetAngle;
+
+            if (Math.abs(diff) <= angleTolerance) {
+                container.classList.add('passed');
+                status.innerText = targetAngle === 0 ? '🟢 수평 정확함 (PASS)' : `🟢 목표 각도 일치 (PASS)`;
+            } else {
+                container.classList.remove('passed');
+                status.innerText = diff > 0 ? '기울어짐 (기준보다 높음)' : '기울어짐 (기준보다 낮음)';
+            }
+        }
+
+        function setZeroPoint() {
+            zeroOffset = lastRawAngle;
+            showToast('영점이 설정되었습니다.');
+        }
+
+        // 📸 캡처 + 메모 (스냅샷) - 표준 브라우저 다운로드 방식
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        async function captureView(viewId, labelPrefix) {
+            if (typeof html2canvas === 'undefined') {
+                alert('캡처 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+            const el = document.getElementById(viewId);
+            const btn = el.querySelector('.capture-btn');
+            if (btn) { btn.disabled = true; btn.innerText = '⏳'; }
+
+            try {
+                const canvas = await html2canvas(el, { backgroundColor: null, scale: 2 });
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                if (!blob) throw new Error('이미지 생성 실패');
+
+                const now = new Date();
+                const ts = now.getFullYear().toString() +
+                    String(now.getMonth() + 1).padStart(2, '0') +
+                    String(now.getDate()).padStart(2, '0') + '_' +
+                    String(now.getHours()).padStart(2, '0') +
+                    String(now.getMinutes()).padStart(2, '0');
+                const filename = `QC_${labelPrefix}_${ts}.png`;
+
+                // 표준 브라우저 다운로드 (Blob URL + <a download>)
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+                showToast('📸 저장되었습니다');
+            } catch (err) {
+                console.error(err);
+                alert('캡처 중 오류가 발생했습니다.');
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = '📸'; }
+            }
+        }
+    </script>
+</body>
+</html>
