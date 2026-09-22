@@ -54,8 +54,16 @@
 
   /* ---------- 마킹 화면 ---------- */
   #markScreen { display: none; flex-direction: column; gap: 12px; }
+  .tool-seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .tool-seg button {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 9px 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12);
+    background: #0c1730; color: rgba(255,255,255,.5); font-size: 10.5px; font-weight: 800; font-family: inherit;
+  }
+  .tool-seg button svg { width: 18px; height: 18px; }
+  .tool-seg button.on { background: rgba(224,176,96,.16); border-color: #e0b060; color: #e0b060; }
   .canvas-wrap { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #0c1730; line-height: 0; }
-  #markCanvas { width: 100%; display: block; touch-action: manipulation; }
+  #markCanvas { width: 100%; display: block; touch-action: none; }
 
   .toolbar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .toolbar button {
@@ -104,6 +112,7 @@
   }
   .sheet .seg-okng button.ok.on { background: rgba(52,211,153,.16); border-color: #34d399; color: #34d399; }
   .sheet .seg-okng button.ng.on { background: rgba(251,113,133,.16); border-color: #fb7185; color: #fb7185; }
+  .sheet .seg-okng.hidden { display: none; }
   .sheet .memo-field { margin-bottom: 16px; }
   .sheet .memo-field label { display: block; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 6px; }
   .sheet .memo-field input {
@@ -164,6 +173,21 @@
 
     <!-- ============ 마킹 화면 ============ -->
     <div id="markScreen">
+      <div class="tool-seg">
+        <button type="button" id="tool-point" class="on" onclick="setTool('point')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"></circle></svg>
+          포인트
+        </button>
+        <button type="button" id="tool-arrow" onclick="setTool('arrow')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"></line><polyline points="9 4 20 4 20 15"></polyline></svg>
+          화살표
+        </button>
+        <button type="button" id="tool-text" onclick="setTool('text')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="12" y1="6" x2="12" y2="20"></line><line x1="8" y1="20" x2="16" y2="20"></line></svg>
+          텍스트
+        </button>
+      </div>
+
       <div class="canvas-wrap">
         <canvas id="markCanvas"></canvas>
       </div>
@@ -177,7 +201,7 @@
       <div class="legend" id="legendList"></div>
 
       <button class="btn-primary" onclick="saveImage()">완료 · 갤러리에 저장</button>
-      <div class="hint">사진을 탭하면 포인트가 추가됩니다 · 기존 포인트를 탭하면 수정/삭제할 수 있습니다</div>
+      <div class="hint" id="toolHint">사진을 탭하면 포인트가 추가됩니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다</div>
     </div>
 
   </main>
@@ -185,17 +209,17 @@
   <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
   <div class="sheet" id="pointSheet">
     <div class="sh-title" id="sheetTitle">포인트 ① 추가</div>
-    <div class="seg-okng">
+    <div class="seg-okng" id="segOkngWrap">
       <button type="button" class="ok on" id="segOk" onclick="setJudge('ok')">✓ OK</button>
       <button type="button" class="ng" id="segNg" onclick="setJudge('ng')">✕ NG</button>
     </div>
-    <div class="memo-field">
-      <label>메모 (선택)</label>
+    <div class="memo-field" id="memoFieldWrap">
+      <label id="memoLabel">메모 (선택)</label>
       <input type="text" id="memoInput" placeholder="예: 웰드라인 발생, 데이텀 A 기준">
     </div>
     <div class="sheet-actions" id="sheetActions">
       <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
-      <button type="button" class="btn-confirm" onclick="confirmPoint()">확인</button>
+      <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
     </div>
   </div>
 
@@ -207,14 +231,41 @@
   const canvas = id('markCanvas');
   const ctx = canvas.getContext('2d');
   let baseImg = null;         // 로드된 원본 Image 객체
-  let marks = [];             // { x, y, judge:'ok'|'ng', memo, num }
+  // marks 항목 형태:
+  //   포인트: { type:'point', x, y, judge:'ok'|'ng', memo, num }
+  //   화살표: { type:'arrow', x1, y1, x2, y2 }
+  //   텍스트: { type:'text', x, y, text, w, h }
+  let marks = [];
   let nextNum = 1;
-  let pendingXY = null;       // 새 포인트 좌표(캔버스 픽셀 기준)
-  let editingIndex = -1;      // 수정 중인 포인트 인덱스(-1이면 신규)
+  let pendingXY = null;       // 신규 항목 좌표(캔버스 픽셀 기준)
+  let editingIndex = -1;      // 수정 중인 인덱스(-1이면 신규)
+  let sheetType = 'point';    // 현재 시트가 다루는 타입: 'point' | 'text'
   let currentJudge = 'ok';
+  let currentTool = 'point';  // 'point' | 'arrow' | 'text'
+
+  // 드래그(화살표) 상태
+  let dragging = false;
+  let dragStart = null;
+  let dragCurrent = null;
+  let downPoint = null;
+  let downHitIndex = -1;
 
   const JUDGE_COLOR = { ok: '#16a34a', ng: '#dc2626' };
+  const ARROW_COLOR = '#e0b060';
+  const TEXT_BG = 'rgba(224,176,96,0.92)';
   const MAX_DIM = 1600; // 저장/작업용 최대 픽셀 크기 (성능·용량 균형)
+
+  const TOOL_HINTS = {
+    point: '사진을 탭하면 포인트가 추가됩니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다',
+    arrow: '사진 위를 드래그하면 화살표가 그려집니다 · 기존 항목을 탭하면 삭제할 수 있습니다',
+    text: '사진을 탭하면 텍스트를 입력할 수 있습니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다'
+  };
+
+  function setTool(t){
+    currentTool = t;
+    ['point','arrow','text'].forEach(k => id('tool-'+k).classList.toggle('on', k===t));
+    id('toolHint').innerText = TOOL_HINTS[t];
+  }
 
   // -------- 사진 불러오기 --------
   function loadImage(evt){
@@ -226,6 +277,7 @@
       baseImg = img;
       marks = [];
       nextNum = 1;
+      setTool('point');
       setupCanvas();
       id('startScreen').style.display = 'none';
       id('markScreen').style.display = 'flex';
@@ -248,37 +300,92 @@
     redraw();
   }
 
+  function markerRadius(){ return Math.max(16, canvas.width * 0.022); }
+
+  function drawArrowShape(g, x1, y1, x2, y2, color, alpha){
+    const headLen = Math.max(14, canvas.width * 0.02);
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    g.save();
+    g.globalAlpha = (alpha === undefined) ? 1 : alpha;
+    g.strokeStyle = color; g.fillStyle = color;
+    g.lineWidth = Math.max(4, canvas.width * 0.006);
+    g.lineCap = 'round';
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    g.beginPath();
+    g.moveTo(x2, y2);
+    g.lineTo(x2 - headLen * Math.cos(angle - Math.PI/7), y2 - headLen * Math.sin(angle - Math.PI/7));
+    g.lineTo(x2 - headLen * Math.cos(angle + Math.PI/7), y2 - headLen * Math.sin(angle + Math.PI/7));
+    g.closePath(); g.fill();
+    g.restore();
+  }
+
+  function roundRectPath(g, x, y, w, h, r){
+    g.beginPath();
+    g.moveTo(x+r, y);
+    g.arcTo(x+w, y, x+w, y+h, r);
+    g.arcTo(x+w, y+h, x, y+h, r);
+    g.arcTo(x, y+h, x, y, r);
+    g.arcTo(x, y, x+w, y, r);
+    g.closePath();
+  }
+
+  function drawTextShape(g, m){
+    const fontSize = Math.max(20, canvas.width * 0.03);
+    g.font = `900 ${fontSize}px -apple-system, sans-serif`;
+    const metrics = g.measureText(m.text);
+    const padX = 10, padY = 6;
+    const w = metrics.width + padX*2;
+    const h = fontSize + padY*2;
+    m.w = w; m.h = h;
+    roundRectPath(g, m.x, m.y - h/2, w, h, 8);
+    g.fillStyle = TEXT_BG;
+    g.fill();
+    g.fillStyle = '#0b1636';
+    g.textAlign = 'left'; g.textBaseline = 'middle';
+    g.fillText(m.text, m.x + padX, m.y);
+  }
+
+  function drawPointShape(g, m){
+    const r = markerRadius();
+    g.beginPath();
+    g.arc(m.x, m.y, r, 0, Math.PI*2);
+    g.fillStyle = JUDGE_COLOR[m.judge];
+    g.globalAlpha = 0.88;
+    g.fill();
+    g.globalAlpha = 1;
+    g.lineWidth = Math.max(2, r*0.12);
+    g.strokeStyle = '#ffffff';
+    g.stroke();
+    g.fillStyle = '#ffffff';
+    g.font = `900 ${Math.round(r*1.05)}px -apple-system, sans-serif`;
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(String(m.num), m.x, m.y + r*0.06);
+  }
+
   function redraw(){
     if(!baseImg) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
-    const r = Math.max(16, canvas.width * 0.022);
     marks.forEach(m => {
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, r, 0, Math.PI*2);
-      ctx.fillStyle = JUDGE_COLOR[m.judge];
-      ctx.globalAlpha = 0.88;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.lineWidth = Math.max(2, r*0.12);
-      ctx.strokeStyle = '#ffffff';
-      ctx.stroke();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = `900 ${Math.round(r*1.05)}px -apple-system, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(String(m.num), m.x, m.y + r*0.06);
+      if (m.type === 'arrow') drawArrowShape(ctx, m.x1, m.y1, m.x2, m.y2, ARROW_COLOR);
+      else if (m.type === 'text') drawTextShape(ctx, m);
+      else drawPointShape(ctx, m);
     });
+    if (dragging && currentTool === 'arrow' && dragStart && dragCurrent){
+      drawArrowShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, ARROW_COLOR, 0.55);
+    }
     renderLegend();
   }
 
   function renderLegend(){
     const wrap = id('legendList');
-    if (marks.length === 0){
+    const points = marks.map((m, i) => ({ m, i })).filter(o => o.m.type === 'point');
+    if (points.length === 0){
       wrap.innerHTML = '<div class="legend-empty">아직 표시된 포인트가 없습니다</div>';
       return;
     }
-    wrap.innerHTML = marks.map((m, i) => `
+    wrap.innerHTML = points.map(({ m, i }) => `
       <div class="legend-item" onclick="openEditSheetByIndex(${i})">
         <div class="lnum ${m.judge}">${m.num}</div>
         <div class="ltxt">
@@ -289,24 +396,81 @@
     `).join('');
   }
 
-  // -------- 캔버스 탭 처리 --------
-  canvas.addEventListener('click', (e) => {
-    if(!baseImg) return;
+  // -------- 좌표/히트테스트 --------
+  function getCanvasPoint(e){
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
+    return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  }
 
-    const r = Math.max(16, canvas.width * 0.022);
-    const hitIndex = marks.findIndex(m => Math.hypot(m.x - x, m.y - y) <= r + 10);
-    if (hitIndex >= 0){
-      openEditSheetByIndex(hitIndex);
-    } else {
-      pendingXY = { x, y };
-      editingIndex = -1;
-      openNewSheet();
+  function distToSegment(p, a, b){
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const lenSq = dx*dx + dy*dy;
+    if (lenSq === 0) return Math.hypot(p.x - a.x, p.y - a.y);
+    let t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq;
+    t = Math.max(0, Math.min(1, t));
+    const px = a.x + t * dx, py = a.y + t * dy;
+    return Math.hypot(p.x - px, p.y - py);
+  }
+
+  function hitTest(pt){
+    const r = markerRadius();
+    for (let i = marks.length - 1; i >= 0; i--){
+      const m = marks[i];
+      if (m.type === 'point'){
+        if (Math.hypot(m.x - pt.x, m.y - pt.y) <= r + 10) return i;
+      } else if (m.type === 'arrow'){
+        if (distToSegment(pt, {x:m.x1,y:m.y1}, {x:m.x2,y:m.y2}) <= 16) return i;
+      } else if (m.type === 'text'){
+        const w = m.w || 60, h = m.h || 30;
+        if (pt.x >= m.x - 8 && pt.x <= m.x + w + 8 && pt.y >= m.y - h/2 - 8 && pt.y <= m.y + h/2 + 8) return i;
+      }
     }
+    return -1;
+  }
+
+  // -------- 캔버스 포인터(탭/드래그) 처리 --------
+  canvas.addEventListener('pointerdown', (e) => {
+    if(!baseImg) return;
+    downPoint = getCanvasPoint(e);
+    downHitIndex = hitTest(downPoint);
+    if (currentTool === 'arrow' && downHitIndex < 0){
+      dragging = true;
+      dragStart = downPoint;
+      dragCurrent = downPoint;
+      canvas.setPointerCapture(e.pointerId);
+    }
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (dragging){
+      dragCurrent = getCanvasPoint(e);
+      redraw();
+    }
+  });
+
+  canvas.addEventListener('pointerup', (e) => {
+    if(!baseImg || !downPoint) return;
+    const endPoint = getCanvasPoint(e);
+    const moved = Math.hypot(endPoint.x - downPoint.x, endPoint.y - downPoint.y);
+
+    if (dragging){
+      dragging = false;
+      if (moved > 20){
+        marks.push({ type: 'arrow', x1: dragStart.x, y1: dragStart.y, x2: endPoint.x, y2: endPoint.y });
+      }
+      dragStart = null; dragCurrent = null;
+      redraw();
+    } else if (downHitIndex >= 0 && moved < 10){
+      openEditSheetByIndex(downHitIndex);
+    } else if (moved < 10){
+      pendingXY = downPoint;
+      editingIndex = -1;
+      if (currentTool === 'text') openNewTextSheet();
+      else if (currentTool === 'point') openNewPointSheet();
+    }
+    downPoint = null; downHitIndex = -1;
   });
 
   // -------- 포인트 입력 시트 --------
@@ -316,15 +480,36 @@
     id('segNg').classList.toggle('on', j==='ng');
   }
 
-  function openNewSheet(){
+  function openNewPointSheet(){
+    sheetType = 'point';
     currentJudge = 'ok';
     setJudge('ok');
+    id('segOkngWrap').classList.remove('hidden');
+    id('memoFieldWrap').classList.remove('hidden');
+    id('memoLabel').innerText = '메모 (선택)';
+    id('memoInput').placeholder = '예: 웰드라인 발생, 데이텀 A 기준';
     id('memoInput').value = '';
     id('sheetTitle').innerText = `포인트 ${nextNum} 추가`;
     id('sheetActions').classList.remove('has-del');
     id('sheetActions').innerHTML = `
       <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
-      <button type="button" class="btn-confirm" onclick="confirmPoint()">확인</button>
+      <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
+    `;
+    showSheet();
+  }
+
+  function openNewTextSheet(){
+    sheetType = 'text';
+    id('segOkngWrap').classList.add('hidden');
+    id('memoFieldWrap').classList.remove('hidden');
+    id('memoLabel').innerText = '텍스트 내용';
+    id('memoInput').placeholder = '예: 크랙, 데이텀 A, 10.02mm';
+    id('memoInput').value = '';
+    id('sheetTitle').innerText = '텍스트 추가';
+    id('sheetActions').classList.remove('has-del');
+    id('sheetActions').innerHTML = `
+      <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+      <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
     `;
     showSheet();
   }
@@ -332,15 +517,54 @@
   function openEditSheetByIndex(i){
     editingIndex = i;
     const m = marks[i];
+
+    if (m.type === 'arrow'){
+      sheetType = 'arrow';
+      id('segOkngWrap').classList.add('hidden');
+      id('memoFieldWrap').classList.add('hidden');
+      id('sheetTitle').innerText = '화살표 삭제';
+      id('sheetActions').classList.add('has-del');
+      id('sheetActions').innerHTML = `
+        <button type="button" class="btn-del" onclick="deleteCurrent()">삭제</button>
+        <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+      `;
+      showSheet();
+      return;
+    }
+
+    if (m.type === 'text'){
+      sheetType = 'text';
+      id('segOkngWrap').classList.add('hidden');
+      id('memoFieldWrap').classList.remove('hidden');
+      id('memoLabel').innerText = '텍스트 내용';
+      id('memoInput').placeholder = '예: 크랙, 데이텀 A, 10.02mm';
+      id('memoInput').value = m.text || '';
+      id('sheetTitle').innerText = '텍스트 수정';
+      id('sheetActions').classList.add('has-del');
+      id('sheetActions').innerHTML = `
+        <button type="button" class="btn-del" onclick="deleteCurrent()">삭제</button>
+        <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+        <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
+      `;
+      showSheet();
+      return;
+    }
+
+    // point
+    sheetType = 'point';
     currentJudge = m.judge;
+    id('segOkngWrap').classList.remove('hidden');
+    id('memoFieldWrap').classList.remove('hidden');
+    id('memoLabel').innerText = '메모 (선택)';
+    id('memoInput').placeholder = '예: 웰드라인 발생, 데이텀 A 기준';
     setJudge(m.judge);
     id('memoInput').value = m.memo || '';
     id('sheetTitle').innerText = `포인트 ${m.num} 수정`;
     id('sheetActions').classList.add('has-del');
     id('sheetActions').innerHTML = `
-      <button type="button" class="btn-del" onclick="deletePoint()">삭제</button>
+      <button type="button" class="btn-del" onclick="deleteCurrent()">삭제</button>
       <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
-      <button type="button" class="btn-confirm" onclick="confirmPoint()">확인</button>
+      <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
     `;
     showSheet();
   }
@@ -356,20 +580,30 @@
     editingIndex = -1;
   }
 
-  function confirmPoint(){
-    const memo = id('memoInput').value.trim();
-    if (editingIndex >= 0){
-      marks[editingIndex].judge = currentJudge;
-      marks[editingIndex].memo = memo;
-    } else if (pendingXY){
-      marks.push({ x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, num: nextNum });
-      nextNum++;
+  function confirmSheet(){
+    if (sheetType === 'point'){
+      const memo = id('memoInput').value.trim();
+      if (editingIndex >= 0){
+        marks[editingIndex].judge = currentJudge;
+        marks[editingIndex].memo = memo;
+      } else if (pendingXY){
+        marks.push({ type: 'point', x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, num: nextNum });
+        nextNum++;
+      }
+    } else if (sheetType === 'text'){
+      const text = id('memoInput').value.trim();
+      if (!text){ closeSheet(); return; }
+      if (editingIndex >= 0){
+        marks[editingIndex].text = text;
+      } else if (pendingXY){
+        marks.push({ type: 'text', x: pendingXY.x, y: pendingXY.y, text });
+      }
     }
     closeSheet();
     redraw();
   }
 
-  function deletePoint(){
+  function deleteCurrent(){
     if (editingIndex >= 0){
       marks.splice(editingIndex, 1);
       renumber();
@@ -379,8 +613,9 @@
   }
 
   function renumber(){
-    marks.forEach((m, i) => { m.num = i + 1; });
-    nextNum = marks.length + 1;
+    let n = 1;
+    marks.forEach(m => { if (m.type === 'point') m.num = n++; });
+    nextNum = n;
   }
 
   function undoMark(){
@@ -401,15 +636,17 @@
     baseImg = null;
     marks = [];
     nextNum = 1;
+    setTool('point');
     id('markScreen').style.display = 'none';
     id('startScreen').style.display = 'flex';
   }
 
   // -------- 저장 (이미지 + 범례 합성 후 공유/저장) --------
   function buildExportCanvas(){
+    const points = marks.filter(m => m.type === 'point');
     const legendLineH = 30;
     const legendPad = 16;
-    const legendH = marks.length > 0 ? (legendPad*2 + marks.length * legendLineH) : 0;
+    const legendH = points.length > 0 ? (legendPad*2 + points.length * legendLineH) : 0;
     const out = document.createElement('canvas');
     out.width = canvas.width;
     out.height = canvas.height + legendH;
@@ -420,7 +657,7 @@
 
     if (legendH > 0){
       let y = canvas.height + legendPad + 14;
-      marks.forEach(m => {
+      points.forEach(m => {
         octx.beginPath();
         octx.arc(legendPad + 10, y - 6, 11, 0, Math.PI*2);
         octx.fillStyle = JUDGE_COLOR[m.judge];
@@ -446,28 +683,47 @@
     return out;
   }
 
+  function dataURLtoBlob(dataUrl){
+    const parts = dataUrl.split(',');
+    const mimeMatch = parts[0].match(/data:(.*?);base64/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const binary = atob(parts[1]);
+    const arr = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+  }
+
+  function triggerDownload(dataUrl, filename){
+    // <a download> 클릭은 팝업 차단 대상이 아니라서 비동기 콜백 안에서도 안전하게 동작함
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('갤러리(다운로드)에 저장되었습니다');
+  }
+
   function saveImage(){
     if(!baseImg) return;
     const exportCanvas = buildExportCanvas();
-    exportCanvas.toBlob(async (blob) => {
-      if(!blob){ showToast('이미지 생성에 실패했습니다'); return; }
-      const filename = `mark_${Date.now()}.jpg`;
-      const file = new File([blob], filename, { type: 'image/jpeg' });
+    // toBlob(비동기) 대신 toDataURL(동기)을 사용 — 비동기 콜백 안에서 열던 새 창이
+    // 모바일 브라우저의 팝업 차단에 걸려 "저장이 안 되는" 문제의 원인이었음
+    const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92);
+    const filename = `mark_${Date.now()}.jpg`;
+    const blob = dataURLtoBlob(dataUrl);
+    const file = new File([blob], filename, { type: 'image/jpeg' });
 
-      if (navigator.canShare && navigator.canShare({ files: [file] })){
-        try {
-          await navigator.share({ files: [file], title: '현장 마킹 사진' });
-          showToast('공유 시트에서 "사진에 저장"을 선택하세요');
-          return;
-        } catch(e){
-          // 사용자가 공유 취소한 경우 등 — 폴백으로 진행
-        }
-      }
-      // 폴백: 새 탭에 이미지 열기 → 길게 눌러 저장
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      showToast('새 탭에서 이미지를 길게 눌러 "사진에 저장"하세요');
-    }, 'image/jpeg', 0.92);
+    if (navigator.canShare && navigator.canShare({ files: [file] })){
+      navigator.share({ files: [file], title: '현장 마킹 사진' })
+        .then(() => showToast('공유 시트에서 "사진에 저장"을 선택하세요'))
+        .catch(() => {
+          // 공유 취소/실패 시 즉시 다운로드로 폴백
+          triggerDownload(dataUrl, filename);
+        });
+      return;
+    }
+    triggerDownload(dataUrl, filename);
   }
 
   let toastTimer = null;
