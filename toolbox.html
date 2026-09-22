@@ -94,11 +94,15 @@
 
         /* 자 모드 */
         .ruler-container { flex: 1; display: flex; background: white; position: relative; overflow: hidden; user-select: none; }
-        .ruler-edge { width: 50px; height: 100%; background: #FEF3C7; border-right: 2px solid #D97706; position: relative; }
+        .ruler-edge { width: 50px; height: 100%; background: #FEF3C7; border-right: 2px solid #D97706; position: relative; flex-shrink: 0; }
         .tick { position: absolute; right: 0; width: 8px; border-top: 1px solid #A16207; }
         .tick.medium { width: 14px; border-top: 1.4px solid #92400E; }
         .tick.major { width: 22px; border-top: 2px solid #78350F; }
         .tick span { position: absolute; right: 26px; top: -6px; font-size: 9px; font-weight: bold; color: #78350F; }
+        /* 오른쪽 눈금자(좌우 대칭) - 왼쪽과 동일한 눈금을 반대쪽 경계선에 맞춰 미러링 */
+        .ruler-edge-mirror { border-right: none; border-left: 2px solid #D97706; }
+        .ruler-edge-mirror .tick { right: auto; left: 0; }
+        .ruler-edge-mirror .tick span { right: auto; left: 26px; }
         .ruler-workspace { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 16px; text-align: center; overflow-y: auto; }
         .ruler-workspace p { font-size: 0.85rem; color: #64748B; margin-bottom: 12px; }
         .cal-box { background: #F1F5F9; padding: 12px; border-radius: 8px; width: 100%; max-width: 260px; margin-bottom: 12px; }
@@ -205,6 +209,84 @@
         .lap-sheet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .lap-sheet-actions .mini-btn { width: 100%; padding: 12px 6px; font-size: 0.82rem; margin-top: 0; }
 
+        /* 📝 품질 메모장 (.qm- 접두사, localStorage 저장) */
+        .qm-scroll { flex: 1; overflow-y: auto; background: #F1F5F9; padding: 12px 12px calc(70px + env(safe-area-inset-bottom,0px)); }
+        .qm-wrap { max-width: 480px; margin: 0 auto; }
+        .qm-input-card { background: white; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+        .qm-cat-row { display: flex; gap: 6px; margin-bottom: 12px; }
+        .qm-cat { flex: 1; background: #F1F5F9; border: 1px solid #E2E8F0; color: #334155; font-size: 0.72rem; font-weight: 700; padding: 9px 4px; border-radius: 10px; text-align: center; }
+        .qm-cat.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
+        .qm-field { margin-bottom: 10px; }
+        .qm-field label { display: block; font-size: 0.7rem; color: #64748B; margin-bottom: 4px; }
+        .qm-field input, .qm-field textarea { width: 100%; padding: 9px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical; }
+        .qm-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.85rem; }
+        .qm-btn.primary { background: var(--accent-color); color: white; }
+
+        .qm-list-head { margin-bottom: 10px; }
+        .qm-list-head input { width: 100%; padding: 9px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; margin-bottom: 8px; background: white; }
+        .qm-filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .qm-chip { background: white; border: 1px solid #E2E8F0; color: #64748B; font-size: 0.7rem; font-weight: 700; padding: 6px 12px; border-radius: 20px; }
+        .qm-chip.on { background: var(--gold); border-color: var(--gold); color: #1a1206; }
+
+        .qm-item { background: white; border: 1px solid #E2E8F0; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+        .qm-item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
+        .qm-badge { font-size: 0.64rem; font-weight: 800; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
+        .qm-badge.defect { background: #FEE2E2; color: #991B1B; }
+        .qm-badge.cmm { background: #DBEAFE; color: #1E40AF; }
+        .qm-badge.etc { background: #F1F5F9; color: #475569; }
+        .qm-item-time { font-size: 0.66rem; color: #94A3B8; margin-left: auto; }
+        .qm-item-part { font-size: 0.76rem; font-weight: 700; color: #1E293B; margin-bottom: 4px; }
+        .qm-item-content { font-size: 0.8rem; color: #334155; line-height: 1.5; white-space: pre-wrap; margin-bottom: 8px; }
+        .qm-item-del { background: none; border: none; color: #EF4444; font-size: 0.7rem; font-weight: 700; padding: 0; }
+        .qm-empty { text-align: center; color: #94A3B8; font-size: 0.8rem; padding: 30px 0; }
+
+        /* 🦾 CMM 프로브 교육 시뮬레이터 (.pe- 접두사로 스코프 처리) */
+        .hub-grid-wide-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,2.5vw,10px); }
+        .hub-grid-wide-2 .hub-card-wide { flex-direction: column; gap: 6px; padding: 12px 8px; }
+        .hub-grid-wide-2 .hub-card-wide h3 { font-size: 0.76rem; line-height: 1.25; }
+
+        .pe-scroll { flex: 1; overflow-y: auto; background: #F1F5F9; padding: 12px 12px calc(20px + env(safe-area-inset-bottom,0px)); }
+        .pe-wrap { max-width: 480px; margin: 0 auto; }
+        .pe-tabbar { display: flex; gap: 6px; margin: 2px 0 12px; }
+        .pe-tbtn { flex: 1; background: white; border: 1px solid #E2E8F0; color: #64748B; font-size: 0.72rem; font-weight: 700; padding: 9px 4px; border-radius: 10px; text-align: center; }
+        .pe-tbtn.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
+
+        .pe-canvas-card { background: #0b1636; border-radius: 16px; padding: 10px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.15); }
+        .pe-viewport-head { color: #93c5fd; font-size: 0.74rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
+        .pe-canvas-card canvas { width: 100%; height: 260px; display: block; border-radius: 10px; background: #0f172a; }
+        .pe-legend { margin-top: 8px; font-size: 0.66rem; color: #94A3B8; line-height: 1.5; font-family: monospace; white-space: pre-line; }
+
+        .pe-card { background: white; border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid #E2E8F0; }
+        .pe-card h2 { font-size: 0.82rem; color: #1E293B; margin-bottom: 10px; }
+        .pe-chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+        .pe-chip { flex: 1; min-width: 80px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #334155; font-size: 0.74rem; font-weight: 700; padding: 9px 6px; border-radius: 10px; text-align: center; }
+        .pe-chip.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
+        .pe-port-item { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 8px 10px; font-size: 0.72rem; color: #475569; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .pe-port-item.on { background: #EFF6FF; border-color: #93C5FD; color: #1E3A8A; font-weight: 700; }
+        .pe-angle-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .pe-angle-grid button { background: #F1F5F9; border: 1px solid #E2E8F0; color: #334155; font-size: 0.64rem; font-weight: 700; padding: 8px 2px; border-radius: 8px; }
+        .pe-angle-grid button.on { background: var(--gold); border-color: var(--gold); color: #1a1206; }
+
+        .pe-slider-row { display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 700; color: #334155; margin-bottom: 4px; }
+        .pe-slider-row .v { font-family: monospace; background: #F1F5F9; padding: 2px 8px; border-radius: 6px; }
+        .pe-field { margin-bottom: 14px; }
+        .pe-field input[type=range] { width: 100%; }
+        .pe-badge-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 6px 0 10px; font-size: 0.72rem; }
+        .pe-badge { padding: 3px 8px; border-radius: 20px; font-weight: 700; font-size: 0.64rem; }
+        .pe-badge.ok { background: #D1FAE5; color: #065F46; }
+        .pe-badge.warn { background: #FEF3C7; color: #92400E; }
+        .pe-mapbox { background: #F1F5F9; border-radius: 10px; padding: 8px 10px; font-size: 0.72rem; color: #1E3A8A; font-family: monospace; }
+
+        .pe-num-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .pe-num-field label { display: block; font-size: 0.7rem; color: #64748B; margin-bottom: 4px; }
+        .pe-num-field input { width: 100%; padding: 9px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; }
+
+        .pe-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.82rem; }
+        .pe-btn.primary { background: var(--accent-color); color: white; }
+        .pe-btn.outline { background: white; border: 1px solid #CBD5E1; color: #334155; margin-top: 8px; }
+        .pe-btn-row { display: flex; gap: 8px; }
+        .pe-btn-row .pe-btn { flex: 1; }
+
         /* 🔮 CMM 측정 납기 예측기 (기존 데스크톱 도구 이식, .cmm-view로 스코프 처리) */
         .cmm-scroll { flex: 1; overflow-y: auto; background: #e9ecef; padding: 14px 10px calc(24px + env(safe-area-inset-bottom, 0px)); }
         .cmm-wrap { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); overflow: hidden; padding: 18px 16px; }
@@ -281,19 +363,23 @@
                     <div class="icon">📐</div>
                     <h3>각도기</h3>
                 </div>
-                <div class="hub-card" onclick="switchView('lux-view')">
-                    <div class="icon">💡</div>
-                    <h3>조도계</h3>
+                <div class="hub-card" onclick="switchView('memo-view')">
+                    <div class="icon">📝</div>
+                    <h3>품질 메모장</h3>
                 </div>
                 <div class="hub-card" onclick="switchView('timer-view')">
                     <div class="icon">⏱️</div>
                     <h3>타임</h3>
                 </div>
             </div>
-            <div class="hub-grid-wide">
+            <div class="hub-grid-wide hub-grid-wide-2">
                 <div class="hub-card hub-card-wide" onclick="switchView('cmm-view')">
                     <div class="icon">🔮</div>
                     <h3>CMM 측정 납기 예측기</h3>
+                </div>
+                <div class="hub-card hub-card-wide" onclick="switchView('probe-edu-view')">
+                    <div class="icon">🦾</div>
+                    <h3>CMM 프로브 교육 시뮬레이터</h3>
                 </div>
             </div>
             <div class="hub-note">신뢰할 수 있는 측정, 지금 이 자리에서</div>
@@ -312,7 +398,7 @@
             <div class="ruler-container">
                 <div class="ruler-edge" id="rulerTicks"></div>
                 <div class="ruler-workspace">
-                    <p>휴대폰 왼쪽 끝선에<br>측정물을 밀착시키세요. <span style="color:#94A3B8;">(단위: mm)</span></p>
+                    <p>휴대폰 좌우 끝선 어느 쪽이든<br>측정물을 밀착시키세요. <span style="color:#94A3B8;">(단위: mm)</span></p>
                     <div class="cal-box">
                         <label>오차 보정 (미세 조절)</label>
                         <input type="range" id="scaleRange" min="0.5" max="2.0" step="0.01" value="1" oninput="updateRuler()">
@@ -378,6 +464,7 @@
                         <input type="text" id="rulerMemo" placeholder="예: 3동 A라인 - 배관 외경 확인">
                     </div>
                 </div>
+                <div class="ruler-edge ruler-edge-mirror" id="rulerTicksRight"></div>
                 <button class="capture-btn light" id="rulerCaptureBtn" onclick="captureView('ruler-view', '자모드')" title="화면 캡처 저장">📸</button>
             </div>
         </div>
@@ -649,6 +736,158 @@
             </div>
             <button class="capture-btn light" id="cmmCaptureBtn" onclick="captureView('cmm-view', 'CMM납기예측')" title="화면 캡처 저장">📸</button>
         </div>
+
+        <!-- 🦾 CMM 프로브 교육 시뮬레이터 -->
+        <div id="probe-edu-view" class="view">
+            <div class="sub-header">
+                <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
+            </div>
+            <div class="pe-scroll">
+            <div class="pe-wrap">
+                <div class="pe-tabbar">
+                    <button class="pe-tbtn on" id="pe-tbtn-probe" onclick="switchPeTab('probe')">🦾 프로브 회전</button>
+                    <button class="pe-tbtn" id="pe-tbtn-ijk" onclick="switchPeTab('ijk')">🧭 IJK 벡터</button>
+                    <button class="pe-tbtn" id="pe-tbtn-dsc" onclick="switchPeTab('dsc')">⭕ DS·C 원측정</button>
+                </div>
+
+                <div class="pe-canvas-card">
+                    <div class="pe-viewport-head" id="peViewportTitle">프로브 회전 시각화</div>
+                    <canvas id="peCanvas"></canvas>
+                    <div class="pe-legend" id="peLegend"></div>
+                </div>
+
+                <!-- 프로브 회전 탭 -->
+                <div id="pe-panel-probe" class="pe-panel">
+                    <div class="pe-card">
+                        <h2>회전 각도 프리셋 (A°|B°)</h2>
+                        <div class="pe-angle-grid" id="peAngleGrid"></div>
+                        <button class="pe-btn outline" onclick="peResetProbeView()">↺ 초기화 (A0° / B0°)</button>
+                    </div>
+                    <div class="pe-card">
+                        <h2>측정기 / 포트 선택</h2>
+                        <div class="pe-chip-row">
+                            <button id="peMachineBtn1" class="pe-chip on" onclick="peSelectMachine(1)">측정기 1번</button>
+                            <button id="peMachineBtn2" class="pe-chip" onclick="peSelectMachine(2)">측정기 2번</button>
+                        </div>
+                        <div id="pePortList"></div>
+                    </div>
+                </div>
+
+                <!-- IJK 벡터 탭 -->
+                <div id="pe-panel-ijk" class="pe-panel" style="display:none;">
+                    <div class="pe-card">
+                        <div class="pe-field">
+                            <div class="pe-slider-row"><span style="color:#dc2626;">I (X축 방향코사인)</span><span class="v" id="pe-val-i">0.000</span></div>
+                            <input type="range" id="pe-slider-i" min="-1" max="1" step="0.01" value="0" oninput="peUpdateIJK()">
+                        </div>
+                        <div class="pe-field">
+                            <div class="pe-slider-row"><span style="color:#059669;">J (Y축 방향코사인)</span><span class="v" id="pe-val-j">0.000</span></div>
+                            <input type="range" id="pe-slider-j" min="-1" max="1" step="0.01" value="0" oninput="peUpdateIJK()">
+                        </div>
+                        <div class="pe-field" style="margin-bottom:6px;">
+                            <div class="pe-slider-row"><span style="color:#0284c7;">K (Z축 방향코사인)</span><span class="v" id="pe-val-k">1.000</span></div>
+                            <input type="range" id="pe-slider-k" min="-1" max="1" step="0.01" value="1" oninput="peUpdateIJK()">
+                        </div>
+                        <div class="pe-badge-row">
+                            <span>벡터 크기 |V| = <strong id="pe-ijk-mag">1.000</strong></span>
+                            <span class="pe-badge ok" id="pe-ijk-badge">단위벡터 OK</span>
+                        </div>
+                        <button class="pe-btn outline" style="margin-top:0;" onclick="peNormalizeIJK()">단위벡터로 정규화</button>
+                        <div class="pe-mapbox" id="pe-ijk-map" style="margin-top:10px;">A = 0.0° (틸트) / B = 0.0° (방위각)</div>
+                        <div class="pe-angle-grid" style="grid-template-columns:repeat(3,1fr);">
+                            <button onclick="peSetIJKPreset(0,0,1)">Z상향 0,0,1</button>
+                            <button onclick="peSetIJKPreset(0,1,0)">Y전방 0,1,0</button>
+                            <button onclick="peSetIJKPreset(1,0,0)">X우측 1,0,0</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DS·C 원측정 탭 -->
+                <div id="pe-panel-dsc" class="pe-panel" style="display:none;">
+                    <div class="pe-card">
+                        <div class="pe-num-field" style="margin-bottom:8px;">
+                            <label>S (시작 각도, °)</label>
+                            <input type="number" id="pe-input-s" value="90" step="15" min="-360" max="360" oninput="peUpdateDSC()">
+                        </div>
+                        <div class="pe-chip-row">
+                            <button class="pe-chip" onclick="peSetSAngle(0)">0°</button>
+                            <button class="pe-chip" onclick="peSetSAngle(90)">90°</button>
+                            <button class="pe-chip" onclick="peSetSAngle(180)">180°</button>
+                            <button class="pe-chip" onclick="peSetSAngle(-90)">-90°</button>
+                        </div>
+                        <div class="pe-num-field" style="margin-bottom:8px;">
+                            <label>E (종료 각도, °)</label>
+                            <input type="number" id="pe-input-e" value="450" step="15" min="-360" max="720" oninput="peUpdateDSC()">
+                        </div>
+                        <div class="pe-chip-row">
+                            <button class="pe-chip" onclick="peSetEFullCircle()">전체원(S+360°)</button>
+                            <button class="pe-chip" onclick="peSetEHalfCircle()">반원(S+180°)</button>
+                            <button class="pe-chip" onclick="peSetEOffset(90)">S+90°</button>
+                        </div>
+                        <div class="pe-num-row" style="margin-top:10px;margin-bottom:0;">
+                            <div class="pe-num-field">
+                                <label>D (직경, mm)</label>
+                                <input type="number" id="pe-input-d" value="6.5" step="0.1" min="1" max="50" oninput="peUpdateDSC()">
+                            </div>
+                            <div class="pe-num-field">
+                                <label>C (포인트 개수)</label>
+                                <input type="number" id="pe-input-c" value="8" step="1" min="2" max="32" oninput="peUpdateDSC()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pe-card">
+                        <h2>측정 순서(Path) 애니메이션</h2>
+                        <p style="font-size:0.72rem;color:#64748B;margin-bottom:10px;">프로브가 P1 → P2 → … 순서대로 이동하며 찍는 과정을 재생합니다.</p>
+                        <div class="pe-btn-row">
+                            <button id="pe-play-btn" class="pe-btn primary" onclick="peToggleDSCPlayback()">▶ 측정 시뮬레이션 재생</button>
+                            <button class="pe-btn outline" style="margin-top:0;width:auto;padding:11px 14px;" onclick="peResetDSCPlayback()">↺</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- 📝 품질 메모장 -->
+        <div id="memo-view" class="view">
+            <div class="sub-header">
+                <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
+            </div>
+            <div class="qm-scroll">
+            <div class="qm-wrap">
+                <div class="disclaimer-banner" style="margin:0 0 10px;">📵 이 기기(브라우저)에만 저장됩니다 · 중요한 내용은 저장 후 우측 하단 📸로 갤러리에 꼭 남겨두세요</div>
+
+                <div class="qm-input-card">
+                    <div class="qm-cat-row">
+                        <button class="qm-cat on" id="qm-cat-defect" onclick="qmSetCategory('defect')">🔴 불량기록</button>
+                        <button class="qm-cat" id="qm-cat-cmm" onclick="qmSetCategory('cmm')">📐 3차원측정</button>
+                        <button class="qm-cat" id="qm-cat-etc" onclick="qmSetCategory('etc')">📝 기타</button>
+                    </div>
+                    <div class="qm-field">
+                        <label>제품명 / 도면번호 (선택)</label>
+                        <input type="text" id="qmPartName" placeholder="예: XX-1234 브라켓">
+                    </div>
+                    <div class="qm-field" style="margin-bottom:12px;">
+                        <label>내용</label>
+                        <textarea id="qmContent" rows="4" placeholder="예: 웰드라인 발생, 2번 캐비티 / A프로브 인덱싱 A90 B0 측정 중 형상공차 이상"></textarea>
+                    </div>
+                    <button class="qm-btn primary" onclick="qmSaveMemo()">💾 메모 저장</button>
+                </div>
+
+                <div class="qm-list-head">
+                    <input type="text" id="qmSearch" placeholder="🔍 검색 (제품명/내용)" oninput="qmRenderList()">
+                    <div class="qm-filter-row">
+                        <button class="qm-chip on" id="qm-filter-all" onclick="qmSetFilter('all')">전체</button>
+                        <button class="qm-chip" id="qm-filter-defect" onclick="qmSetFilter('defect')">불량기록</button>
+                        <button class="qm-chip" id="qm-filter-cmm" onclick="qmSetFilter('cmm')">3차원측정</button>
+                        <button class="qm-chip" id="qm-filter-etc" onclick="qmSetFilter('etc')">기타</button>
+                    </div>
+                </div>
+                <div id="qmList"></div>
+            </div>
+            </div>
+            <button class="capture-btn light" id="qmCaptureBtn" onclick="captureView('memo-view', '품질메모장')" title="화면 캡처 저장(갤러리)">📸</button>
+        </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -663,6 +902,7 @@
             // 다른 화면으로 넘어갈 때 센서/카메라 정리
             if (viewId !== 'level-view') stopSensor();
             if (viewId !== 'lux-view') stopLux();
+            if (viewId !== 'probe-edu-view' && typeof pePauseDSCPlayback === 'function') pePauseDSCPlayback();
 
             if (viewId === 'ruler-view') {
                 initRuler();
@@ -670,6 +910,10 @@
                 initSensor();
             } else if (viewId === 'lux-view') {
                 initLux();
+            } else if (viewId === 'probe-edu-view') {
+                initProbeEdu();
+            } else if (viewId === 'memo-view') {
+                initMemo();
             }
         }
 
@@ -677,32 +921,39 @@
         // 눈금자 스케일: mm 기준. 1mm = PX_PER_MM 픽셀 (10mm = 1cm ≈ 37.8px 기준)
         const PX_PER_MM = 3.78;
 
-        function initRuler() {
-            const ruler = document.getElementById('rulerTicks');
-            if (ruler.children.length === 0) {
-                for (let i = 0; i <= 300; i++) { // 0~300mm(30cm)
-                    const tick = document.createElement('div');
-                    let cls = 'tick';
-                    if (i % 10 === 0) cls += ' major';
-                    else if (i % 5 === 0) cls += ' medium';
-                    tick.className = cls;
-                    tick.style.top = (i * PX_PER_MM) + 'px';
+        // 좌우 눈금자에 공통으로 눈금 생성(대칭)
+        function buildRulerTicks(ruler) {
+            if (!ruler || ruler.children.length > 0) return;
+            for (let i = 0; i <= 300; i++) { // 0~300mm(30cm)
+                const tick = document.createElement('div');
+                let cls = 'tick';
+                if (i % 10 === 0) cls += ' major';
+                else if (i % 5 === 0) cls += ' medium';
+                tick.className = cls;
+                tick.style.top = (i * PX_PER_MM) + 'px';
 
-                    if (i % 10 === 0) {
-                        const label = document.createElement('span');
-                        label.innerText = i;
-                        tick.appendChild(label);
-                    }
-                    ruler.appendChild(tick);
+                if (i % 10 === 0) {
+                    const label = document.createElement('span');
+                    label.innerText = i;
+                    tick.appendChild(label);
                 }
+                ruler.appendChild(tick);
             }
+        }
+
+        function initRuler() {
+            buildRulerTicks(document.getElementById('rulerTicks'));
+            buildRulerTicks(document.getElementById('rulerTicksRight'));
             loadCalibration();
         }
 
         function updateRuler() {
             const scale = document.getElementById('scaleRange').value;
-            document.getElementById('rulerTicks').style.transform = `scaleY(${scale})`;
-            document.getElementById('rulerTicks').style.transformOrigin = 'top';
+            ['rulerTicks', 'rulerTicksRight'].forEach(elId => {
+                const el = document.getElementById(elId);
+                el.style.transform = `scaleY(${scale})`;
+                el.style.transformOrigin = 'top';
+            });
             saveCalibration();
         }
 
@@ -783,8 +1034,11 @@
                 const v = localStorage.getItem('qc_ruler_scale');
                 if (v) {
                     document.getElementById('scaleRange').value = v;
-                    document.getElementById('rulerTicks').style.transform = `scaleY(${v})`;
-                    document.getElementById('rulerTicks').style.transformOrigin = 'top';
+                    ['rulerTicks', 'rulerTicksRight'].forEach(elId => {
+                        const el = document.getElementById(elId);
+                        el.style.transform = `scaleY(${v})`;
+                        el.style.transformOrigin = 'top';
+                    });
                 }
             } catch (e) { /* 저장소 사용 불가 시 기본값 유지 */ }
         }
@@ -1701,6 +1955,508 @@
         machineOvertimes = [0, 0];
         onMachineCountChange();
         window.addEventListener('load', () => { performCalculation(); });
+
+        // ==================== 🦾 CMM 프로브 교육 시뮬레이터 (pe- 접두사) ====================
+        const peProbeData = {
+            1: [
+                { id: 2, name: "포트 2번", spec: "ø2_ (40mm)" },
+                { id: 3, name: "포트 3번", spec: "ø0.7 (20mm + se20mm)" },
+                { id: 5, name: "포트 5번", spec: "ø0.5 (10mm + 30mm)" },
+                { id: 16, name: "포트 16번", spec: "ø1 (27.5mm + se30mm)" }
+            ],
+            2: [
+                { id: 2, name: "포트 2번", spec: "ø2_ (40mm)" },
+                { id: 3, name: "포트 3번", spec: "ø0.5_ (1.0m + se 30mm)" },
+                { id: 5, name: "포트 5번", spec: "ø0.11_ (2.0m + se 30mm)" },
+                { id: 6, name: "포트 6번", spec: "ø1_ (27.5mm + se 30mm)" }
+            ]
+        };
+        const peAnglePresets = [
+            { a: 0, b: 0 }, { a: 90, b: 0 }, { a: 90, b: 90 }, { a: 90, b: 180 },
+            { a: 45, b: 0 }, { a: 45, b: 90 }, { a: 45, b: 180 }, { a: 45, b: -90 },
+            { a: 15, b: 0 }, { a: 15, b: 90 }, { a: 15, b: 180 }, { a: 15, b: -90 },
+            { a: 7.5, b: 0 }, { a: 7.5, b: 90 }, { a: 7.5, b: 180 }, { a: 7.5, b: -90 }
+        ];
+
+        let peInitialized = false;
+        let peActiveTab = 'probe';
+        let peCurrentMachine = 1;
+        let peSelectedPortIndex = 0;
+        let peCurrentAngleA = 0, peCurrentAngleB = 0;
+        let peIjkVal = { i: 0, j: 0, k: 1 };
+        let peDscVal = { d: 6.5, s: 90, e: 450, c: 8 };
+        let peDscAnim = { playing: false, finished: false, currentSeg: 0, t: 0, segStartTime: 0, segDuration: 700, angles: [], radius: 0, rafId: null };
+        let peCanvas, peCtx;
+
+        function initProbeEdu() {
+            peCanvas = document.getElementById('peCanvas');
+            peCtx = peCanvas.getContext('2d');
+            if (!peInitialized) {
+                peInitialized = true;
+                peRenderPortList();
+                peRenderAngleGrid();
+                window.addEventListener('resize', () => { peResizeCanvas(); peDrawSimulation(); });
+            }
+            peResizeCanvas();
+            peDrawSimulation();
+        }
+
+        function peResizeCanvas() {
+            const rect = peCanvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            peCanvas.width = rect.width * dpr;
+            peCanvas.height = rect.height * dpr;
+            peCtx.setTransform(1, 0, 0, 1, 0, 0);
+            peCtx.scale(dpr, dpr);
+        }
+
+        function switchPeTab(tab) {
+            if (tab !== 'dsc') pePauseDSCPlayback();
+            peActiveTab = tab;
+            ['probe', 'ijk', 'dsc'].forEach(t => {
+                document.getElementById('pe-panel-' + t).style.display = (t === tab) ? 'block' : 'none';
+                document.getElementById('pe-tbtn-' + t).classList.toggle('on', t === tab);
+            });
+            const titles = { probe: '프로브 회전 시각화', ijk: 'IJK 벡터(수직방향) 시각화', dsc: 'DS/C 원측정 조건 및 포인트 시각화' };
+            document.getElementById('peViewportTitle').innerText = titles[tab];
+            peDrawSimulation();
+        }
+
+        function peSelectMachine(num) {
+            peCurrentMachine = num;
+            peSelectedPortIndex = 0;
+            document.getElementById('peMachineBtn1').classList.toggle('on', num === 1);
+            document.getElementById('peMachineBtn2').classList.toggle('on', num === 2);
+            peRenderPortList();
+            peDrawSimulation();
+        }
+
+        function peRenderPortList() {
+            const wrap = document.getElementById('pePortList');
+            wrap.innerHTML = peProbeData[peCurrentMachine].map((port, idx) => `
+                <div class="pe-port-item ${idx === peSelectedPortIndex ? 'on' : ''}" onclick="peSelectPort(${idx})">
+                    <span>${port.name}</span><span>${port.spec}</span>
+                </div>`).join('');
+        }
+        function peSelectPort(idx) {
+            peSelectedPortIndex = idx;
+            peRenderPortList();
+            peDrawSimulation();
+        }
+
+        function peRenderAngleGrid() {
+            const wrap = document.getElementById('peAngleGrid');
+            wrap.innerHTML = peAnglePresets.map((p, idx) =>
+                `<button id="pe-angle-${idx}" onclick="peSetAnglePreset(${idx})">${p.a}°|${p.b}°</button>`
+            ).join('');
+        }
+        function peSetAnglePreset(idx) {
+            const p = peAnglePresets[idx];
+            peCurrentAngleA = p.a; peCurrentAngleB = p.b;
+            peAnglePresets.forEach((_, i) => document.getElementById('pe-angle-' + i).classList.toggle('on', i === idx));
+            if (peActiveTab !== 'probe') switchPeTab('probe');
+            peDrawSimulation();
+        }
+        function peResetProbeView() {
+            peCurrentAngleA = 0; peCurrentAngleB = 0;
+            document.querySelectorAll('#peAngleGrid button').forEach(b => b.classList.remove('on'));
+            peDrawSimulation();
+        }
+
+        function peLerpHexColor(hex1, hex2, t) {
+            const h1 = parseInt(hex1.slice(1), 16), h2 = parseInt(hex2.slice(1), 16);
+            const r1 = (h1 >> 16) & 255, g1 = (h1 >> 8) & 255, b1 = h1 & 255;
+            const r2 = (h2 >> 16) & 255, g2 = (h2 >> 8) & 255, b2 = h2 & 255;
+            return `rgb(${Math.round(r1 + (r2 - r1) * t)}, ${Math.round(g1 + (g2 - g1) * t)}, ${Math.round(b1 + (b2 - b1) * t)})`;
+        }
+        function peGetProbeDirectionLabel(aDeg, bDeg) {
+            if (Math.abs(aDeg) < 1) return '→ 정반 방향으로 일자(수직) 상태';
+            const compass = ['우', '우전', '전', '좌전', '좌', '좌후', '후', '우후'];
+            const full = ['우측', '우측 전방', '전방', '좌측 전방', '좌측', '좌측 후방', '후방', '우측 후방'];
+            let b = ((bDeg % 360) + 360) % 360;
+            const idx = Math.round(b / 45) % 8;
+            return `→ 정반 대비 ${compass[idx]}(${full[idx]}) 쪽으로 ${Math.abs(aDeg).toFixed(1)}° 꺾인 상태`;
+        }
+
+        // ---- IJK ----
+        function peUpdateIJK() {
+            peIjkVal.i = parseFloat(document.getElementById('pe-slider-i').value);
+            peIjkVal.j = parseFloat(document.getElementById('pe-slider-j').value);
+            peIjkVal.k = parseFloat(document.getElementById('pe-slider-k').value);
+            document.getElementById('pe-val-i').innerText = peIjkVal.i.toFixed(3);
+            document.getElementById('pe-val-j').innerText = peIjkVal.j.toFixed(3);
+            document.getElementById('pe-val-k').innerText = peIjkVal.k.toFixed(3);
+
+            const mag = Math.sqrt(peIjkVal.i ** 2 + peIjkVal.j ** 2 + peIjkVal.k ** 2);
+            document.getElementById('pe-ijk-mag').innerText = mag.toFixed(3);
+            const badge = document.getElementById('pe-ijk-badge');
+            if (Math.abs(mag - 1) < 0.015) { badge.innerText = '단위벡터 OK'; badge.className = 'pe-badge ok'; }
+            else { badge.innerText = '정규화 필요'; badge.className = 'pe-badge warn'; }
+
+            const mapEl = document.getElementById('pe-ijk-map');
+            if (mag < 0.001) { mapEl.innerText = '벡터 크기가 0에 가까워 각도를 계산할 수 없습니다'; }
+            else {
+                const kNorm = Math.max(-1, Math.min(1, peIjkVal.k / mag));
+                const aDeg = Math.acos(kNorm) * (180 / Math.PI);
+                const bDeg = Math.atan2(peIjkVal.j, peIjkVal.i) * (180 / Math.PI);
+                mapEl.innerText = `A = ${aDeg.toFixed(1)}° (틸트) / B = ${bDeg.toFixed(1)}° (방위각)`;
+            }
+            peDrawSimulation();
+        }
+        function peNormalizeIJK() {
+            const mag = Math.sqrt(peIjkVal.i ** 2 + peIjkVal.j ** 2 + peIjkVal.k ** 2);
+            if (mag < 0.001) return;
+            document.getElementById('pe-slider-i').value = (peIjkVal.i / mag).toFixed(3);
+            document.getElementById('pe-slider-j').value = (peIjkVal.j / mag).toFixed(3);
+            document.getElementById('pe-slider-k').value = (peIjkVal.k / mag).toFixed(3);
+            peUpdateIJK();
+        }
+        function peSetIJKPreset(i, j, k) {
+            document.getElementById('pe-slider-i').value = i;
+            document.getElementById('pe-slider-j').value = j;
+            document.getElementById('pe-slider-k').value = k;
+            peUpdateIJK();
+        }
+
+        // ---- DS/C ----
+        function peUpdateDSC() {
+            peDscVal.d = parseFloat(document.getElementById('pe-input-d').value) || 5;
+            peDscVal.s = parseFloat(document.getElementById('pe-input-s').value) || 0;
+            peDscVal.e = parseFloat(document.getElementById('pe-input-e').value);
+            if (isNaN(peDscVal.e)) peDscVal.e = peDscVal.s + 360;
+            peDscVal.c = Math.max(2, parseInt(document.getElementById('pe-input-c').value) || 8);
+            peResetDSCPlayback();
+        }
+        function peSetSAngle(a) { document.getElementById('pe-input-s').value = a; peUpdateDSC(); }
+        function peSetEFullCircle() { const s = parseFloat(document.getElementById('pe-input-s').value) || 0; document.getElementById('pe-input-e').value = s + 360; peUpdateDSC(); }
+        function peSetEHalfCircle() { const s = parseFloat(document.getElementById('pe-input-s').value) || 0; document.getElementById('pe-input-e').value = s + 180; peUpdateDSC(); }
+        function peSetEOffset(o) { const s = parseFloat(document.getElementById('pe-input-s').value) || 0; document.getElementById('pe-input-e').value = s + o; peUpdateDSC(); }
+
+        function peComputeDSCPoints() {
+            const sweep = peDscVal.e - peDscVal.s;
+            const isFullCircle = Math.abs(sweep) >= 359.999;
+            const radius = peDscVal.d * 12;
+            const count = peDscVal.c;
+            const step = isFullCircle ? (sweep / count) : (count > 1 ? (sweep / (count - 1)) : 0);
+            const angles = [];
+            for (let i = 0; i < count; i++) angles.push(peDscVal.s + (i * step));
+            return { sweep, isFullCircle, radius, angles, count };
+        }
+
+        function peToggleDSCPlayback() { if (peDscAnim.playing) pePauseDSCPlayback(); else peStartDSCPlayback(); }
+        function peStartDSCPlayback() {
+            const pts = peComputeDSCPoints();
+            if (pts.angles.length < 2) return;
+            peDscAnim.angles = pts.angles;
+            peDscAnim.radius = pts.radius;
+            if (peDscAnim.finished || peDscAnim.currentSeg >= pts.angles.length - 1) { peDscAnim.currentSeg = 0; peDscAnim.t = 0; }
+            peDscAnim.finished = false;
+            peDscAnim.playing = true;
+            peDscAnim.segStartTime = performance.now() - (peDscAnim.t * peDscAnim.segDuration);
+            document.getElementById('pe-play-btn').innerText = '⏸ 일시정지';
+            if (peActiveTab !== 'dsc') switchPeTab('dsc');
+            peDscAnim.rafId = requestAnimationFrame(peDscAnimationStep);
+        }
+        function pePauseDSCPlayback() {
+            if (!peDscAnim.playing) return;
+            peDscAnim.playing = false;
+            if (peDscAnim.rafId) cancelAnimationFrame(peDscAnim.rafId);
+            const btn = document.getElementById('pe-play-btn');
+            if (btn) btn.innerText = peDscAnim.finished ? '▶ 처음부터 다시 재생' : '▶ 이어서 재생';
+        }
+        function peResetDSCPlayback() {
+            peDscAnim.playing = false;
+            peDscAnim.finished = false;
+            peDscAnim.currentSeg = 0;
+            peDscAnim.t = 0;
+            if (peDscAnim.rafId) cancelAnimationFrame(peDscAnim.rafId);
+            const btn = document.getElementById('pe-play-btn');
+            if (btn) btn.innerText = '▶ 측정 시뮬레이션 재생';
+            peDrawSimulation();
+        }
+        function peDscAnimationStep(now) {
+            if (!peDscAnim.playing) return;
+            const elapsed = now - peDscAnim.segStartTime;
+            peDscAnim.t = Math.min(1, elapsed / peDscAnim.segDuration);
+            peDrawSimulation();
+            if (peDscAnim.t >= 1) {
+                peDscAnim.currentSeg++;
+                peDscAnim.segStartTime = now;
+                peDscAnim.t = 0;
+                if (peDscAnim.currentSeg >= peDscAnim.angles.length - 1) {
+                    peDscAnim.playing = false;
+                    peDscAnim.finished = true;
+                    peDscAnim.currentSeg = peDscAnim.angles.length - 2;
+                    peDscAnim.t = 1;
+                    peDrawSimulation();
+                    document.getElementById('pe-play-btn').innerText = '▶ 처음부터 다시 재생';
+                    return;
+                }
+            }
+            peDscAnim.rafId = requestAnimationFrame(peDscAnimationStep);
+        }
+
+        // ---- 마스터 드로잉 ----
+        function peDrawSimulation() {
+            if (!peCtx) return;
+            const w = peCanvas.clientWidth, h = peCanvas.clientHeight;
+            if (!w || !h) return;
+            peCtx.clearRect(0, 0, w, h);
+            const cx = w / 2, cy = h / 2;
+
+            peCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+            peCtx.lineWidth = 1;
+            for (let x = 0; x < w; x += 24) { peCtx.beginPath(); peCtx.moveTo(x, 0); peCtx.lineTo(x, h); peCtx.stroke(); }
+            for (let y = 0; y < h; y += 24) { peCtx.beginPath(); peCtx.moveTo(0, y); peCtx.lineTo(w, y); peCtx.stroke(); }
+
+            if (peActiveTab === 'probe') peDrawProbe(cx, cy);
+            else if (peActiveTab === 'ijk') peDrawIJK(cx, cy);
+            else peDrawDSC(cx, cy, Math.min(w, h));
+        }
+
+        function peDrawProbe(cx, cy) {
+            const port = peProbeData[peCurrentMachine][peSelectedPortIndex];
+            document.getElementById('peLegend').innerText =
+                `측정기 ${peCurrentMachine}번 | ${port.name} (${port.spec})\nA: ${peCurrentAngleA}° / B: ${peCurrentAngleB}°`;
+
+            peCtx.fillStyle = '#334155'; peCtx.strokeStyle = '#64748b'; peCtx.lineWidth = 3;
+            peCtx.beginPath(); peCtx.roundRect(cx - 44, cy - 118, 88, 40, 8); peCtx.fill(); peCtx.stroke();
+            peCtx.fillStyle = '#94a3b8'; peCtx.font = '10px sans-serif'; peCtx.textAlign = 'center';
+            peCtx.fillText('DUKIN PH10 HEAD', cx, cy - 94);
+
+            const jx = cx, jy = cy - 68, armLen = 78;
+            const aRad = (peCurrentAngleA * Math.PI) / 180, bRad = (peCurrentAngleB * Math.PI) / 180;
+            const dirDown = Math.cos(aRad), dirSide = Math.sin(aRad) * Math.cos(bRad), dirDepth = Math.sin(aRad) * Math.sin(bRad);
+            const depthSkew = dirDepth >= 0 ? 0.35 : 0.7;
+            const tipX = jx + armLen * dirSide, tipY = jy + armLen * dirDown + armLen * dirDepth * depthSkew;
+
+            const swingRadius = armLen * Math.sin(aRad);
+            if (swingRadius > 2) {
+                peCtx.save(); peCtx.strokeStyle = 'rgba(14,165,233,0.35)'; peCtx.lineWidth = 1.5; peCtx.setLineDash([4, 4]);
+                peCtx.beginPath(); peCtx.ellipse(jx, jy + armLen * dirDown, swingRadius, swingRadius * 0.32, 0, 0, Math.PI * 2); peCtx.stroke();
+                peCtx.setLineDash([]); peCtx.restore();
+            }
+
+            peCtx.fillStyle = '#0ea5e9'; peCtx.beginPath(); peCtx.arc(jx, jy, 10, 0, Math.PI * 2); peCtx.fill();
+            peCtx.strokeStyle = '#bae6fd'; peCtx.lineWidth = 2; peCtx.stroke();
+
+            const armWidth = Math.max(3, Math.min(11, 6 + dirDepth * 5));
+            peCtx.strokeStyle = '#e2e8f0'; peCtx.lineWidth = armWidth; peCtx.lineCap = 'round';
+            peCtx.beginPath(); peCtx.moveTo(jx, jy); peCtx.lineTo(tipX, tipY); peCtx.stroke();
+
+            const depthT = (dirDepth + 1) / 2;
+            const ballR = Math.max(3, Math.min(10, 6 + dirDepth * 5));
+            peCtx.fillStyle = peLerpHexColor('#7f1d1d', '#fca5a5', depthT);
+            peCtx.beginPath(); peCtx.arc(tipX, tipY, ballR, 0, Math.PI * 2); peCtx.fill();
+            peCtx.strokeStyle = '#fca5a5'; peCtx.lineWidth = 1.5; peCtx.stroke();
+
+            if (dirDepth < -0.35) {
+                peCtx.fillStyle = '#fca5a5'; peCtx.font = 'bold 10px sans-serif'; peCtx.textAlign = 'left';
+                peCtx.fillText('◀ 후방', tipX + 10, tipY);
+            }
+
+            peCtx.strokeStyle = 'rgba(148,163,184,0.25)'; peCtx.lineWidth = 1; peCtx.setLineDash([3, 3]);
+            peCtx.beginPath(); peCtx.moveTo(jx, jy); peCtx.lineTo(jx, jy + armLen); peCtx.stroke(); peCtx.setLineDash([]);
+
+            peCtx.fillStyle = '#cbd5e1'; peCtx.font = 'bold 12px sans-serif'; peCtx.textAlign = 'center';
+            peCtx.fillText(`A: ${peCurrentAngleA}°  /  B: ${peCurrentAngleB}°`, cx, cy + 78);
+            peCtx.fillStyle = '#38bdf8'; peCtx.font = '10.5px sans-serif';
+            peCtx.fillText(peGetProbeDirectionLabel(peCurrentAngleA, peCurrentAngleB), cx, cy + 96);
+        }
+
+        function peDrawIJK(cx, cy) {
+            document.getElementById('peLegend').innerText =
+                `I: ${peIjkVal.i.toFixed(2)}, J: ${peIjkVal.j.toFixed(2)}, K: ${peIjkVal.k.toFixed(2)}`;
+            const scaleLen = 85;
+            const vx = cx + peIjkVal.i * scaleLen, vy = cy - peIjkVal.j * scaleLen;
+
+            peCtx.strokeStyle = '#0ea5e9'; peCtx.lineWidth = 4;
+            peCtx.beginPath(); peCtx.moveTo(cx, cy); peCtx.lineTo(vx, vy); peCtx.stroke();
+
+            const ang = Math.atan2(vy - cy, vx - cx);
+            peCtx.fillStyle = '#38bdf8';
+            peCtx.beginPath(); peCtx.moveTo(vx, vy);
+            peCtx.lineTo(vx - 10 * Math.cos(ang - Math.PI / 6), vy - 10 * Math.sin(ang - Math.PI / 6));
+            peCtx.lineTo(vx - 10 * Math.cos(ang + Math.PI / 6), vy - 10 * Math.sin(ang + Math.PI / 6));
+            peCtx.closePath(); peCtx.fill();
+
+            peCtx.fillStyle = '#ffffff'; peCtx.beginPath(); peCtx.arc(cx, cy, 5, 0, Math.PI * 2); peCtx.fill();
+
+            peCtx.fillStyle = '#f8fafc'; peCtx.font = '11px monospace'; peCtx.textAlign = 'center';
+            peCtx.fillText(`V = (${peIjkVal.i.toFixed(2)}, ${peIjkVal.j.toFixed(2)}, ${peIjkVal.k.toFixed(2)})`, cx, cy + 96);
+        }
+
+        function peDrawDSC(cx, cy, minDim) {
+            const sweep = peDscVal.e - peDscVal.s;
+            const isFullCircle = Math.abs(sweep) >= 359.999;
+            const playbackNote = peDscAnim.playing ? ' | ▶ 재생 중' : (peDscAnim.finished ? ' | 재생 완료' : '');
+            document.getElementById('peLegend').innerText =
+                `D:${peDscVal.d}mm S:${peDscVal.s}°→E:${peDscVal.e}° (${isFullCircle ? '전체원' : sweep.toFixed(0) + '° 호'}) C:${peDscVal.c}개${playbackNote}`;
+
+            const radius = Math.min(peDscVal.d * 10, minDim * 0.34);
+            const startRad = (peDscVal.s * Math.PI) / 180, endRad = (peDscVal.e * Math.PI) / 180;
+            const count = peDscVal.c;
+
+            peCtx.strokeStyle = '#334155'; peCtx.lineWidth = 2;
+            peCtx.beginPath(); peCtx.arc(cx, cy, radius, 0, Math.PI * 2); peCtx.stroke();
+
+            peCtx.strokeStyle = 'rgba(16,185,129,0.35)'; peCtx.lineWidth = 7;
+            peCtx.beginPath();
+            if (sweep >= 0) peCtx.arc(cx, cy, radius, startRad, endRad, false);
+            else peCtx.arc(cx, cy, radius, endRad, startRad, false);
+            peCtx.stroke();
+
+            const step = isFullCircle ? (sweep / count) : (count > 1 ? (sweep / (count - 1)) : 0);
+            peCtx.strokeStyle = '#10b981'; peCtx.lineWidth = 2.5; peCtx.beginPath();
+            let firstPoint = null, lastPoint = null;
+            for (let i = 0; i < count; i++) {
+                const deg = peDscVal.s + (i * step);
+                const rad = (deg * Math.PI) / 180;
+                const px = cx + radius * Math.cos(rad), py = cy + radius * Math.sin(rad);
+                if (i === 0) { firstPoint = { x: px, y: py }; peCtx.moveTo(px, py); } else peCtx.lineTo(px, py);
+                lastPoint = { x: px, y: py };
+                const isStart = i === 0, isEnd = (i === count - 1) && !isFullCircle;
+                peCtx.fillStyle = isStart ? '#ef4444' : (isEnd ? '#f59e0b' : '#0ea5e9');
+                peCtx.beginPath(); peCtx.arc(px, py, 5, 0, Math.PI * 2); peCtx.fill();
+                peCtx.strokeStyle = '#ffffff'; peCtx.lineWidth = 1.2; peCtx.stroke();
+                peCtx.fillStyle = '#94a3b8'; peCtx.font = '9px monospace';
+                peCtx.fillText(`P${i + 1}`, px + 8, py + 3);
+            }
+            peCtx.stroke();
+
+            if (firstPoint) {
+                peCtx.fillStyle = '#ef4444'; peCtx.font = 'bold 10px sans-serif'; peCtx.textAlign = 'left';
+                peCtx.fillText(`S=${peDscVal.s}°`, firstPoint.x + 10, firstPoint.y - 8);
+            }
+            if (lastPoint && !isFullCircle) {
+                peCtx.fillStyle = '#f59e0b'; peCtx.font = 'bold 10px sans-serif'; peCtx.textAlign = 'left';
+                peCtx.fillText(`E=${peDscVal.e}°`, lastPoint.x + 10, lastPoint.y + 16);
+            }
+
+            if ((peDscAnim.playing || peDscAnim.finished) && peDscAnim.angles.length >= 2) {
+                const segA = peDscAnim.angles[peDscAnim.currentSeg];
+                const segB = peDscAnim.angles[peDscAnim.currentSeg + 1];
+                const curDeg = segA + (segB - segA) * peDscAnim.t;
+                const curRad = (curDeg * Math.PI) / 180;
+                const mx = cx + radius * Math.cos(curRad), my = cy + radius * Math.sin(curRad);
+                peCtx.save();
+                peCtx.strokeStyle = 'rgba(250,204,21,0.9)'; peCtx.lineWidth = 2.5;
+                peCtx.beginPath(); peCtx.arc(mx, my, 9, 0, Math.PI * 2); peCtx.stroke();
+                peCtx.fillStyle = '#facc15'; peCtx.beginPath(); peCtx.arc(mx, my, 4, 0, Math.PI * 2); peCtx.fill();
+                peCtx.restore();
+
+                const fromIdx = peDscAnim.currentSeg + 1, toIdx = peDscAnim.currentSeg + 2;
+                const statusText = peDscAnim.finished ? `측정 완료 (${peDscAnim.angles.length}개)` : `이동 중: P${fromIdx} → P${toIdx}`;
+                peCtx.fillStyle = '#facc15'; peCtx.font = 'bold 11px sans-serif'; peCtx.textAlign = 'center';
+                peCtx.fillText(statusText, cx, cy - radius - 16 > 16 ? cy - radius - 16 : 16);
+            }
+        }
+
+        // ==================== 📝 품질 메모장 (qm- 접두사, localStorage 저장) ====================
+        const QM_STORAGE_KEY = 'qc_quality_memos';
+        let qmMemos = [];
+        let qmActiveCategory = 'defect';
+        let qmActiveFilter = 'all';
+        let qmInitialized = false;
+
+        function initMemo() {
+            if (!qmInitialized) {
+                qmInitialized = true;
+                qmLoadMemos();
+            }
+            qmRenderList();
+        }
+
+        function qmLoadMemos() {
+            try {
+                const raw = localStorage.getItem(QM_STORAGE_KEY);
+                qmMemos = raw ? JSON.parse(raw) : [];
+            } catch (e) { qmMemos = []; }
+        }
+
+        function qmSaveToStorage() {
+            try {
+                localStorage.setItem(QM_STORAGE_KEY, JSON.stringify(qmMemos));
+            } catch (e) { /* 저장소 사용 불가(용량 초과 등) 시 무시 */ }
+        }
+
+        function qmSetCategory(cat) {
+            qmActiveCategory = cat;
+            ['defect', 'cmm', 'etc'].forEach(c => document.getElementById('qm-cat-' + c).classList.toggle('on', c === cat));
+        }
+
+        function qmSetFilter(f) {
+            qmActiveFilter = f;
+            ['all', 'defect', 'cmm', 'etc'].forEach(c => document.getElementById('qm-filter-' + c).classList.toggle('on', c === f));
+            qmRenderList();
+        }
+
+        function qmSaveMemo() {
+            const content = document.getElementById('qmContent').value.trim();
+            if (!content) { showToast('내용을 입력해주세요'); return; }
+            const part = document.getElementById('qmPartName').value.trim();
+            const memo = {
+                id: Date.now(),
+                cat: qmActiveCategory,
+                part: part,
+                content: content,
+                ts: new Date().toISOString()
+            };
+            qmMemos.unshift(memo);
+            qmSaveToStorage();
+            document.getElementById('qmPartName').value = '';
+            document.getElementById('qmContent').value = '';
+            qmRenderList();
+            showToast('저장됨 ✅ 중요 내용은 📸로 갤러리에도 남겨두세요');
+        }
+
+        function qmDeleteMemo(id) {
+            if (!confirm('이 메모를 삭제할까요?')) return;
+            qmMemos = qmMemos.filter(m => m.id !== id);
+            qmSaveToStorage();
+            qmRenderList();
+        }
+
+        function qmFormatTime(iso) {
+            const d = new Date(iso);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mi = String(d.getMinutes()).padStart(2, '0');
+            return `${mm}/${dd} ${hh}:${mi}`;
+        }
+
+        const QM_CAT_LABEL = { defect: '🔴 불량기록', cmm: '📐 3차원측정', etc: '📝 기타' };
+
+        function qmRenderList() {
+            const wrap = document.getElementById('qmList');
+            const search = (document.getElementById('qmSearch').value || '').trim().toLowerCase();
+            let list = qmMemos;
+            if (qmActiveFilter !== 'all') list = list.filter(m => m.cat === qmActiveFilter);
+            if (search) list = list.filter(m => (m.part + ' ' + m.content).toLowerCase().includes(search));
+
+            if (list.length === 0) {
+                wrap.innerHTML = '<div class="qm-empty">저장된 메모가 없습니다</div>';
+                return;
+            }
+            wrap.innerHTML = list.map(m => `
+                <div class="qm-item">
+                    <div class="qm-item-head">
+                        <span class="qm-badge ${m.cat}">${QM_CAT_LABEL[m.cat] || m.cat}</span>
+                        <span class="qm-item-time">${qmFormatTime(m.ts)}</span>
+                    </div>
+                    ${m.part ? `<div class="qm-item-part">${qmEscapeHtml(m.part)}</div>` : ''}
+                    <div class="qm-item-content">${qmEscapeHtml(m.content)}</div>
+                    <button class="qm-item-del" onclick="qmDeleteMemo(${m.id})">🗑 삭제</button>
+                </div>
+            `).join('');
+        }
+
+        function qmEscapeHtml(str) {
+            const div = document.createElement('div');
+            div.innerText = str;
+            return div.innerHTML;
+        }
     </script>
 </body>
 </html>
