@@ -71,14 +71,18 @@
         .cal-box label { font-size: 0.75rem; font-weight: bold; }
         .cal-box input { width: 100%; margin-top: 8px; }
 
-        .calib-toggle-row { display: flex; gap: 6px; margin-top: 10px; }
-        .mini-btn { flex: 1; background: white; border: 1px solid #CBD5E1; color: #334155; font-size: 0.72rem; font-weight: bold; padding: 7px 6px; border-radius: 6px; cursor: pointer; }
+        .calib-toggle-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .mini-btn { flex: 1 1 auto; min-width: 84px; background: white; border: 1px solid #CBD5E1; color: #334155; font-size: 0.68rem; font-weight: bold; padding: 7px 6px; border-radius: 6px; cursor: pointer; }
         .mini-btn.ghost { flex: 0 0 auto; padding: 7px 10px; color: #94A3B8; }
         .mini-btn.done { width: 100%; background: var(--accent-color); border-color: var(--accent-color); color: white; margin-top: 8px; }
         .mini-btn:active { transform: scale(0.97); }
         .calib-guide { display: none; text-align: left; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #CBD5E1; }
         .calib-guide.open { display: block; }
         .calib-text { font-size: 0.72rem; color: #475569; line-height: 1.5; }
+        .direct-calib-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .direct-calib-field { display: flex; flex-direction: column; gap: 2px; }
+        .direct-calib-field label { font-size: 0.68rem; color: #64748B; }
+        .direct-calib-field input { width: 100%; padding: 6px 8px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: white; }
 
         .calib-ref-line { position: absolute; right: 0; width: 26px; border-top: 3px solid #EF4444; z-index: 5; }
         .calib-ref-line span { position: absolute; right: 30px; top: -9px; font-size: 9px; font-weight: bold; color: #EF4444; white-space: nowrap; }
@@ -163,9 +167,10 @@
                     <p>휴대폰 왼쪽 끝선에<br>측정물을 밀착시키세요. <span style="color:#94A3B8;">(단위: mm)</span></p>
                     <div class="cal-box">
                         <label>오차 보정 (미세 조절)</label>
-                        <input type="range" id="scaleRange" min="0.8" max="1.2" step="0.01" value="1" oninput="updateRuler()">
+                        <input type="range" id="scaleRange" min="0.5" max="2.0" step="0.01" value="1" oninput="updateRuler()">
                         <div class="calib-toggle-row">
-                            <button class="mini-btn" type="button" onclick="toggleCalibGuide()">💳 카드로 보정하기</button>
+                            <button class="mini-btn" type="button" onclick="toggleCalibGuide()">💳 카드로 보정</button>
+                            <button class="mini-btn" type="button" onclick="toggleDirectCalib()">📐 직접 입력 보정</button>
                             <button class="mini-btn ghost" type="button" onclick="resetCalibration()">초기화</button>
                         </div>
                         <div class="calib-guide" id="calibGuide">
@@ -175,6 +180,24 @@
                                 ③ 맞춰지면 완료를 누르세요. 이후에도 자동으로 이 값이 적용됩니다.
                             </p>
                             <button class="mini-btn done" type="button" onclick="finishCalibGuide()">✅ 보정 완료</button>
+                        </div>
+                        <div class="calib-guide" id="directCalibGuide">
+                            <p class="calib-text">
+                                ① 정확한 치수를 아는 물체(캘리퍼스로 잰 값 등)를 자 왼쪽 끝 <b>0</b>에 맞춰 대세요.<br>
+                                ② 물체 끝이 화면 자에서 <b>몇 mm 눈금</b>에 닿는지 읽어서 아래 "화면에 보인 값"에 입력하세요.<br>
+                                ③ 그 물체의 <b>실제 치수</b>를 아래에 입력하고 적용을 누르세요. 배율이 자동 계산·저장됩니다.
+                            </p>
+                            <div class="direct-calib-row">
+                                <div class="direct-calib-field">
+                                    <label>화면에 보인 값(mm)</label>
+                                    <input type="number" inputmode="decimal" step="0.01" id="dcDisplayed" placeholder="예: 101.48">
+                                </div>
+                                <div class="direct-calib-field">
+                                    <label>실제 치수(mm)</label>
+                                    <input type="number" inputmode="decimal" step="0.01" id="dcActual" placeholder="예: 150.00">
+                                </div>
+                            </div>
+                            <button class="mini-btn done" type="button" onclick="applyDirectCalib()">✅ 계산 후 적용</button>
                         </div>
                     </div>
 
@@ -299,6 +322,7 @@
         const CARD_WIDTH_MM = 85.6; // 신용카드 표준 규격(ISO/IEC 7810 ID-1) 폭
 
         function toggleCalibGuide() {
+            document.getElementById('directCalibGuide').classList.remove('open');
             const guide = document.getElementById('calibGuide');
             const isOpen = guide.classList.contains('open');
             if (isOpen) {
@@ -308,6 +332,31 @@
                 guide.classList.add('open');
                 addCalibRefLine();
             }
+        }
+
+        // 📐 직접 입력 보정 (캘리퍼 등 정밀 측정기로 잰 실제 치수 기준)
+        function toggleDirectCalib() {
+            removeCalibRefLine();
+            document.getElementById('calibGuide').classList.remove('open');
+            document.getElementById('directCalibGuide').classList.toggle('open');
+        }
+
+        function applyDirectCalib() {
+            const displayed = parseFloat(document.getElementById('dcDisplayed').value);
+            const actual = parseFloat(document.getElementById('dcActual').value);
+            if (isNaN(displayed) || isNaN(actual) || displayed <= 0 || actual <= 0) {
+                showToast('값을 정확히 입력해주세요');
+                return;
+            }
+            const currentScale = parseFloat(document.getElementById('scaleRange').value) || 1;
+            let newScale = currentScale * (actual / displayed);
+            const min = parseFloat(document.getElementById('scaleRange').min);
+            const max = parseFloat(document.getElementById('scaleRange').max);
+            newScale = Math.min(max, Math.max(min, newScale));
+            document.getElementById('scaleRange').value = newScale.toFixed(2);
+            updateRuler();
+            document.getElementById('directCalibGuide').classList.remove('open');
+            showToast(`보정 완료 (배율 ${newScale.toFixed(2)}) ✅`);
         }
 
         function addCalibRefLine() {
@@ -356,6 +405,9 @@
             document.getElementById('scaleRange').value = 1;
             updateRuler();
             document.getElementById('calibGuide').classList.remove('open');
+            document.getElementById('directCalibGuide').classList.remove('open');
+            document.getElementById('dcDisplayed').value = '';
+            document.getElementById('dcActual').value = '';
             removeCalibRefLine();
             showToast('보정값이 초기화되었습니다');
         }
