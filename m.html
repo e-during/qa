@@ -140,6 +140,18 @@
   .credit .line { width: 30px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 8px; }
   .credit p { font-size: 9.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.5; letter-spacing: .2px; }
   .credit a { color: rgba(255,255,255,.35); text-decoration: none; }
+
+  .fab-camera {
+    position: fixed; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff7a2f, #ff5500);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 24px rgba(255,85,0,.45);
+    text-decoration: none; z-index: 20;
+    transition: transform .12s ease;
+  }
+  .fab-camera:active { transform: scale(.93); }
+  .fab-camera svg { width: 25px; height: 25px; stroke: #fff; }
 </style>
 </head>
 <body>
@@ -218,6 +230,10 @@
       <p>Developed by 품질경영팀 정충용<br><a href="mailto:cyjeong@e-during.co.kr">cyjeong@e-during.co.kr</a></p>
     </div>
   </div>
+
+  <a class="fab-camera" href="mark.html" aria-label="현장 마킹">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+  </a>
 
 </body>
 </html>
