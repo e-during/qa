@@ -54,14 +54,18 @@
 
   /* ---------- 마킹 화면 ---------- */
   #markScreen { display: none; flex-direction: column; gap: 12px; }
-  .tool-seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .tool-seg { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .tool-seg button {
     display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 9px 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12);
-    background: #0c1730; color: rgba(255,255,255,.5); font-size: 10.5px; font-weight: 800; font-family: inherit;
+    padding: 8px 2px; border-radius: 11px; border: 1px solid rgba(255,255,255,.12);
+    background: #0c1730; color: rgba(255,255,255,.5); font-size: 9.5px; font-weight: 800; font-family: inherit;
   }
-  .tool-seg button svg { width: 18px; height: 18px; }
+  .tool-seg button svg { width: 16px; height: 16px; }
   .tool-seg button.on { background: rgba(224,176,96,.16); border-color: #e0b060; color: #e0b060; }
+  .color-strip { display: flex; align-items: center; gap: 9px; padding: 2px 3px; }
+  .color-strip .clabel { font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.4); margin-right: 2px; }
+  .color-strip .cswatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.15); padding: 0; }
+  .color-strip .cswatch.on { border-color: #fff; box-shadow: 0 0 0 2px rgba(224,176,96,.65); }
   .canvas-wrap { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #0c1730; line-height: 0; }
   #markCanvas { width: 100%; display: block; touch-action: none; }
 
@@ -120,6 +124,10 @@
     padding: 12px 13px; font-size: 14px; font-weight: 600; color: #fff; font-family: inherit;
   }
   .sheet .memo-field input:focus { outline: none; border-color: #e0b060; }
+  .sheet .sheet-field { margin-bottom: 16px; }
+  .sheet .sheet-field label { display: block; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 8px; }
+  .sheet .sheet-field.hidden { display: none; }
+  .sheet input[type="range"] { width: 100%; height: 4px; accent-color: #e0b060; }
   .sheet .sheet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .sheet .sheet-actions.has-del { grid-template-columns: auto 1fr 1fr; }
   .sheet .sheet-actions button { padding: 13px 10px; border-radius: 12px; border: none; font-size: 13.5px; font-weight: 800; font-family: inherit; }
@@ -182,10 +190,27 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"></line><polyline points="9 4 20 4 20 15"></polyline></svg>
           화살표
         </button>
+        <button type="button" id="tool-box" onclick="setTool('box')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1.5"></rect></svg>
+          박스
+        </button>
         <button type="button" id="tool-text" onclick="setTool('text')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="12" y1="6" x2="12" y2="20"></line><line x1="8" y1="20" x2="16" y2="20"></line></svg>
           텍스트
         </button>
+        <button type="button" id="tool-move" onclick="setTool('move')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+          조정
+        </button>
+      </div>
+
+      <div class="color-strip" id="colorStrip" style="display:none;">
+        <span class="clabel">색상</span>
+        <button type="button" class="cswatch on" data-color="#e0b060" style="background:#e0b060" onclick="setDrawColor('#e0b060', this)"></button>
+        <button type="button" class="cswatch" data-color="#dc2626" style="background:#dc2626" onclick="setDrawColor('#dc2626', this)"></button>
+        <button type="button" class="cswatch" data-color="#16a34a" style="background:#16a34a" onclick="setDrawColor('#16a34a', this)"></button>
+        <button type="button" class="cswatch" data-color="#3b82f6" style="background:#3b82f6" onclick="setDrawColor('#3b82f6', this)"></button>
+        <button type="button" class="cswatch" data-color="#ffffff" style="background:#ffffff" onclick="setDrawColor('#ffffff', this)"></button>
       </div>
 
       <div class="canvas-wrap">
@@ -217,6 +242,20 @@
       <label id="memoLabel">메모 (선택)</label>
       <input type="text" id="memoInput" placeholder="예: 웰드라인 발생, 데이텀 A 기준">
     </div>
+    <div class="sheet-field hidden" id="sizeFieldWrap">
+      <label>크기 조정</label>
+      <input type="range" id="sizeInput" min="0.6" max="2.2" step="0.1" value="1" oninput="onSizeInput(this.value)">
+    </div>
+    <div class="sheet-field hidden" id="colorFieldWrap">
+      <label>색상 선택</label>
+      <div class="color-strip" id="sheetColorStrip">
+        <button type="button" class="cswatch" data-color="#e0b060" style="background:#e0b060" onclick="setSheetColor('#e0b060', this)"></button>
+        <button type="button" class="cswatch" data-color="#dc2626" style="background:#dc2626" onclick="setSheetColor('#dc2626', this)"></button>
+        <button type="button" class="cswatch" data-color="#16a34a" style="background:#16a34a" onclick="setSheetColor('#16a34a', this)"></button>
+        <button type="button" class="cswatch" data-color="#3b82f6" style="background:#3b82f6" onclick="setSheetColor('#3b82f6', this)"></button>
+        <button type="button" class="cswatch" data-color="#ffffff" style="background:#ffffff" onclick="setSheetColor('#ffffff', this)"></button>
+      </div>
+    </div>
     <div class="sheet-actions" id="sheetActions">
       <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
       <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
@@ -232,23 +271,32 @@
   const ctx = canvas.getContext('2d');
   let baseImg = null;         // 로드된 원본 Image 객체
   // marks 항목 형태:
-  //   포인트: { type:'point', x, y, judge:'ok'|'ng', memo, num }
-  //   화살표: { type:'arrow', x1, y1, x2, y2 }
-  //   텍스트: { type:'text', x, y, text, w, h }
+  //   포인트: { type:'point', x, y, judge:'ok'|'ng', memo, num, sizeMul }
+  //   화살표: { type:'arrow', x1, y1, x2, y2, color }
+  //   박스:   { type:'box',   x1, y1, x2, y2, color }
+  //   텍스트: { type:'text', x, y, text, w, h, sizeMul }
   let marks = [];
   let nextNum = 1;
   let pendingXY = null;       // 신규 항목 좌표(캔버스 픽셀 기준)
   let editingIndex = -1;      // 수정 중인 인덱스(-1이면 신규)
-  let sheetType = 'point';    // 현재 시트가 다루는 타입: 'point' | 'text'
+  let sheetType = 'point';    // 현재 시트가 다루는 타입: 'point' | 'text' | 'arrow' | 'box'
   let currentJudge = 'ok';
-  let currentTool = 'point';  // 'point' | 'arrow' | 'text'
+  let currentTool = 'point';  // 'point' | 'arrow' | 'box' | 'text' | 'move'
+  let currentSizeMul = 1;     // 시트에서 조정 중인 크기 배율(포인트/텍스트)
+  let currentDrawColor = '#e0b060'; // 새로 그릴 화살표/박스 색상
 
-  // 드래그(화살표) 상태
+  // 드래그(화살표/박스 신규 생성) 상태
   let dragging = false;
   let dragStart = null;
   let dragCurrent = null;
+  let dragShapeType = null;   // 'arrow' | 'box'
   let downPoint = null;
   let downHitIndex = -1;
+
+  // 이동(조정) 상태
+  let movingMark = false;
+  let moveIndex = -1;
+  let moveOrigin = null;
 
   const JUDGE_COLOR = { ok: '#16a34a', ng: '#dc2626' };
   const ARROW_COLOR = '#e0b060';
@@ -257,14 +305,22 @@
 
   const TOOL_HINTS = {
     point: '사진을 탭하면 포인트가 추가됩니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다',
-    arrow: '사진 위를 드래그하면 화살표가 그려집니다 · 기존 항목을 탭하면 삭제할 수 있습니다',
-    text: '사진을 탭하면 텍스트를 입력할 수 있습니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다'
+    arrow: '사진 위를 드래그하면 화살표가 그려집니다 · 기존 항목을 탭하면 삭제·색상변경할 수 있습니다',
+    box: '사진 위를 드래그하면 박스가 그려집니다 · 기존 항목을 탭하면 삭제·색상변경할 수 있습니다',
+    text: '사진을 탭하면 텍스트를 입력할 수 있습니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다',
+    move: '이동할 항목을 눌러서 드래그하면 위치가 바뀝니다'
   };
 
   function setTool(t){
     currentTool = t;
-    ['point','arrow','text'].forEach(k => id('tool-'+k).classList.toggle('on', k===t));
+    ['point','arrow','box','text','move'].forEach(k => id('tool-'+k).classList.toggle('on', k===t));
     id('toolHint').innerText = TOOL_HINTS[t];
+    id('colorStrip').style.display = (t === 'arrow' || t === 'box') ? 'flex' : 'none';
+  }
+
+  function setDrawColor(c, btn){
+    currentDrawColor = c;
+    document.querySelectorAll('#colorStrip .cswatch').forEach(b => b.classList.toggle('on', b === btn));
   }
 
   // -------- 사진 불러오기 --------
@@ -278,6 +334,7 @@
       marks = [];
       nextNum = 1;
       setTool('point');
+      resetDrawColor();
       setupCanvas();
       id('startScreen').style.display = 'none';
       id('markScreen').style.display = 'flex';
@@ -300,7 +357,7 @@
     redraw();
   }
 
-  function markerRadius(){ return Math.max(16, canvas.width * 0.022); }
+  function markerRadius(sizeMul){ return Math.max(16, canvas.width * 0.022) * (sizeMul || 1); }
 
   function drawArrowShape(g, x1, y1, x2, y2, color, alpha){
     const headLen = Math.max(14, canvas.width * 0.02);
@@ -319,6 +376,16 @@
     g.restore();
   }
 
+  function drawBoxShape(g, x1, y1, x2, y2, color, alpha){
+    g.save();
+    g.globalAlpha = (alpha === undefined) ? 1 : alpha;
+    g.strokeStyle = color;
+    g.lineWidth = Math.max(4, canvas.width * 0.006);
+    const x = Math.min(x1, x2), y = Math.min(y1, y2), w = Math.abs(x2 - x1), h = Math.abs(y2 - y1);
+    g.strokeRect(x, y, w, h);
+    g.restore();
+  }
+
   function roundRectPath(g, x, y, w, h, r){
     g.beginPath();
     g.moveTo(x+r, y);
@@ -330,7 +397,7 @@
   }
 
   function drawTextShape(g, m){
-    const fontSize = Math.max(20, canvas.width * 0.03);
+    const fontSize = Math.max(20, canvas.width * 0.03) * (m.sizeMul || 1);
     g.font = `900 ${fontSize}px -apple-system, sans-serif`;
     const metrics = g.measureText(m.text);
     const padX = 10, padY = 6;
@@ -346,7 +413,7 @@
   }
 
   function drawPointShape(g, m){
-    const r = markerRadius();
+    const r = markerRadius(m.sizeMul);
     g.beginPath();
     g.arc(m.x, m.y, r, 0, Math.PI*2);
     g.fillStyle = JUDGE_COLOR[m.judge];
@@ -368,12 +435,14 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
     marks.forEach(m => {
-      if (m.type === 'arrow') drawArrowShape(ctx, m.x1, m.y1, m.x2, m.y2, ARROW_COLOR);
+      if (m.type === 'arrow') drawArrowShape(ctx, m.x1, m.y1, m.x2, m.y2, m.color || ARROW_COLOR);
+      else if (m.type === 'box') drawBoxShape(ctx, m.x1, m.y1, m.x2, m.y2, m.color || ARROW_COLOR);
       else if (m.type === 'text') drawTextShape(ctx, m);
       else drawPointShape(ctx, m);
     });
-    if (dragging && currentTool === 'arrow' && dragStart && dragCurrent){
-      drawArrowShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, ARROW_COLOR, 0.55);
+    if (dragging && dragStart && dragCurrent){
+      if (dragShapeType === 'box') drawBoxShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, currentDrawColor, 0.55);
+      else drawArrowShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, currentDrawColor, 0.55);
     }
     renderLegend();
   }
@@ -415,13 +484,18 @@
   }
 
   function hitTest(pt){
-    const r = markerRadius();
     for (let i = marks.length - 1; i >= 0; i--){
       const m = marks[i];
       if (m.type === 'point'){
+        const r = markerRadius(m.sizeMul);
         if (Math.hypot(m.x - pt.x, m.y - pt.y) <= r + 10) return i;
       } else if (m.type === 'arrow'){
         if (distToSegment(pt, {x:m.x1,y:m.y1}, {x:m.x2,y:m.y2}) <= 16) return i;
+      } else if (m.type === 'box'){
+        const x = Math.min(m.x1,m.x2), y = Math.min(m.y1,m.y2), w = Math.abs(m.x2-m.x1), h = Math.abs(m.y2-m.y1);
+        const c = [{x,y},{x:x+w,y},{x:x+w,y:y+h},{x,y:y+h}];
+        const edges = [[c[0],c[1]],[c[1],c[2]],[c[2],c[3]],[c[3],c[0]]];
+        for (const [a,b] of edges){ if (distToSegment(pt, a, b) <= 16) return i; }
       } else if (m.type === 'text'){
         const w = m.w || 60, h = m.h || 30;
         if (pt.x >= m.x - 8 && pt.x <= m.x + w + 8 && pt.y >= m.y - h/2 - 8 && pt.y <= m.y + h/2 + 8) return i;
@@ -430,15 +504,38 @@
     return -1;
   }
 
+  function cloneMarkCoords(m){
+    if (m.type === 'point' || m.type === 'text') return { x: m.x, y: m.y };
+    return { x1: m.x1, y1: m.y1, x2: m.x2, y2: m.y2 };
+  }
+
+  function applyMoveDelta(m, origin, dx, dy){
+    if (m.type === 'point' || m.type === 'text'){
+      m.x = origin.x + dx; m.y = origin.y + dy;
+    } else {
+      m.x1 = origin.x1 + dx; m.y1 = origin.y1 + dy;
+      m.x2 = origin.x2 + dx; m.y2 = origin.y2 + dy;
+    }
+  }
+
   // -------- 캔버스 포인터(탭/드래그) 처리 --------
+  let downClient = null; // 탭/드래그 판정은 화면(CSS) 좌표 기준으로 해야 캔버스 확대배율에 안 흔들림
+
   canvas.addEventListener('pointerdown', (e) => {
     if(!baseImg) return;
     downPoint = getCanvasPoint(e);
+    downClient = { x: e.clientX, y: e.clientY };
     downHitIndex = hitTest(downPoint);
-    if (currentTool === 'arrow' && downHitIndex < 0){
+    if ((currentTool === 'arrow' || currentTool === 'box') && downHitIndex < 0){
       dragging = true;
+      dragShapeType = currentTool;
       dragStart = downPoint;
       dragCurrent = downPoint;
+      canvas.setPointerCapture(e.pointerId);
+    } else if (currentTool === 'move' && downHitIndex >= 0){
+      movingMark = true;
+      moveIndex = downHitIndex;
+      moveOrigin = cloneMarkCoords(marks[downHitIndex]);
       canvas.setPointerCapture(e.pointerId);
     }
   });
@@ -447,30 +544,44 @@
     if (dragging){
       dragCurrent = getCanvasPoint(e);
       redraw();
+    } else if (movingMark){
+      const cur = getCanvasPoint(e);
+      applyMoveDelta(marks[moveIndex], moveOrigin, cur.x - downPoint.x, cur.y - downPoint.y);
+      redraw();
     }
   });
 
   canvas.addEventListener('pointerup', (e) => {
-    if(!baseImg || !downPoint) return;
+    if(!baseImg) return;
+    if (movingMark){
+      movingMark = false; moveIndex = -1; moveOrigin = null;
+      downPoint = null; downHitIndex = -1; downClient = null;
+      showToast('위치를 이동했습니다');
+      return;
+    }
+    if (!downPoint) return;
     const endPoint = getCanvasPoint(e);
+    // 탭 판정: 손가락 떨림을 감안해 화면(CSS) 좌표 기준 12px 이내면 탭으로 취급
+    const movedScreen = downClient ? Math.hypot(e.clientX - downClient.x, e.clientY - downClient.y) : 0;
+    const isTap = movedScreen < 12;
     const moved = Math.hypot(endPoint.x - downPoint.x, endPoint.y - downPoint.y);
 
     if (dragging){
       dragging = false;
       if (moved > 20){
-        marks.push({ type: 'arrow', x1: dragStart.x, y1: dragStart.y, x2: endPoint.x, y2: endPoint.y });
+        marks.push({ type: dragShapeType, x1: dragStart.x, y1: dragStart.y, x2: endPoint.x, y2: endPoint.y, color: currentDrawColor });
       }
-      dragStart = null; dragCurrent = null;
+      dragStart = null; dragCurrent = null; dragShapeType = null;
       redraw();
-    } else if (downHitIndex >= 0 && moved < 10){
+    } else if (downHitIndex >= 0 && isTap){
       openEditSheetByIndex(downHitIndex);
-    } else if (moved < 10){
+    } else if (isTap){
       pendingXY = downPoint;
       editingIndex = -1;
       if (currentTool === 'text') openNewTextSheet();
       else if (currentTool === 'point') openNewPointSheet();
     }
-    downPoint = null; downHitIndex = -1;
+    downPoint = null; downHitIndex = -1; downClient = null;
   });
 
   // -------- 포인트 입력 시트 --------
@@ -480,15 +591,41 @@
     id('segNg').classList.toggle('on', j==='ng');
   }
 
+  function onSizeInput(v){
+    currentSizeMul = parseFloat(v);
+    if (editingIndex >= 0){
+      marks[editingIndex].sizeMul = currentSizeMul;
+      redraw();
+    }
+  }
+
+  function setSheetColor(c, btn){
+    if (editingIndex >= 0){
+      marks[editingIndex].color = c;
+      redraw();
+    }
+    document.querySelectorAll('#sheetColorStrip .cswatch').forEach(b => b.classList.toggle('on', b === btn));
+  }
+
+  function syncSheetColorSwatch(color){
+    document.querySelectorAll('#sheetColorStrip .cswatch').forEach(b => {
+      b.classList.toggle('on', b.dataset.color === color);
+    });
+  }
+
   function openNewPointSheet(){
     sheetType = 'point';
     currentJudge = 'ok';
+    currentSizeMul = 1;
     setJudge('ok');
     id('segOkngWrap').classList.remove('hidden');
     id('memoFieldWrap').classList.remove('hidden');
     id('memoLabel').innerText = '메모 (선택)';
     id('memoInput').placeholder = '예: 웰드라인 발생, 데이텀 A 기준';
     id('memoInput').value = '';
+    id('sizeFieldWrap').classList.remove('hidden');
+    id('sizeInput').value = 1;
+    id('colorFieldWrap').classList.add('hidden');
     id('sheetTitle').innerText = `포인트 ${nextNum} 추가`;
     id('sheetActions').classList.remove('has-del');
     id('sheetActions').innerHTML = `
@@ -500,11 +637,15 @@
 
   function openNewTextSheet(){
     sheetType = 'text';
+    currentSizeMul = 1;
     id('segOkngWrap').classList.add('hidden');
     id('memoFieldWrap').classList.remove('hidden');
     id('memoLabel').innerText = '텍스트 내용';
     id('memoInput').placeholder = '예: 크랙, 데이텀 A, 10.02mm';
     id('memoInput').value = '';
+    id('sizeFieldWrap').classList.remove('hidden');
+    id('sizeInput').value = 1;
+    id('colorFieldWrap').classList.add('hidden');
     id('sheetTitle').innerText = '텍스트 추가';
     id('sheetActions').classList.remove('has-del');
     id('sheetActions').innerHTML = `
@@ -518,15 +659,19 @@
     editingIndex = i;
     const m = marks[i];
 
-    if (m.type === 'arrow'){
-      sheetType = 'arrow';
+    if (m.type === 'arrow' || m.type === 'box'){
+      sheetType = m.type;
       id('segOkngWrap').classList.add('hidden');
       id('memoFieldWrap').classList.add('hidden');
-      id('sheetTitle').innerText = '화살표 삭제';
+      id('sizeFieldWrap').classList.add('hidden');
+      id('colorFieldWrap').classList.remove('hidden');
+      syncSheetColorSwatch(m.color || ARROW_COLOR);
+      id('sheetTitle').innerText = (m.type === 'arrow' ? '화살표 수정' : '박스 수정');
       id('sheetActions').classList.add('has-del');
       id('sheetActions').innerHTML = `
         <button type="button" class="btn-del" onclick="deleteCurrent()">삭제</button>
         <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+        <button type="button" class="btn-confirm" onclick="confirmSheet()">완료</button>
       `;
       showSheet();
       return;
@@ -534,11 +679,15 @@
 
     if (m.type === 'text'){
       sheetType = 'text';
+      currentSizeMul = m.sizeMul || 1;
       id('segOkngWrap').classList.add('hidden');
       id('memoFieldWrap').classList.remove('hidden');
       id('memoLabel').innerText = '텍스트 내용';
       id('memoInput').placeholder = '예: 크랙, 데이텀 A, 10.02mm';
       id('memoInput').value = m.text || '';
+      id('sizeFieldWrap').classList.remove('hidden');
+      id('sizeInput').value = currentSizeMul;
+      id('colorFieldWrap').classList.add('hidden');
       id('sheetTitle').innerText = '텍스트 수정';
       id('sheetActions').classList.add('has-del');
       id('sheetActions').innerHTML = `
@@ -553,12 +702,16 @@
     // point
     sheetType = 'point';
     currentJudge = m.judge;
+    currentSizeMul = m.sizeMul || 1;
     id('segOkngWrap').classList.remove('hidden');
     id('memoFieldWrap').classList.remove('hidden');
     id('memoLabel').innerText = '메모 (선택)';
     id('memoInput').placeholder = '예: 웰드라인 발생, 데이텀 A 기준';
     setJudge(m.judge);
     id('memoInput').value = m.memo || '';
+    id('sizeFieldWrap').classList.remove('hidden');
+    id('sizeInput').value = currentSizeMul;
+    id('colorFieldWrap').classList.add('hidden');
     id('sheetTitle').innerText = `포인트 ${m.num} 수정`;
     id('sheetActions').classList.add('has-del');
     id('sheetActions').innerHTML = `
@@ -586,8 +739,9 @@
       if (editingIndex >= 0){
         marks[editingIndex].judge = currentJudge;
         marks[editingIndex].memo = memo;
+        marks[editingIndex].sizeMul = currentSizeMul;
       } else if (pendingXY){
-        marks.push({ type: 'point', x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, num: nextNum });
+        marks.push({ type: 'point', x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, num: nextNum, sizeMul: currentSizeMul });
         nextNum++;
       }
     } else if (sheetType === 'text'){
@@ -595,10 +749,12 @@
       if (!text){ closeSheet(); return; }
       if (editingIndex >= 0){
         marks[editingIndex].text = text;
+        marks[editingIndex].sizeMul = currentSizeMul;
       } else if (pendingXY){
-        marks.push({ type: 'text', x: pendingXY.x, y: pendingXY.y, text });
+        marks.push({ type: 'text', x: pendingXY.x, y: pendingXY.y, text, sizeMul: currentSizeMul });
       }
     }
+    // arrow/box는 색상 스와치를 탭하는 즉시 반영되므로 여기서는 시트만 닫음
     closeSheet();
     redraw();
   }
@@ -637,8 +793,15 @@
     marks = [];
     nextNum = 1;
     setTool('point');
+    resetDrawColor();
     id('markScreen').style.display = 'none';
     id('startScreen').style.display = 'flex';
+  }
+
+  function resetDrawColor(){
+    currentDrawColor = ARROW_COLOR;
+    const swatches = document.querySelectorAll('#colorStrip .cswatch');
+    swatches.forEach((b, i) => b.classList.toggle('on', i === 0));
   }
 
   // -------- 저장 (이미지 + 범례 합성 후 공유/저장) --------
@@ -711,18 +874,7 @@
     // 모바일 브라우저의 팝업 차단에 걸려 "저장이 안 되는" 문제의 원인이었음
     const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92);
     const filename = `mark_${Date.now()}.jpg`;
-    const blob = dataURLtoBlob(dataUrl);
-    const file = new File([blob], filename, { type: 'image/jpeg' });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })){
-      navigator.share({ files: [file], title: '현장 마킹 사진' })
-        .then(() => showToast('공유 시트에서 "사진에 저장"을 선택하세요'))
-        .catch(() => {
-          // 공유 취소/실패 시 즉시 다운로드로 폴백
-          triggerDownload(dataUrl, filename);
-        });
-      return;
-    }
+    // 공유 시트(에어드롭/카톡 등 선택 화면)를 거치지 않고 즉시 다운로드해 갤러리에 바로 저장
     triggerDownload(dataUrl, filename);
   }
 
