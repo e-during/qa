@@ -337,7 +337,6 @@
 </script>
 <script src="js/github-config.js"></script>
 <script src="js/github-sync.js"></script>
-<script src="js/gitlab-storage.js"></script>
 <script src="js/chatbot-core.js"></script>
 
 <script>
@@ -353,8 +352,8 @@
 
   // 모바일은 외부망 접속을 고려해 GitHub(외부용 저장소)를 먼저 조회하고,
   // 응답이 없을 때만(사내망에 있을 때 등) 기존 GitLab을 대체로 조회합니다.
-  const GITLAB_MEASURE_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('measure.json', null)) || gitlabLoadLatestVersionedSync('data/measure');
-  const GITLAB_INSPECTION_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('inspection.json', null)) || gitlabLoadLatestVersionedSync('data/inspection');
+  const GITLAB_MEASURE_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('measure.json', null)) || (typeof gitlabLoadLatestVersionedSync === 'function' ? gitlabLoadLatestVersionedSync('data/measure') : null);
+  const GITLAB_INSPECTION_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('inspection.json', null)) || (typeof gitlabLoadLatestVersionedSync === 'function' ? gitlabLoadLatestVersionedSync('data/inspection') : null);
   const GITLAB_SYNC_OK = !!(GITLAB_MEASURE_DATA || GITLAB_INSPECTION_DATA);
 
   function loadJson(key){
