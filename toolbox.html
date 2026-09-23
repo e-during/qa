@@ -294,48 +294,64 @@
         .cmm-wrap { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); overflow: hidden; padding: 18px 16px; }
         .cmm-view h1 { font-size: 1.3rem; font-weight: 700; color: #1e2a3e; margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .cmm-view h1 small { font-size: 0.72rem; font-weight: normal; background: #f1f3f5; padding: 5px 10px; border-radius: 40px; color: #2c3e66; }
-        .cmm-view h3 { font-size: 1.02rem; margin: 0 0 14px 0; padding-left: 6px; border-left: 4px solid #2c7da0; color: #1f3a4b; }
-        .cmm-view .flex-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
-        .cmm-view .card { background: #fefefe; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex: 1 1 260px; }
-        .cmm-view .param-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 12px; gap: 8px; }
-        .cmm-view .param-row label { width: 100px; font-weight: 500; color: #2c3e50; font-size: 0.85rem; }
-        .cmm-view input, .cmm-view select { padding: 7px 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; font-family: inherit; font-size: 0.88rem; }
+        .cmm-view h3 { font-size: 0.92rem; margin: 0 0 14px 0; padding-left: 8px; border-left: 4px solid var(--gold); color: #1f3a4b; }
+        .cmm-view .card { background: #fefefe; border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); margin-bottom: 14px; }
+        .cmm-view input, .cmm-view select { padding: 10px 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; font-family: inherit; font-size: 0.9rem; width: 100%; }
         .cmm-view select { cursor: pointer; }
-        .cmm-view input:focus, .cmm-view select:focus { outline: none; border-color: #2c7da0; box-shadow: 0 0 0 2px rgba(44,125,160,0.2); }
-        .cmm-view .check-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
-        .cmm-view .check-group label { width: auto; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-        .cmm-view button { background: #2c7da0; border: none; color: white; padding: 8px 14px; border-radius: 40px; font-weight: 500; cursor: pointer; font-size: 0.82rem; }
-        .cmm-view button:active { background: #1f5e7e; }
-        .cmm-view .button-outline { background: white; border: 1px solid #2c7da0; color: #2c7da0; }
-        .cmm-view .button-outline:active { background: #e6f4fa; }
-        .cmm-view .item-table-wrapper { overflow-x: auto; margin: 16px 0 10px; }
-        .cmm-view table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 520px; }
-        .cmm-view th { background: #1e4663; color: white; padding: 10px 6px; font-weight: 500; }
-        .cmm-view td { border: 1px solid #dee2e6; padding: 8px 6px; vertical-align: middle; background: white; }
-        .cmm-view input[type="text"], .cmm-view input[type="number"] { width: 100%; min-width: 60px; }
+        .cmm-view input:focus, .cmm-view select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px rgba(224,176,96,0.25); }
+        .cmm-view .check-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+        .cmm-view .check-group label { width: auto; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.84rem; color: #334155; }
+        .cmm-view button { background: var(--primary-color); border: none; color: white; padding: 10px 14px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.84rem; }
+        .cmm-view button:active { background: #17284f; }
+        .cmm-view .button-outline { background: white; border: 1px solid #cbd5e1; color: #334155; }
+        .cmm-view .button-outline:active { background: #f1f5f9; }
+        /* ---- 핵심 입력 필드 (라벨 위 / 인풋 아래 - 모바일 최적화) ---- */
+        .cmm-view .cmm-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+        .cmm-view .cmm-field:last-child { margin-bottom: 0; }
+        .cmm-view .cmm-field label { font-size: 0.78rem; font-weight: 700; color: #64748b; }
+        .cmm-view .cmm-field-row { display: flex; gap: 8px; }
+        .cmm-view .cmm-field-row input { flex: 1; min-width: 0; }
+        .cmm-view .cmm-field-row button { flex: none; white-space: nowrap; }
+        .cmm-view .cmm-field-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        .cmm-view .cmm-field-row2:last-child { margin-bottom: 0; }
+        .cmm-view .cmm-field-row2 .cmm-field { margin-bottom: 0; }
+        .cmm-view .cmm-field-row2 button { width: 100%; }
+        /* ---- 고급 설정 아코디언 ---- */
+        .cmm-view .cmm-advanced { background: #fefefe; border: 1px solid #e2e8f0; border-radius: 16px; margin-bottom: 14px; overflow: hidden; }
+        .cmm-view .cmm-advanced summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.86rem; color: #1e2a3e; }
+        .cmm-view .cmm-advanced summary::-webkit-details-marker { display: none; }
+        .cmm-view .cmm-advanced summary::after { content: '▾'; margin-left: auto; color: #94a3b8; }
+        .cmm-view .cmm-advanced[open] summary::after { content: '▴'; }
+        .cmm-view .cmm-advanced-hint { font-size: 0.66rem; font-weight: 500; color: #94a3b8; }
+        .cmm-view .cmm-advanced-body { padding: 2px 16px 16px; border-top: 1px solid #f1f3f5; padding-top: 14px; }
+        .cmm-view .item-table-wrapper { overflow-x: auto; margin: 14px 0 10px; -webkit-overflow-scrolling: touch; }
+        .cmm-view table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 480px; }
+        .cmm-view th { background: var(--primary-color); color: var(--gold); padding: 9px 6px; font-weight: 700; }
+        .cmm-view td { border: 1px solid #eef1f4; padding: 6px 4px; vertical-align: middle; background: white; }
+        .cmm-view input[type="text"], .cmm-view input[type="number"] { width: 100%; min-width: 56px; padding: 8px 8px; }
         .cmm-view .action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; justify-content: space-between; align-items: center; }
-        .cmm-view .calc-btn { background: #2b6e3c; font-size: 0.95rem; padding: 10px 24px; }
-        .cmm-view .calc-btn:active { background: #1d5229; }
-        .cmm-view .result-area { margin-top: 22px; background: #f8fafc; border-radius: 18px; padding: 14px; border: 1px solid #cbd5e1; }
+        .cmm-view .calc-btn { background: var(--accent-color); font-size: 0.95rem; padding: 13px 24px; border-radius: 14px; width: 100%; }
+        .cmm-view .calc-btn:active { background: #0d9868; }
+        .cmm-view .result-area { margin-top: 18px; background: #f8fafc; border-radius: 18px; padding: 14px; border: 1px solid #cbd5e1; }
         .cmm-view .result-card { background: white; border-radius: 16px; padding: 14px 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .cmm-view .highlight-date { font-size: 1.3rem; font-weight: 800; color: #c7254e; background: #fff0f3; display: inline-block; padding: 7px 16px; border-radius: 60px; margin: 6px 0; }
-        .cmm-view .stat-grid { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
-        .cmm-view .stat-item { background: #f1f5f9; border-radius: 16px; padding: 10px 14px; flex: 1; min-width: 130px; font-size: 0.85rem; line-height: 1.6; }
-        .cmm-view .per-item-table th { background: #3a6b4b; }
+        .cmm-view .highlight-date { font-size: 1.15rem; font-weight: 800; color: var(--primary-color); background: #FBF3E4; display: inline-block; padding: 8px 16px; border-radius: 14px; margin: 6px 0; border: 1px solid rgba(224,176,96,.4); }
+        .cmm-view .stat-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+        .cmm-view .stat-item { background: #f1f5f9; border-radius: 14px; padding: 10px 14px; flex: 1; min-width: 130px; font-size: 0.83rem; line-height: 1.6; }
+        .cmm-view .per-item-table th { background: var(--accent-color); color: white; }
         .cmm-view hr { margin: 16px 0; border-color: #e2e8f0; }
-        .cmm-view .machine-badge { background: #e2f0fa; border-radius: 24px; padding: 3px 9px; font-size: 0.76rem; font-weight: 500; color: #1f6392; display: inline-block; }
-        .cmm-view .machine-badge-both { background: #fef3c7; border-radius: 24px; padding: 3px 9px; font-size: 0.76rem; font-weight: 600; color: #92400e; display: inline-block; }
-        .cmm-view .overtime-group { margin-top: 8px; padding: 8px 6px; background: #f9f9fc; border-radius: 14px; }
+        .cmm-view .machine-badge { background: #eff6ff; border-radius: 10px; padding: 3px 9px; font-size: 0.74rem; font-weight: 700; color: #1e40af; display: inline-block; }
+        .cmm-view .machine-badge-both { background: #fef3c7; border-radius: 10px; padding: 3px 9px; font-size: 0.74rem; font-weight: 700; color: #92400e; display: inline-block; }
+        .cmm-view .overtime-group { margin-top: 8px; padding: 10px 10px; background: #f9f9fc; border-radius: 12px; }
         .cmm-view .overtime-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .cmm-view .overtime-item label { width: auto; min-width: 80px; font-size: 0.82rem; }
         .cmm-view .overtime-item input { width: 80px; }
-        .cmm-view .deadline-ok { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 40px; padding: 7px 16px; font-size: 1rem; font-weight: 700; margin-top: 6px; }
-        .cmm-view .deadline-warn { display: inline-block; background: #fee2e2; color: #991b1b; border-radius: 40px; padding: 7px 16px; font-size: 1rem; font-weight: 700; margin-top: 6px; animation: cmm-blink-warn 1.2s ease-in-out infinite; }
+        .cmm-view .deadline-ok { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 12px; padding: 8px 16px; font-size: 0.95rem; font-weight: 800; margin-top: 6px; }
+        .cmm-view .deadline-warn { display: inline-block; background: #fee2e2; color: #991b1b; border-radius: 12px; padding: 8px 16px; font-size: 0.95rem; font-weight: 800; margin-top: 6px; animation: cmm-blink-warn 1.2s ease-in-out infinite; }
         @keyframes cmm-blink-warn { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        .cmm-view .workday-badge { display: inline-block; background: #ede9fe; color: #4c1d95; border-radius: 40px; padding: 6px 14px; font-size: 0.92rem; font-weight: 600; margin-top: 4px; }
-        .cmm-view .parallel-ok-badge { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 40px; padding: 6px 14px; font-size: 0.85rem; font-weight: 600; }
+        .cmm-view .workday-badge { display: inline-block; background: #ede9fe; color: #4c1d95; border-radius: 10px; padding: 6px 14px; font-size: 0.86rem; font-weight: 700; margin-top: 4px; }
+        .cmm-view .parallel-ok-badge { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 10px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; }
         .cmm-view .section-label { font-size: 0.74rem; color: #64748b; margin-top: 4px; font-weight: 400; }
-        .cmm-view .split-option-box { margin-top: 10px; padding: 10px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; font-size: 0.84rem; color: #1e40af; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .cmm-view .split-option-box { margin-top: 10px; padding: 10px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; font-size: 0.82rem; color: #1e40af; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .cmm-view .split-option-box input[type="checkbox"] { width: auto; min-width: auto; padding: 0; accent-color: #2563eb; }
     </style>
 </head>
@@ -610,67 +626,64 @@
                     <small>수량 자동 균등 분할 · 세팅시간 · 납기여유</small>
                 </h1>
 
-                <div class="flex-grid">
-                    <!-- 왼쪽: 시간 설정 -->
-                    <div class="card">
-                        <h3>⏱️ 작업 시작 & 시간</h3>
-                        <div class="param-row">
-                            <label>시작 일시</label>
+                <!-- 핵심 입력: 시작 & 측정기 -->
+                <div class="card">
+                    <h3>⏱️ 시작 & 측정기</h3>
+                    <div class="cmm-field">
+                        <label>시작 일시</label>
+                        <div class="cmm-field-row">
                             <input type="datetime-local" id="startDateTime" value="2026-06-16T08:00">
-                            <button type="button" id="nowBtn" class="button-outline">📆 현재시간</button>
-                        </div>
-                        <div class="param-row">
-                            <label>근무 시작</label>
-                            <input type="time" id="workStart" value="08:00">
-                        </div>
-                        <div class="param-row">
-                            <label>근무 종료</label>
-                            <input type="time" id="workEnd" value="17:00">
-                        </div>
-                        <div class="param-row">
-                            <label>점심 시작</label>
-                            <input type="time" id="lunchStart" value="12:00">
-                        </div>
-                        <div class="param-row">
-                            <label>점심 종료</label>
-                            <input type="time" id="lunchEnd" value="13:00">
-                        </div>
-                        <div class="param-row" style="margin-top:4px;">
-                            <label>🎯 목표 납기일<br><span class="section-label">(선택)</span></label>
-                            <input type="date" id="targetDeadline">
+                            <button type="button" id="nowBtn" class="button-outline">📆 지금</button>
                         </div>
                     </div>
+                    <div class="cmm-field">
+                        <label>📏 측정기 대수</label>
+                        <select id="machineCount">
+                            <option value="1" selected>1대 (단일 순차 작업)</option>
+                            <option value="2">2대 (병렬 / 균등 분할)</option>
+                        </select>
+                    </div>
+                    <!-- 수량 균등 분할 옵션 (2대 선택 시 표시) -->
+                    <div id="splitOptionArea" style="display:none;">
+                        <label class="split-option-box">
+                            <input type="checkbox" id="autoSplitCheck" checked>
+                            ✂️ 수량 균등 자동 분할 <strong>(권장)</strong>
+                        </label>
+                    </div>
+                </div>
 
-                    <!-- 오른쪽: 설비 설정 -->
-                    <div class="card">
-                        <h3>⚙️ 설비 & 병렬 측정기</h3>
-                        <div class="param-row">
+                <!-- 고급 설정 (기본값 그대로, 접어둠) -->
+                <details class="cmm-advanced">
+                    <summary>⚙️ 고급 설정 <span class="cmm-advanced-hint">근무시간 · 효율 · 휴무일 · 목표납기 · 저장</span></summary>
+                    <div class="cmm-advanced-body">
+                        <div class="cmm-field-row2">
+                            <div class="cmm-field"><label>근무 시작</label><input type="time" id="workStart" value="08:00"></div>
+                            <div class="cmm-field"><label>근무 종료</label><input type="time" id="workEnd" value="17:00"></div>
+                        </div>
+                        <div class="cmm-field-row2">
+                            <div class="cmm-field"><label>점심 시작</label><input type="time" id="lunchStart" value="12:00"></div>
+                            <div class="cmm-field"><label>점심 종료</label><input type="time" id="lunchEnd" value="13:00"></div>
+                        </div>
+                        <div class="cmm-field">
                             <label>설비효율 (%)</label>
                             <input type="number" id="efficiency" value="100" step="1" min="1" max="200">
-                            <span>%</span>
-                        </div>
-                        <div class="param-row">
-                            <label>📏 측정기 대수</label>
-                            <select id="machineCount">
-                                <option value="1" selected>1대 (단일 순차 작업)</option>
-                                <option value="2">2대 (병렬 / 균등 분할)</option>
-                            </select>
-                        </div>
-                        <!-- 수량 균등 분할 옵션 (2대 선택 시 표시) -->
-                        <div id="splitOptionArea" style="display:none;">
-                            <label class="split-option-box">
-                                <input type="checkbox" id="autoSplitCheck" checked>
-                                ✂️ 수량 균등 자동 분할 <strong>(권장)</strong> — 모든 품목 수량을 장비 수로 나눠 동시 처리
-                            </label>
                         </div>
                         <!-- 장비별 잔업 동적 영역 -->
-                        <div id="overtimePerMachineContainer" style="margin-top:12px;"></div>
-                        <div class="check-group" style="margin-top:14px;">
+                        <div id="overtimePerMachineContainer"></div>
+                        <div class="check-group">
                             <label><input type="checkbox" id="excludeSat" checked> 🚫 토요일 제외</label>
                             <label><input type="checkbox" id="excludeSun" checked> 🚫 일요일 제외</label>
                         </div>
+                        <div class="cmm-field" style="margin-top:14px;">
+                            <label>🎯 목표 납기일 <span class="section-label">(선택)</span></label>
+                            <input type="date" id="targetDeadline">
+                        </div>
+                        <div class="cmm-field-row2" style="margin-top:14px;">
+                            <button id="saveDataBtn" class="button-outline" type="button">💾 저장</button>
+                            <button id="loadDataBtn" class="button-outline" type="button">📂 불러오기</button>
+                        </div>
                     </div>
-                </div>
+                </details>
 
                 <!-- 품목 입력 테이블 -->
                 <div class="card" style="padding:18px 20px;">
@@ -713,10 +726,6 @@
                     </div>
                     <div class="action-bar">
                         <button onclick="addItemRow()">➕ 품목 추가</button>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <button id="saveDataBtn" class="button-outline">💾 저장 (JSON)</button>
-                            <button id="loadDataBtn" class="button-outline">📂 불러오기</button>
-                        </div>
                     </div>
                 </div>
 
