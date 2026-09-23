@@ -14,15 +14,15 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  html { height: 100%; background: #060b1c; }
+  html { height: 100%; background: #F8FAFC; }
   body {
     min-height: 100%; min-height: 100dvh;
-    background: #060b1c; color: #fff;
+    background: #F8FAFC; color: #334155;
     display: flex; flex-direction: column;
     overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
   }
 
-  /* ---------- 헤더 ---------- */
+  /* ---------- 헤더 (다크 네이비 유지 - 브랜드 톤/통일감) ---------- */
   header {
     position: relative;
     padding: calc(env(safe-area-inset-top) + 14px) 18px 12px;
@@ -41,17 +41,18 @@
   .panel.active { display: flex; }
 
   .card {
-    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08);
+    background: #FFFFFF; border: 1px solid #E2E8F0;
     border-radius: 18px; padding: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
   }
-  .card h2 { font-size: 12px; font-weight: 800; letter-spacing: .3px; color: #e0b060; margin-bottom: 12px; text-transform: uppercase; }
+  .card h2 { font-size: 12px; font-weight: 800; letter-spacing: .3px; color: #b8863c; margin-bottom: 12px; text-transform: uppercase; }
 
   .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
   .field:last-child { margin-bottom: 0; }
-  .field label { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.55); }
+  .field label { font-size: 11.5px; font-weight: 700; color: #64748B; }
   .field input[type=number], .field input[type=text] {
-    width: 100%; min-width: 0; background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
-    padding: 12px 13px; font-size: 15px; font-weight: 700; color: #fff; font-family: inherit;
+    width: 100%; min-width: 0; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px;
+    padding: 12px 13px; font-size: 15px; font-weight: 700; color: #1E293B; font-family: inherit;
     -moz-appearance: textfield;
   }
   .field input:focus { outline: none; border-color: #e0b060; }
@@ -65,59 +66,58 @@
   .seg.g2 { grid-template-columns: 1fr 1fr; }
   .seg.g3 { grid-template-columns: 1fr 1fr 1fr; }
   .seg button {
-    padding: 10px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16);
-    background: #0c1730; color: rgba(255,255,255,.72); font-size: 12px; font-weight: 800;
+    padding: 10px 8px; border-radius: 12px; border: 1px solid #E2E8F0;
+    background: #F1F5F9; color: #334155; font-size: 12px; font-weight: 800;
     font-family: inherit;
   }
-  /* 선택된 상태는 금색 배경 + 진한 텍스트로 확실하게 대비를 줘서 한눈에 구분되게 한다
-     (기존 "금색 텍스트 + 옅은 금색 배경"은 어두운 화면에서 시인성이 떨어졌음) */
+  /* 선택된 상태는 금색 배경 + 진한 텍스트로 확실하게 대비를 줘서 한눈에 구분되게 한다 */
   .seg button.on { background: #e0b060; border-color: #e0b060; color: #1a1206; font-weight: 900; }
 
   .btn-primary {
     width: 100%; padding: 14px; border-radius: 14px; border: none;
     background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff;
     font-size: 14.5px; font-weight: 800; font-family: inherit;
-    box-shadow: 0 10px 24px rgba(255,85,0,.35);
+    box-shadow: 0 10px 24px rgba(255,85,0,.25);
   }
   .btn-primary:active { transform: scale(.98); }
   .btn-secondary {
-    width: 100%; padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12);
-    background: #0c1730; color: rgba(255,255,255,.6); font-size: 13px; font-weight: 800; font-family: inherit;
+    width: 100%; padding: 12px; border-radius: 14px; border: 1px solid #CBD5E1;
+    background: #F1F5F9; color: #475569; font-size: 13px; font-weight: 800; font-family: inherit;
   }
-  .btn-secondary:active { background: #16233f; }
+  .btn-secondary:active { background: #E2E8F0; }
 
-  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; border-bottom: 1px solid #F1F5F9; }
   .result-row:last-child { border-bottom: none; }
-  .result-row .rl { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.5); }
-  .result-row .rv { font-size: 15px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+  .result-row .rl { font-size: 11.5px; font-weight: 700; color: #64748B; }
+  .result-row .rv { font-size: 15px; font-weight: 800; color: #1E293B; font-variant-numeric: tabular-nums; }
 
   /* ---------- 간이계산기 계산 기록(누적) ---------- */
   .card-head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .card-head-row h2 { margin-bottom: 0; }
-  .hist-clear-btn { font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.4); background: none; border: none; font-family: inherit; padding: 4px 6px; }
-  .hist-clear-btn:active { color: #fb7185; }
+  .hist-clear-btn { font-size: 10.5px; font-weight: 700; color: #94A3B8; background: none; border: none; font-family: inherit; padding: 4px 6px; }
+  .hist-clear-btn:active { color: #EF4444; }
   .calc-history { display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; }
-  .hist-empty { text-align: center; font-size: 11.5px; color: rgba(255,255,255,.3); padding: 14px 0; }
-  .hist-item { padding: 10px 2px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .hist-empty { text-align: center; font-size: 11.5px; color: #94A3B8; padding: 14px 0; }
+  .hist-item { padding: 10px 2px; border-bottom: 1px solid #F1F5F9; }
   .hist-item:last-child { border-bottom: none; }
-  .hist-item .he { font-size: 11px; color: rgba(255,255,255,.45); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .hist-item .hr { margin-top: 2px; font-size: 16px; font-weight: 800; color: #e0b060; font-variant-numeric: tabular-nums; }
+  .hist-item .he { font-size: 11px; color: #94A3B8; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist-item .hr { margin-top: 2px; font-size: 16px; font-weight: 800; color: #b8863c; font-variant-numeric: tabular-nums; }
   .verdict { text-align: center; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 900; letter-spacing: .5px; margin-top: 4px; }
-  .verdict.pass { background: rgba(16,185,129,.14); color: #34d399; border: 1px solid rgba(52,211,153,.35); }
-  .verdict.warn { background: rgba(224,176,96,.14); color: #e0b060; border: 1px solid rgba(224,176,96,.35); }
-  .verdict.fail { background: rgba(244,63,94,.14); color: #fb7185; border: 1px solid rgba(251,113,133,.35); }
-  .hint { font-size: 10.5px; color: rgba(255,255,255,.35); line-height: 1.6; margin-top: 10px; }
+  .verdict.pass { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+  .verdict.warn { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+  .verdict.fail { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+  .hint { font-size: 10.5px; color: #94A3B8; line-height: 1.6; margin-top: 10px; }
 
   /* ---------- 시뮬레이터 ---------- */
   .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .preset-grid button {
-    padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1);
-    background: #0c1730; color: rgba(255,255,255,.75); font-size: 11px; font-weight: 700; text-align: left; font-family: inherit;
+    padding: 10px; border-radius: 12px; border: 1px solid #E2E8F0;
+    background: #F1F5F9; color: #334155; font-size: 11px; font-weight: 700; text-align: left; font-family: inherit;
   }
-  .slider-row { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.55); margin-bottom: 4px; }
-  .slider-row span { color: #e0b060; font-weight: 800; }
+  .slider-row { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 700; color: #64748B; margin-bottom: 4px; }
+  .slider-row span { color: #b8863c; font-weight: 800; }
   input[type=range] { width: 100%; accent-color: #e0b060; }
-  canvas { width: 100%; height: 220px; display: block; border-radius: 12px; background: #0c1730; touch-action: none; }
+  canvas { width: 100%; height: 220px; display: block; border-radius: 12px; background: #F1F5F9; touch-action: none; }
 
   /* ---------- 커스텀 숫자 키패드 ---------- */
   .keypad-backdrop {
