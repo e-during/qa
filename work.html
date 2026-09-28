@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>업무 스케줄러</title>
+<meta name="theme-color" content="#0b1636">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<style>
+  /* ============================================================
+     📅 업무 스케줄러 (work.html) — 모바일 전용 독립 페이지
+     - PC Work Manager v5.0의 달력·일정·업무기록·할일 기능을 모바일용으로 새로 구성
+     - 서버 통신 없음. 데이터는 이 휴대폰(브라우저) localStorage 'ws_v1'에만 저장
+     - m.html 첫 화면 버튼에 '오늘 일정' 요약을 보여주기 위해 'ws_home_cache'도 함께 기록
+     ============================================================ */
+  :root {
+    --navy: #0b1636; --gold: #e0b060; --bg: #F1F5F9; --card: #fff; --line: #E2E8F0;
+    --ink: #0F172A; --body: #334155; --muted: #64748B; --faint: #94A3B8;
+    --red: #DC2626; --sat: #2563EB; --green: #059669;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  html, body { background: var(--bg); color: var(--body); }
+  body { min-height: 100vh; min-height: 100dvh; padding-bottom: calc(env(safe-area-inset-bottom) + 24px); }
+  button, input, select, textarea { font-family: inherit; }
+
+  header {
+    position: sticky; top: 0; z-index: 30; display: flex; align-items: center;
+    background: linear-gradient(180deg, #0d1836 0%, #0b1636 100%); color: #fff;
+    padding: calc(env(safe-area-inset-top) + 11px) 16px 11px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  header .back { position: absolute; left: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.1); display: grid; place-items: center; color: #fff; text-decoration: none; font-size: 15px; }
+  header .title { flex: 1; text-align: center; }
+  header .t1 { font-size: 15.5px; font-weight: 900; }
+  header .t2 { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--gold); margin-top: 1px; }
+
+  .wrap { max-width: 480px; margin: 0 auto; padding: 12px 12px 0; }
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #E2E8F0; padding: 4px; border-radius: 14px; margin-bottom: 12px; }
+  .tabs button { position: relative; border: none; background: transparent; padding: 12px 4px; border-radius: 11px; font-size: 0.95rem; font-weight: 900; color: var(--muted); }
+  .tabs button.on { background: #fff; color: var(--navy); box-shadow: 0 2px 6px rgba(0,0,0,.1); }
+  .tabs .cnt { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 4px; border-radius: 999px; background: var(--red); color: #fff; font-size: 0.7rem; line-height: 18px; vertical-align: 1px; }
+  .page { display: none; }
+  .page.on { display: block; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+  .card-title { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 900; color: var(--ink); margin-bottom: 10px; }
+  .card-title small { margin-left: auto; font-size: 0.74rem; font-weight: 800; color: var(--muted); }
+  .hint { font-size: 0.74rem; color: var(--faint); font-weight: 600; line-height: 1.5; margin-top: 6px; }
+  .empty { text-align: center; color: var(--faint); font-size: 0.86rem; font-weight: 700; padding: 14px 0; line-height: 1.6; }
+
+  /* ---------- 달력 ---------- */
+  .cal-head { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .cal-head .ym { flex: 1; text-align: center; font-size: 1.25rem; font-weight: 900; color: var(--ink); }
+  .nav-btn { width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--line); background: #fff; font-size: 1.2rem; font-weight: 900; color: var(--navy); }
+  .today-btn { height: 42px; padding: 0 12px; border-radius: 12px; border: 2px solid var(--navy); background: #fff; color: var(--navy); font-weight: 900; font-size: 0.85rem; }
+  .dow { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.74rem; font-weight: 900; color: var(--muted); padding: 4px 0 6px; }
+  .dow .sun { color: var(--red); } .dow .sat { color: var(--sat); }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; touch-action: pan-y; }
+  .cell { position: relative; min-height: 68px; border-radius: 10px; background: #F8FAFC; border: 1.5px solid transparent; padding: 4px 3px 3px; overflow: hidden; cursor: pointer; }
+  .cell.other { opacity: .38; }
+  .cell .dn { font-size: 0.82rem; font-weight: 900; color: var(--ink); line-height: 1.2; display: flex; align-items: center; gap: 2px; }
+  .cell.sun .dn, .cell.hol .dn { color: var(--red); }
+  .cell.sat .dn { color: var(--sat); }
+  .cell .hn { font-size: 0.56rem; font-weight: 800; color: var(--red); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+  .cell .ob { font-size: 0.56rem; font-weight: 700; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+  .cell .ev { font-size: 0.6rem; font-weight: 800; color: #fff; border-radius: 4px; padding: 1px 3px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.35; }
+  .cell .more { font-size: 0.58rem; font-weight: 900; color: var(--muted); margin-top: 1px; }
+  .cell .wk { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); display: inline-block; margin-left: auto; }
+  .cell.today { background: #FBF3E4; border-color: rgba(224,176,96,.7); }
+  .cell.today .dn span.num { background: var(--navy); color: var(--gold); border-radius: 999px; padding: 0 5px; }
+  .cell.sel { border-color: var(--navy); background: #EEF2FF; box-shadow: 0 0 0 2px rgba(11,22,54,.12); }
+  .legend { display: flex; gap: 10px; justify-content: center; margin-top: 8px; font-size: 0.68rem; color: var(--faint); font-weight: 700; }
+  .legend i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); margin-right: 3px; vertical-align: 1px; }
+
+  /* 빠른 추가 */
+  .quick { display: flex; gap: 8px; }
+  .quick input { flex: 1; min-width: 0; height: 52px; border: 2px solid #CBD5E1; border-radius: 12px; padding: 0 12px; font-size: 1rem; font-weight: 700; color: var(--ink); }
+  .quick input:focus, .fld:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
+  .quick button { flex: none; width: 76px; height: 52px; border: none; border-radius: 12px; background: var(--green); color: #fff; font-size: 1rem; font-weight: 900; }
+
+  /* 선택한 날 */
+  .day-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .day-head .d { font-size: 1.15rem; font-weight: 900; color: var(--ink); }
+  .pill { font-size: 0.72rem; font-weight: 900; padding: 3px 9px; border-radius: 999px; background: #F1F5F9; color: var(--muted); }
+  .pill.today { background: var(--navy); color: var(--gold); }
+  .pill.hol { background: #FEE2E2; color: var(--red); }
+  .ev-row { display: flex; align-items: center; gap: 10px; padding: 11px 10px; border-radius: 12px; border: 1px solid var(--line); background: #fff; margin-bottom: 6px; cursor: pointer; }
+  .ev-row .bar { width: 5px; align-self: stretch; border-radius: 3px; flex: none; }
+  .ev-row .tm { flex: none; width: 52px; font-size: 0.84rem; font-weight: 900; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.25; }
+  .ev-row .tm small { display: block; font-size: 0.68rem; color: var(--faint); font-weight: 700; }
+  .ev-row .tt { flex: 1; min-width: 0; }
+  .ev-row .tt b { display: block; font-size: 0.95rem; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ev-row .tt span { font-size: 0.72rem; color: var(--muted); font-weight: 700; }
+  .ev-row .dd { flex: none; font-size: 0.74rem; font-weight: 900; color: var(--navy); background: #FBF3E4; border: 1px solid rgba(224,176,96,.5); padding: 3px 8px; border-radius: 999px; }
+  .ev-row .dd.now { background: var(--red); color: #fff; border-color: var(--red); }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .btn { height: 50px; border-radius: 12px; border: none; font-size: 0.95rem; font-weight: 900; }
+  .btn.pri { background: var(--navy); color: var(--gold); }
+  .btn.ok { background: var(--green); color: #fff; }
+  .btn.line { background: #fff; color: var(--navy); border: 2px solid var(--navy); }
+  .btn.danger { background: #fff; color: var(--red); border: 1.5px solid #FCA5A5; }
+  .btn.gray { background: #fff; color: var(--muted); border: 1.5px solid #CBD5E1; }
+  .btn.full { width: 100%; }
+  .work-box { margin-top: 10px; border-radius: 12px; background: #FFFBF0; border: 1px solid rgba(224,176,96,.45); padding: 10px 12px; cursor: pointer; }
+  .work-box .h { font-size: 0.78rem; font-weight: 900; color: #7c5a1c; margin-bottom: 4px; }
+  .work-box .b { font-size: 0.86rem; color: var(--body); white-space: pre-wrap; line-height: 1.5; }
+  .work-box .b + .h { margin-top: 8px; }
+
+  /* ---------- 할 일 ---------- */
+  .todo-add { display: flex; gap: 8px; }
+  .todo-add input { flex: 1; min-width: 0; height: 52px; border: 2px solid #CBD5E1; border-radius: 12px; padding: 0 12px; font-size: 1rem; font-weight: 700; }
+  .todo-add input:focus { outline: none; border-color: var(--gold); }
+  .todo-add button { flex: none; width: 76px; height: 52px; border: none; border-radius: 12px; background: var(--green); color: #fff; font-size: 1rem; font-weight: 900; }
+  .prio-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .prio-seg button { padding: 10px 4px; border-radius: 10px; border: 1.5px solid var(--line); background: #fff; font-weight: 900; font-size: 0.86rem; color: var(--muted); }
+  .prio-seg button.on[data-p="높음"] { background: #FEE2E2; border-color: #F87171; color: var(--red); }
+  .prio-seg button.on[data-p="보통"] { background: #DBEAFE; border-color: #60A5FA; color: #1D4ED8; }
+  .prio-seg button.on[data-p="낮음"] { background: #F1F5F9; border-color: #94A3B8; color: #475569; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chip { background: #fff; border: 1px solid var(--line); color: var(--muted); font-size: 0.8rem; font-weight: 800; padding: 8px 12px; border-radius: 999px; }
+  .chip.on { background: var(--gold); border-color: var(--gold); color: #1a1206; }
+  .todo { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; border: 1px solid var(--line); background: #fff; margin-bottom: 6px; }
+  .todo .ck { flex: none; width: 30px; height: 30px; border-radius: 9px; border: 2px solid #CBD5E1; background: #fff; display: grid; place-items: center; font-size: 1rem; color: #fff; font-weight: 900; }
+  .todo.done .ck { background: var(--green); border-color: var(--green); }
+  .todo input.tx { flex: 1; min-width: 0; border: none; background: transparent; font-size: 0.95rem; font-weight: 700; color: var(--ink); padding: 6px 2px; }
+  .todo input.tx:focus { outline: none; background: #F8FAFC; border-radius: 6px; }
+  .todo.done input.tx { color: var(--faint); text-decoration: line-through; }
+  .todo .pr { flex: none; font-size: 0.72rem; font-weight: 900; padding: 4px 8px; border-radius: 999px; border: none; }
+  .todo .pr[data-p="높음"] { background: #FEE2E2; color: var(--red); }
+  .todo .pr[data-p="보통"] { background: #DBEAFE; color: #1D4ED8; }
+  .todo .pr[data-p="낮음"] { background: #F1F5F9; color: #475569; }
+  .todo .x { flex: none; border: none; background: none; color: #CBD5E1; font-size: 1.15rem; font-weight: 900; padding: 4px; }
+
+  /* ---------- 백업 ---------- */
+  .stat3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+  .stat3 div { background: #F8FAFC; border: 1px solid var(--line); border-radius: 12px; padding: 10px 4px; text-align: center; }
+  .stat3 .k { font-size: 0.72rem; font-weight: 800; color: var(--muted); }
+  .stat3 .v { font-size: 1.3rem; font-weight: 900; color: var(--ink); }
+  .stack > * + * { margin-top: 8px; }
+
+  /* ---------- 하단 시트 (일정/업무기록 입력) ---------- */
+  .sheet-bg { position: fixed; inset: 0; background: rgba(15,23,42,.5); z-index: 50; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+  .sheet-bg.show { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; max-width: 480px; margin: 0 auto; max-height: 92vh; max-height: 92dvh; overflow-y: auto; background: #fff; border-radius: 22px 22px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.2); padding: 8px 16px calc(env(safe-area-inset-bottom) + 18px); transform: translateY(105%); transition: transform .24s ease; }
+  .sheet.show { transform: translateY(0); }
+  .sheet .grab { width: 44px; height: 5px; border-radius: 3px; background: #CBD5E1; margin: 4px auto 10px; }
+  .sheet h3 { font-size: 1.1rem; font-weight: 900; color: var(--ink); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .sheet h3 .x { margin-left: auto; border: none; background: #F1F5F9; width: 34px; height: 34px; border-radius: 50%; font-size: 1rem; font-weight: 900; color: var(--muted); }
+  .lbl { display: block; font-size: 0.82rem; font-weight: 800; color: #475569; margin: 12px 0 6px; }
+  .lbl .opt { color: var(--faint); font-weight: 600; }
+  .fld { width: 100%; height: 52px; border: 2px solid #CBD5E1; border-radius: 12px; padding: 0 12px; font-size: 1rem; font-weight: 700; color: var(--ink); background: #fff; }
+  textarea.fld { height: auto; padding: 10px 12px; line-height: 1.5; resize: vertical; font-weight: 600; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toggle { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 12px; background: #F8FAFC; border: 1px solid var(--line); font-weight: 800; color: var(--body); font-size: 0.9rem; margin-top: 12px; cursor: pointer; }
+  .toggle input { width: 22px; height: 22px; accent-color: var(--navy); }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button { flex: 1 1 auto; min-width: 64px; padding: 10px 6px; border-radius: 10px; border: 1.5px solid var(--line); background: #fff; font-weight: 800; font-size: 0.84rem; color: var(--muted); }
+  .seg button.on { background: var(--navy); border-color: var(--navy); color: var(--gold); }
+  .colors { display: flex; gap: 10px; }
+  .colors button { width: 38px; height: 38px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1.5px var(--line); }
+  .colors button.on { box-shadow: 0 0 0 3px var(--ink); }
+  .sheet .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+  .sheet .actions .wide { grid-column: 1 / -1; }
+  .tpl { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tpl button { padding: 8px 10px; border-radius: 999px; border: 1px solid var(--line); background: #F8FAFC; font-weight: 800; font-size: 0.8rem; color: var(--body); }
+  .measure-box { border: 1.5px dashed #99F6E4; background: #F0FDFA; border-radius: 12px; padding: 10px; margin-top: 10px; }
+  .measure-box .h { font-size: 0.8rem; font-weight: 900; color: #0F766E; margin-bottom: 6px; }
+  .measure-box .fld { height: 44px; font-size: 0.92rem; }
+  .measure-box .three { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 6px; margin-top: 6px; }
+
+  /* 알림 배너 (페이지가 열려 있을 때만) */
+  .alarm { position: fixed; left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 64px); z-index: 80; max-width: 456px; margin: 0 auto; background: var(--navy); color: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 12px 30px rgba(0,0,0,.35); display: none; border: 1px solid rgba(224,176,96,.5); }
+  .alarm.show { display: block; animation: drop .25s ease; }
+  @keyframes drop { from { transform: translateY(-20px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .alarm .k { font-size: 0.74rem; font-weight: 900; color: var(--gold); }
+  .alarm .v { font-size: 1.05rem; font-weight: 900; margin-top: 4px; }
+  .alarm button { margin-top: 10px; width: 100%; height: 42px; border: none; border-radius: 10px; background: var(--gold); color: #1a1206; font-weight: 900; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translate(-50%, 12px); background: rgba(15,23,42,.92); color: #fff; padding: 11px 18px; border-radius: 999px; font-size: 0.86rem; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 100; max-width: 90vw; text-align: center; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back" href="toolbox.html" aria-label="툴박스로">←</a>
+  <div class="title">
+    <div class="t1">업무 스케줄러</div>
+    <div class="t2">WORK SCHEDULER</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <button type="button" id="tabCal" class="on" onclick="setTab('cal')">📅 달력</button>
+    <button type="button" id="tabTodo" onclick="setTab('todo')">✅ 할 일<span class="cnt" id="todoBadge" style="display:none;"></span></button>
+    <button type="button" id="tabBak" onclick="setTab('bak')">💾 백업</button>
+  </div>
+
+  <!-- ===== 📅 달력 ===== -->
+  <section class="page on" id="pageCal">
+    <div class="card" style="padding:12px 8px 10px;">
+      <div class="cal-head">
+        <button type="button" class="nav-btn" onclick="moveMonth(-1)" aria-label="이전 달">‹</button>
+        <div class="ym" id="ymLabel"></div>
+        <button type="button" class="nav-btn" onclick="moveMonth(1)" aria-label="다음 달">›</button>
+        <button type="button" class="today-btn" onclick="goToday()">오늘</button>
+      </div>
+      <div class="dow"><div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div></div>
+      <div class="grid" id="calGrid"></div>
+      <div class="legend"><span>날짜를 누르면 아래에 그날 일정이 나옵니다</span><span><i></i>업무기록</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ 빠른 일정 추가<small id="quickDateLabel"></small></div>
+      <div class="quick">
+        <input type="text" id="quickInput" placeholder="예: 14:00 팀 회의" enterkeyhint="done" autocomplete="off"
+               onkeydown="if (event.key === 'Enter') { event.preventDefault(); quickAdd(); }">
+        <button type="button" onclick="quickAdd()">추가</button>
+      </div>
+      <div class="hint">선택한 날짜에 바로 들어갑니다. "오후 3시 미팅", "9시반 보고"처럼 써도 시간이 자동으로 잡힙니다.</div>
+    </div>
+
+    <div class="card" id="dayCard">
+      <div class="day-head" id="dayHead"></div>
+      <div id="dayEvents"></div>
+      <div class="btn-row">
+        <button type="button" class="btn pri" onclick="openEvent(null)">＋ 일정 추가</button>
+        <button type="button" class="btn line" onclick="openWork()">✎ 업무 기록</button>
+      </div>
+      <div id="dayWork"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔜 다가오는 일정<small>오늘부터 30일</small></div>
+      <div id="upcoming"></div>
+    </div>
+  </section>
+
+  <!-- ===== ✅ 할 일 ===== -->
+  <section class="page" id="pageTodo">
+    <div class="card">
+      <div class="card-title">✏️ 할 일 추가</div>
+      <div class="todo-add">
+        <input type="text" id="todoInput" placeholder="예: 3호기 교정성적서 받기" enterkeyhint="done" autocomplete="off"
+               onkeydown="if (event.key === 'Enter') { event.preventDefault(); addTodo(); }">
+        <button type="button" onclick="addTodo()">추가</button>
+      </div>
+      <div class="prio-seg" id="prioSeg">
+        <button type="button" data-p="높음">🔴 높음</button>
+        <button type="button" data-p="보통" class="on">🔵 보통</button>
+        <button type="button" data-p="낮음">⚪ 낮음</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 목록<small id="todoCount"></small></div>
+      <div class="chips">
+        <button type="button" class="chip on" data-f="open" onclick="setTodoFilter('open')">진행 중</button>
+        <button type="button" class="chip" data-f="done" onclick="setTodoFilter('done')">완료</button>
+        <button type="button" class="chip" data-f="all" onclick="setTodoFilter('all')">전체</button>
+      </div>
+      <div id="todoList"></div>
+      <div class="hint">□를 누르면 완료, 글자를 누르면 바로 고칠 수 있습니다. 우선순위 표시를 누르면 높음→보통→낮음으로 바뀝니다.</div>
+      <button type="button" class="btn gray full" style="margin-top:10px;" onclick="clearDoneTodos()">완료된 할 일 비우기</button>
+    </div>
+  </section>
+
+  <!-- ===== 💾 백업 ===== -->
+  <section class="page" id="pageBak">
+    <div class="card">
+      <div class="card-title">📦 저장된 데이터</div>
+      <div class="stat3">
+        <div><div class="k">일정</div><div class="v" id="stEv">0</div></div>
+        <div><div class="k">업무 기록</div><div class="v" id="stWk">0</div></div>
+        <div><div class="k">할 일</div><div class="v" id="stTd">0</div></div>
+      </div>
+      <div class="hint" style="margin-top:0;">📵 모든 데이터는 <b>이 휴대폰(브라우저)에만</b> 저장됩니다. 휴대폰을 바꾸거나 브라우저 기록을 지우기 전에 꼭 백업 파일을 저장하세요.</div>
+    </div>
+    <div class="card stack">
+      <button type="button" class="btn pri full" onclick="exportBackup()">💾 백업 파일 저장</button>
+      <button type="button" class="btn line full" onclick="document.getElementById('restoreFile').click()">📂 백업 파일 불러오기</button>
+      <input type="file" id="restoreFile" accept=".json,application/json" style="display:none;" onchange="importBackup(this)">
+      <button type="button" class="btn line full" onclick="exportWorkCsv()">📊 업무 기록 엑셀(CSV)로 내보내기</button>
+      <button type="button" class="btn line full" onclick="exportAllIcs()">📲 앞으로 일정 전부 휴대폰 캘린더로</button>
+    </div>
+    <div class="card">
+      <button type="button" class="btn danger full" onclick="resetAll()">🗑 전체 초기화</button>
+      <div class="hint">일정 · 업무 기록 · 할 일이 모두 지워집니다. 되돌릴 수 없습니다.</div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== 일정 입력 시트 ===== -->
+<div class="sheet-bg" id="sheetBg" onclick="closeSheets()"></div>
+<div class="sheet" id="evSheet">
+  <div class="grab"></div>
+  <h3><span id="evSheetTitle">일정 추가</span><button type="button" class="x" onclick="closeSheets()">✕</button></h3>
+
+  <label class="lbl">제목</label>
+  <input class="fld" type="text" id="evTitle" placeholder="예: 고객사 품질 회의" autocomplete="off">
+
+  <label class="lbl">날짜</label>
+  <input class="fld" type="date" id="evDate">
+
+  <label class="toggle"><input type="checkbox" id="evAllDay" onchange="syncEvTimeUI()"> 하루 종일 (시간 없음)</label>
+  <div class="two" id="evTimeBox">
+    <div><label class="lbl">시작 시간</label><input class="fld" type="time" id="evTime"></div>
+    <div><label class="lbl">끝 시간 <span class="opt">— 선택</span></label><input class="fld" type="time" id="evEnd"></div>
+  </div>
+
+  <label class="lbl">반복</label>
+  <div class="seg" id="evRepeat">
+    <button type="button" data-v="none" class="on">없음</button>
+    <button type="button" data-v="daily">매일</button>
+    <button type="button" data-v="weekday">평일</button>
+    <button type="button" data-v="weekly">매주</button>
+    <button type="button" data-v="monthly">매월</button>
+    <button type="button" data-v="yearly">매년</button>
+  </div>
+  <div id="evUntilBox" style="display:none;">
+    <label class="lbl">반복 끝나는 날 <span class="opt">— 비우면 계속</span></label>
+    <input class="fld" type="date" id="evUntil">
+  </div>
+
+  <div id="evAlarmBox">
+    <label class="lbl">알림 <span class="opt">— 휴대폰 캘린더에 추가할 때 적용</span></label>
+    <div class="seg" id="evAlarm">
+      <button type="button" data-v="-1">없음</button>
+      <button type="button" data-v="0">정시</button>
+      <button type="button" data-v="10" class="on">10분 전</button>
+      <button type="button" data-v="30">30분 전</button>
+      <button type="button" data-v="60">1시간 전</button>
+      <button type="button" data-v="1440">하루 전</button>
+    </div>
+  </div>
+
+  <label class="lbl">색상</label>
+  <div class="colors" id="evColors"></div>
+
+  <label class="toggle"><input type="checkbox" id="evPin"> 📌 다가오는 일정 맨 위에 고정</label>
+
+  <label class="lbl">메모 <span class="opt">— 선택</span></label>
+  <textarea class="fld" id="evNote" rows="2" placeholder="장소, 준비물 등"></textarea>
+
+  <div class="actions">
+    <button type="button" class="btn ok wide" onclick="saveEvent()">💾 저장</button>
+    <button type="button" class="btn line" id="evIcsBtn" onclick="icsFromSheet()">📲 휴대폰 캘린더에</button>
+    <button type="button" class="btn danger" id="evDelBtn" onclick="askDeleteEvent()">🗑 삭제</button>
+  </div>
+</div>
+
+<!-- 반복 일정 삭제 선택 -->
+<div class="sheet" id="delSheet">
+  <div class="grab"></div>
+  <h3>반복 일정 삭제<button type="button" class="x" onclick="closeSheets()">✕</button></h3>
+  <div class="hint" style="margin:0 0 12px; font-size:.86rem;" id="delMsg"></div>
+  <div class="stack">
+    <button type="button" class="btn line full" onclick="deleteEvent('one')">이 날짜만 삭제</button>
+    <button type="button" class="btn danger full" onclick="deleteEvent('all')">반복 일정 전체 삭제</button>
+    <button type="button" class="btn gray full" onclick="closeSheets()">취소</button>
+  </div>
+</div>
+
+<!-- ===== 업무 기록 시트 ===== -->
+<div class="sheet" id="workSheet">
+  <div class="grab"></div>
+  <h3>✎ <span id="workSheetTitle">업무 기록</span><button type="button" class="x" onclick="closeSheets()">✕</button></h3>
+
+  <label class="lbl" style="margin-top:0;">📚 업무 내용 (학습/실적)</label>
+  <div class="tpl">
+    <button type="button" onclick="applyTpl('edu')">📚 교육</button>
+    <button type="button" onclick="applyTpl('work')">🔧 작업</button>
+    <button type="button" onclick="applyTpl('meet')">📝 회의</button>
+  </div>
+  <textarea class="fld" id="wkLearn" rows="5" style="margin-top:8px;" placeholder="오늘 한 일을 적으세요"></textarea>
+
+  <div class="measure-box">
+    <div class="h">📐 측정 실적 빠르게 넣기 → 위 업무 내용에 한 줄 추가</div>
+    <div class="two">
+      <input class="fld" type="text" id="mqProduct" placeholder="품명" autocomplete="off">
+      <input class="fld" type="text" id="mqCustomer" placeholder="고객사 (선택)" autocomplete="off">
+    </div>
+    <div class="three">
+      <input class="fld" type="text" id="mqItem" placeholder="항목 (예: 전수 치수)" autocomplete="off">
+      <input class="fld" type="text" id="mqQty" inputmode="numeric" value="1" autocomplete="off">
+      <input class="fld" type="text" id="mqUnit" value="ea" autocomplete="off">
+    </div>
+    <button type="button" class="btn ok full" style="height:44px; margin-top:8px; background:#0F766E;" onclick="addMeasureLine()">＋ 측정 항목 추가</button>
+  </div>
+
+  <label class="lbl">📊 측정 데이터 (요약)</label>
+  <input class="fld" type="text" id="wkMeasure" placeholder="예: CMM 12건 / 수입검사 30건" autocomplete="off">
+
+  <label class="lbl">📅 차기 계획</label>
+  <input class="fld" type="text" id="wkTodo" placeholder="예: 내일 B커버 재측정" autocomplete="off">
+
+  <div class="actions">
+    <button type="button" class="btn ok wide" onclick="saveWork()">💾 저장</button>
+    <button type="button" class="btn gray" onclick="closeSheets()">닫기</button>
+    <button type="button" class="btn danger" onclick="deleteWork()">🗑 이 날 기록 삭제</button>
+  </div>
+</div>
+
+<div class="alarm" id="alarmBox">
+  <div class="k">🔔 일정 알림</div>
+  <div class="v" id="alarmText"></div>
+  <button type="button" onclick="document.getElementById('alarmBox').classList.remove('show')">확인</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   데이터
+   ================================================================ */
+const WS_KEY = 'ws_v1';
+const HOME_CACHE_KEY = 'ws_home_cache';
+const FIRED_KEY = 'ws_fired';
+const HOLIDAYS = {"2024-01-01":"신정","2024-02-09":"설날 연휴","2024-02-10":"설날","2024-02-11":"설날 연휴","2024-02-12":"설날 대체","2024-03-01":"삼일절","2024-04-10":"국회의원 선거일","2024-05-05":"어린이날","2024-05-06":"어린이날 대체","2024-05-15":"부처님오신날","2024-06-06":"현충일","2024-08-15":"광복절","2024-09-16":"추석 연휴","2024-09-17":"추석","2024-09-18":"추석 연휴","2024-10-01":"국군의 날","2024-10-03":"개천절","2024-10-09":"한글날","2024-12-25":"성탄절","2025-01-01":"신정","2025-01-27":"임시공휴일","2025-01-28":"설날 연휴","2025-01-29":"설날","2025-01-30":"설날 연휴","2025-03-01":"삼일절","2025-03-03":"삼일절 대체","2025-05-05":"부처님오신날·어린이날","2025-05-06":"부처님오신날 대체·어린이날 대체","2025-06-03":"대통령 선거일","2025-06-06":"현충일","2025-08-15":"광복절","2025-10-03":"개천절","2025-10-05":"추석 연휴","2025-10-06":"추석","2025-10-07":"추석 연휴","2025-10-08":"추석 대체","2025-10-09":"한글날","2025-12-25":"성탄절","2026-01-01":"신정","2026-02-16":"설날 연휴","2026-02-17":"설날","2026-02-18":"설날 연휴","2026-03-01":"삼일절","2026-03-02":"삼일절 대체","2026-05-01":"노동절","2026-05-05":"어린이날","2026-05-24":"부처님오신날","2026-05-25":"부처님오신날 대체","2026-06-03":"지방선거일","2026-06-06":"현충일","2026-07-17":"제헌절","2026-08-15":"광복절","2026-08-17":"광복절 대체","2026-09-24":"추석 연휴","2026-09-25":"추석","2026-09-26":"추석 연휴","2026-10-03":"개천절","2026-10-05":"개천절 대체","2026-10-09":"한글날","2026-12-25":"성탄절","2027-01-01":"신정","2027-02-06":"설날 연휴","2027-02-07":"설날","2027-02-08":"설날 연휴","2027-02-09":"설날 대체","2027-03-01":"삼일절","2027-05-01":"노동절","2027-05-03":"노동절 대체","2027-05-05":"어린이날","2027-05-13":"부처님오신날","2027-06-06":"현충일","2027-07-17":"제헌절","2027-07-19":"제헌절 대체","2027-08-15":"광복절","2027-08-16":"광복절 대체","2027-09-14":"추석 연휴","2027-09-15":"추석","2027-09-16":"추석 연휴","2027-10-03":"개천절","2027-10-04":"개천절 대체","2027-10-09":"한글날","2027-10-11":"한글날 대체","2027-12-25":"성탄절","2027-12-27":"성탄절 대체","2028-01-01":"신정","2028-01-26":"설날 연휴","2028-01-27":"설날","2028-01-28":"설날 연휴","2028-03-01":"삼일절","2028-04-12":"국회의원 선거일","2028-05-01":"노동절","2028-05-02":"부처님오신날","2028-05-05":"어린이날","2028-06-06":"현충일","2028-07-17":"제헌절","2028-08-15":"광복절","2028-10-02":"추석 연휴","2028-10-03":"개천절·추석","2028-10-04":"추석 연휴","2028-10-05":"추석 대체","2028-10-09":"한글날","2028-12-25":"성탄절","2029-01-01":"신정","2029-02-12":"설날 연휴","2029-02-13":"설날","2029-02-14":"설날 연휴","2029-03-01":"삼일절","2029-05-01":"노동절","2029-05-05":"어린이날","2029-05-07":"어린이날 대체","2029-05-20":"부처님오신날","2029-05-21":"부처님오신날 대체","2029-06-06":"현충일","2029-07-17":"제헌절","2029-08-15":"광복절","2029-09-21":"추석 연휴","2029-09-22":"추석","2029-09-23":"추석 연휴","2029-09-24":"추석 대체","2029-10-03":"개천절","2029-10-09":"한글날","2029-12-25":"성탄절","2030-01-01":"신정","2030-02-02":"설날 연휴","2030-02-03":"설날","2030-02-04":"설날 연휴","2030-02-05":"설날 대체","2030-03-01":"삼일절","2030-04-03":"대통령 선거일","2030-05-01":"노동절","2030-05-05":"어린이날","2030-05-06":"어린이날 대체","2030-05-09":"부처님오신날","2030-06-06":"현충일","2030-06-12":"지방선거일","2030-07-17":"제헌절","2030-08-15":"광복절","2030-09-11":"추석 연휴","2030-09-12":"추석","2030-09-13":"추석 연휴","2030-10-03":"개천절","2030-10-09":"한글날","2030-12-25":"성탄절","2031-01-01":"신정","2031-01-22":"설날 연휴","2031-01-23":"설날","2031-01-24":"설날 연휴","2031-03-01":"삼일절","2031-03-03":"삼일절 대체","2031-05-01":"노동절","2031-05-05":"어린이날","2031-05-28":"부처님오신날","2031-06-06":"현충일","2031-07-17":"제헌절","2031-08-15":"광복절","2031-09-30":"추석 연휴","2031-10-01":"추석","2031-10-02":"추석 연휴","2031-10-03":"개천절","2031-10-09":"한글날","2031-12-25":"성탄절","2032-01-01":"신정","2032-02-10":"설날 연휴","2032-02-11":"설날","2032-02-12":"설날 연휴","2032-03-01":"삼일절","2032-04-14":"국회의원 선거일","2032-05-01":"노동절","2032-05-03":"노동절 대체","2032-05-05":"어린이날","2032-05-16":"부처님오신날","2032-05-17":"부처님오신날 대체","2032-06-06":"현충일","2032-07-17":"제헌절","2032-07-19":"제헌절 대체","2032-08-15":"광복절","2032-08-16":"광복절 대체","2032-09-18":"추석 연휴","2032-09-19":"추석","2032-09-20":"추석 연휴","2032-09-21":"추석 대체","2032-10-03":"개천절","2032-10-04":"개천절 대체","2032-10-09":"한글날","2032-10-11":"한글날 대체","2032-12-25":"성탄절","2032-12-27":"성탄절 대체","2033-01-01":"신정","2033-01-30":"설날 연휴","2033-01-31":"설날","2033-02-01":"설날 연휴","2033-02-02":"설날 대체","2033-03-01":"삼일절","2033-05-01":"노동절","2033-05-02":"노동절 대체","2033-05-05":"어린이날","2033-05-06":"부처님오신날","2033-06-06":"현충일","2033-07-17":"제헌절","2033-07-18":"제헌절 대체","2033-08-15":"광복절","2033-09-07":"추석 연휴","2033-09-08":"추석","2033-09-09":"추석 연휴","2033-10-03":"개천절","2033-10-09":"한글날","2033-10-10":"한글날 대체","2033-12-25":"성탄절","2033-12-26":"성탄절 대체","2034-01-01":"신정","2034-02-18":"설날 연휴","2034-02-19":"설날","2034-02-20":"설날 연휴","2034-02-21":"설날 대체","2034-03-01":"삼일절","2034-05-01":"노동절","2034-05-05":"어린이날","2034-05-25":"부처님오신날","2034-06-06":"현충일","2034-06-14":"지방선거일","2034-07-17":"제헌절","2034-08-15":"광복절","2034-09-26":"추석 연휴","2034-09-27":"추석","2034-09-28":"추석 연휴","2034-10-03":"개천절","2034-10-09":"한글날","2034-12-25":"성탄절","2035-01-01":"신정","2035-02-07":"설날 연휴","2035-02-08":"설날","2035-02-09":"설날 연휴","2035-03-01":"삼일절","2035-04-04":"대통령 선거일","2035-05-01":"노동절","2035-05-05":"어린이날","2035-05-07":"어린이날 대체","2035-05-15":"부처님오신날","2035-06-06":"현충일","2035-07-17":"제헌절","2035-08-15":"광복절","2035-09-15":"추석 연휴","2035-09-16":"추석","2035-09-17":"추석 연휴","2035-09-18":"추석 대체","2035-10-03":"개천절","2035-10-09":"한글날","2035-12-25":"성탄절"};
+const OBSERVANCES = { '04-05': '식목일', '05-08': '어버이날', '05-15': '스승의 날', '10-01': '국군의 날' };
+const COLORS = { '파랑': '#1971c2', '초록': '#2f9e44', '주황': '#e67700', '빨강': '#e03131', '보라': '#7048e8', '청록': '#0c8599' };
+const REPEAT_LABEL = { none: '', daily: '매일', weekday: '평일', weekly: '매주', monthly: '매월', yearly: '매년' };
+const ALARM_LABEL = { '-1': '', '0': '정시', '5': '5분 전', '10': '10분 전', '30': '30분 전', '60': '1시간 전', '1440': '하루 전' };
+const WD = ['일', '월', '화', '수', '목', '금', '토'];
+
+let S = { events: [], work: {}, todos: [] };
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(WS_KEY) || 'null');
+    if (s && typeof s === 'object') {
+      S.events = Array.isArray(s.events) ? s.events : [];
+      S.work = s.work && typeof s.work === 'object' ? s.work : {};
+      S.todos = Array.isArray(s.todos) ? s.todos : [];
+    }
+  } catch (e) {}
+}
+function save() {
+  try { localStorage.setItem(WS_KEY, JSON.stringify(S)); }
+  catch (e) { toast('저장 공간이 부족합니다. 백업 후 오래된 기록을 지워주세요'); }
+  writeHomeCache();
+}
+
+/* ================================================================
+   날짜 유틸
+   ================================================================ */
+const pad = n => String(n).padStart(2, '0');
+function d2s(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function s2d(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+function todayStr() { return d2s(new Date()); }
+function daysBetween(a, b) { return Math.round((s2d(b) - s2d(a)) / 86400000); }
+function ddayText(ds) { const n = daysBetween(todayStr(), ds); return n === 0 ? 'D-DAY' : (n > 0 ? `D-${n}` : `D+${-n}`); }
+function korDate(ds, withYear) {
+  const d = s2d(ds);
+  return `${withYear ? d.getFullYear() + '년 ' : ''}${d.getMonth() + 1}월 ${d.getDate()}일 (${WD[d.getDay()]})`;
+}
+function esc(s) { return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])); }
+
+// "14:00 회의", "오후 3시 미팅", "9시30분 보고", "9시반" → [HH:MM, 나머지]  (PC 버전과 같은 규칙)
+function matchTimePrefix(text) {
+  const t = text || '';
+  const m = t.match(/^\s*(오전|오후)?\s*(\d{1,2})\s*(?::\s*(\d{2})|시\s*(?:(\d{1,2})\s*분|(반))?)(?!\d)/);
+  if (!m) return [null, t.trim()];
+  let hh = parseInt(m[2], 10);
+  const mm = parseInt(m[3] || m[4] || (m[5] ? '30' : '0'), 10);
+  if (m[1] === '오후' && hh < 12) hh += 12;
+  if (m[1] === '오전' && hh === 12) hh = 0;
+  if (hh > 23 || mm > 59) return [null, t.trim()];
+  return [`${pad(hh)}:${pad(mm)}`, t.slice(m[0].length).trim()];
+}
+
+/* ================================================================
+   반복 일정 펼치기 (PC 버전 _expand 이식)
+   ================================================================ */
+function expand(ev, startStr, endStr) {
+  const out = [];
+  const base = s2d(ev.date);
+  const start = s2d(startStr);
+  let last = s2d(endStr);
+  if (ev.until) { const u = s2d(ev.until); if (u < last) last = u; }
+  const rep = ev.repeat || 'none';
+  if (rep === 'none') { if (base >= start && base <= last) out.push(ev.date); return out; }
+  const first = base > start ? base : start;
+  if (first > last) return out;
+  if (rep === 'daily' || rep === 'weekday') {
+    for (let d = new Date(first); d <= last; d = addDays(d, 1)) {
+      const w = d.getDay();
+      if (rep === 'daily' || (w >= 1 && w <= 5)) out.push(d2s(d));
+    }
+  } else if (rep === 'weekly') {
+    const off = ((Math.round((first - base) / 86400000) % 7) + 7) % 7;
+    for (let d = off === 0 ? new Date(first) : addDays(first, 7 - off); d <= last; d = addDays(d, 7)) out.push(d2s(d));
+  } else if (rep === 'monthly') {
+    let y = first.getFullYear(), m = first.getMonth();
+    while (y < last.getFullYear() || (y === last.getFullYear() && m <= last.getMonth())) {
+      const dim = new Date(y, m + 1, 0).getDate();
+      const d = new Date(y, m, Math.min(base.getDate(), dim));
+      if (d >= first && d <= last) out.push(d2s(d));
+      m++; if (m > 11) { m = 0; y++; }
+    }
+  } else if (rep === 'yearly') {
+    for (let y = first.getFullYear(); y <= last.getFullYear(); y++) {
+      let d = new Date(y, base.getMonth(), base.getDate());
+      if (d.getMonth() !== base.getMonth()) d = new Date(y, base.getMonth(), 28); // 2/29 → 평년 2/28
+      if (d >= first && d <= last) out.push(d2s(d));
+    }
+  }
+  return out;
+}
+function occurrences(startStr, endStr) {
+  const map = {};
+  S.events.forEach(ev => {
+    const skip = new Set(ev.ex || []);
+    expand(ev, startStr, endStr).forEach(ds => {
+      if (skip.has(ds)) return;
+      (map[ds] = map[ds] || []).push(ev);
+    });
+  });
+  Object.values(map).forEach(list => list.sort((a, b) => ((a.time ? 1 : 0) - (b.time ? 1 : 0)) || (a.time || '').localeCompare(b.time || '') || (a.title || '').localeCompare(b.title || '')));
+  return map;
+}
+
+/* ================================================================
+   화면 상태
+   ================================================================ */
+let viewY, viewM, selDate;
+function setTab(t) {
+  ['cal', 'todo', 'bak'].forEach(k => {
+    document.getElementById('tab' + k.charAt(0).toUpperCase() + k.slice(1)).classList.toggle('on', k === t);
+  });
+  document.getElementById('pageCal').classList.toggle('on', t === 'cal');
+  document.getElementById('pageTodo').classList.toggle('on', t === 'todo');
+  document.getElementById('pageBak').classList.toggle('on', t === 'bak');
+  if (t === 'todo') renderTodos();
+  if (t === 'bak') renderBackupStats();
+  window.scrollTo(0, 0);
+}
+function moveMonth(delta) {
+  viewM += delta;
+  if (viewM < 0) { viewM = 11; viewY--; }
+  if (viewM > 11) { viewM = 0; viewY++; }
+  renderCalendar();
+}
+function goToday() {
+  const t = new Date();
+  viewY = t.getFullYear(); viewM = t.getMonth(); selDate = todayStr();
+  renderAll();
+}
+function selectDate(ds) {
+  selDate = ds;
+  const d = s2d(ds);
+  if (d.getFullYear() !== viewY || d.getMonth() !== viewM) { viewY = d.getFullYear(); viewM = d.getMonth(); }
+  renderCalendar(); renderDay();
+}
+
+/* ================================================================
+   달력 그리기
+   ================================================================ */
+function renderCalendar() {
+  document.getElementById('ymLabel').innerText = `${viewY}년 ${viewM + 1}월`;
+  const first = new Date(viewY, viewM, 1);
+  const gridStart = addDays(first, -first.getDay());
+  const gridEnd = addDays(gridStart, 41);
+  const occ = occurrences(d2s(gridStart), d2s(gridEnd));
+  const today = todayStr();
+  let html = '';
+  for (let i = 0; i < 42; i++) {
+    const d = addDays(gridStart, i);
+    const ds = d2s(d);
+    const w = d.getDay();
+    const hol = HOLIDAYS[ds];
+    const obs = OBSERVANCES[ds.slice(5)];
+    const evs = occ[ds] || [];
+    const cls = ['cell'];
+    if (d.getMonth() !== viewM) cls.push('other');
+    if (w === 0) cls.push('sun');
+    if (w === 6) cls.push('sat');
+    if (hol) cls.push('hol');
+    if (ds === today) cls.push('today');
+    if (ds === selDate) cls.push('sel');
+    const hasWork = !!S.work[ds];
+    const bars = evs.slice(0, 2).map(ev => `<div class="ev" style="background:${COLORS[ev.color] || COLORS['파랑']}">${ev.time ? ev.time.replace(/^0/, '') + ' ' : ''}${esc(ev.title)}</div>`).join('');
+    html += `<div class="${cls.join(' ')}" onclick="selectDate('${ds}')">
+      <div class="dn"><span class="num">${d.getDate()}</span>${hasWork ? '<i class="wk"></i>' : ''}</div>
+      ${hol ? `<div class="hn">${esc(hol)}</div>` : (obs ? `<div class="ob">${obs}</div>` : '')}
+      ${bars}${evs.length > 2 ? `<div class="more">+${evs.length - 2}</div>` : ''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+/* 좌우로 밀어서 달 넘기기 */
+(function () {
+  const g = document.getElementById('calGrid');
+  let x0 = null, y0 = null;
+  g.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  g.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) moveMonth(dx < 0 ? 1 : -1);
+    x0 = null;
+  }, { passive: true });
+})();
+
+/* ================================================================
+   선택한 날 + 다가오는 일정
+   ================================================================ */
+function evRowHtml(ev, ds, showDday) {
+  const marks = [REPEAT_LABEL[ev.repeat || 'none'] ? '↻ ' + REPEAT_LABEL[ev.repeat] : '', (ev.alarm ?? -1) >= 0 && ev.time ? '🔔 ' + ALARM_LABEL[String(ev.alarm)] : '', ev.pin ? '📌 고정' : '']
+    .filter(Boolean).join(' · ');
+  const sub = [showDday ? korDate(ds) : '', marks, ev.note ? esc(ev.note) : ''].filter(Boolean).join(' · ');
+  const dd = showDday ? `<span class="dd ${ds === todayStr() ? 'now' : ''}">${ddayText(ds)}</span>` : '';
+  return `<div class="ev-row" onclick="openEvent('${ev.id}','${ds}')">
+    <span class="bar" style="background:${COLORS[ev.color] || COLORS['파랑']}"></span>
+    <span class="tm">${ev.time ? ev.time + (ev.end ? `<small>~${ev.end}</small>` : '') : '<small style="font-size:.78rem;color:#64748B;">종일</small>'}</span>
+    <span class="tt"><b>${esc(ev.title)}</b>${sub ? `<span>${sub}</span>` : ''}</span>${dd}
+  </div>`;
+}
+function renderDay() {
+  const ds = selDate;
+  const hol = HOLIDAYS[ds];
+  const n = daysBetween(todayStr(), ds);
+  document.getElementById('dayHead').innerHTML = `<span class="d">${korDate(ds)}</span>
+    <span class="pill ${n === 0 ? 'today' : ''}">${n === 0 ? '오늘' : ddayText(ds)}</span>
+    ${hol ? `<span class="pill hol">${esc(hol)}</span>` : ''}`;
+  document.getElementById('quickDateLabel').innerText = `${korDate(ds)}에 추가`;
+  const evs = (occurrences(ds, ds)[ds]) || [];
+  document.getElementById('dayEvents').innerHTML = evs.length
+    ? evs.map(ev => evRowHtml(ev, ds, false)).join('')
+    : '<div class="empty">이 날은 일정이 없습니다</div>';
+  const w = S.work[ds];
+  const box = document.getElementById('dayWork');
+  if (w && (w.learn || w.measure || w.todo)) {
+    box.innerHTML = `<div class="work-box" onclick="openWork()">
+      ${w.learn ? `<div class="h">📚 업무 내용</div><div class="b">${esc(w.learn)}</div>` : ''}
+      ${w.measure ? `<div class="h">📊 측정 데이터</div><div class="b">${esc(w.measure)}</div>` : ''}
+      ${w.todo ? `<div class="h">📅 차기 계획</div><div class="b">${esc(w.todo)}</div>` : ''}
+    </div>`;
+  } else box.innerHTML = '';
+}
+function renderUpcoming() {
+  const t = todayStr();
+  const end = d2s(addDays(new Date(), 30));
+  const occ = occurrences(t, end);
+  const nowHM = `${pad(new Date().getHours())}:${pad(new Date().getMinutes())}`;
+  let list = [];
+  const seenRepeat = new Set(); // 반복 일정은 '다음 한 번'만 보여줌 (매일·평일 일정이 목록을 덮지 않게)
+  Object.keys(occ).sort().forEach(ds => occ[ds].forEach(ev => {
+    if (ds === t && ev.time && (ev.end || ev.time) < nowHM) return; // 오늘 이미 끝난 일정 제외
+    if (ev.repeat && ev.repeat !== 'none') { if (seenRepeat.has(ev.id)) return; seenRepeat.add(ev.id); }
+    list.push({ ds, ev });
+  }));
+  // 📌 고정 일정: 1년 안의 다음 날짜를 맨 위로
+  const pinned = [];
+  S.events.filter(ev => ev.pin).forEach(ev => {
+    const skip = new Set(ev.ex || []);
+    const next = expand(ev, t, d2s(addDays(new Date(), 366))).find(ds => !skip.has(ds));
+    if (next) pinned.push({ ds: next, ev });
+  });
+  pinned.sort((a, b) => a.ds.localeCompare(b.ds));
+  const pinnedIds = new Set(pinned.map(p => p.ev.id + '|' + p.ds));
+  const pinnedEv = new Set(pinned.map(p => p.ev.id));
+  list = [...pinned, ...list.filter(x => !pinnedIds.has(x.ev.id + '|' + x.ds) && !(pinnedEv.has(x.ev.id) && x.ev.repeat && x.ev.repeat !== 'none'))].slice(0, 12);
+  document.getElementById('upcoming').innerHTML = list.length
+    ? list.map(x => evRowHtml(x.ev, x.ds, true)).join('')
+    : '<div class="empty">앞으로 30일 동안 일정이 없습니다</div>';
+}
+function renderAll() { renderCalendar(); renderDay(); renderUpcoming(); renderTodoBadge(); }
+
+/* ================================================================
+   빠른 추가
+   ================================================================ */
+function quickAdd() {
+  const inp = document.getElementById('quickInput');
+  const raw = inp.value.trim();
+  if (!raw) { toast('일정 내용을 적어주세요 (예: 14:00 팀 회의)'); inp.focus(); return; }
+  const [t, rest] = matchTimePrefix(raw);
+  const title = t ? rest : raw;
+  if (!title) { toast('시간 뒤에 일정 제목을 적어주세요'); return; }
+  S.events.push({ id: 'e' + Date.now(), date: selDate, time: t || '', end: '', title, note: '', repeat: 'none', until: '', alarm: t ? 10 : -1, color: '파랑', pin: false, ex: [] });
+  save(); inp.value = '';
+  renderAll();
+  toast(`${korDate(selDate)}${t ? ' ' + t : ''} "${title}" 추가됨`);
+}
+
+/* ================================================================
+   일정 입력 시트
+   ================================================================ */
+let editId = null, editOcc = null;
+function segVal(id) { const b = document.querySelector(`#${id} button.on`); return b ? b.dataset.v : null; }
+function setSeg(id, v) { document.querySelectorAll(`#${id} button`).forEach(b => b.classList.toggle('on', b.dataset.v === String(v))); }
+['evRepeat', 'evAlarm'].forEach(id => document.getElementById(id).addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  setSeg(id, b.dataset.v);
+  if (id === 'evRepeat') document.getElementById('evUntilBox').style.display = b.dataset.v === 'none' ? 'none' : '';
+}));
+document.getElementById('evColors').innerHTML = Object.entries(COLORS).map(([k, c]) => `<button type="button" data-v="${k}" style="background:${c}" title="${k}"></button>`).join('');
+document.getElementById('evColors').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSeg('evColors', b.dataset.v); });
+function syncEvTimeUI() {
+  const all = document.getElementById('evAllDay').checked;
+  document.getElementById('evTimeBox').style.display = all ? 'none' : '';
+  document.getElementById('evAlarmBox').style.opacity = all ? .5 : 1;
+}
+function openSheet(id) {
+  document.getElementById('sheetBg').classList.add('show');
+  document.getElementById(id).classList.add('show');
+}
+function closeSheets() {
+  document.getElementById('sheetBg').classList.remove('show');
+  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show'));
+}
+function openEvent(id, occDate) {
+  const ev = id ? S.events.find(e => e.id === id) : null;
+  editId = ev ? ev.id : null;
+  editOcc = occDate || selDate;
+  document.getElementById('evSheetTitle').innerText = ev ? '일정 수정' : `${korDate(selDate)} 일정 추가`;
+  document.getElementById('evTitle').value = ev ? ev.title : '';
+  document.getElementById('evDate').value = ev ? ev.date : selDate;
+  document.getElementById('evAllDay').checked = ev ? !ev.time : false;
+  document.getElementById('evTime').value = ev ? (ev.time || '') : '09:00';
+  document.getElementById('evEnd').value = ev ? (ev.end || '') : '';
+  setSeg('evRepeat', ev ? (ev.repeat || 'none') : 'none');
+  document.getElementById('evUntilBox').style.display = (ev && ev.repeat && ev.repeat !== 'none') ? '' : 'none';
+  document.getElementById('evUntil').value = ev ? (ev.until || '') : '';
+  setSeg('evAlarm', ev ? (ev.alarm ?? -1) : 10);
+  setSeg('evColors', ev ? (ev.color || '파랑') : '파랑');
+  document.getElementById('evPin').checked = ev ? !!ev.pin : false;
+  document.getElementById('evNote').value = ev ? (ev.note || '') : '';
+  document.getElementById('evDelBtn').style.display = ev ? '' : 'none';
+  document.getElementById('evIcsBtn').classList.toggle('wide', !ev);
+  syncEvTimeUI();
+  openSheet('evSheet');
+  if (!ev) setTimeout(() => document.getElementById('evTitle').focus(), 280);
+}
+function readEventForm() {
+  const title = document.getElementById('evTitle').value.trim();
+  const date = document.getElementById('evDate').value;
+  const all = document.getElementById('evAllDay').checked;
+  const time = all ? '' : document.getElementById('evTime').value;
+  const end = all ? '' : document.getElementById('evEnd').value;
+  const repeat = segVal('evRepeat') || 'none';
+  const until = repeat === 'none' ? '' : document.getElementById('evUntil').value;
+  if (!title) { toast('제목을 적어주세요'); document.getElementById('evTitle').focus(); return null; }
+  if (!date) { toast('날짜를 골라주세요'); return null; }
+  if (!all && !time) { toast('시작 시간을 넣거나 "하루 종일"을 체크하세요'); return null; }
+  if (end && time && end < time) { toast('끝 시간이 시작 시간보다 빠릅니다'); return null; }
+  if (until && until < date) { toast('반복 끝나는 날이 시작 날짜보다 빠릅니다'); return null; }
+  return {
+    title, date, time, end, repeat, until,
+    alarm: parseInt(segVal('evAlarm') ?? '-1', 10),
+    color: segVal('evColors') || '파랑',
+    pin: document.getElementById('evPin').checked,
+    note: document.getElementById('evNote').value.trim()
+  };
+}
+function saveEvent() {
+  const f = readEventForm();
+  if (!f) return;
+  if (editId) {
+    const ev = S.events.find(e => e.id === editId);
+    Object.assign(ev, f);
+  } else {
+    S.events.push(Object.assign({ id: 'e' + Date.now(), ex: [] }, f));
+  }
+  save(); closeSheets();
+  selectDate(f.repeat === 'none' || !editId ? f.date : selDate);
+  renderUpcoming();
+  toast(editId ? '일정을 수정했습니다' : '일정을 추가했습니다');
+}
+function askDeleteEvent() {
+  const ev = S.events.find(e => e.id === editId);
+  if (!ev) return;
+  if (ev.repeat && ev.repeat !== 'none') {
+    document.getElementById('delMsg').innerText = `"${ev.title}"은(는) ${REPEAT_LABEL[ev.repeat]} 반복 일정입니다. ${korDate(editOcc)} 하루만 지울까요, 전체를 지울까요?`;
+    document.getElementById('evSheet').classList.remove('show');
+    openSheet('delSheet');
+  } else if (confirm(`"${ev.title}" 일정을 삭제할까요?`)) {
+    deleteEvent('all');
+  }
+}
+function deleteEvent(mode) {
+  const ev = S.events.find(e => e.id === editId);
+  if (!ev) return;
+  if (mode === 'one') { ev.ex = [...new Set([...(ev.ex || []), editOcc])]; }
+  else S.events = S.events.filter(e => e.id !== editId);
+  save(); closeSheets(); renderAll();
+  toast(mode === 'one' ? `${korDate(editOcc)} 하루만 삭제했습니다` : '일정을 삭제했습니다');
+}
+
+/* ================================================================
+   📲 휴대폰 캘린더(.ics) 내보내기 — 알림은 휴대폰 캘린더가 울림
+   ================================================================ */
+function icsEsc(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+function icsDate(ds) { return ds.replace(/-/g, ''); }
+function icsEvent(ev) {
+  const lines = ['BEGIN:VEVENT', `UID:${ev.id}@during-work-scheduler`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '')}`, `SUMMARY:${icsEsc(ev.title)}`];
+  if (ev.time) {
+    lines.push(`DTSTART:${icsDate(ev.date)}T${ev.time.replace(':', '')}00`);
+    const endT = ev.end || (() => { const [h, m] = ev.time.split(':').map(Number); const t = h * 60 + m + 60; return `${pad(Math.min(23, Math.floor(t / 60)))}:${pad(t >= 1440 ? 59 : t % 60)}`; })();
+    lines.push(`DTEND:${icsDate(ev.date)}T${endT.replace(':', '')}00`);
+  } else {
+    lines.push(`DTSTART;VALUE=DATE:${icsDate(ev.date)}`, `DTEND;VALUE=DATE:${icsDate(d2s(addDays(s2d(ev.date), 1)))}`);
+  }
+  const rr = { daily: 'FREQ=DAILY', weekday: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR', weekly: 'FREQ=WEEKLY', monthly: 'FREQ=MONTHLY', yearly: 'FREQ=YEARLY' }[ev.repeat];
+  if (rr) lines.push(`RRULE:${rr}${ev.until ? `;UNTIL=${icsDate(ev.until)}T235959` : ''}`);
+  (ev.ex || []).forEach(x => lines.push(ev.time ? `EXDATE:${icsDate(x)}T${ev.time.replace(':', '')}00` : `EXDATE;VALUE=DATE:${icsDate(x)}`));
+  if (ev.note) lines.push(`DESCRIPTION:${icsEsc(ev.note)}`);
+  if (ev.time && (ev.alarm ?? -1) >= 0) lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(ev.title)}`, `TRIGGER:-PT${ev.alarm}M`, 'END:VALARM');
+  lines.push('END:VEVENT');
+  return lines;
+}
+function downloadIcs(events, name) {
+  const body = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//DURING//Work Scheduler//KO', 'CALSCALE:GREGORIAN'];
+  events.forEach(ev => body.push(...icsEvent(ev)));
+  body.push('END:VCALENDAR');
+  download(new Blob([body.join('\r\n')], { type: 'text/calendar;charset=utf-8' }), name);
+}
+function icsFromSheet() {
+  const f = readEventForm();
+  if (!f) return;
+  const ev = Object.assign({ id: editId || ('e' + Date.now()), ex: editId ? (S.events.find(e => e.id === editId).ex || []) : [] }, f);
+  downloadIcs([ev], `일정_${f.title.slice(0, 20)}.ics`);
+  toast('파일을 열고 "캘린더에 추가"를 누르세요');
+}
+function exportAllIcs() {
+  const t = todayStr();
+  const list = S.events.filter(ev => (ev.repeat && ev.repeat !== 'none') ? (!ev.until || ev.until >= t) : ev.date >= t);
+  if (!list.length) { toast('앞으로 예정된 일정이 없습니다'); return; }
+  downloadIcs(list, `업무일정_${t}.ics`);
+  toast(`${list.length}개 일정을 파일로 저장했습니다. 열어서 캘린더에 추가하세요`);
+}
+
+/* ================================================================
+   업무 기록 시트 (PC 버전 '업무 입력' 이식)
+   ================================================================ */
+const TPL = {
+  edu: '교육 수강\n- 주제: \n- 핵심 내용: \n- 소감: ',
+  work: '작업 내용\n- 진행 상황: \n- 특이사항: ',
+  meet: '회의록\n- 참석자: \n- 논의 내용: \n- 결정 사항: '
+};
+function openWork() {
+  const w = S.work[selDate] || {};
+  document.getElementById('workSheetTitle').innerText = `${korDate(selDate)} 업무 기록`;
+  document.getElementById('wkLearn').value = w.learn || '';
+  document.getElementById('wkMeasure').value = w.measure || '';
+  document.getElementById('wkTodo').value = w.todo || '';
+  ['mqProduct', 'mqCustomer', 'mqItem'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mqQty').value = '1';
+  document.getElementById('mqUnit').value = 'ea';
+  openSheet('workSheet');
+}
+function applyTpl(k) {
+  const ta = document.getElementById('wkLearn');
+  if (ta.value.trim() && !confirm('지금 적힌 내용 뒤에 템플릿을 붙일까요?')) return;
+  ta.value = ta.value.trim() ? ta.value.trim() + '\n\n' + TPL[k] : TPL[k];
+  ta.focus();
+}
+function addMeasureLine() {
+  const g = id => document.getElementById(id).value.trim();
+  const item = g('mqItem');
+  if (!item) { toast('측정 항목을 적어주세요'); document.getElementById('mqItem').focus(); return; }
+  let line = `- ${g('mqProduct')} ${item} 측정 ${g('mqQty') || '1'}${g('mqUnit') || 'ea'}`.replace(/\s+/g, ' ');
+  if (g('mqCustomer')) line += ` [${g('mqCustomer')}]`;
+  const ta = document.getElementById('wkLearn');
+  ta.value = ta.value.trim() ? ta.value.trim() + '\n' + line : line;
+  document.getElementById('mqItem').value = '';
+  document.getElementById('mqItem').focus();
+  toast('업무 내용에 한 줄 추가했습니다');
+}
+function saveWork() {
+  const l = document.getElementById('wkLearn').value.trim();
+  const m = document.getElementById('wkMeasure').value.trim();
+  const t = document.getElementById('wkTodo').value.trim();
+  if (!l && !m && !t) delete S.work[selDate];
+  else S.work[selDate] = { learn: l, measure: m, todo: t, updated: new Date().toISOString() };
+  save(); closeSheets(); renderAll();
+  toast('업무 기록을 저장했습니다');
+}
+function deleteWork() {
+  if (!S.work[selDate]) { closeSheets(); return; }
+  if (!confirm(`${korDate(selDate)} 업무 기록을 삭제할까요?`)) return;
+  delete S.work[selDate];
+  save(); closeSheets(); renderAll();
+  toast('업무 기록을 삭제했습니다');
+}
+
+/* ================================================================
+   할 일
+   ================================================================ */
+let todoPrio = '보통', todoFilter = 'open';
+const PRIO_ORDER = { '높음': 0, '보통': 1, '낮음': 2 };
+document.getElementById('prioSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  todoPrio = b.dataset.p;
+  document.querySelectorAll('#prioSeg button').forEach(x => x.classList.toggle('on', x === b));
+});
+function addTodo() {
+  const inp = document.getElementById('todoInput');
+  const v = inp.value.trim();
+  if (!v) { toast('할 일을 적어주세요'); inp.focus(); return; }
+  S.todos.unshift({ id: 't' + Date.now(), text: v, done: false, prio: todoPrio, created: new Date().toISOString() });
+  save(); inp.value = ''; inp.focus();
+  renderTodos();
+}
+function setTodoFilter(f) {
+  todoFilter = f;
+  document.querySelectorAll('#pageTodo .chip').forEach(c => c.classList.toggle('on', c.dataset.f === f));
+  renderTodos();
+}
+function renderTodos() {
+  let list = S.todos.slice();
+  if (todoFilter === 'open') list = list.filter(t => !t.done);
+  if (todoFilter === 'done') list = list.filter(t => t.done);
+  list.sort((a, b) => (a.done - b.done) || (PRIO_ORDER[a.prio] - PRIO_ORDER[b.prio]) || (b.created || '').localeCompare(a.created || ''));
+  const open = S.todos.filter(t => !t.done).length;
+  document.getElementById('todoCount').innerText = `진행 ${open} · 완료 ${S.todos.length - open}`;
+  document.getElementById('todoList').innerHTML = list.length ? list.map(t => `
+    <div class="todo ${t.done ? 'done' : ''}">
+      <button type="button" class="ck" onclick="toggleTodo('${t.id}')" aria-label="완료 표시">${t.done ? '✓' : ''}</button>
+      <input class="tx" value="${esc(t.text)}" onchange="editTodo('${t.id}', this.value)">
+      <button type="button" class="pr" data-p="${t.prio}" onclick="cyclePrio('${t.id}')">${t.prio}</button>
+      <button type="button" class="x" onclick="deleteTodo('${t.id}')" aria-label="삭제">×</button>
+    </div>`).join('')
+    : `<div class="empty">${todoFilter === 'done' ? '완료한 할 일이 없습니다' : '할 일이 없습니다 🎉'}</div>`;
+  renderTodoBadge();
+}
+function renderTodoBadge() {
+  const n = S.todos.filter(t => !t.done).length;
+  const b = document.getElementById('todoBadge');
+  b.style.display = n ? '' : 'none';
+  b.innerText = n;
+}
+function findTodo(id) { return S.todos.find(t => t.id === id); }
+function toggleTodo(id) { const t = findTodo(id); if (!t) return; t.done = !t.done; save(); renderTodos(); }
+function editTodo(id, v) { const t = findTodo(id); if (!t) return; v = v.trim(); if (!v) { renderTodos(); return; } t.text = v; save(); }
+function cyclePrio(id) { const t = findTodo(id); if (!t) return; t.prio = { '높음': '보통', '보통': '낮음', '낮음': '높음' }[t.prio] || '보통'; save(); renderTodos(); }
+function deleteTodo(id) { const t = findTodo(id); if (!t || !confirm(`"${t.text}"을(를) 삭제할까요?`)) return; S.todos = S.todos.filter(x => x.id !== id); save(); renderTodos(); }
+function clearDoneTodos() {
+  const n = S.todos.filter(t => t.done).length;
+  if (!n) { toast('완료된 할 일이 없습니다'); return; }
+  if (!confirm(`완료된 할 일 ${n}개를 지울까요?`)) return;
+  S.todos = S.todos.filter(t => !t.done); save(); renderTodos();
+}
+
+/* ================================================================
+   백업 · 내보내기
+   ================================================================ */
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+function renderBackupStats() {
+  document.getElementById('stEv').innerText = S.events.length;
+  document.getElementById('stWk').innerText = Object.keys(S.work).length;
+  document.getElementById('stTd').innerText = S.todos.length;
+}
+function exportBackup() {
+  const data = { app: 'DURING Work Scheduler', version: 1, exported: new Date().toISOString(), data: S };
+  download(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }), `업무스케줄러_백업_${todayStr()}.json`);
+  toast('백업 파일을 저장했습니다');
+}
+function importBackup(input) {
+  const f = input.files && input.files[0];
+  input.value = '';
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const j = JSON.parse(r.result);
+      const d = j && j.data ? j.data : j;
+      if (!d || !Array.isArray(d.events) || typeof d.work !== 'object' || !Array.isArray(d.todos)) throw new Error('형식이 맞지 않습니다');
+      if (!confirm(`백업 파일을 불러오면 지금 데이터가 바뀝니다.\n(일정 ${d.events.length} · 업무기록 ${Object.keys(d.work).length} · 할 일 ${d.todos.length})\n계속할까요?`)) return;
+      S = { events: d.events, work: d.work, todos: d.todos };
+      save(); renderAll(); renderBackupStats();
+      toast('백업을 불러왔습니다 ✅');
+    } catch (e) { alert('백업 파일을 읽을 수 없습니다: ' + e.message); }
+  };
+  r.readAsText(f);
+}
+function exportWorkCsv() {
+  const keys = Object.keys(S.work).sort();
+  if (!keys.length) { toast('업무 기록이 없습니다'); return; }
+  const c = v => { const s = String(v || ''); return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const rows = keys.map(k => [k, WD[s2d(k).getDay()], S.work[k].learn, S.work[k].measure, S.work[k].todo].map(c).join(','));
+  const csv = '\uFEFF' + ['날짜,요일,업무 내용,측정 데이터,차기 계획', ...rows].join('\r\n');
+  download(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `업무기록_${todayStr()}.csv`);
+  toast(`업무 기록 ${keys.length}일치를 내보냈습니다`);
+}
+function resetAll() {
+  if (!confirm('일정 · 업무 기록 · 할 일을 모두 지울까요?')) return;
+  if (!confirm('정말 지울까요? 되돌릴 수 없습니다.\n(필요하면 먼저 "백업 파일 저장"을 누르세요)')) return;
+  S = { events: [], work: {}, todos: [] };
+  save(); renderAll(); renderBackupStats();
+  toast('모두 지웠습니다');
+}
+
+/* ================================================================
+   첫 화면(m.html) 버튼용 요약 · 페이지가 열려 있을 때의 알림
+   ================================================================ */
+function writeHomeCache() {
+  try {
+    const t = todayStr();
+    const days = {};
+    const occ = occurrences(t, d2s(addDays(new Date(), 13)));
+    Object.keys(occ).forEach(ds => { days[ds] = occ[ds].map(ev => ({ t: ev.time || '', e: ev.end || '', title: ev.title })); });
+    localStorage.setItem(HOME_CACHE_KEY, JSON.stringify({ made: t, days, todoOpen: S.todos.filter(x => !x.done).length }));
+  } catch (e) {}
+}
+function checkAlarms() {
+  let fired = {};
+  try { fired = JSON.parse(localStorage.getItem(FIRED_KEY) || '{}'); } catch (e) {}
+  const now = new Date();
+  const t = todayStr(), tm = d2s(addDays(now, 1));
+  const occ = occurrences(t, tm);
+  const due = [];
+  Object.keys(occ).forEach(ds => occ[ds].forEach(ev => {
+    if (!ev.time || (ev.alarm ?? -1) < 0) return;
+    const [h, m] = ev.time.split(':').map(Number);
+    const start = s2d(ds); start.setHours(h, m, 0, 0);
+    const at = new Date(start.getTime() - ev.alarm * 60000);
+    const key = `${ev.id}|${ds}`;
+    if (now >= at && now < new Date(start.getTime() + 10 * 60000) && !fired[key]) { fired[key] = 1; due.push({ ds, ev }); }
+  }));
+  if (due.length) {
+    // 오래된 기록 정리 후 저장
+    Object.keys(fired).forEach(k => { if (k.split('|')[1] < d2s(addDays(now, -3))) delete fired[k]; });
+    try { localStorage.setItem(FIRED_KEY, JSON.stringify(fired)); } catch (e) {}
+    const x = due[0];
+    document.getElementById('alarmText').innerText = `${x.ds === t ? '오늘' : '내일'} ${x.ev.time} · ${x.ev.title}${due.length > 1 ? ` 외 ${due.length - 1}건` : ''}`;
+    document.getElementById('alarmBox').classList.add('show');
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  }
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.innerText = msg; el.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* ================================================================
+   시작
+   ================================================================ */
+load();
+(function init() {
+  const t = new Date();
+  viewY = t.getFullYear(); viewM = t.getMonth(); selDate = todayStr();
+  renderAll();
+  writeHomeCache();
+  checkAlarms();
+  setInterval(checkAlarms, 30000);
+  // 자정이 지나거나 다른 앱에서 돌아왔을 때 오늘 기준 다시 그리기
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { renderUpcoming(); renderCalendar(); checkAlarms(); writeHomeCache(); } });
+})();
+</script>
+</body>
+</html>
