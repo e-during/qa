@@ -485,6 +485,71 @@
         .tb-link-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; background: #FBF3E4; color: #7c5a1c; font-weight: 900; font-size: 0.92rem; border: 1px solid rgba(224,176,96,.6); font-family: inherit; }
         .tb-sub { font-size: 0.86rem; font-weight: 900; color: #0F172A; margin: 16px 0 10px; padding-top: 14px; border-top: 1px dashed #E2E8F0; }
         .tb-rec-sum { margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
+        /* 📐 측정 소요시간 예측 (2026-09 개편, .cm- 접두사) */
+        .tb-input.cm-sm { height: 52px; font-size: 1.05rem; padding: 0 12px; }
+        .cm-now { flex: none; height: 52px; padding: 0 16px; border-radius: 12px; border: 2px solid var(--primary-color); background: #fff; color: var(--primary-color); font-weight: 900; font-size: 0.95rem; font-family: inherit; }
+        .cm-check { display: flex; gap: 10px; align-items: flex-start; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 12px; margin-bottom: 12px; font-size: 0.86rem; color: #1E3A8A; font-weight: 700; line-height: 1.45; cursor: pointer; }
+        .cm-check input { width: 22px; height: 22px; flex: none; margin-top: 1px; accent-color: #2563EB; }
+        .cm-check small { font-weight: 600; color: #64748B; }
+        .cm-item { border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 12px; margin-bottom: 10px; background: #FCFDFE; }
+        .cm-item.bad { border-color: #F87171; background: #FFF5F5; }
+        .cm-item-head { display: flex; align-items: center; margin-bottom: 8px; }
+        .cm-item-no { font-size: 0.82rem; font-weight: 900; color: var(--primary-color); background: #FBF3E4; border: 1px solid rgba(224,176,96,.5); padding: 3px 10px; border-radius: 999px; }
+        .cm-item-head .tb-del { margin-left: auto; }
+        .cm-import { width: 100%; margin-top: 8px; padding: 10px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #fff; color: #475569; font-weight: 800; font-size: 0.8rem; font-family: inherit; }
+        .cm-item-sum { margin-top: 8px; font-size: 0.86rem; font-weight: 800; color: #047857; text-align: right; }
+        .cm-item-sum b { font-size: 1rem; }
+        .cm-item-sum.idle { color: #94A3B8; font-weight: 700; }
+        .cm-add { width: 100%; padding: 14px; border-radius: 12px; border: 2px dashed #CBD5E1; background: #fff; color: var(--primary-color); font-weight: 900; font-size: 0.95rem; font-family: inherit; }
+        .cm-wait { text-align: center; color: #94A3B8; font-weight: 700; font-size: 0.88rem; padding: 18px 0; line-height: 1.6; background: #fff; border: 1px dashed #CBD5E1; border-radius: 14px; margin-bottom: 12px; }
+        .cm-hero { background: var(--primary-color); color: #fff; border-radius: 18px; padding: 18px 14px; text-align: center; margin-bottom: 10px; }
+        .cm-hero .k { font-size: 0.82rem; font-weight: 800; color: var(--gold); letter-spacing: .5px; }
+        .cm-hero .v { font-size: 1.75rem; font-weight: 900; line-height: 1.25; margin-top: 4px; font-variant-numeric: tabular-nums; }
+        .cm-hero .s { font-size: 0.78rem; color: #CBD5E1; margin-top: 6px; font-weight: 600; }
+        .cm-dl { margin-top: 12px; border-radius: 12px; padding: 10px; font-size: 0.92rem; font-weight: 800; line-height: 1.45; }
+        .cm-dl b { font-size: 1.05rem; }
+        .cm-dl small { font-weight: 600; font-size: 0.74rem; opacity: .9; }
+        .cm-dl.ok { background: #D1FAE5; color: #065F46; }
+        .cm-dl.late { background: #FEE2E2; color: #991B1B; }
+        .cm-hero.late { background: #450a0a; }
+        .cm-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+        .cm-stats .tb-sum .v { font-size: 0.98rem; line-height: 1.3; }
+        .cm-machines { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+        .cm-mc { background: #EEF2FF; border: 1px solid #C7D2FE; border-radius: 12px; padding: 10px; font-size: 0.8rem; color: #334155; line-height: 1.5; }
+        .cm-mc .t { font-weight: 900; color: #1E3A8A; margin-bottom: 2px; }
+        .cm-res-title { font-size: 0.9rem; font-weight: 900; color: #0F172A; margin: 14px 2px 8px; }
+        .cm-res-item { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; }
+        .cm-res-item .n { font-size: 0.95rem; font-weight: 900; color: #0F172A; }
+        .cm-res-item .n span { font-size: 0.76rem; font-weight: 700; color: #64748B; margin-left: 4px; }
+        .cm-res-item .m { font-size: 0.76rem; color: #64748B; font-weight: 700; margin-top: 2px; }
+        .cm-res-item .f { font-size: 1rem; font-weight: 900; color: #B91C1C; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+        /* 📝 품질 기록 (2026-09 개편) */
+        .qm-seg3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #F1F5F9; padding: 4px; border-radius: 14px; margin-bottom: 8px; }
+        .qm-seg3 button { border: none; background: transparent; padding: 10px 4px; border-radius: 10px; font-size: 0.9rem; font-weight: 900; color: #64748B; line-height: 1.35; font-family: inherit; }
+        .qm-seg3 button.on { background: var(--primary-color); color: var(--gold); box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+        .qm-goto-dim { width: 100%; margin-bottom: 14px; padding: 10px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #F8FAFC; color: #64748B; font-size: 0.8rem; font-weight: 700; font-family: inherit; }
+        .qm-goto-dim b { color: var(--primary-color); }
+        .qm-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
+        .qm-type { padding: 12px 4px; border-radius: 10px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 0.84rem; font-weight: 800; color: #475569; font-family: inherit; }
+        .qm-type.on { background: #DC2626; border-color: #DC2626; color: #fff; }
+        .qm-ta { width: 100%; padding: 12px; border: 2px solid #CBD5E1; border-radius: 12px; font-size: 1rem; font-family: inherit; resize: vertical; margin-bottom: 12px; line-height: 1.5; }
+        .qm-ta:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
+        .qm-rate { color: #B91C1C !important; font-size: 0.86rem !important; }
+        .qm-rate b { font-size: 1.05rem; }
+        .qm-rate.warn { color: #92400E !important; }
+        #qmFormCard.editing { border: 2px solid var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.2); }
+        .qm-item.editing { border-color: var(--gold); }
+        .qm-item-types { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+        .qm-item-types span { font-size: 0.72rem; font-weight: 800; background: #FEE2E2; color: #991B1B; padding: 3px 8px; border-radius: 999px; }
+        .qm-item-rate { font-size: 0.72rem; font-weight: 900; color: #B91C1C; background: #FEF2F2; border: 1px solid #FECACA; padding: 2px 8px; border-radius: 999px; }
+        .qm-item-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; border-top: 1px solid #F1F5F9; padding-top: 8px; }
+        .qm-item-actions button { padding: 9px 4px; border-radius: 9px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 0.78rem; font-weight: 800; color: #334155; font-family: inherit; }
+        .qm-item-actions button.del { color: #DC2626; border-color: #FECACA; background: #fff; }
+        .qm-migrate { display: block; width: 100%; margin-top: 8px; padding: 9px; border-radius: 9px; border: 1px solid #F59E0B; background: #fff; color: #92400E; font-weight: 900; font-family: inherit; }
+        .qm-list-head input { height: 46px; font-size: 0.95rem; }
+        .qm-chip { font-size: 0.8rem; padding: 8px 12px; }
     </style>
 </head>
 <body>
@@ -830,138 +895,96 @@
             <button class="capture-btn light" id="timerCaptureBtn" onclick="captureView('timer-view', '측정선별시간')" title="화면 캡처 저장">📸</button>
         </div>
 
-        <!-- 🔮 CMM 측정 납기 예측기 -->
-        <div id="cmm-view" class="view cmm-view">
+        <!-- 📐 측정 소요시간 예측 (2026-09 개편: 카드형 품목 입력 · 시작시각 자동 · 결과 요약 우선) -->
+        <div id="cmm-view" class="view">
             <div class="sub-header">
                 <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
             </div>
-            <div class="cmm-scroll">
-            <div class="cmm-wrap">
-                <h1>
-                    📐 측정 소요시간 예측
-                    <small>수량 자동 균등 분할 · 세팅시간 · 납기여유</small>
-                </h1>
+            <div class="qm-scroll">
+            <div class="qm-wrap">
+                <div class="tb-guide">① <b>언제부터</b> 측정할지 정하고 → ② <b>측정할 품목</b>을 넣은 뒤 → <b>계산하기</b>를 누르면 끝나는 날짜가 나옵니다</div>
 
-                <!-- 핵심 입력: 시작 & 측정기 -->
-                <div class="card">
-                    <h3>⏱️ 시작 & 측정기</h3>
-                    <div class="cmm-field">
-                        <label>시작 일시</label>
-                        <div class="cmm-field-row">
-                            <input type="datetime-local" id="startDateTime" value="2026-06-16T08:00">
-                            <button type="button" id="nowBtn" class="button-outline">📆 지금</button>
-                        </div>
+                <!-- ① 시작 · 측정기 · 납기 -->
+                <div class="tb-card">
+                    <div class="tb-step"><span class="n">1</span>시작 · 측정기 · 납기</div>
+
+                    <label class="tb-label">측정 시작 일시</label>
+                    <div class="tb-row">
+                        <input class="tb-input cm-sm" type="datetime-local" id="startDateTime" style="flex:1;">
+                        <button type="button" id="nowBtn" class="cm-now">지금</button>
                     </div>
-                    <div class="cmm-field">
-                        <label>📏 측정기 대수</label>
-                        <select id="machineCount">
-                            <option value="1" selected>1대 (단일 순차 작업)</option>
-                            <option value="2">2대 (병렬 / 균등 분할)</option>
-                        </select>
+
+                    <label class="tb-label">측정기 몇 대로 하나요?</label>
+                    <div class="tb-seg">
+                        <button type="button" id="cmMc1" class="on" onclick="cmSetMachines(1)">1대<small>품목 순서대로 측정</small></button>
+                        <button type="button" id="cmMc2" onclick="cmSetMachines(2)">2대<small>나눠서 동시에 측정</small></button>
                     </div>
-                    <!-- 수량 균등 분할 옵션 (2대 선택 시 표시) -->
+                    <select id="machineCount" style="display:none;">
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                    </select>
                     <div id="splitOptionArea" style="display:none;">
-                        <label class="split-option-box">
-                            <input type="checkbox" id="autoSplitCheck" checked>
-                            ✂️ 수량 균등 자동 분할 <strong>(권장)</strong>
+                        <label class="cm-check">
+                            <input type="checkbox" id="autoSplitCheck" checked onchange="cmAutoSave()">
+                            <span>품목마다 수량을 <b>반씩 나눠</b> 두 대가 동시에 측정 <b>(권장)</b><br><small>끄면 품목 단위로 1호기·2호기에 나눠 배정합니다</small></span>
                         </label>
                     </div>
+
+                    <label class="tb-label" style="margin-top:4px;">목표 납기일 <span class="opt">— 선택</span></label>
+                    <input class="tb-input cm-sm" type="date" id="targetDeadline">
+                    <div class="tb-hint">넣으면 납기 안에 끝나는지 바로 알려줍니다.</div>
                 </div>
 
-                <!-- 고급 설정 (기본값 그대로, 접어둠) -->
-                <details class="cmm-advanced">
-                    <summary>⚙️ 고급 설정 <span class="cmm-advanced-hint">근무시간 · 효율 · 휴무일 · 목표납기 · 저장</span></summary>
-                    <div class="cmm-advanced-body">
-                        <div class="cmm-field-row2">
-                            <div class="cmm-field"><label>근무 시작</label><input type="time" id="workStart" value="08:00"></div>
-                            <div class="cmm-field"><label>근무 종료</label><input type="time" id="workEnd" value="17:00"></div>
-                        </div>
-                        <div class="cmm-field-row2">
-                            <div class="cmm-field"><label>점심 시작</label><input type="time" id="lunchStart" value="12:00"></div>
-                            <div class="cmm-field"><label>점심 종료</label><input type="time" id="lunchEnd" value="13:00"></div>
-                        </div>
-                        <div class="cmm-field">
-                            <label>설비효율 (%)</label>
-                            <input type="number" id="efficiency" value="100" step="1" min="1" max="200">
-                        </div>
-                        <!-- 장비별 잔업 동적 영역 -->
-                        <div id="overtimePerMachineContainer"></div>
-                        <div class="check-group">
-                            <label><input type="checkbox" id="excludeSat" checked> 🚫 토요일 제외</label>
-                            <label><input type="checkbox" id="excludeSun" checked> 🚫 일요일 제외</label>
-                        </div>
-                        <div class="cmm-field" style="margin-top:14px;">
-                            <label>🎯 목표 납기일 <span class="section-label">(선택)</span></label>
-                            <input type="date" id="targetDeadline">
-                        </div>
-                        <div class="cmm-field-row2" style="margin-top:14px;">
-                            <button id="saveDataBtn" class="button-outline" type="button">💾 저장</button>
-                            <button id="loadDataBtn" class="button-outline" type="button">📂 불러오기</button>
-                        </div>
-                    </div>
-                </details>
-
-                <!-- 품목 입력 테이블 -->
-                <div class="card" style="padding:18px 20px;">
-                    <h3>📦 품목 작업 리스트</h3>
-                    <div class="item-table-wrapper">
-                        <table id="itemTable">
-                            <thead>
-                                <tr>
-                                    <th>품목명</th>
-                                    <th>수량 (EA)</th>
-                                    <th>개당 측정시간 (분)</th>
-                                    <th>세팅시간 (분)</th>
-                                    <th style="width:70px;">삭제</th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemTableBody">
-                                <tr>
-                                    <td><input type="text" placeholder="예: A부품" value="A부품"></td>
-                                    <td><input type="number" value="100" step="1" min="0"></td>
-                                    <td><input type="number" value="15" step="1" min="0"></td>
-                                    <td><input type="number" value="20" step="1" min="0" placeholder="0"></td>
-                                    <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
-                                </tr>
-                                <tr>
-                                    <td><input type="text" placeholder="예: B부품" value="B부품"></td>
-                                    <td><input type="number" value="50" step="1" min="0"></td>
-                                    <td><input type="number" value="20" step="1" min="0"></td>
-                                    <td><input type="number" value="15" step="1" min="0" placeholder="0"></td>
-                                    <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
-                                </tr>
-                                <tr>
-                                    <td><input type="text" placeholder="예: C부품" value="C부품"></td>
-                                    <td><input type="number" value="80" step="1" min="0"></td>
-                                    <td><input type="number" value="10" step="1" min="0"></td>
-                                    <td><input type="number" value="10" step="1" min="0" placeholder="0"></td>
-                                    <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="action-bar">
-                        <button onclick="addItemRow()">➕ 품목 추가</button>
-                    </div>
+                <!-- ② 품목 -->
+                <div class="tb-card">
+                    <div class="tb-step"><span class="n">2</span>측정할 품목<small id="cmItemCount"></small></div>
+                    <div id="itemTableBody"></div>
+                    <button type="button" class="cm-add" onclick="addItemRow(true)">＋ 품목 추가</button>
                 </div>
 
-                <div style="text-align:center; margin:20px 0 10px;">
-                    <button id="calculateBtn" class="calc-btn">🔮 납기 계산 & 예측</button>
+                <!-- 고급 설정 (기존 로직 그대로, 스타일만 기존 .cmm-view 범위 사용) -->
+                <div class="cmm-view">
+                    <details class="cmm-advanced">
+                        <summary>⚙️ 근무시간 · 잔업 · 휴무일 설정 <span class="cmm-advanced-hint">평소엔 안 건드려도 됩니다</span></summary>
+                        <div class="cmm-advanced-body">
+                            <div class="cmm-field-row2">
+                                <div class="cmm-field"><label>근무 시작</label><input type="time" id="workStart" value="08:00" onchange="cmAutoSave()"></div>
+                                <div class="cmm-field"><label>근무 종료</label><input type="time" id="workEnd" value="17:00" onchange="cmAutoSave()"></div>
+                            </div>
+                            <div class="cmm-field-row2">
+                                <div class="cmm-field"><label>점심 시작</label><input type="time" id="lunchStart" value="12:00" onchange="cmAutoSave()"></div>
+                                <div class="cmm-field"><label>점심 종료</label><input type="time" id="lunchEnd" value="13:00" onchange="cmAutoSave()"></div>
+                            </div>
+                            <div class="cmm-field">
+                                <label>설비효율 (%) <span class="section-label">— 100이면 입력한 시간 그대로, 80이면 더 오래 걸린다고 계산</span></label>
+                                <input type="number" id="efficiency" value="100" step="1" min="1" max="200" onchange="cmAutoSave()">
+                            </div>
+                            <!-- 장비별 잔업 동적 영역 -->
+                            <div id="overtimePerMachineContainer"></div>
+                            <div class="check-group">
+                                <label><input type="checkbox" id="excludeSat" checked onchange="cmAutoSave()"> 🚫 토요일 쉼</label>
+                                <label><input type="checkbox" id="excludeSun" checked onchange="cmAutoSave()"> 🚫 일요일 쉼</label>
+                            </div>
+                            <div class="cmm-field-row2" style="margin-top:14px;">
+                                <button id="saveDataBtn" class="button-outline" type="button">💾 이 설정 보관</button>
+                                <button id="loadDataBtn" class="button-outline" type="button">📂 보관한 설정 불러오기</button>
+                            </div>
+                        </div>
+                    </details>
                 </div>
 
-                <div id="resultArea" class="result-area">
-                    <div style="text-align:center; color:#6c757d; padding:20px;">
-                        ⏳ 설정 후 [납기 계산] 버튼을 누르세요<br>
-                        <small>수량 균등 분할 · 세팅시간 반영 · 납기 여유 자동 계산</small>
-                    </div>
+                <button type="button" id="calculateBtn" class="tb-big-btn" style="margin-bottom:12px;">📅 계산하기</button>
+
+                <div class="cmm-view">
+                    <div id="resultArea"></div>
                 </div>
 
-                <div class="disclaimer-banner" style="margin: 16px 0 0;">
-                    ⚠️ 본 계산 결과는 참고용 예측치입니다. 실제 일정·납기는 현장 여건에 따라 달라질 수 있습니다.
+                <div class="disclaimer-banner" style="margin: 4px 0 0; white-space: normal;">
+                    ⚠️ 참고용 예측치입니다. 실제 일정은 현장 여건에 따라 달라질 수 있습니다.
                 </div>
             </div>
             </div>
-            <button class="capture-btn light" id="cmmCaptureBtn" onclick="captureView('cmm-view', 'CMM납기예측')" title="화면 캡처 저장">📸</button>
+            <button class="capture-btn light" id="cmmCaptureBtn" onclick="captureView('cmm-view', '측정소요시간예측')" title="화면 캡처 저장">📸</button>
         </div>
 
         <!-- 🦾 CMM 프로브 교육 시뮬레이터 -->
@@ -1075,115 +1098,82 @@
             </div>
         </div>
 
-        <!-- 📝 품질 메모장 -->
+        <!-- 📝 품질 기록 (2026-09 개편: 사출 불량 버튼 · 수량/불량률 · 수정 · 공유 · 엑셀 내보내기) -->
         <div id="memo-view" class="view">
             <div class="sub-header">
                 <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
             </div>
             <div class="qm-scroll">
             <div class="qm-wrap">
-                <div class="disclaimer-banner" style="margin:0 0 10px;">📵 이 기기(브라우저)에만 저장됩니다 · 중요한 내용은 저장 후 우측 하단 📸로 갤러리에 꼭 남겨두세요</div>
+                <div class="tb-guide">종류를 고르고 → 칸을 채운 뒤 → <b>💾 저장</b>. 저장한 기록은 아래 목록에서 <b>수정 · 카톡 공유 · 엑셀 내보내기</b>를 할 수 있습니다.</div>
 
-                <div class="qm-input-card">
-                    <div class="qm-cat-row">
-                        <button class="qm-cat on" id="qm-cat-defect" onclick="qmSetCategory('defect')">🔴 불량기록</button>
-                        <button class="qm-cat" id="qm-cat-cmm" onclick="qmSetCategory('cmm')">📐 3차원측정</button>
-                        <button class="qm-cat" id="qm-cat-quick" onclick="qmSetCategory('quick')">🧮 간이측정</button>
-                        <button class="qm-cat" id="qm-cat-etc" onclick="qmSetCategory('etc')">📝 기타</button>
-                    </div>
-                    <div class="qm-field" id="qm-part-field">
-                        <label>품번 / 도면번호</label>
-                        <input type="text" id="qmPartName" placeholder="예: XX-1234 브라켓">
-                    </div>
+                <div id="qmOldQuickNotice" class="tb-warn" style="margin:0 0 12px;"></div>
 
-                    <!-- 🔴 불량기록 전용 입력 -->
+                <!-- 새 기록 쓰기 -->
+                <div class="tb-card" id="qmFormCard">
+                    <div class="tb-step"><span class="n">✎</span><span id="qmFormTitle">새 기록 쓰기</span></div>
+
+                    <div class="qm-seg3">
+                        <button type="button" id="qm-cat-defect" class="on" onclick="qmSetCategory('defect')">🔴<br>불량</button>
+                        <button type="button" id="qm-cat-cmm" onclick="qmSetCategory('cmm')">📐<br>3차원측정</button>
+                        <button type="button" id="qm-cat-etc" onclick="qmSetCategory('etc')">📝<br>기타</button>
+                    </div>
+                    <button type="button" class="qm-goto-dim" onclick="switchView('dimension-view')">🧮 치수 측정값 합격/불합격은 → <b>치수 판정</b>에서</button>
+
+                    <label class="tb-label">품번 / 도면번호 <span class="opt">— 선택</span></label>
+                    <input class="tb-input cm-sm" type="text" id="qmPartName" placeholder="예: XX-1234 브라켓" autocomplete="off" style="margin-bottom:14px;">
+
+                    <!-- 🔴 불량 -->
                     <div id="qm-fields-defect">
-                        <div class="qm-field">
-                            <label>불량 유형</label>
-                            <select id="qmDefectType">
-                                <option value="치수">치수</option>
-                                <option value="형상">형상</option>
-                                <option value="외관">외관</option>
-                                <option value="조립">조립</option>
-                                <option value="기타">기타</option>
-                            </select>
+                        <label class="tb-label">불량 유형 <span class="opt">— 해당하는 것 모두 누르세요</span></label>
+                        <div class="qm-types" id="qmTypeChips"></div>
+
+                        <label class="tb-label">수량 <span class="opt">— 선택 (넣으면 불량률 자동 계산)</span></label>
+                        <div class="tb-two">
+                            <div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="qmNgQty" placeholder="불량" autocomplete="off" oninput="qmUpdateRate()"><span class="tb-unit">개</span></div>
+                            <div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="qmTotalQty" placeholder="검사" autocomplete="off" oninput="qmUpdateRate()"><span class="tb-unit">개</span></div>
                         </div>
-                        <div class="qm-field">
-                            <label>불량 내용</label>
-                            <textarea id="qmDefectContent" rows="3" placeholder="예: 웰드라인 발생, 2번 캐비티"></textarea>
-                        </div>
-                        <div class="qm-field" style="margin-bottom:12px;">
-                            <label>조치사항</label>
-                            <textarea id="qmDefectAction" rows="2" placeholder="예: 사출압 조정 후 재검사"></textarea>
-                        </div>
+                        <div class="tb-hint" id="qmRateHint" style="margin-bottom:12px;">왼쪽 = 불량 수량, 오른쪽 = 전체 검사 수량</div>
+
+                        <label class="tb-label">불량 내용 <span class="opt">— 위치·캐비티·로트 등</span></label>
+                        <textarea class="qm-ta" id="qmDefectContent" rows="3" placeholder="예: 2번 캐비티 게이트 반대편 웰드라인"></textarea>
+                        <label class="tb-label">조치사항 <span class="opt">— 선택</span></label>
+                        <textarea class="qm-ta" id="qmDefectAction" rows="2" placeholder="예: 금형온도 +10℃, 사출속도 조정 후 재검사"></textarea>
                     </div>
 
-                    <!-- 📐 3차원측정 전용 입력 -->
+                    <!-- 📐 3차원측정 -->
                     <div id="qm-fields-cmm" style="display:none;">
-                        <div class="qm-field">
-                            <label>측정 내용</label>
-                            <textarea id="qmCmmContent" rows="3" placeholder="예: A프로브 인덱싱 A90 B0 측정 중 형상공차 이상"></textarea>
-                        </div>
-                        <div class="qm-field" style="margin-bottom:12px;">
-                            <label>특이사항</label>
-                            <textarea id="qmCmmNote" rows="2" placeholder="예: 재측정 필요, 고객 통보 예정"></textarea>
-                        </div>
+                        <label class="tb-label">측정 내용</label>
+                        <textarea class="qm-ta" id="qmCmmContent" rows="3" placeholder="예: A90 B0 인덱싱으로 측정 중 평면도 초과"></textarea>
+                        <label class="tb-label">특이사항 <span class="opt">— 선택</span></label>
+                        <textarea class="qm-ta" id="qmCmmNote" rows="2" placeholder="예: 재측정 필요, 고객 통보 예정"></textarea>
                     </div>
 
-                    <!-- 📝 기타 전용 입력 -->
+                    <!-- 📝 기타 -->
                     <div id="qm-fields-etc" style="display:none;">
-                        <div class="qm-field" style="margin-bottom:12px;">
-                            <label>내용</label>
-                            <textarea id="qmContent" rows="4" placeholder="예: 기타 특이사항 메모"></textarea>
-                        </div>
+                        <label class="tb-label">내용</label>
+                        <textarea class="qm-ta" id="qmContent" rows="4" placeholder="예: 기타 특이사항"></textarea>
                     </div>
 
-                    <button class="qm-btn primary" id="qm-save-btn" onclick="qmSaveMemo()">💾 메모 저장</button>
+                    <button type="button" class="tb-big-btn" id="qm-save-btn" style="height:60px; font-size:1.2rem;" onclick="qmSaveMemo()">💾 저장</button>
+                    <button type="button" class="tb-ghost-btn gray" id="qm-cancel-btn" style="display:none; margin-top:8px;" onclick="qmCancelEdit()">수정 취소</button>
                 </div>
 
-                <!-- 🧮 간이측정 전용 화면 (메모가 아닌 표 형태) -->
-                <div id="qm-quickrecord-card" style="display:none;">
-                    <div class="pe-card">
-                        <div class="pe-num-field" style="margin-bottom:10px;">
-                            <label>허용오차 (±mm)</label>
-                            <input type="number" id="qrTolerance" value="0.05" step="0.01" min="0" oninput="qrRecalcAll()">
-                        </div>
-                        <div class="item-table-wrapper">
-                            <table id="qrTable">
-                                <thead>
-                                    <tr>
-                                        <th>항목</th>
-                                        <th>기준</th>
-                                        <th>측정값</th>
-                                        <th>판정</th>
-                                        <th style="width:40px;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="qrTableBody"></tbody>
-                            </table>
-                        </div>
-                        <button class="pe-btn outline" onclick="qrAddRow()">➕ 항목 추가</button>
-                    </div>
-                    <div class="pe-card" style="text-align:center;">
-                        <div class="pe-badge-row" style="justify-content:center; gap:16px;">
-                            <span id="qrTotal" style="font-weight:700; color:#334155;"></span>
-                            <span class="pe-badge ok" id="qrOkBadge"></span>
-                            <span class="pe-badge" id="qrNgBadge" style="background:#FEE2E2;color:#991B1B;"></span>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- 저장된 기록 -->
                 <div id="qm-list-section">
+                    <div class="tb-step" style="margin:6px 2px 10px;"><span class="n">≡</span>저장된 기록<small id="qmListCount"></small></div>
                     <div class="qm-list-head">
-                        <input type="text" id="qmSearch" placeholder="🔍 검색 (제품명/내용)" oninput="qmRenderList()">
+                        <input type="text" id="qmSearch" placeholder="🔍 품번·내용으로 찾기" oninput="qmRenderList()">
                         <div class="qm-filter-row">
                             <button class="qm-chip on" id="qm-filter-all" onclick="qmSetFilter('all')">전체</button>
-                            <button class="qm-chip" id="qm-filter-defect" onclick="qmSetFilter('defect')">불량기록</button>
-                            <button class="qm-chip" id="qm-filter-cmm" onclick="qmSetFilter('cmm')">3차원측정</button>
-                            <button class="qm-chip" id="qm-filter-etc" onclick="qmSetFilter('etc')">기타</button>
+                            <button class="qm-chip" id="qm-filter-defect" onclick="qmSetFilter('defect')">🔴 불량</button>
+                            <button class="qm-chip" id="qm-filter-cmm" onclick="qmSetFilter('cmm')">📐 3차원측정</button>
+                            <button class="qm-chip" id="qm-filter-etc" onclick="qmSetFilter('etc')">📝 기타</button>
                         </div>
                     </div>
                     <div id="qmList"></div>
+                    <button type="button" class="tb-link-btn" onclick="qmExportCsv()">📊 보이는 기록을 엑셀(CSV)로 내보내기</button>
+                    <div class="disclaimer-banner" style="margin:10px 0 0; white-space:normal;">📵 이 휴대폰(브라우저)에만 저장됩니다 · 중요한 기록은 엑셀로 내보내거나 📸로 남겨두세요</div>
                 </div>
             </div>
             </div>
@@ -1217,6 +1207,8 @@
                 initProbeEdu();
             } else if (viewId === 'memo-view') {
                 initMemo();
+            } else if (viewId === 'cmm-view') {
+                cmInit();
             }
         }
 
@@ -2119,7 +2111,8 @@
         function minutesToHourMin(m) {
             const h = Math.floor(m / 60);
             const min = Math.floor(m % 60);
-            return `${h}시간 ${min}분`;
+            if (h === 0) return `${min}분`;
+            return min ? `${h}시간 ${min}분` : `${h}시간`;
         }
         function formatDateTime(date) {
             if (!date) return '오류';
@@ -2281,7 +2274,7 @@
 
         function performCalculation() {
             const startDateStr = startDateTimeInput.value;
-            if (!startDateStr) { alert('시작 일시를 입력하세요.'); return; }
+            if (!startDateStr) { showToast('측정 시작 일시를 넣어주세요'); startDateTimeInput.focus(); return; }
             const startDate = new Date(startDateStr);
             if (isNaN(startDate.getTime())) { alert('시작일시 오류'); return; }
 
@@ -2310,19 +2303,34 @@
             const lunchStartMin = timeToMinutes(lunchStart);
             const lunchEndMin   = timeToMinutes(lunchEnd);
 
-            const rows = document.querySelectorAll('#itemTableBody tr');
+            // 품목 카드 읽기 (수량·1개 시간이 비어있는 카드는 건너뜀)
+            const cards = [...tableBody.querySelectorAll('.cm-item')];
             let itemsData = [];
-            for (let row of rows) {
-                const inputs = row.querySelectorAll('input');
-                if (inputs.length < 4) continue;
-                const name     = inputs[0].value.trim() || '미지정';
-                const qty      = parseFloat(inputs[1].value) || 0;
-                const perMin   = parseFloat(inputs[2].value) || 0;
-                const setupMin = parseFloat(inputs[3].value) || 0;
+            let firstBad = null;
+            cards.forEach((card, i) => {
+                const name     = card.querySelector('.cm-name').value.trim() || `품목 ${i + 1}`;
+                const qty      = cmNum(card.querySelector('.cm-qty').value);
+                const perMin   = cmNum(card.querySelector('.cm-min').value) + cmNum(card.querySelector('.cm-sec').value) / 60;
+                const setupMin = cmNum(card.querySelector('.cm-setup').value);
+                card.classList.remove('bad');
+                if (!qty || !perMin) {
+                    const touched = [...card.querySelectorAll('input')].some(inp => inp.value.trim() !== '');
+                    if (touched) { card.classList.add('bad'); if (!firstBad) firstBad = card; }
+                    return;
+                }
                 const totalRaw = qty * perMin + setupMin;
                 itemsData.push({ name, qty, perMin, setupMin, totalMinutes: totalRaw, requiredMinutes: totalRaw / effFactor });
+            });
+            if (firstBad) {
+                firstBad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                showToast('빨간 테두리 품목의 수량 또는 1개 측정 시간이 비어 있습니다');
+                return;
             }
-            if (itemsData.length === 0) { alert('품목을 최소 1개 입력하세요.'); return; }
+            if (itemsData.length === 0) {
+                if (cards[0]) cards[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+                showToast('품목의 수량과 1개 측정 시간을 넣어주세요');
+                return;
+            }
 
             const totalRawSum      = itemsData.reduce((s,it) => s + it.totalMinutes, 0);
             const totalRequiredSum = itemsData.reduce((s,it) => s + it.requiredMinutes, 0);
@@ -2365,212 +2373,324 @@
                 }
             }
 
-            let html = '';
+            // ── 결과 (2026-09 개편: 완료 예정일·납기 여부를 맨 위에 크게) ──
+            const pad2 = n => String(n).padStart(2, '0');
+            const fmtK = d => `${d.getMonth() + 1}월 ${d.getDate()}일 (${'일월화수목금토'[d.getDay()]}) ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+            const fmtDiff = ms => {
+                const totalMin = Math.round(Math.abs(ms) / 60000);
+                const d = Math.floor(totalMin / 1440), h = Math.floor((totalMin % 1440) / 60), m = totalMin % 60;
+                if (d > 0) return `${d}일 ${h}시간`;
+                if (h > 0) return `${h}시간 ${m}분`;
+                return `${m}분`;
+            };
 
-            html += `<div class="result-card"><h3>📊 전체 측정 예측 (${machineCount}대 처리${splitMode ? ' / 수량 균등 분할' : ''})</h3>`;
-            html += `<div class="stat-grid">
-                <div class="stat-item">
-                    <strong>⚙️ 총 작업량</strong><br>${minutesToHourMin(totalRequiredSum)}<br>
-                    <span class="section-label">효율 ${efficiency}% 적용</span>
-                </div>
-                <div class="stat-item">
-                    <strong>📅 예상 작업일</strong><br>
-                    <span class="workday-badge">${estimatedDays.toFixed(2)} 일</span>
-                </div>
+            let late = false, dlHtml = '';
+            if (targetDeadlineStr) {
+                const deadlineDate = new Date(targetDeadlineStr);
+                deadlineDate.setHours(23, 59, 59, 999);
+                const diffMs = deadlineDate - finalFinishDate;
+                const dlLabel = `${deadlineDate.getMonth() + 1}월 ${deadlineDate.getDate()}일 (${'일월화수목금토'[deadlineDate.getDay()]})`;
+                late = diffMs < 0;
+                dlHtml = late
+                    ? `<div class="cm-dl late">⚠️ 납기 ${dlLabel}보다 <b>${fmtDiff(diffMs)}</b> 늦어요<br><small>측정기를 늘리거나 잔업(⚙️ 설정)을 넣어 다시 계산해 보세요</small></div>`
+                    : `<div class="cm-dl ok">✅ 납기 ${dlLabel}까지 <b>${fmtDiff(diffMs)}</b> 여유</div>`;
+            }
+
+            let html = '';
+            html += `<div class="cm-hero ${late ? 'late' : ''}">
+                <div class="k">측정 완료 예정</div>
+                <div class="v">${fmtK(finalFinishDate)}</div>
+                <div class="s">${fmtK(startDate)} 시작 · 측정기 ${machineCount}대${machineCount >= 2 ? (splitMode ? ' (수량 반씩 나눠서)' : ' (품목별 배정)') : ''}</div>
+                ${dlHtml}
             </div>`;
+
+            html += `<div class="cm-stats">
+                <div class="tb-sum"><div class="k">총 작업시간</div><div class="v">${minutesToHourMin(totalRequiredSum)}</div></div>
+                <div class="tb-sum"><div class="k">측정 + 세팅</div><div class="v" style="font-size:.86rem;">${minutesToHourMin(totalMeasureSum)}<br>+ ${minutesToHourMin(totalSetupSum)}</div></div>
+                <div class="tb-sum"><div class="k">근무일 기준</div><div class="v">약 ${estimatedDays.toFixed(1)}일</div></div>
+            </div>`;
+            if (efficiency !== 100) html += `<div class="tb-hint" style="margin:-4px 0 10px;">설비효율 ${efficiency}%를 반영한 시간입니다.</div>`;
 
             if (machineCount >= 2) {
                 const finishTimes = scheduleResult.machineFinishTimes || [];
-                html += `<div class="stat-grid" style="background:#eef2ff;border-radius:20px;padding:12px 16px;margin:4px 0;">`;
+                html += `<div class="cm-machines">`;
                 for (let m = 0; m < machineCount; m++) {
                     const load = scheduleResult.machineLoads[m] || 0;
-                    const ft   = finishTimes[m] ? formatDateTime(finishTimes[m]) : '-';
-                    html += `<div class="stat-item" style="background:white;">
-                        <strong>🔧 장비 ${m+1} 배정 부하</strong><br>${minutesToHourMin(load)}<br>
-                        <span class="section-label">예상 종료: ${ft}</span>
-                    </div>`;
-                }
-                if (splitMode) {
-                    html += `<div class="stat-item" style="background:white;">
-                        <strong>⚡ 병렬 처리 상태</strong><br>
-                        <span class="parallel-ok-badge">✅ 장비 ${machineCount}대 균등 분배 완료</span><br>
-                        <span class="section-label">모든 품목 수량 ${machineCount}등분 처리</span>
-                    </div>`;
-                } else {
-                    html += `<div class="stat-item" style="background:white;">
-                        <strong>⚡ 병렬 처리 상태</strong><br>
-                        품목 단위 LPT 배분<br>
-                        <span class="section-label">균등분할 사용 시 효율 최대화</span>
-                    </div>`;
+                    const ft = finishTimes[m] ? fmtK(finishTimes[m]) : '-';
+                    html += `<div class="cm-mc"><div class="t">🔧 ${m + 1}호기</div><div class="d">작업 ${minutesToHourMin(load)}<br>끝: <b>${ft}</b></div></div>`;
                 }
                 html += `</div>`;
             }
 
-            html += `<div style="margin-top:12px;">
-                <span class="highlight-date">🎯 최종 완료 예정 : ${formatDateTime(finalFinishDate)}</span>
-                ${deadlineHtml}
-            </div></div>`;
-
-            html += `<div class="result-card"><h3>📋 품목별 완료 예정${splitMode ? ' (수량 균등 분할 · 1호기·2호기 동시 처리)' : ' (장비별 배정)'}</h3>
-            <div class="item-table-wrapper">
-            <table class="per-item-table">
-                <thead><tr>
-                    <th>품목명</th>
-                    <th>배정 장비</th>
-                    <th>배정 수량</th>
-                    <th>완료 예정일시</th>
-                </tr></thead>
-                <tbody>`;
-
+            html += `<div class="cm-res-title">📋 품목별 끝나는 시각</div>`;
             if (splitMode) {
                 const itemNames = [...new Set(itemsData.map(it => it.name))];
                 for (let name of itemNames) {
-                    const jobsOfItem = perItemDetails.filter(j => j.name === name).sort((a,b) => a.machineNo - b.machineNo);
+                    const jobsOfItem = perItemDetails.filter(j => j.name === name).sort((a, b) => a.machineNo - b.machineNo);
                     if (jobsOfItem.length === 0) continue;
                     const lastFinish = new Date(Math.max(...jobsOfItem.map(j => j.finishDate.getTime())));
-                    const originalQty = jobsOfItem[0].originalQty;
-
-                    if (jobsOfItem.length >= 2) {
-                        const machineLabels = jobsOfItem.map(j => `${j.machineNo}호기`).join(' · ');
-                        const qtyLabels     = jobsOfItem.map(j => `${j.qty}EA`).join(' / ');
-
-                        html += `<tr style="background:#fffbeb;">
-                            <td rowspan="${jobsOfItem.length + 1}"><strong>${escapeHtml(name)}</strong><br><span class="section-label">원본 ${originalQty} EA</span></td>
-                            <td><span class="machine-badge-both">🔄 ${machineLabels} 동시</span></td>
-                            <td style="text-align:center;">${qtyLabels}</td>
-                            <td><strong style="color:#b91c1c;">${formatDateTime(lastFinish)}</strong><br><span class="section-label">양 장비 중 늦은 쪽 기준</span></td>
-                        </tr>`;
-                        for (let j of jobsOfItem) {
-                            html += `<tr>
-                                <td><span class="machine-badge">${j.machineNo}호기</span></td>
-                                <td style="text-align:center;">${j.qty} EA</td>
-                                <td>${formatDateTime(j.finishDate)}</td>
-                            </tr>`;
-                        }
-                    } else {
-                        const j = jobsOfItem[0];
-                        html += `<tr>
-                            <td><strong>${escapeHtml(name)}</strong></td>
-                            <td><span class="machine-badge">${j.machineNo}호기</span></td>
-                            <td style="text-align:center;">${j.qty} EA</td>
-                            <td><strong style="color:#b91c1c;">${formatDateTime(j.finishDate)}</strong></td>
-                        </tr>`;
-                    }
+                    const split = jobsOfItem.map(j => `${j.machineNo}호기 ${j.qty}개`).join(' · ');
+                    html += `<div class="cm-res-item">
+                        <div class="n">${escapeHtml(name)} <span>총 ${jobsOfItem[0].originalQty}개</span></div>
+                        <div class="m">${split}</div>
+                        <div class="f">${fmtK(lastFinish)}</div>
+                    </div>`;
                 }
             } else {
-                const sortedByFinish = [...perItemDetails].sort((a,b) => a.finishDate - b.finishDate);
+                const sortedByFinish = [...perItemDetails].sort((a, b) => a.finishDate - b.finishDate);
                 for (let res of sortedByFinish) {
-                    const machineInfo = res.machineNo ? `${res.machineNo}호기` : '단일';
-                    html += `<tr>
-                        <td>${escapeHtml(res.name)}</td>
-                        <td><span class="machine-badge">${machineInfo}</span></td>
-                        <td style="text-align:center;">${res.qty} EA</td>
-                        <td><strong style="color:#b91c1c;">${formatDateTime(res.finishDate)}</strong></td>
-                    </tr>`;
+                    html += `<div class="cm-res-item">
+                        <div class="n">${escapeHtml(res.name)} <span>${res.qty}개</span></div>
+                        <div class="m">${machineCount >= 2 ? `${res.machineNo}호기에서 측정` : '순서대로 측정'}</div>
+                        <div class="f">${fmtK(res.finishDate)}</div>
+                    </div>`;
                 }
             }
 
-            html += `</tbody></table></div></div>`;
-
             resultArea.innerHTML = html;
+            resultArea.scrollIntoView({ block: 'start', behavior: 'smooth' });
         }
 
-        window.addItemRow = function() {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="text" placeholder="품목명"></td>
-                <td><input type="number" value="1" step="1" min="0"></td>
-                <td><input type="number" value="10" step="1" min="0"></td>
-                <td><input type="number" value="0" step="1" min="0" placeholder="0"></td>
-                <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
-            `;
-            tableBody.appendChild(row);
+        // ── 품목 카드 (2026-09 개편: 표 → 카드, 1개당 시간 분·초 분리) ──
+        function cmNum(v) {
+            const n = parseFloat(String(v === undefined || v === null ? '' : v).replace(/,/g, '').replace(/[^\d.]/g, ''));
+            return isFinite(n) && n > 0 ? n : 0;
+        }
+        function cmAttr(v) { return escapeHtml(String(v === undefined || v === null ? '' : v)); }
+
+        function cmItemHtml(d) {
+            d = d || {};
+            return `
+                <div class="cm-item-head">
+                    <span class="cm-item-no">품목</span>
+                    <button type="button" class="tb-del" title="이 품목 삭제" onclick="deleteRow(this)">×</button>
+                </div>
+                <input class="tb-input cm-sm cm-name" type="text" placeholder="품목명 (예: A브라켓)" autocomplete="off" value="${cmAttr(d.name)}">
+                <div class="tb-two" style="margin-top:10px;">
+                    <div>
+                        <label class="tb-label">측정 수량</label>
+                        <div class="tb-input-wrap"><input class="tb-input cm-qty" type="text" inputmode="numeric" placeholder="예: 100" autocomplete="off" value="${cmAttr(d.qty)}"><span class="tb-unit">개</span></div>
+                    </div>
+                    <div>
+                        <label class="tb-label">세팅시간 <span class="opt">(없으면 0)</span></label>
+                        <div class="tb-input-wrap"><input class="tb-input cm-setup" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.setup)}"><span class="tb-unit">분</span></div>
+                    </div>
+                </div>
+                <label class="tb-label" style="margin-top:10px;">1개 측정하는 데 걸리는 시간</label>
+                <div class="tb-two">
+                    <div class="tb-input-wrap"><input class="tb-input cm-min" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.min)}"><span class="tb-unit">분</span></div>
+                    <div class="tb-input-wrap"><input class="tb-input cm-sec" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.sec)}"><span class="tb-unit">초</span></div>
+                </div>
+                <button type="button" class="cm-import" onclick="cmImportAvg(this)">⏱ '측정·선별 시간'에서 잰 평균 넣기</button>
+                <div class="cm-item-sum"></div>`;
+        }
+
+        function cmRenumber() {
+            const cards = tableBody.querySelectorAll('.cm-item');
+            cards.forEach((c, i) => { c.querySelector('.cm-item-no').innerText = `품목 ${i + 1}`; });
+            document.getElementById('cmItemCount').innerText = `${cards.length}개`;
+        }
+
+        function cmUpdateItemSum(card) {
+            const qty = cmNum(card.querySelector('.cm-qty').value);
+            const per = cmNum(card.querySelector('.cm-min').value) + cmNum(card.querySelector('.cm-sec').value) / 60;
+            const setup = cmNum(card.querySelector('.cm-setup').value);
+            const el = card.querySelector('.cm-item-sum');
+            if (!qty || !per) {
+                el.className = 'cm-item-sum idle';
+                el.innerText = !qty ? '측정 수량을 넣어주세요' : '1개 측정 시간을 넣어주세요';
+                return;
+            }
+            el.className = 'cm-item-sum';
+            el.innerHTML = `이 품목 합계 ≈ <b>${minutesToHourMin(qty * per + setup)}</b>`;
+        }
+
+        window.addItemRow = function(focus, data) {
+            const card = document.createElement('div');
+            card.className = 'cm-item';
+            card.innerHTML = cmItemHtml(data);
+            tableBody.appendChild(card);
+            cmRenumber();
+            cmUpdateItemSum(card);
+            if (focus === true) {
+                card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                setTimeout(() => card.querySelector('.cm-name').focus(), 250);
+                cmAutoSave();
+            }
+            return card;
         };
         window.deleteRow = function(btn) {
-            const row = btn.closest('tr');
-            if (tableBody.children.length > 1) row.remove();
-            else alert('최소 1개 품목은 필요합니다.');
+            const card = btn.closest('.cm-item');
+            if (tableBody.querySelectorAll('.cm-item').length <= 1) {
+                card.querySelectorAll('input').forEach(i => i.value = '');
+                cmUpdateItemSum(card);
+                showToast('마지막 품목은 지우는 대신 비웠습니다');
+            } else {
+                card.remove();
+                cmRenumber();
+            }
+            cmAutoSave();
         };
 
-        nowBtn.addEventListener('click', () => {
-            const now = new Date();
-            const pad = n => String(n).padStart(2,'0');
-            startDateTimeInput.value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        tableBody.addEventListener('input', e => {
+            const card = e.target.closest('.cm-item');
+            if (card) cmUpdateItemSum(card);
+            cmAutoSave();
         });
 
+        function cmReadItemInputs() {
+            return [...tableBody.querySelectorAll('.cm-item')].map(card => ({
+                name: card.querySelector('.cm-name').value,
+                qty: card.querySelector('.cm-qty').value,
+                setup: card.querySelector('.cm-setup').value,
+                min: card.querySelector('.cm-min').value,
+                sec: card.querySelector('.cm-sec').value
+            }));
+        }
+
+        // '측정·선별 시간 > 시간 재기' 기록의 1개당 평균을 이 품목에 넣기
+        function cmImportAvg(btn) {
+            const card = btn.closest('.cm-item');
+            const recs = (typeof st !== 'undefined' && st && Array.isArray(st.records)) ? st.records : [];
+            if (!recs.length) { showToast("'측정·선별 시간'에 저장된 기록이 없습니다"); return; }
+            const withQty = recs.filter(r => r.qty);
+            const perSec = withQty.length
+                ? withQty.reduce((a, r) => a + r.ms / 1000 / r.qty, 0) / withQty.length
+                : recs.reduce((a, r) => a + r.ms, 0) / recs.length / 1000;
+            const total = Math.round(perSec);
+            card.querySelector('.cm-min').value = Math.floor(total / 60);
+            card.querySelector('.cm-sec').value = total % 60;
+            cmUpdateItemSum(card);
+            cmAutoSave();
+            showToast(`기록 ${recs.length}건 평균 ${Math.floor(total / 60)}분 ${total % 60}초를 넣었습니다`);
+        }
+
+        function cmSetMachines(n) {
+            machineCountSelect.value = String(n);
+            onMachineCountChange();
+            document.getElementById('cmMc1').classList.toggle('on', n === 1);
+            document.getElementById('cmMc2').classList.toggle('on', n === 2);
+            cmAutoSave();
+        }
+
+        function cmPadDT(d) {
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        nowBtn.addEventListener('click', () => {
+            startDateTimeInput.value = cmPadDT(new Date());
+            cmStartTouched = true;
+            showToast('시작 시각을 지금으로 맞췄습니다');
+        });
+
+        // 자동 보관 (품목·측정기·근무설정) → 다시 열어도 그대로. 시작일시·납기는 매번 새로.
+        const CM_AUTO_KEY = 'cmm_auto_v1';
+        function cmAutoSave() {
+            try {
+                const cnt = parseInt(machineCountSelect.value, 10);
+                localStorage.setItem(CM_AUTO_KEY, JSON.stringify({
+                    items: cmReadItemInputs(),
+                    machineCount: cnt,
+                    autoSplit: autoSplitCheck.checked,
+                    workStart: workStartInput.value, workEnd: workEndInput.value,
+                    lunchStart: lunchStartInput.value, lunchEnd: lunchEndInput.value,
+                    efficiency: efficiencyInput.value,
+                    excludeSat: excludeSatCheck.checked, excludeSun: excludeSunCheck.checked,
+                    machineOvertimes: machineOvertimes.slice(0, cnt)
+                }));
+            } catch (e) {}
+        }
+        overtimePerMachineDiv.addEventListener('change', () => cmAutoSave());
+
+        function cmApplyConfig(d, includeDates) {
+            if (includeDates) {
+                if (d.startDateTime) { startDateTimeInput.value = d.startDateTime; cmStartTouched = true; }
+                targetDeadlineInput.value = d.targetDeadline || '';
+            }
+            workStartInput.value  = d.workStart  || '08:00';
+            workEndInput.value    = d.workEnd    || '17:00';
+            lunchStartInput.value = d.lunchStart || '12:00';
+            lunchEndInput.value   = d.lunchEnd   || '13:00';
+            efficiencyInput.value = d.efficiency ?? 100;
+            excludeSatCheck.checked = d.excludeSat ?? true;
+            excludeSunCheck.checked = d.excludeSun ?? true;
+            autoSplitCheck.checked = d.autoSplit ?? true;
+            machineOvertimes = Array.isArray(d.machineOvertimes) ? [...d.machineOvertimes] : [0, 0];
+            while (machineOvertimes.length < 2) machineOvertimes.push(0);
+            const n = parseInt(d.machineCount, 10) === 2 ? 2 : 1;
+            machineCountSelect.value = String(n);
+            onMachineCountChange();
+            document.getElementById('cmMc1').classList.toggle('on', n === 1);
+            document.getElementById('cmMc2').classList.toggle('on', n === 2);
+            if (Array.isArray(d.items)) {
+                tableBody.innerHTML = '';
+                d.items.forEach(it => {
+                    // 예전 저장 형식(perMin = 분, 소수) 호환
+                    if (it.min === undefined && it.perMin !== undefined) {
+                        const pm = parseFloat(it.perMin) || 0;
+                        it = { name: it.name, qty: it.qty, setup: it.setupMin, min: Math.floor(pm), sec: Math.round((pm % 1) * 60) || '' };
+                    }
+                    addItemRow(false, it);
+                });
+                if (!tableBody.children.length) addItemRow(false);
+            }
+        }
+
         saveBtn.addEventListener('click', () => {
-            const items = [];
-            document.querySelectorAll('#itemTableBody tr').forEach(row => {
-                const inputs = row.querySelectorAll('input');
-                if (inputs.length >= 4) items.push({ name: inputs[0].value, qty: inputs[1].value, perMin: inputs[2].value, setupMin: inputs[3].value });
-            });
             const cnt = parseInt(machineCountSelect.value, 10);
-            const savedOvertimes = [];
-            for (let i = 0; i < cnt; i++) savedOvertimes.push(machineOvertimes[i] || 0);
             const config = {
                 startDateTime: startDateTimeInput.value,
                 workStart: workStartInput.value, workEnd: workEndInput.value,
                 lunchStart: lunchStartInput.value, lunchEnd: lunchEndInput.value,
-                efficiency: efficiencyInput.value, machineCount: machineCountSelect.value,
+                efficiency: efficiencyInput.value, machineCount: cnt,
                 excludeSat: excludeSatCheck.checked, excludeSun: excludeSunCheck.checked,
                 targetDeadline: targetDeadlineInput.value,
                 autoSplit: autoSplitCheck.checked,
-                machineOvertimes: savedOvertimes,
-                items
+                machineOvertimes: machineOvertimes.slice(0, cnt),
+                items: cmReadItemInputs()
             };
-            localStorage.setItem('cmm_v4', JSON.stringify(config));
-            showToast('저장 완료 (cmm_v4) ✅');
+            try { localStorage.setItem('cmm_v4', JSON.stringify(config)); showToast('현재 설정과 품목을 보관했습니다 ✅'); }
+            catch (e) { showToast('보관에 실패했습니다'); }
         });
 
         loadBtn.addEventListener('click', () => {
             const saved = localStorage.getItem('cmm_v4');
-            if (!saved) { showToast('저장된 데이터 없음'); return; }
+            if (!saved) { showToast('보관한 설정이 없습니다'); return; }
             try {
-                const d = JSON.parse(saved);
-                startDateTimeInput.value = d.startDateTime || startDateTimeInput.value;
-                workStartInput.value  = d.workStart  || '08:00';
-                workEndInput.value    = d.workEnd    || '17:00';
-                lunchStartInput.value = d.lunchStart || '12:00';
-                lunchEndInput.value   = d.lunchEnd   || '13:00';
-                efficiencyInput.value = d.efficiency ?? 100;
-                machineCountSelect.value = d.machineCount ?? '1';
-                excludeSatCheck.checked = d.excludeSat ?? true;
-                excludeSunCheck.checked = d.excludeSun ?? true;
-                targetDeadlineInput.value = d.targetDeadline || '';
-                autoSplitCheck.checked = d.autoSplit ?? true;
-                machineOvertimes = Array.isArray(d.machineOvertimes) ? [...d.machineOvertimes] : [0,0];
-                while (machineOvertimes.length < 2) machineOvertimes.push(0);
-                onMachineCountChange();
-                const cnt = parseInt(machineCountSelect.value, 10);
-                for (let i = 0; i < cnt; i++) {
-                    const inp = document.getElementById(`machineOvertime_${i}`);
-                    if (inp && machineOvertimes[i] !== undefined) inp.value = machineOvertimes[i];
-                }
-                if (d.items && Array.isArray(d.items)) {
-                    tableBody.innerHTML = '';
-                    for (let it of d.items) {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td><input type="text" value="${escapeHtml(it.name||'')}"></td>
-                            <td><input type="number" value="${it.qty??1}"></td>
-                            <td><input type="number" value="${it.perMin??10}"></td>
-                            <td><input type="number" value="${it.setupMin??0}" placeholder="0"></td>
-                            <td><button class="button-outline" onclick="deleteRow(this)">삭제</button></td>
-                        `;
-                        tableBody.appendChild(row);
-                    }
-                    if (tableBody.children.length === 0) addItemRow();
-                }
-                showToast('불러오기 완료 ✅');
-            } catch(e) { alert('오류: ' + e.message); }
+                cmApplyConfig(JSON.parse(saved), false);
+                cmAutoSave();
+                showToast('보관한 설정과 품목을 불러왔습니다 ✅');
+            } catch (e) { alert('불러오기 오류: ' + e.message); }
         });
 
-        calculateBtn.addEventListener('click', performCalculation);
+        calculateBtn.addEventListener('click', () => {
+            performCalculation();
+        });
+
+        let cmInitialized = false;
+        let cmStartTouched = false;
+        startDateTimeInput.addEventListener('input', () => { cmStartTouched = true; });
+
+        function cmInit() {
+            if (!cmInitialized) {
+                cmInitialized = true;
+                let restored = false;
+                try {
+                    const s = JSON.parse(localStorage.getItem(CM_AUTO_KEY) || 'null');
+                    if (s && Array.isArray(s.items) && s.items.length) { cmApplyConfig(s, false); restored = true; }
+                } catch (e) {}
+                if (!restored) { tableBody.innerHTML = ''; addItemRow(false); }
+                resultArea.innerHTML = `<div class="cm-wait">품목을 넣고 <b>📅 계산하기</b>를 누르면<br>여기에 끝나는 날짜가 나옵니다</div>`;
+            }
+            // 시작 일시는 열 때마다 '지금'으로 (직접 바꾼 경우는 유지)
+            if (!cmStartTouched) startDateTimeInput.value = cmPadDT(new Date());
+        }
 
         machineCountSelect.value = '1';
         machineOvertimes = [0, 0];
         onMachineCountChange();
-        window.addEventListener('load', () => { performCalculation(); });
+
 
         // ==================== 🦾 CMM 프로브 교육 시뮬레이터 (pe- 접두사) ====================
         const peProbeData = {
@@ -2971,17 +3091,28 @@
             }
         }
 
-        // ==================== 📝 품질 메모장 (qm- 접두사, localStorage 저장) ====================
+        // ==================== 📝 품질 기록 (2026-09 개편, qm- 접두사, localStorage 저장) ====================
+        //  - 저장 키는 기존과 동일(qc_quality_memos) → 예전 기록도 그대로 보임
+        //  - 불량: 사출 불량 유형 버튼(복수 선택) + 불량/검사 수량 → 불량률
+        //  - 기록마다 수정 · 공유(카톡 등) · 삭제, 전체 CSV 내보내기
+        //  - 예전 '간이측정' 탭은 치수 판정으로 대체. 남아있는 간이측정 데이터(qc_quick_record)는
+        //    지우지 않고, 원하면 기록 1건으로 옮길 수 있게 안내만 표시
         const QM_STORAGE_KEY = 'qc_quality_memos';
+        const QM_DEFECT_TYPES = ['미성형', '버(Burr)', '웰드라인', '싱크마크(수축)', '휨·변형', '은줄', '기포', '흑점·이물', '크랙', '치수', '외관기타', '기타'];
+        const QM_CAT_LABEL = { defect: '🔴 불량', cmm: '📐 3차원측정', etc: '📝 기타', quick: '🧮 간이측정' };
         let qmMemos = [];
         let qmActiveCategory = 'defect';
         let qmActiveFilter = 'all';
         let qmInitialized = false;
+        let qmSelTypes = [];
+        let qmEditingId = null;
 
         function initMemo() {
             if (!qmInitialized) {
                 qmInitialized = true;
                 qmLoadMemos();
+                qmRenderTypeChips();
+                qmCheckOldQuick();
             }
             qmRenderList();
         }
@@ -2990,29 +3121,54 @@
             try {
                 const raw = localStorage.getItem(QM_STORAGE_KEY);
                 qmMemos = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(qmMemos)) qmMemos = [];
             } catch (e) { qmMemos = []; }
         }
-
         function qmSaveToStorage() {
-            try {
-                localStorage.setItem(QM_STORAGE_KEY, JSON.stringify(qmMemos));
-            } catch (e) { /* 저장소 사용 불가(용량 초과 등) 시 무시 */ }
+            try { localStorage.setItem(QM_STORAGE_KEY, JSON.stringify(qmMemos)); return true; }
+            catch (e) { showToast('저장 공간이 부족합니다. 오래된 기록을 내보낸 뒤 지워주세요'); return false; }
+        }
+
+        function qmRenderTypeChips() {
+            document.getElementById('qmTypeChips').innerHTML = QM_DEFECT_TYPES.map(t =>
+                `<button type="button" class="qm-type${qmSelTypes.includes(t) ? ' on' : ''}" onclick="qmToggleType(this, '${t}')">${t}</button>`
+            ).join('');
+        }
+        function qmToggleType(btn, t) {
+            const i = qmSelTypes.indexOf(t);
+            if (i >= 0) qmSelTypes.splice(i, 1); else qmSelTypes.push(t);
+            btn.classList.toggle('on', i < 0);
+        }
+
+        function qmNum(v) {
+            const n = parseFloat(String(v || '').replace(/,/g, '').replace(/[^\d.]/g, ''));
+            return isFinite(n) && n >= 0 ? n : null;
+        }
+        function qmRate(ng, total) {
+            if (ng === null || total === null || !total) return null;
+            return ng / total * 100;
+        }
+        function qmFmtRate(r) { return r === null ? '' : (r < 10 ? r.toFixed(2) : r.toFixed(1)) + '%'; }
+        function qmUpdateRate() {
+            const ng = qmNum(document.getElementById('qmNgQty').value);
+            const total = qmNum(document.getElementById('qmTotalQty').value);
+            const hint = document.getElementById('qmRateHint');
+            const r = qmRate(ng, total);
+            if (r === null) {
+                hint.className = 'tb-hint'; hint.innerHTML = '왼쪽 = 불량 수량, 오른쪽 = 전체 검사 수량';
+            } else if (ng > total) {
+                hint.className = 'tb-hint qm-rate warn'; hint.innerHTML = '⚠️ 불량 수량이 검사 수량보다 많습니다';
+            } else {
+                hint.className = 'tb-hint qm-rate'; hint.innerHTML = `불량률 <b>${qmFmtRate(r)}</b> (${ng}/${total}개)`;
+            }
         }
 
         function qmSetCategory(cat) {
             qmActiveCategory = cat;
-            ['defect', 'cmm', 'etc', 'quick'].forEach(c => {
+            ['defect', 'cmm', 'etc'].forEach(c => {
                 document.getElementById('qm-cat-' + c).classList.toggle('on', c === cat);
-                const fieldEl = document.getElementById('qm-fields-' + c);
-                if (fieldEl) fieldEl.style.display = (c === cat) ? '' : 'none';
+                document.getElementById('qm-fields-' + c).style.display = (c === cat) ? '' : 'none';
             });
-
-            const isQuick = (cat === 'quick');
-            document.getElementById('qm-part-field').style.display = isQuick ? 'none' : '';
-            document.getElementById('qm-save-btn').style.display = isQuick ? 'none' : '';
-            document.getElementById('qm-quickrecord-card').style.display = isQuick ? '' : 'none';
-            document.getElementById('qm-list-section').style.display = isQuick ? 'none' : '';
-            if (isQuick) initQuickRecord();
         }
 
         function qmSetFilter(f) {
@@ -3021,197 +3177,275 @@
             qmRenderList();
         }
 
-        function qmSaveMemo() {
-            const part = document.getElementById('qmPartName').value.trim();
-            let content = '';
-
-            if (qmActiveCategory === 'defect') {
-                const type = document.getElementById('qmDefectType').value;
-                const detail = document.getElementById('qmDefectContent').value.trim();
-                const action = document.getElementById('qmDefectAction').value.trim();
-                if (!detail) { showToast('불량 내용을 입력해주세요'); return; }
-                content = `[불량유형] ${type}\n[불량내용] ${detail}` + (action ? `\n[조치사항] ${action}` : '');
-            } else if (qmActiveCategory === 'cmm') {
-                const measure = document.getElementById('qmCmmContent').value.trim();
-                const note = document.getElementById('qmCmmNote').value.trim();
-                if (!measure) { showToast('측정 내용을 입력해주세요'); return; }
-                content = `[측정내용] ${measure}` + (note ? `\n[특이사항] ${note}` : '');
-            } else {
-                content = document.getElementById('qmContent').value.trim();
-                if (!content) { showToast('내용을 입력해주세요'); return; }
+        // 화면 표시·검색·공유에 쓰는 본문 텍스트 (예전 형식과 동일한 [라벨] 형태)
+        function qmBuildContent(m) {
+            if (m.cat === 'defect') {
+                const lines = [];
+                if (m.types && m.types.length) lines.push(`[불량유형] ${m.types.join(', ')}`);
+                const r = qmRate(qmNum(m.ng), qmNum(m.total));
+                if (m.ng !== '' && m.ng !== undefined && m.ng !== null) lines.push(`[수량] 불량 ${m.ng}개` + (m.total ? ` / 검사 ${m.total}개` : '') + (r !== null ? ` (불량률 ${qmFmtRate(r)})` : ''));
+                if (m.detail) lines.push(`[불량내용] ${m.detail}`);
+                if (m.action) lines.push(`[조치사항] ${m.action}`);
+                return lines.join('\n');
             }
+            if (m.cat === 'cmm') return `[측정내용] ${m.detail}` + (m.action ? `\n[특이사항] ${m.action}` : '');
+            return m.detail || '';
+        }
 
-            const memo = {
-                id: Date.now(),
-                cat: qmActiveCategory,
-                part: part,
-                content: content,
-                ts: new Date().toISOString()
-            };
-            qmMemos.unshift(memo);
-            qmSaveToStorage();
+        function qmClearForm() {
+            ['qmPartName', 'qmNgQty', 'qmTotalQty', 'qmDefectContent', 'qmDefectAction', 'qmCmmContent', 'qmCmmNote', 'qmContent']
+                .forEach(id => document.getElementById(id).value = '');
+            qmSelTypes = [];
+            qmRenderTypeChips();
+            qmUpdateRate();
+        }
 
-            document.getElementById('qmPartName').value = '';
-            document.getElementById('qmDefectContent').value = '';
-            document.getElementById('qmDefectAction').value = '';
-            document.getElementById('qmCmmContent').value = '';
-            document.getElementById('qmCmmNote').value = '';
-            document.getElementById('qmContent').value = '';
+        function qmSaveMemo() {
+            const $ = id => document.getElementById(id);
+            const part = $('qmPartName').value.trim();
+            const cat = qmActiveCategory;
+            let m = { cat, part };
 
+            if (cat === 'defect') {
+                m.types = qmSelTypes.slice();
+                m.ng = $('qmNgQty').value.trim();
+                m.total = $('qmTotalQty').value.trim();
+                m.detail = $('qmDefectContent').value.trim();
+                m.action = $('qmDefectAction').value.trim();
+                if (!m.types.length && !m.detail) { showToast('불량 유형을 누르거나 불량 내용을 적어주세요'); return; }
+                const ng = qmNum(m.ng), total = qmNum(m.total);
+                if (ng !== null && total !== null && total > 0 && ng > total) { showToast('불량 수량이 검사 수량보다 많습니다'); $('qmNgQty').focus(); return; }
+            } else if (cat === 'cmm') {
+                m.detail = $('qmCmmContent').value.trim();
+                m.action = $('qmCmmNote').value.trim();
+                if (!m.detail) { showToast('측정 내용을 적어주세요'); $('qmCmmContent').focus(); return; }
+            } else {
+                m.detail = $('qmContent').value.trim();
+                if (!m.detail) { showToast('내용을 적어주세요'); $('qmContent').focus(); return; }
+            }
+            m.content = qmBuildContent(m);
+
+            if (qmEditingId !== null) {
+                const idx = qmMemos.findIndex(x => x.id === qmEditingId);
+                if (idx >= 0) qmMemos[idx] = Object.assign({}, qmMemos[idx], m, { edited: new Date().toISOString() });
+                qmEditingId = null;
+                qmSetEditMode(false);
+                if (qmSaveToStorage()) showToast('수정했습니다 ✅');
+            } else {
+                m.id = Date.now();
+                m.ts = new Date().toISOString();
+                qmMemos.unshift(m);
+                if (qmSaveToStorage()) showToast('저장했습니다 ✅');
+            }
+            qmClearForm();
             qmRenderList();
-            showToast('저장됨 ✅ 중요 내용은 📸로 갤러리에도 남겨두세요');
+        }
+
+        function qmSetEditMode(on) {
+            document.getElementById('qmFormTitle').innerText = on ? '✏️ 기록 수정 중' : '새 기록 쓰기';
+            document.getElementById('qm-save-btn').innerText = on ? '✅ 수정 완료' : '💾 저장';
+            document.getElementById('qm-cancel-btn').style.display = on ? '' : 'none';
+            document.getElementById('qmFormCard').classList.toggle('editing', on);
+        }
+
+        function qmEditMemo(id) {
+            const m = qmMemos.find(x => x.id === id);
+            if (!m) return;
+            const $ = elId => document.getElementById(elId);
+            qmClearForm();
+            const cat = (m.cat === 'cmm' || m.cat === 'etc') ? m.cat : (m.cat === 'defect' ? 'defect' : 'etc');
+            qmSetCategory(cat);
+            $('qmPartName').value = m.part || '';
+            const structured = m.detail !== undefined || m.types !== undefined;
+            if (cat === 'defect') {
+                if (structured) {
+                    qmSelTypes = Array.isArray(m.types) ? m.types.slice() : [];
+                    $('qmNgQty').value = m.ng || '';
+                    $('qmTotalQty').value = m.total || '';
+                    $('qmDefectContent').value = m.detail || '';
+                    $('qmDefectAction').value = m.action || '';
+                } else {
+                    // 예전 형식: [불량유형] ..\n[불량내용] ..\n[조치사항] ..
+                    const get = k => { const r = (m.content || '').match(new RegExp('\\[' + k + '\\]\\s*([^\\n]*)')); return r ? r[1] : ''; };
+                    const t = get('불량유형');
+                    const mapped = ({ '외관': '외관기타' })[t] || t;
+                    qmSelTypes = QM_DEFECT_TYPES.includes(mapped) ? [mapped] : [];
+                    $('qmDefectContent').value = (get('불량내용') || '') + (t && !QM_DEFECT_TYPES.includes(({ '외관': '외관기타' })[t] || t) ? ` (유형: ${t})` : '');
+                    $('qmDefectAction').value = get('조치사항');
+                }
+                qmRenderTypeChips();
+                qmUpdateRate();
+            } else if (cat === 'cmm') {
+                if (structured) { $('qmCmmContent').value = m.detail || ''; $('qmCmmNote').value = m.action || ''; }
+                else {
+                    const get = k => { const r = (m.content || '').match(new RegExp('\\[' + k + '\\]\\s*([^\\n]*)')); return r ? r[1] : ''; };
+                    $('qmCmmContent').value = get('측정내용') || m.content || '';
+                    $('qmCmmNote').value = get('특이사항');
+                }
+            } else {
+                $('qmContent').value = structured ? (m.detail || '') : (m.content || '');
+            }
+            qmEditingId = id;
+            qmSetEditMode(true);
+            document.querySelector('#memo-view .qm-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function qmCancelEdit() {
+            qmEditingId = null;
+            qmSetEditMode(false);
+            qmClearForm();
         }
 
         function qmDeleteMemo(id) {
-            if (!confirm('이 메모를 삭제할까요?')) return;
+            if (!confirm('이 기록을 삭제할까요?\n(삭제하면 되돌릴 수 없습니다)')) return;
             qmMemos = qmMemos.filter(m => m.id !== id);
+            if (qmEditingId === id) qmCancelEdit();
             qmSaveToStorage();
             qmRenderList();
         }
 
         function qmFormatTime(iso) {
             const d = new Date(iso);
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const hh = String(d.getHours()).padStart(2, '0');
-            const mi = String(d.getMinutes()).padStart(2, '0');
-            return `${mm}/${dd} ${hh}:${mi}`;
+            if (isNaN(d.getTime())) return '';
+            const p = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
         }
 
-        const QM_CAT_LABEL = { defect: '🔴 불량기록', cmm: '📐 3차원측정', etc: '📝 기타' };
+        function qmShareText(m) {
+            const head = `[${(QM_CAT_LABEL[m.cat] || m.cat).replace(/^\S+\s/, '')}] ${qmFormatTime(m.ts)}` + (m.part ? ` · ${m.part}` : '');
+            return `${head}\n${m.content || qmBuildContent(m)}`;
+        }
+        async function qmShareMemo(id) {
+            const m = qmMemos.find(x => x.id === id);
+            if (!m) return;
+            const text = qmShareText(m);
+            if (navigator.share) {
+                try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+            }
+            let ok = false;
+            try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; } } catch (e) {}
+            if (!ok) {
+                const ta = document.createElement('textarea');
+                ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                try { ok = document.execCommand('copy'); } catch (e) {}
+                ta.remove();
+            }
+            showToast(ok ? '복사했습니다. 카톡 대화창에 붙여넣기 하세요' : '복사에 실패했습니다');
+        }
 
-        function qmRenderList() {
-            const wrap = document.getElementById('qmList');
+        function qmFilteredList() {
             const search = (document.getElementById('qmSearch').value || '').trim().toLowerCase();
             let list = qmMemos;
             if (qmActiveFilter !== 'all') list = list.filter(m => m.cat === qmActiveFilter);
-            if (search) list = list.filter(m => (m.part + ' ' + m.content).toLowerCase().includes(search));
+            if (search) list = list.filter(m => ((m.part || '') + ' ' + (m.content || '')).toLowerCase().includes(search));
+            return list;
+        }
 
+        function qmRenderList() {
+            const wrap = document.getElementById('qmList');
+            const list = qmFilteredList();
+            document.getElementById('qmListCount').innerText = qmMemos.length ? `${list.length} / 전체 ${qmMemos.length}건` : '';
             if (list.length === 0) {
-                wrap.innerHTML = '<div class="qm-empty">저장된 메모가 없습니다</div>';
+                wrap.innerHTML = `<div class="qm-empty">${qmMemos.length ? '조건에 맞는 기록이 없습니다' : '아직 저장된 기록이 없습니다'}</div>`;
                 return;
             }
-            wrap.innerHTML = list.map(m => `
-                <div class="qm-item">
+            wrap.innerHTML = list.map(m => {
+                let chips = '';
+                if (m.cat === 'defect' && Array.isArray(m.types) && m.types.length) {
+                    chips = `<div class="qm-item-types">${m.types.map(t => `<span>${qmEscapeHtml(t)}</span>`).join('')}</div>`;
+                }
+                const r = m.cat === 'defect' ? qmRate(qmNum(m.ng), qmNum(m.total)) : null;
+                const rate = r !== null ? `<span class="qm-item-rate">불량률 ${qmFmtRate(r)}</span>` : '';
+                // 구조화된 기록은 유형 줄을 칩으로 보여주므로 본문에서 제외
+                const body = (m.content || '').split('\n').filter(l => !(chips && l.startsWith('[불량유형]'))).join('\n');
+                return `
+                <div class="qm-item${qmEditingId === m.id ? ' editing' : ''}">
                     <div class="qm-item-head">
                         <span class="qm-badge ${m.cat}">${QM_CAT_LABEL[m.cat] || m.cat}</span>
-                        <span class="qm-item-time">${qmFormatTime(m.ts)}</span>
+                        ${rate}
+                        <span class="qm-item-time">${qmFormatTime(m.ts)}${m.edited ? ' (수정됨)' : ''}</span>
                     </div>
                     ${m.part ? `<div class="qm-item-part">${qmEscapeHtml(m.part)}</div>` : ''}
-                    <div class="qm-item-content">${qmEscapeHtml(m.content)}</div>
-                    <button class="qm-item-del" onclick="qmDeleteMemo(${m.id})">🗑 삭제</button>
-                </div>
-            `).join('');
+                    ${chips}
+                    <div class="qm-item-content">${qmEscapeHtml(body)}</div>
+                    <div class="qm-item-actions">
+                        <button type="button" onclick="qmEditMemo(${m.id})">✏️ 수정</button>
+                        <button type="button" onclick="qmShareMemo(${m.id})">💬 공유·복사</button>
+                        <button type="button" class="del" onclick="qmDeleteMemo(${m.id})">🗑 삭제</button>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function qmEscapeHtml(str) {
             const div = document.createElement('div');
-            div.innerText = str;
+            div.innerText = str === undefined || str === null ? '' : String(str);
             return div.innerHTML;
         }
 
-        // ==================== 🧮 간이 측정 기록 (localStorage 저장) ====================
-        const QR_STORAGE_KEY = 'qc_quick_record';
-        let qrRows = [];
-        let qrInitialized = false;
-
-        function initQuickRecord() {
-            if (!qrInitialized) {
-                qrInitialized = true;
-                loadQrRows();
-                if (qrRows.length === 0) qrRows = [{ std: '', measured: '' }, { std: '', measured: '' }, { std: '', measured: '' }];
-            }
-            renderQrTable();
-        }
-
-        function loadQrRows() {
-            try {
-                const raw = localStorage.getItem(QR_STORAGE_KEY);
-                const data = raw ? JSON.parse(raw) : null;
-                if (data) {
-                    qrRows = data.rows || [];
-                    if (data.tolerance != null) document.getElementById('qrTolerance').value = data.tolerance;
-                }
-            } catch (e) { qrRows = []; }
-        }
-
-        function saveQrRows() {
-            try {
-                localStorage.setItem(QR_STORAGE_KEY, JSON.stringify({
-                    rows: qrRows,
-                    tolerance: document.getElementById('qrTolerance').value
-                }));
-            } catch (e) { /* 저장소 사용 불가 시 무시 */ }
-        }
-
-        function renderQrTable() {
-            const tbody = document.getElementById('qrTableBody');
-            tbody.innerHTML = qrRows.map((row, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td><input type="number" step="0.01" value="${row.std}" oninput="qrUpdateValue(${i},'std',this.value)"></td>
-                    <td><input type="number" step="0.01" value="${row.measured}" oninput="qrUpdateValue(${i},'measured',this.value)"></td>
-                    <td class="qr-verdict" id="qr-verdict-${i}">-</td>
-                    <td><button class="qr-del" type="button" onclick="qrDeleteRow(${i})">✕</button></td>
-                </tr>
-            `).join('');
-            qrRows.forEach((_, i) => qrUpdateVerdict(i));
-            qrUpdateSummary();
-            saveQrRows();
-        }
-
-        function qrUpdateValue(idx, field, value) {
-            qrRows[idx][field] = value;
-            qrUpdateVerdict(idx);
-            qrUpdateSummary();
-            saveQrRows();
-        }
-
-        function qrUpdateVerdict(idx) {
-            const row = qrRows[idx];
-            const cell = document.getElementById('qr-verdict-' + idx);
-            if (!row || !cell) return;
-            const tol = Math.abs(parseFloat(document.getElementById('qrTolerance').value)) || 0;
-            const std = parseFloat(row.std);
-            const measured = parseFloat(row.measured);
-            if (isNaN(std) || isNaN(measured)) {
-                cell.innerText = '-';
-                cell.className = 'qr-verdict';
-                return;
-            }
-            const ok = Math.abs(measured - std) <= tol;
-            cell.innerText = ok ? '🟢 OK' : '🔴 NG';
-            cell.className = 'qr-verdict ' + (ok ? 'ok' : 'ng');
-        }
-
-        function qrUpdateSummary() {
-            const tol = Math.abs(parseFloat(document.getElementById('qrTolerance').value)) || 0;
-            let okCount = 0, ngCount = 0;
-            qrRows.forEach(row => {
-                const std = parseFloat(row.std), measured = parseFloat(row.measured);
-                if (!isNaN(std) && !isNaN(measured)) {
-                    if (Math.abs(measured - std) <= tol) okCount++; else ngCount++;
-                }
+        // 엑셀(CSV) 내보내기 — 현재 필터·검색 결과 기준, 한글 깨짐 방지 BOM 포함
+        function qmExportCsv() {
+            const list = qmFilteredList();
+            if (!list.length) { showToast('내보낼 기록이 없습니다'); return; }
+            const esc = v => {
+                const s = v === undefined || v === null ? '' : String(v);
+                return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+            };
+            const head = ['구분', '일시', '품번/도면번호', '불량유형', '불량수량', '검사수량', '불량률(%)', '내용', '조치사항/특이사항'];
+            const rows = list.map(m => {
+                const structured = m.detail !== undefined || m.types !== undefined;
+                const r = m.cat === 'defect' ? qmRate(qmNum(m.ng), qmNum(m.total)) : null;
+                return [
+                    (QM_CAT_LABEL[m.cat] || m.cat).replace(/^\S+\s/, ''),
+                    qmFormatTime(m.ts),
+                    m.part || '',
+                    Array.isArray(m.types) ? m.types.join(', ') : '',
+                    m.ng || '', m.total || '',
+                    r !== null ? r.toFixed(2) : '',
+                    structured ? (m.detail || '') : (m.content || ''),
+                    structured ? (m.action || '') : ''
+                ].map(esc).join(',');
             });
-            document.getElementById('qrTotal').innerText = `총 ${qrRows.length}개`;
-            document.getElementById('qrOkBadge').innerText = `OK ${okCount}`;
-            document.getElementById('qrNgBadge').innerText = `NG ${ngCount}`;
+            const csv = '﻿' + [head.join(','), ...rows].join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const d = new Date(), p = n => String(n).padStart(2, '0');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `품질기록_${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}.csv`;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+            showToast(`${list.length}건을 엑셀 파일로 내보냈습니다`);
         }
 
-        function qrRecalcAll() {
-            qrRows.forEach((_, i) => qrUpdateVerdict(i));
-            qrUpdateSummary();
-            saveQrRows();
+        // 예전 '간이측정' 데이터가 남아있으면 기록 1건으로 옮길 수 있게 안내
+        function qmCheckOldQuick() {
+            const box = document.getElementById('qmOldQuickNotice');
+            let data = null;
+            try { data = JSON.parse(localStorage.getItem('qc_quick_record') || 'null'); } catch (e) {}
+            const rows = data && Array.isArray(data.rows) ? data.rows.filter(r => String(r.std || '').trim() !== '' || String(r.measured || '').trim() !== '') : [];
+            if (!rows.length || localStorage.getItem('qc_quick_record_migrated') === '1') { box.style.display = 'none'; return; }
+            box.style.display = 'block';
+            box.innerHTML = `예전 <b>간이측정</b> 기록 ${rows.length}줄이 이 휴대폰에 남아 있습니다.
+                <button type="button" class="qm-migrate" onclick="qmMigrateOldQuick()">기록 목록으로 옮기기</button>`;
         }
-
-        function qrAddRow() {
-            qrRows.push({ std: '', measured: '' });
-            renderQrTable();
-        }
-
-        function qrDeleteRow(idx) {
-            qrRows.splice(idx, 1);
-            renderQrTable();
+        function qmMigrateOldQuick() {
+            let data = null;
+            try { data = JSON.parse(localStorage.getItem('qc_quick_record') || 'null'); } catch (e) {}
+            if (!data || !Array.isArray(data.rows)) return;
+            const tol = Math.abs(parseFloat(data.tolerance)) || 0;
+            const lines = data.rows.filter(r => String(r.std || '').trim() !== '' || String(r.measured || '').trim() !== '').map((r, i) => {
+                const s = parseFloat(r.std), v = parseFloat(r.measured);
+                const j = (isNaN(s) || isNaN(v)) ? '-' : (Math.abs(v - s) <= tol ? 'OK' : 'NG');
+                return `#${i + 1} 기준 ${r.std || '-'} / 측정 ${r.measured || '-'} → ${j}`;
+            });
+            const detail = `[간이측정 · 허용오차 ±${tol}]\n` + lines.join('\n');
+            qmMemos.unshift({ id: Date.now(), cat: 'etc', part: '', detail, content: detail, ts: new Date().toISOString() });
+            if (qmSaveToStorage()) {
+                try { localStorage.setItem('qc_quick_record_migrated', '1'); } catch (e) {}
+                showToast('간이측정 기록을 목록으로 옮겼습니다 (기타)');
+            }
+            qmCheckOldQuick();
+            qmRenderList();
         }
     </script>
 </body>
