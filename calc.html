@@ -188,6 +188,18 @@
   .cs-hist::-webkit-scrollbar { display: none; }
   .cs-hist .hi { text-align: right; font-size: 13px; color: rgba(255,255,255,.5); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 1px 0; cursor: pointer; font-variant-numeric: tabular-nums; flex: none; }
   .cs-hist .hi b { color: #e0b060; font-weight: 800; }
+  .cs-hist .hi .mm { color: #fff; font-weight: 800; }
+  .hs-back { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 55; opacity: 0; pointer-events: none; transition: opacity .18s; }
+  .hs-back.show { opacity: 1; pointer-events: auto; }
+  .hs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 56; max-width: 480px; margin: 0 auto; background: #fff; border-radius: 20px 20px 0 0; padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px); transform: translateY(105%); transition: transform .2s ease; box-shadow: 0 -10px 30px rgba(0,0,0,.25); }
+  .hs.show { transform: translateY(0); }
+  .hs-line { font-size: 18px; font-weight: 800; color: #0F172A; text-align: right; font-variant-numeric: tabular-nums; word-break: break-all; }
+  .hs-line b { color: #b8863c; }
+  #hsMemo { width: 100%; margin-top: 12px; height: 46px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #E2E8F0; background: #F8FAFC; font-size: 15px; font-weight: 700; color: #0F172A; font-family: inherit; }
+  #hsMemo:focus { outline: none; border-color: #e0b060; background: #fff; }
+  .hs-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .hs-btns button { height: 52px; border-radius: 14px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 14px; font-weight: 800; color: #334155; font-family: inherit; }
+  .hs-btns button.pri { background: #0b1636; border-color: #0b1636; color: #e0b060; }
   .cs-hist .hi.empty { color: rgba(255,255,255,.28); cursor: default; }
   .cs-expr { margin-top: 4px; text-align: right; font-size: 36px; line-height: 46px; min-height: 46px; font-weight: 800; letter-spacing: -.5px; word-break: break-all; font-variant-numeric: tabular-nums; }
   .cs-expr.m { font-size: 28px; line-height: 36px; }
@@ -217,6 +229,10 @@
   .cv-u .d { font-size: 10.5px; font-weight: 700; color: #94A3B8; margin-top: 1px; }
   .cv-row input { flex: 1; min-width: 0; border: none; background: none; outline: none; text-align: right; font-size: 23px; font-weight: 800; color: #1E293B; font-family: inherit; font-variant-numeric: tabular-nums; caret-color: transparent; cursor: pointer; }
   .cv-row.src input { color: #9a6b1f; }
+  .cv-dms { flex: 1; min-width: 0; display: flex; align-items: baseline; justify-content: flex-end; gap: 2px; }
+  .cv-dms input { flex: 0 1 54px; width: 54px; min-width: 0; font-size: 21px !important; padding: 2px 0; border-bottom: 1.5px dashed #CBD5E1 !important; }
+  .cv-dms input:first-child { flex-basis: 62px; width: 62px; }
+  .cv-dms span { font-size: 18px; font-weight: 900; color: #94A3B8; margin-right: 4px; }
   .cv-tip { font-size: 11px; font-weight: 700; color: #94A3B8; text-align: center; margin-top: 2px; }
 
   /* ---------- ④ Cpk · 불량률 ---------- */
@@ -333,6 +349,7 @@
         <div class="cs-expr" id="csExpr">0</div>
         <div class="cs-prev" id="csPrev"></div>
         <div class="cs-foot">
+          <button type="button" onclick="cCopyHist()">기록 복사</button>
           <button type="button" onclick="cClearHist()">기록 지우기</button>
           <span class="sp"></span>
           <button type="button" onclick="cCopy()">📋 복사</button>
@@ -370,7 +387,7 @@
         <button type="button" data-cat="torque" onclick="setConvCat('torque')">토크</button>
         <button type="button" data-cat="force" onclick="setConvCat('force')">힘</button>
         <button type="button" data-cat="pressure" onclick="setConvCat('pressure')">압력</button>
-        <button type="button" data-cat="temp" onclick="setConvCat('temp')">온도</button>
+        <button type="button" data-cat="angle" onclick="setConvCat('angle')">각도</button>
       </div>
       <div class="cv-list" id="cvList"></div>
       <div class="cv-tip">아무 칸이나 눌러 값을 넣으면 나머지가 바로 바뀝니다</div>
@@ -588,6 +605,18 @@
     <div class="keypad-grid" id="keypadGrid"></div>
   </div>
   <input type="hidden" id="cpk-entry" value="">
+  <!-- 계산 기록 한 줄 누르면 뜨는 작은 선택창 -->
+  <div class="hs-back" id="hsBack" onclick="closeHistSheet()"></div>
+  <div class="hs" id="hs">
+    <div class="hs-line" id="hsLine"></div>
+    <input type="text" id="hsMemo" placeholder="✎ 메모 (예: Ø10 내경) — 적으면 바로 저장" autocomplete="off" enterkeyhint="done"
+           oninput="hsSaveMemo()" onkeydown="if (event.key === 'Enter') { event.preventDefault(); closeHistSheet(); }">
+    <div class="hs-btns">
+      <button type="button" class="pri" id="hsUse" onclick="hsUse()">넣기</button>
+      <button type="button" id="hsRe" onclick="hsRe()">식 다시 쓰기</button>
+      <button type="button" onclick="hsCopy()">📋 복사</button>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
 
 <script>
@@ -836,14 +865,14 @@
     if (!hasOp(cPrepare(cx.expr))) { cx.expr = rawStr(r); cx.done = true; cRender(); return; }
     hist.unshift({ e: prettyExpr(cPrepare(cx.expr)), r: rawStr(r) });
     if (hist.length > 30) hist.length = 30;
-    try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch (e) {}
+    saveHist();
     cx.expr = rawStr(r); cx.done = true;
     cRender(); renderHist();
   }
   function renderHist(){
     id('csHist').innerHTML = hist.length
-      ? hist.map((h, i) => `<div class="hi" onclick="cUseHist(${i})">${h.e} = <b>${fmtDisp(parseFloat(h.r))}</b></div>`).join('')
-      : '<div class="hi empty">계산 기록이 여기에 쌓입니다 · 누르면 다시 불러옵니다</div>';
+      ? hist.map((h, i) => `<div class="hi" onclick="openHistSheet(${i})">${h.m ? `<span class="mm">${escH(h.m)}</span> · ` : ''}${h.e} = <b>${fmtDisp(parseFloat(h.r))}</b></div>`).join('')
+      : '<div class="hi empty">계산 기록이 여기에 쌓입니다 · 누르면 메모·다시 쓰기</div>';
   }
   function cUseHist(i){
     const r = hist[i].r;
@@ -851,6 +880,37 @@
     if (cx.expr === '' || /[+\-*/(]$/.test(cx.expr)) cx.expr += (r.startsWith('-') && cx.expr !== '') ? '(' + r : r;
     else cx.expr = r;
     cx.done = false; cRender();
+  }
+  function escH(t){ return String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function saveHist(){ try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch (e) {} }
+  function histText(h){ return `${h.m ? h.m + ' : ' : ''}${h.e} = ${fmtDisp(parseFloat(h.r))}`; }
+  let hsIdx = -1;
+  function openHistSheet(i){
+    const h = hist[i]; if (!h) return;
+    hsIdx = i;
+    id('hsLine').innerHTML = `${escH(h.e)} = <b>${fmtDisp(parseFloat(h.r))}</b>`;
+    id('hsMemo').value = h.m || '';
+    id('hsUse').innerText = `${fmtDisp(parseFloat(h.r))} 넣기`;
+    id('hs').classList.add('show'); id('hsBack').classList.add('show');
+  }
+  function closeHistSheet(){ id('hsMemo').blur(); id('hs').classList.remove('show'); id('hsBack').classList.remove('show'); hsIdx = -1; }
+  function hsSaveMemo(){
+    const h = hist[hsIdx]; if (!h) return;
+    const m = id('hsMemo').value.trim().slice(0, 40);
+    if (m) h.m = m; else delete h.m;
+    saveHist(); renderHist();
+  }
+  function hsUse(){ const i = hsIdx; closeHistSheet(); if (i >= 0) cUseHist(i); }
+  function hsRe(){
+    const h = hist[hsIdx]; closeHistSheet(); if (!h) return;
+    cx.expr = h.e.replace(/,/g, '').replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+    cx.done = false; cRender();
+  }
+  async function hsCopy(){ const h = hist[hsIdx]; closeHistSheet(); if (!h) return; toast(await copyTextSafe(histText(h)) ? '복사했습니다' : '복사에 실패했습니다'); }
+  async function cCopyHist(){
+    if (!hist.length) { toast('복사할 기록이 없습니다'); return; }
+    const text = '[계산 기록]\n' + hist.slice().reverse().map(histText).join('\n');
+    toast(await copyTextSafe(text) ? `계산 기록 ${hist.length}개를 복사했습니다` : '복사에 실패했습니다');
   }
   function cClearHist(){ if (!hist.length) return; if (!confirm('계산 기록을 모두 지울까요?')) return; hist = []; try { localStorage.removeItem(HIST_KEY); } catch (e) {} renderHist(); }
   async function cCopy(){
@@ -862,7 +922,7 @@
   }
   // PC 키보드
   document.addEventListener('keydown', e => {
-    if (!id('panel-quick').classList.contains('active') || id('keypadOverlay').classList.contains('show')) return;
+    if (!id('panel-quick').classList.contains('active') || id('keypadOverlay').classList.contains('show') || id('hs').classList.contains('show')) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     const k = e.key;
     if (/^\d$/.test(k)) cDigit(k);
@@ -884,16 +944,30 @@
     length:   { def: [0, '1'], hint: '1 inch = 25.4 mm · 1 mil = 0.001 inch = 25.4 μm',
                 units: [['mm', '밀리미터', 1], ['μm', '마이크로미터', 0.001], ['inch', '인치', 25.4], ['mil', '1/1000 inch', 0.0254]] },
     torque:   { def: [0, '1'], hint: '1 kgf·cm = 0.0980665 N·m · 1 lbf·in ≈ 0.11298 N·m',
-                units: [['N·m', '뉴턴미터', 1], ['kgf·cm', '킬로그램힘 cm', 0.0980665], ['kgf·m', '킬로그램힘 m', 9.80665], ['lbf·in', '파운드 인치', 0.1129848290276167], ['lbf·ft', '파운드 피트', 1.3558179483314004]] },
-    force:    { def: [2, '1'], hint: '1 kgf = 9.80665 N · 1 lbf ≈ 4.44822 N',
-                units: [['N', '뉴턴', 1], ['kN', '킬로뉴턴', 1000], ['kgf', '킬로그램힘', 9.80665], ['lbf', '파운드힘', 4.4482216152605]] },
+                units: [['N·m', '뉴턴미터', 1], ['N·cm', '뉴턴센티미터', 0.01], ['kgf·cm', '킬로그램힘 cm', 0.0980665], ['kgf·m', '킬로그램힘 m', 9.80665], ['lbf·in', '파운드 인치', 0.1129848290276167], ['lbf·ft', '파운드 피트', 1.3558179483314004]] },
+    force:    { def: [0, '850'], hint: '1 kgf = 9.80665 N · 1 gf = 0.00980665 N · 1 lbf ≈ 4.44822 N',
+                units: [['N', '뉴턴', 1], ['kN', '킬로뉴턴', 1000], ['kgf', '킬로그램힘', 9.80665], ['gf', '그램힘', 0.00980665], ['lbf', '파운드힘', 4.4482216152605]] },
     pressure: { def: [0, '1'], hint: '1 MPa = 10 bar ≈ 10.197 kgf/cm² ≈ 145.04 psi',
-                units: [['MPa', '메가파스칼', 1], ['bar', '바', 0.1], ['kgf/cm²', '킬로그램힘/cm²', 0.0980665], ['psi', 'lbf/in²', 0.006894757293168361], ['kPa', '킬로파스칼', 0.001]] },
-    temp:     { def: [0, '20'], hint: '℉ = ℃ × 1.8 + 32 · 측정실 표준온도 20 ℃ = 68 ℉',
-                units: [['℃', '섭씨'], ['℉', '화씨'], ['K', '켈빈']] }
+                units: [['MPa', '메가파스칼', 1], ['kPa', '킬로파스칼', 0.001], ['Pa', '파스칼', 1e-6], ['bar', '바', 0.1], ['kgf/cm²', '킬로그램힘/cm²', 0.0980665], ['psi', 'lbf/in²', 0.006894757293168361]] },
+    angle:    { def: [0, '1'], hint: '',
+                units: [['°', '도 (십진)'], ['° ′ ″', '도·분·초'], ['rad', '라디안'], ['%', '기울기 (tan×100)']] }
   };
-  function tempToC(i, v){ return i === 0 ? v : i === 1 ? (v - 32) / 1.8 : v - 273.15; }
-  function tempFromC(i, c){ return i === 0 ? c : i === 1 ? c * 1.8 + 32 : c + 273.15; }
+  const DMS_I = 1;
+  const D2R = Math.PI / 180;
+  function angToDeg(i, v){ return i === 0 ? v : i === 2 ? v / D2R : Math.atan(v / 100) / D2R; }
+  function angFromDeg(i, d){ return i === 0 ? d : i === 2 ? d * D2R : (Math.abs(d) >= 90 ? NaN : Math.tan(d * D2R) * 100); }
+  function degToDms(deg){
+    const sg = deg < 0 ? -1 : 1; let a = Math.abs(deg);
+    let D = Math.floor(a), M = Math.floor((a - D) * 60), S = Math.round(((a - D) * 60 - M) * 60 * 100) / 100;
+    if (S >= 60) { S -= 60; M++; } if (M >= 60) { M -= 60; D++; }
+    return [(sg < 0 ? '-' : '') + D, String(M), String(S)];
+  }
+  function dmsToDeg(d, m, s){
+    const neg = String(d).trim().startsWith('-');
+    const D = Math.abs(parseNum(d) || 0), M = parseNum(m) || 0, S = parseNum(s) || 0;
+    if ([d, m, s].every(x => String(x).trim() === '' || String(x).trim() === '-')) return NaN;
+    return (neg ? -1 : 1) * (D + M / 60 + S / 3600);
+  }
   function fmtConv(x){
     if (!isFinite(x)) return '';
     const a = Math.abs(x);
@@ -904,32 +978,60 @@
     ST.convCat = cat; saveState();
     document.querySelectorAll('#cvCats button').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
     const C = CONV[cat];
-    const src = ST.conv[cat] || { i: C.def[0], v: C.def[1] };
-    id('cvList').innerHTML = C.units.map((u, i) => `
+    let src = ST.conv[cat] || { i: C.def[0], v: C.def[1] };
+    if (!(src.i >= 0 && src.i < C.units.length)) src = { i: C.def[0], v: C.def[1] };
+    id('cvList').innerHTML = C.units.map((u, i) => (cat === 'angle' && i === DMS_I) ? `
+      <div class="cv-row${i === src.i ? ' src' : ''}" onclick="openKeypad(this.querySelector('input'))">
+        <div class="cv-u"><div class="n">${u[0]}</div><div class="d">${u[1]}</div></div>
+        <div class="cv-dms">
+          <input type="text" readonly data-p="d" data-label="도 (°)" onclick="event.stopPropagation(); openKeypad(this)" oninput="convDms()"><span>°</span>
+          <input type="text" readonly data-p="m" data-label="분 (′)" onclick="event.stopPropagation(); openKeypad(this)" oninput="convDms()"><span>′</span>
+          <input type="text" readonly data-p="s" data-label="초 (″)" onclick="event.stopPropagation(); openKeypad(this)" oninput="convDms()"><span>″</span>
+        </div>
+      </div>` : `
       <div class="cv-row${i === src.i ? ' src' : ''}" onclick="openKeypad(this.querySelector('input'))">
         <div class="cv-u"><div class="n">${u[0]}</div><div class="d">${u[1]}</div></div>
         <input type="text" readonly data-i="${i}" data-label="${u[0]} (${u[1]})" oninput="convInput(${i}, this.value)">
       </div>`).join('');
     id('cvHint').innerText = C.hint;
-    const inp = id('cvList').querySelectorAll('input');
-    inp[src.i].value = src.v;
+    const rows = id('cvList').querySelectorAll('.cv-row');
+    if (cat === 'angle' && src.i === DMS_I) {
+      const p = String(src.v).split('|'); const ins = rows[DMS_I].querySelectorAll('input');
+      ins.forEach((el, k) => el.value = p[k] || '');
+    } else rows[src.i].querySelector('input').value = src.v;
     convFill(src.i, src.v);
   }
   function convFill(si, sv){
     const cat = ST.convCat, C = CONV[cat];
+    const rows = id('cvList').querySelectorAll('.cv-row');
+    if (cat === 'angle') {
+      const deg = si === DMS_I ? dmsToDeg(...String(sv).split('|').concat(['', '', '']).slice(0, 3)) : angToDeg(si, parseNum(sv));
+      rows.forEach((r, i) => {
+        if (i === si) return;
+        if (i === DMS_I) { const p = isFinite(deg) ? degToDms(deg) : ['', '', '']; r.querySelectorAll('input').forEach((el, k) => el.value = p[k]); }
+        else r.querySelector('input').value = isFinite(deg) ? fmtConv(angFromDeg(i, deg)) : '';
+      });
+      id('cvHint').innerText = isFinite(deg) && Math.abs(deg) < 90
+        ? `빼기구배 ${fmtConv(deg)}° → 깊이 10 mm당 편측 ${fmtConv(10 * Math.tan(deg * D2R))} mm · 1° = 60′ = 3600″`
+        : '1° = 60′ = 3600″ · 1 rad ≈ 57.29578°';
+      return;
+    }
     const v = parseNum(sv);
-    const inputs = id('cvList').querySelectorAll('input');
-    inputs.forEach((el, i) => {
+    rows.forEach((r, i) => {
       if (i === si) return;
-      if (isNaN(v)) { el.value = ''; return; }
-      el.value = cat === 'temp' ? fmtConv(tempFromC(i, tempToC(si, v))) : fmtConv(v * C.units[si][2] / C.units[i][2]);
+      r.querySelector('input').value = isNaN(v) ? '' : fmtConv(v * C.units[si][2] / C.units[i][2]);
     });
   }
+  function convMark(i){ id('cvList').querySelectorAll('.cv-row').forEach((r, k) => r.classList.toggle('src', k === i)); }
   function convInput(i, val){
     ST.conv[ST.convCat] = { i, v: val };
-    id('cvList').querySelectorAll('.cv-row').forEach((r, k) => r.classList.toggle('src', k === i));
-    convFill(i, val);
-    saveState();
+    convMark(i); convFill(i, val); saveState();
+  }
+  function convDms(){
+    const ins = id('cvList').querySelectorAll('.cv-row')[DMS_I].querySelectorAll('input');
+    const v = [...ins].map(el => el.value.replace(/,/g, '')).join('|');
+    ST.conv.angle = { i: DMS_I, v };
+    convMark(DMS_I); convFill(DMS_I, v); saveState();
   }
 
   /* ==========================================================
