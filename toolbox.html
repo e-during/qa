@@ -658,6 +658,26 @@
         .c-list .tb-item .badge { padding: 4px 8px; font-size: 0.74rem; }
         .c-list:empty { display: none; }
 
+        /* 📋 측정 기록지 (2026-09-29) — 여유·공차 사용률·한계 근접·공유·Cpk 연동 */
+        .dm-meta { display: grid; grid-template-columns: 1fr 1.2fr; gap: 6px; margin-bottom: 8px; }
+        .dm-meta input { width: 100%; min-width: 0; height: 38px; padding: 0 10px; border-radius: 10px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 0.84rem; font-weight: 700; color: #0F172A; font-family: inherit; }
+        .dm-meta input:focus { outline: none; border-color: var(--gold); background: #fff; }
+        .tb-latest.near { background: #FEF3C7; color: #92400E; }
+        .c-latest .mg { display: flex; justify-content: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+        .c-latest .mg span { background: rgba(255,255,255,.65); border-radius: 999px; padding: 3px 9px; font-size: 0.74rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .c-latest .mg span b { font-weight: 900; }
+        .tb-item.near { border-color: #FCD34D; background: #FFFBEB; }
+        .tb-item.near .badge { background: #FEF3C7; color: #92400E; }
+        .tb-bar .near { position: absolute; top: 13px; height: 14px; background: repeating-linear-gradient(45deg, #FDE68A 0 4px, #FEF3C7 4px 8px); }
+        .tb-bar .dot.near { background: #D97706; }
+        .tb-bar .dot.last { width: 16px; height: 16px; margin-left: -8px; top: 12px; border-width: 3px; box-shadow: 0 0 0 2px #0F172A; z-index: 2; }
+        .dm-extra { text-align: center; font-size: 0.72rem; font-weight: 800; color: #64748B; font-variant-numeric: tabular-nums; margin-top: 2px; }
+        .dm-extra:empty { display: none; }
+        .dm-actions { display: grid; grid-template-columns: 1fr 1fr 1.35fr; gap: 6px; margin-bottom: 8px; }
+        .dm-actions button { height: 44px; border-radius: 12px; border: 1px solid #E2E8F0; background: #fff; font-size: 0.86rem; font-weight: 800; color: #334155; font-family: inherit; }
+        .dm-actions button.pri { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
+        .dm-actions button:active { transform: scale(.97); }
+
         /* 시간 재기 */
         .c-timer { padding-top: 10px; }
         .c-qty { display: flex; align-items: center; gap: 8px; }
@@ -861,6 +881,10 @@
                 <!-- ① 도면 치수 (한눈에 보기: 기준치 ± 공차 한 줄) -->
                 <div class="tb-card">
                     <div class="tb-step"><span class="n">1</span>도면 치수</div>
+                    <div class="dm-meta">
+                        <input type="text" id="dmPart" placeholder="품명 (선택) 예: A-123" autocomplete="off" oninput="dmOnMetaInput()">
+                        <input type="text" id="dmItem" placeholder="측정항목 (선택) 예: Ø10 내경" autocomplete="off" oninput="dmOnMetaInput()">
+                    </div>
                     <div class="tb-seg c-seg">
                         <button type="button" id="dmModeSym" class="on" onclick="dmSetMode('sym')">± 위아래 같음</button>
                         <button type="button" id="dmModeAsym" onclick="dmSetMode('asym')">+ / − 위·아래 다름</button>
@@ -927,7 +951,7 @@
 
                     <!-- 전체 결과 (2개 이상일 때, 한 줄 요약 + 막대) -->
                     <div id="dmSummaryCard" style="display:none;">
-                        <div class="c-sum6">
+                        <div class="c-sum6" id="dmSum6">
                             <div class="tb-sum"><div class="k">개수</div><div class="v" id="dmSumN">0</div></div>
                             <div class="tb-sum ok"><div class="k">OK</div><div class="v" id="dmSumOk">0</div></div>
                             <div class="tb-sum ng"><div class="k">NG</div><div class="v" id="dmSumNg">0</div></div>
@@ -936,11 +960,17 @@
                             <div class="tb-sum"><div class="k">최대</div><div class="v" id="dmSumMax">-</div></div>
                         </div>
                         <div class="tb-bar c-bar" id="dmBar"></div>
+                        <div class="dm-extra" id="dmExtra"></div>
                     </div>
 
                     <div class="tb-list c-list" id="dmList"></div>
                 </div>
 
+                <div class="dm-actions" id="dmActions" style="display:none;">
+                    <button type="button" onclick="dmCopy()">📋 복사</button>
+                    <button type="button" onclick="dmShare()">💬 공유</button>
+                    <button type="button" class="pri" onclick="dmToCpk()">📊 Cpk로 보내기</button>
+                </div>
                 <button type="button" class="tb-ghost-btn" id="dmClearBtn" style="display:none; margin-bottom:12px;" onclick="dmClearValues()">🗑 측정값 전체 지우기</button>
                 <button type="button" class="tb-ghost-btn gray" onclick="dmClearAll()">↺ 처음부터 다시 (도면 치수까지 지우기)</button>
             </div>
@@ -1483,7 +1513,8 @@
         // ─────────────────────────────────────────────
         const DM_KEY = 'tb_dim_v1';
         const DM_EPS = 1e-9; // 부동소수 오차(13.6+0.15=13.750000001 등) 보정
-        let dm = { mode: 'sym', nominal: '', tolSym: '', tolUp: '', tolLo: '', upSign: '+', loSign: '-', values: [] };
+        let dm = { mode: 'sym', nominal: '', tolSym: '', tolUp: '', tolLo: '', upSign: '+', loSign: '-', values: [], part: '', item: '' };
+        const DM_NEAR = 0.8; // 공차 사용률 80% 이상 = 한계 근접 (사내 기준에 맞게 조정)
 
         function dmNum(str) {
             if (str === undefined || str === null) return NaN;
@@ -1528,9 +1559,12 @@
 
         function dmJudge(v, spec) {
             if (!spec) return null;
-            if (v < spec.min - DM_EPS) return { ok: false, side: 'low', diff: spec.min - v };
-            if (v > spec.max + DM_EPS) return { ok: false, side: 'high', diff: v - spec.max };
-            return { ok: true };
+            const half = (spec.max - spec.min) / 2, mid = (spec.max + spec.min) / 2;
+            const use = half > 0 ? Math.abs(v - mid) / half : 0;          // 공차 사용률 (공차 중심 → 한계 = 100%)
+            const base = { use, toMax: spec.max - v, toMin: v - spec.min };
+            if (v < spec.min - DM_EPS) return Object.assign(base, { ok: false, side: 'low', diff: spec.min - v });
+            if (v > spec.max + DM_EPS) return Object.assign(base, { ok: false, side: 'high', diff: v - spec.max });
+            return Object.assign(base, { ok: true, near: use >= DM_NEAR - DM_EPS });
         }
 
         // 입력칸 ↔ 상태 동기화
@@ -1545,6 +1579,13 @@
             document.getElementById('dmTolSym').value = dm.tolSym;
             document.getElementById('dmTolUp').value = dm.tolUp;
             document.getElementById('dmTolLo').value = dm.tolLo;
+            document.getElementById('dmPart').value = dm.part || '';
+            document.getElementById('dmItem').value = dm.item || '';
+        }
+        function dmOnMetaInput() {
+            dm.part = document.getElementById('dmPart').value;
+            dm.item = document.getElementById('dmItem').value;
+            dmSave();
         }
 
         function dmOnSpecInput() { dmReadInputs(); dmSave(); dmRender(); }
@@ -1610,6 +1651,81 @@
             dm.values.splice(i, 1);
             dmSave(); dmRender();
         }
+        function dmStats() {
+            const vals = dm.values.map(x => x.v), n = vals.length;
+            if (!n) return null;
+            const mean = vals.reduce((a, b) => a + b, 0) / n;
+            const mn = Math.min(...vals), mx = Math.max(...vals);
+            const sd = n >= 2 ? Math.sqrt(vals.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1)) : 0;
+            return { n, mean, min: mn, max: mx, range: mx - mn, sd };
+        }
+        function dmShareText() {
+            const spec = dmSpec(), st = dmStats();
+            const dp = Math.min(4, Math.max(spec ? spec.dp : 2, ...dm.values.map(x => dmDecimals(x.raw))));
+            const d = new Date(), pad = x => String(x).padStart(2, '0');
+            const when = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            const title = [dm.part, dm.item].map(x => (x || '').trim()).filter(Boolean).join(' / ');
+            const L = [`📋 ${title ? title + ' 측정' : '치수 측정'} (${when})`];
+            if (spec) {
+                const tol = dm.mode === 'sym' ? `±${Math.abs(spec.up).toFixed(spec.dp)}` : `${dmSigned(spec.up, spec.dp)} / ${dmSigned(spec.lo, spec.dp)}`;
+                L.push(`규격 ${dmFmt(spec.nom, spec.dp)} ${tol} (${dmFmt(spec.min, spec.dp)} ~ ${dmFmt(spec.max, spec.dp)}) mm`);
+            }
+            L.push('');
+            let ok = 0, ng = 0, near = 0;
+            dm.values.forEach((x, i) => {
+                const j = dmJudge(x.v, spec);
+                let tag = '';
+                if (j) {
+                    if (!j.ok) { ng++; tag = `  NG (${j.side === 'high' ? '+' : '−'}${j.diff.toFixed(dp)} 초과)`; }
+                    else if (j.near) { ok++; near++; tag = `  OK·근접 (${Math.round(j.use * 100)}%)`; }
+                    else { ok++; tag = '  OK'; }
+                }
+                L.push(`${String(i + 1).padStart(2, '0')}  ${x.v.toFixed(dp)}${tag}`);
+            });
+            if (st) {
+                L.push('');
+                L.push(`평균 ${st.mean.toFixed(Math.min(5, dp + 1))} · 최대 ${st.max.toFixed(dp)} · 최소 ${st.min.toFixed(dp)}`);
+                if (st.n >= 2) L.push(`범위 ${st.range.toFixed(dp)} · 표준편차 σ ${st.sd.toFixed(Math.min(5, dp + 1))}`);
+                if (spec) L.push(`판정 OK ${ok} / NG ${ng}${near ? ` (한계 근접 ${near})` : ''} · 총 ${st.n}개`);
+            }
+            return L.join('\n');
+        }
+        async function dmCopyText(text) {
+            try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) {}
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+            ta.remove(); return ok;
+        }
+        async function dmCopy() {
+            if (!dm.values.length) return;
+            showToast(await dmCopyText(dmShareText()) ? '측정 기록을 복사했습니다. 붙여넣기 하세요' : '복사에 실패했습니다');
+        }
+        async function dmShare() {
+            if (!dm.values.length) return;
+            const text = dmShareText();
+            if (navigator.share) {
+                try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+            }
+            showToast(await dmCopyText(text) ? '공유 창을 열 수 없어 복사했습니다. 붙여넣기 하세요' : '복사에 실패했습니다');
+        }
+        // 측정값 + 규격을 계산기 Cpk 화면으로 넘김 (calc.html 저장값에 기록)
+        function dmToCpk() {
+            if (dm.values.length < 2) { showToast('Cpk는 측정값 2개 이상부터 계산됩니다'); return; }
+            const KEY = 'calc_state_v2';
+            let st = {};
+            try { st = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { st = {}; }
+            const prev = Array.isArray(st.data) ? st.data.length : 0;
+            if (prev && !confirm(`계산기 Cpk에 있던 측정값 ${prev}개를 지금 값 ${dm.values.length}개로 바꿀까요?`)) return;
+            const spec = dmSpec();
+            st.data = dm.values.map(x => String(x.raw || x.v));
+            st.usl = spec ? dmFmt(spec.max, spec.dp) : '';
+            st.lsl = spec ? dmFmt(spec.min, spec.dp) : '';
+            st.tab = 'cpk'; st.cpkSub = 'data';
+            try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { showToast('저장에 실패했습니다'); return; }
+            location.href = 'calc.html';
+        }
         function dmClearValues() {
             if (!dm.values.length) return;
             if (!confirm(`측정값 ${dm.values.length}개를 모두 지울까요?`)) return;
@@ -1618,7 +1734,7 @@
         }
         function dmClearAll() {
             if (!confirm('도면 치수와 측정값을 모두 지우고 처음부터 할까요?')) return;
-            dm = { mode: 'sym', nominal: '', tolSym: '', tolUp: '', tolLo: '', upSign: '+', loSign: '-', values: [] };
+            dm = { mode: 'sym', nominal: '', tolSym: '', tolUp: '', tolLo: '', upSign: '+', loSign: '-', values: [], part: '', item: '' };
             dmWriteInputs(); dmSave(); dmRender();
             document.getElementById('dmNominal').focus();
         }
@@ -1672,8 +1788,9 @@
                 const j = dmJudge(item.v, spec);
                 let cls = '', badge = '판정 대기', dev = '';
                 if (j) {
-                    if (j.ok) { ok++; cls = 'ok'; badge = '🟢 OK'; } else { ng++; cls = 'ng'; badge = '🔴 NG'; }
-                    dev = `기준 대비 ${dmSigned(item.v - spec.nom, dp)}`;
+                    if (j.ok && j.near) { ok++; cls = 'near'; badge = '🟡 근접'; }
+                    else if (j.ok) { ok++; cls = 'ok'; badge = '🟢 OK'; } else { ng++; cls = 'ng'; badge = '🔴 NG'; }
+                    dev = `기준 대비 ${dmSigned(item.v - spec.nom, dp)} · 공차 ${Math.round(j.use * 100)}%`;
                 }
                 return `<div class="tb-item ${cls}">
                     <span class="no">#${i + 1}</span>
@@ -1696,8 +1813,9 @@
                     latest.className = 'tb-latest c-latest wait';
                     latest.innerHTML = `<div class="big">⏳ 판정 대기</div><div class="sub">①에 도면 치수를 넣으면 바로 판정됩니다</div>`;
                 } else if (j.ok) {
-                    latest.className = 'tb-latest c-latest ok';
-                    latest.innerHTML = `<div class="big">🟢 합격 (OK)</div><div class="sub">#${n} 측정값 ${last.v.toFixed(dp)} · 허용범위 안</div>`;
+                    latest.className = 'tb-latest c-latest ' + (j.near ? 'near' : 'ok');
+                    latest.innerHTML = `<div class="big">${j.near ? '🟡 합격 · 한계 근접' : '🟢 합격 (OK)'}</div><div class="sub">#${n} 측정값 ${last.v.toFixed(dp)} · 기준 대비 ${dmSigned(last.v - spec.nom, dp)}</div>`
+                        + `<div class="mg"><span>상한까지 <b>${Math.max(0, j.toMax).toFixed(dp)}</b></span><span>하한까지 <b>${Math.max(0, j.toMin).toFixed(dp)}</b></span><span>공차 사용 <b>${Math.round(j.use * 100)}%</b></span></div>`;
                 } else {
                     latest.className = 'tb-latest c-latest ng';
                     const why = j.side === 'high'
@@ -1710,7 +1828,9 @@
 
             // 전체 결과 (2개 이상)
             const card = $('dmSummaryCard');
-            if (n >= 2) {
+            $('dmActions').style.display = n ? '' : 'none';
+            $('dmSum6').style.display = n >= 2 ? '' : 'none';
+            if (n >= 1) {
                 card.style.display = '';
                 const vals = dm.values.map(x => x.v);
                 const dp = Math.min(4, Math.max(spec ? spec.dp : 2, ...dm.values.map(x => dmDecimals(x.raw))));
@@ -1723,6 +1843,8 @@
                 $('dmSumAvg').innerText = avg.toFixed(Math.min(4, dp + 1));
                 $('dmSumMax').innerText = vMax.toFixed(dp);
                 dmRenderBar(spec, vals);
+                const st = dmStats();
+                $('dmExtra').innerText = n >= 2 ? `범위 ${st.range.toFixed(dp)} · 표준편차 σ ${st.sd.toFixed(Math.min(5, dp + 1))}${(() => { const k = spec ? dm.values.filter(x => { const q = dmJudge(x.v, spec); return q && q.ok && q.near; }).length : 0; return k ? ` · 한계 근접 ${k}개` : ''; })()}` : '';
             } else {
                 card.style.display = 'none';
             }
@@ -1753,13 +1875,19 @@
             const pos = v => ((v - L) / (R - L)) * 100;
             let html = '<div class="axis"></div>';
             html += `<div class="zone" style="left:${pos(spec.min)}%; width:${pos(spec.max) - pos(spec.min)}%;"></div>`;
+            const nh = (spec.max - spec.min) / 2 * (1 - DM_NEAR);
+            if (nh > 0) {
+                html += `<div class="near" style="left:${pos(spec.min)}%; width:${pos(spec.min + nh) - pos(spec.min)}%;"></div>`;
+                html += `<div class="near" style="left:${pos(spec.max - nh)}%; width:${pos(spec.max) - pos(spec.max - nh)}%;"></div>`;
+            }
             html += `<div class="nom" style="left:${pos(spec.nom)}%;"></div>`;
             html += `<div class="tb-tick" style="left:${pos(spec.min)}%;">${dmFmt(spec.min, spec.dp)}</div>`;
             html += `<div class="tb-tick" style="left:${pos(spec.max)}%;">${dmFmt(spec.max, spec.dp)}</div>`;
             html += `<div class="tb-tick top" style="left:${pos(spec.nom)}%;">기준 ${dmFmt(spec.nom, spec.dp)}</div>`;
-            vals.forEach(v => {
+            vals.forEach((v, i) => {
                 const j = dmJudge(v, spec);
-                html += `<div class="dot ${j && !j.ok ? 'ng' : ''}" style="left:${pos(v)}%;" title="${v}"></div>`;
+                const c = j && !j.ok ? 'ng' : j && j.near ? 'near' : '';
+                html += `<div class="dot ${c}${i === vals.length - 1 ? ' last' : ''}" style="left:${pos(v)}%;" title="#${i + 1} ${v}"></div>`;
             });
             bar.innerHTML = html;
         }
