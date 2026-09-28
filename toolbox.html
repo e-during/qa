@@ -375,6 +375,116 @@
         .cmm-view .section-label { font-size: 0.74rem; color: #64748b; margin-top: 4px; font-weight: 400; }
         .cmm-view .split-option-box { margin-top: 10px; padding: 10px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; font-size: 0.82rem; color: #1e40af; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .cmm-view .split-option-box input[type="checkbox"] { width: auto; min-width: auto; padding: 0; accent-color: #2563eb; }
+
+        /* ==========================================================
+           📊 치수 판정 · ⏱️ 측정/선별 시간 (2026-09 개편, .tb- 접두사)
+           - 누구나 바로 쓸 수 있게: 번호 순서, 큰 입력칸, 단위 표시, 즉시 결과
+           ========================================================== */
+        .tb-guide { background: var(--primary-color); color: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; font-size: 0.84rem; line-height: 1.55; font-weight: 600; }
+        .tb-guide b { color: var(--gold); }
+        .tb-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+        .tb-step { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 900; color: #0F172A; margin-bottom: 12px; }
+        .tb-step .n { width: 26px; height: 26px; border-radius: 50%; background: var(--primary-color); color: var(--gold); display: grid; place-items: center; font-size: 0.8rem; flex: none; }
+        .tb-step small { font-size: 0.74rem; color: #64748B; font-weight: 800; margin-left: auto; }
+        .tb-label { display: block; font-size: 0.82rem; font-weight: 800; color: #475569; margin-bottom: 6px; }
+        .tb-label .opt { color: #94A3B8; font-weight: 600; }
+        .tb-input-wrap { position: relative; display: flex; align-items: center; min-width: 0; }
+        .tb-input { width: 100%; height: 58px; border: 2px solid #CBD5E1; border-radius: 12px; padding: 0 48px 0 14px; font-size: 1.4rem; font-weight: 800; color: #0F172A; background: #fff; font-variant-numeric: tabular-nums; font-family: inherit; }
+        .tb-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
+        .tb-input::placeholder { color: #CBD5E1; font-weight: 700; font-size: 1.1rem; }
+        .tb-unit { position: absolute; right: 14px; font-size: 0.95rem; font-weight: 800; color: #94A3B8; pointer-events: none; }
+        .tb-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #F1F5F9; padding: 4px; border-radius: 14px; margin-bottom: 12px; }
+        .tb-seg button { border: none; background: transparent; padding: 10px 4px; border-radius: 10px; font-size: 0.92rem; font-weight: 900; color: #64748B; line-height: 1.3; font-family: inherit; }
+        .tb-seg button small { display: block; font-size: 0.68rem; font-weight: 700; opacity: .8; margin-top: 2px; }
+        .tb-seg button.on { background: var(--primary-color); color: var(--gold); box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+        .tb-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .tb-rowlabel { flex: none; width: 58px; font-size: 0.82rem; font-weight: 900; color: #475569; line-height: 1.2; }
+        .tb-sign { display: flex; flex: none; border: 2px solid #CBD5E1; border-radius: 12px; overflow: hidden; height: 58px; }
+        .tb-sign button { width: 44px; border: none; background: #fff; font-size: 1.4rem; font-weight: 900; color: #CBD5E1; font-family: inherit; }
+        .tb-sign button.on { background: var(--primary-color); color: var(--gold); }
+        .tb-pm { flex: none; width: 58px; height: 58px; border-radius: 12px; background: var(--primary-color); color: var(--gold); font-size: 1.6rem; font-weight: 900; display: grid; place-items: center; }
+        .tb-drawing { text-align: center; font-size: 0.82rem; color: #64748B; margin: 4px 0 10px; font-weight: 700; min-height: 20px; }
+        .tb-drawing b { font-size: 1.1rem; color: #0F172A; font-variant-numeric: tabular-nums; }
+        .tb-range { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 14px; padding: 12px 8px; }
+        .tb-range .box { text-align: center; }
+        .tb-range .k { font-size: 0.72rem; font-weight: 800; color: #3B82F6; }
+        .tb-range .v { font-size: 1.5rem; font-weight: 900; color: #1E3A8A; font-variant-numeric: tabular-nums; }
+        .tb-range .sep { font-size: 1.2rem; color: #93C5FD; font-weight: 900; }
+        .tb-range.idle .v { color: #BFDBFE; }
+        .tb-warn { margin-top: 8px; background: #FEF3C7; color: #92400E; border-radius: 10px; padding: 8px 10px; font-size: 0.78rem; font-weight: 700; display: none; line-height: 1.45; }
+        .tb-add-row { display: flex; gap: 8px; }
+        .tb-add-btn { flex: none; width: 86px; height: 58px; border: none; border-radius: 12px; background: var(--accent-color); color: #fff; font-size: 1.05rem; font-weight: 900; font-family: inherit; }
+        .tb-add-btn:active { transform: scale(.97); }
+        .tb-hint { font-size: 0.74rem; color: #94A3B8; margin-top: 6px; line-height: 1.5; font-weight: 600; }
+        .tb-hint b { color: #64748B; }
+        .tb-latest { margin-top: 12px; border-radius: 14px; padding: 16px 12px; text-align: center; background: #F1F5F9; color: #94A3B8; font-weight: 800; font-size: 0.86rem; line-height: 1.5; }
+        .tb-latest.ok { background: #D1FAE5; color: #065F46; }
+        .tb-latest.ng { background: #FEE2E2; color: #991B1B; }
+        .tb-latest.wait { background: #FEF3C7; color: #92400E; }
+        .tb-latest .big { font-size: 2rem; font-weight: 900; line-height: 1.2; }
+        .tb-latest .sub { font-size: 0.86rem; margin-top: 4px; font-weight: 800; }
+        .tb-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .tb-item { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 12px; border-radius: 12px; border: 1px solid #E2E8F0; background: #fff; }
+        .tb-item .no { flex: none; min-width: 30px; font-size: 0.76rem; font-weight: 800; color: #94A3B8; }
+        .tb-item .val { font-size: 1.15rem; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; }
+        .tb-item .dev { font-size: 0.76rem; color: #64748B; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .tb-item .badge { margin-left: auto; padding: 5px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 900; white-space: nowrap; background: #F1F5F9; color: #94A3B8; }
+        .tb-item.ok .badge { background: #D1FAE5; color: #065F46; }
+        .tb-item.ng { border-color: #FCA5A5; background: #FFF5F5; }
+        .tb-item.ng .badge { background: #DC2626; color: #fff; }
+        .tb-del { flex: none; border: none; background: none; color: #CBD5E1; font-size: 1.15rem; font-weight: 900; padding: 4px 6px; font-family: inherit; }
+        .tb-sum-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+        .tb-sum { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 4px; text-align: center; }
+        .tb-sum .k { font-size: 0.72rem; font-weight: 800; color: #64748B; }
+        .tb-sum .v { font-size: 1.2rem; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; }
+        .tb-sum.ok .v { color: #059669; }
+        .tb-sum.ng .v { color: #DC2626; }
+        .tb-bar { position: relative; height: 56px; margin: 8px 18px 14px; }
+        .tb-bar .axis { position: absolute; left: 0; right: 0; top: 23px; height: 2px; background: #E2E8F0; }
+        .tb-bar .zone { position: absolute; top: 16px; height: 16px; background: #D1FAE5; border: 1px solid #6EE7B7; border-radius: 4px; }
+        .tb-bar .nom { position: absolute; top: 8px; height: 32px; border-left: 2px dashed #3B82F6; }
+        .tb-bar .dot { position: absolute; top: 17px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #059669; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.35); }
+        .tb-bar .dot.ng { background: #DC2626; }
+        .tb-bar .tb-tick { position: absolute; top: 40px; font-size: 0.68rem; font-weight: 800; color: #475569; transform: translateX(-50%); white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .tb-bar .tb-tick.top { top: -6px; color: #3B82F6; }
+        .tb-ghost-btn { width: 100%; padding: 13px; border-radius: 12px; border: 1px solid #FCA5A5; background: #fff; color: #DC2626; font-weight: 800; font-size: 0.88rem; font-family: inherit; }
+        .tb-ghost-btn.gray { border-color: #CBD5E1; color: #64748B; }
+
+        /* ⏱️ 측정/선별 시간 */
+        .tb-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #E2E8F0; padding: 4px; border-radius: 14px; margin-bottom: 12px; }
+        .tb-tabs button { border: none; background: transparent; padding: 13px 4px; border-radius: 11px; font-size: 1rem; font-weight: 900; color: #64748B; font-family: inherit; }
+        .tb-tabs button.on { background: #fff; color: var(--primary-color); box-shadow: 0 2px 6px rgba(0,0,0,.1); }
+        .tb-clock { font-size: 3.8rem; font-weight: 900; text-align: center; color: #0F172A; font-variant-numeric: tabular-nums; letter-spacing: 1px; line-height: 1.1; margin: 10px 0 4px; }
+        .tb-clock.run { color: #DC2626; }
+        .tb-clock-status { text-align: center; font-size: 0.86rem; font-weight: 800; color: #94A3B8; margin-bottom: 14px; }
+        .tb-clock-status.run { color: #DC2626; }
+        .tb-big-btn { width: 100%; height: 70px; border: none; border-radius: 18px; font-size: 1.45rem; font-weight: 900; color: #fff; background: #059669; box-shadow: 0 6px 16px rgba(5,150,105,.3); font-family: inherit; }
+        .tb-big-btn.stop { background: #DC2626; box-shadow: 0 6px 16px rgba(220,38,38,.3); }
+        .tb-big-btn:active { transform: scale(.98); }
+        .tb-rec { border: 1px solid #E2E8F0; border-radius: 14px; padding: 12px; background: #fff; }
+        .tb-rec.new { animation: tbFlash 1.2s ease; }
+        @keyframes tbFlash { 0% { background: #FEF9C3; } 100% { background: #fff; } }
+        .tb-rec-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .tb-rec-head .no { flex: none; font-size: 0.8rem; font-weight: 900; color: var(--primary-color); background: #FBF3E4; border: 1px solid rgba(224,176,96,.5); padding: 3px 9px; border-radius: 999px; }
+        .tb-rec-head .t { font-size: 1.4rem; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; }
+        .tb-rec-head .pp { margin-left: auto; font-size: 0.8rem; font-weight: 800; color: #059669; text-align: right; line-height: 1.25; }
+        .tb-rec input { width: 100%; padding: 11px 12px; border: 1px dashed #CBD5E1; border-radius: 10px; font-size: 0.92rem; background: #F8FAFC; font-family: inherit; }
+        .tb-rec input:focus { outline: none; border-style: solid; border-color: var(--gold); background: #fff; }
+        .tb-empty { text-align: center; color: #94A3B8; font-size: 0.86rem; font-weight: 700; padding: 18px 0; line-height: 1.5; }
+        .tb-result { background: var(--primary-color); color: #fff; border-radius: 16px; padding: 16px 12px; text-align: center; margin-top: 12px; }
+        .tb-result .k { font-size: 0.8rem; font-weight: 800; color: var(--gold); letter-spacing: .5px; }
+        .tb-result .v { font-size: 2.3rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1.2; margin-top: 2px; }
+        .tb-result .s { font-size: 0.82rem; color: #CBD5E1; margin-top: 4px; font-weight: 700; }
+        .tb-result.idle { background: #F1F5F9; }
+        .tb-result.idle .k { color: #94A3B8; }
+        .tb-result.idle .v { font-size: 0.95rem; color: #94A3B8; font-weight: 700; margin-top: 6px; }
+        .tb-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .tb-mini-result { margin-top: 10px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 12px; text-align: center; font-size: 0.84rem; color: #065F46; font-weight: 800; line-height: 1.45; }
+        .tb-mini-result b { display: block; font-size: 1.6rem; font-weight: 900; color: #047857; font-variant-numeric: tabular-nums; }
+        .tb-mini-result.idle { background: #F8FAFC; border-color: #E2E8F0; color: #94A3B8; }
+        .tb-link-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; background: #FBF3E4; color: #7c5a1c; font-weight: 900; font-size: 0.92rem; border: 1px solid rgba(224,176,96,.6); font-family: inherit; }
+        .tb-sub { font-size: 0.86rem; font-weight: 900; color: #0F172A; margin: 16px 0 10px; padding-top: 14px; border-top: 1px dashed #E2E8F0; }
+        .tb-rec-sum { margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
     </style>
 </head>
 <body>
@@ -506,187 +616,214 @@
             </div>
         </div>
 
-        <!-- 📊 치수 판정 -->
+        <!-- 📊 치수 판정 (2026-09 개편: 공차 선택식 입력 + 측정값 쌓아서 바로 판정) -->
         <div id="dimension-view" class="view">
             <div class="sub-header">
                 <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
             </div>
             <div class="qm-scroll">
             <div class="qm-wrap">
-                <div class="pe-tabbar">
-                    <button class="pe-tbtn on" id="dt-tab-single" onclick="dtSwitchTab('single')">단일 측정값</button>
-                    <button class="pe-tbtn" id="dt-tab-multi" onclick="dtSwitchTab('multi')">다수 측정값</button>
+                <div class="tb-guide">① <b>도면 치수</b>를 넣고 → ② <b>측정값</b>을 넣으면 → <b>합격/불합격</b>이 바로 나옵니다</div>
+
+                <!-- ① 도면 치수 -->
+                <div class="tb-card">
+                    <div class="tb-step"><span class="n">1</span>도면 치수 입력</div>
+
+                    <label class="tb-label">기준치 (도면에 적힌 숫자)</label>
+                    <div class="tb-input-wrap" style="margin-bottom:14px;">
+                        <input class="tb-input" type="text" inputmode="decimal" id="dmNominal" placeholder="예: 13.6" autocomplete="off" oninput="dmOnSpecInput()">
+                        <span class="tb-unit">mm</span>
+                    </div>
+
+                    <label class="tb-label">공차가 어떻게 적혀 있나요?</label>
+                    <div class="tb-seg">
+                        <button type="button" id="dmModeSym" class="on" onclick="dmSetMode('sym')">± 위아래 같음<small>예: 13.6 ±0.05</small></button>
+                        <button type="button" id="dmModeAsym" onclick="dmSetMode('asym')">위·아래 다름<small>예: 13.6 +0.15 / −0.10</small></button>
+                    </div>
+
+                    <div id="dmSymBox">
+                        <div class="tb-row">
+                            <div class="tb-pm">±</div>
+                            <div class="tb-input-wrap" style="flex:1;">
+                                <input class="tb-input" type="text" inputmode="decimal" id="dmTolSym" placeholder="예: 0.05" autocomplete="off" oninput="dmOnSpecInput()">
+                                <span class="tb-unit">mm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="dmAsymBox" style="display:none;">
+                        <div class="tb-row">
+                            <span class="tb-rowlabel">위 공차<br><span style="font-weight:700;color:#94A3B8;font-size:.7rem;">(윗줄)</span></span>
+                            <div class="tb-sign" id="dmUpSign">
+                                <button type="button" data-s="+" class="on">+</button>
+                                <button type="button" data-s="-">−</button>
+                            </div>
+                            <div class="tb-input-wrap" style="flex:1;">
+                                <input class="tb-input" type="text" inputmode="decimal" id="dmTolUp" placeholder="0.15" autocomplete="off" oninput="dmOnSpecInput()">
+                                <span class="tb-unit">mm</span>
+                            </div>
+                        </div>
+                        <div class="tb-row">
+                            <span class="tb-rowlabel">아래 공차<br><span style="font-weight:700;color:#94A3B8;font-size:.7rem;">(아랫줄)</span></span>
+                            <div class="tb-sign" id="dmLoSign">
+                                <button type="button" data-s="+">+</button>
+                                <button type="button" data-s="-" class="on">−</button>
+                            </div>
+                            <div class="tb-input-wrap" style="flex:1;">
+                                <input class="tb-input" type="text" inputmode="decimal" id="dmTolLo" placeholder="0.10" autocomplete="off" oninput="dmOnSpecInput()">
+                                <span class="tb-unit">mm</span>
+                            </div>
+                        </div>
+                        <div class="tb-hint" style="margin-top:0; margin-bottom:6px;">도면에 <b>+0</b>처럼 0이면 0을 넣으세요. 두 줄이 모두 +(예: +0.20 / +0.10)면 아래 부호도 <b>+</b>로 바꾸세요.</div>
+                    </div>
+
+                    <div class="tb-drawing" id="dmDrawing"></div>
+                    <div class="tb-range idle" id="dmRangeBox">
+                        <div class="box"><div class="k">최소 (이상)</div><div class="v" id="dmMin">-</div></div>
+                        <div class="sep">~</div>
+                        <div class="box"><div class="k">최대 (이하)</div><div class="v" id="dmMax">-</div></div>
+                    </div>
+                    <div class="tb-warn" id="dmWarn"></div>
                 </div>
 
-                <div class="pe-card">
-                    <h2>공차 표기 해석 (선택)</h2>
-                    <div class="qm-field" style="margin-bottom:8px;">
-                        <label>도면 공차 표기 입력</label>
-                        <input type="text" id="dtSpecInput" placeholder="예: 13.6 +0/-0.05  또는  13.6 ±0.05">
+                <!-- ② 측정값 -->
+                <div class="tb-card">
+                    <div class="tb-step"><span class="n">2</span>측정값 입력<small id="dmCountLabel"></small></div>
+                    <div class="tb-add-row">
+                        <div class="tb-input-wrap" style="flex:1;">
+                            <input class="tb-input" type="text" inputmode="decimal" enterkeyhint="done" id="dmValueInput" placeholder="측정값" autocomplete="off"
+                                   onkeydown="if (event.key === 'Enter') { event.preventDefault(); dmAddFromInput(); }" onpaste="dmOnPaste(event)">
+                            <span class="tb-unit">mm</span>
+                        </div>
+                        <button type="button" class="tb-add-btn" onclick="dmAddFromInput()">+ 추가</button>
                     </div>
-                    <button class="pe-btn outline" style="margin-top:0;" onclick="dtParseSpec()">해석해서 자동 입력</button>
-                    <div class="pe-mapbox" id="dtSpecResult" style="margin-top:8px; display:none;"></div>
+                    <div class="tb-hint">값을 넣고 <b>+ 추가</b>(또는 Enter)를 누르면 아래로 쌓입니다. 엑셀에서 여러 칸을 복사해 붙여넣으면 한 번에 들어갑니다.</div>
+                    <div class="tb-latest" id="dmLatest">도면 치수와 측정값을 넣으면<br>여기에 합격/불합격이 크게 나옵니다</div>
+                    <div class="tb-list" id="dmList"></div>
                 </div>
 
-                <!-- 단일 측정값 판정 -->
-                <div id="dt-panel-single" class="pe-panel">
-                    <div class="verdict-panel" style="max-width:none;">
-                        <h4>치수 판정 (Go / No-Go)</h4>
-                        <div class="verdict-grid">
-                            <div class="verdict-field">
-                                <label>기준치 (mm)</label>
-                                <input type="number" inputmode="decimal" step="0.01" id="dTarget" oninput="calcVerdict('d')">
-                            </div>
-                            <div class="verdict-field">
-                                <label>측정값 (mm)</label>
-                                <input type="number" inputmode="decimal" step="0.01" id="dMeasured" oninput="calcVerdict('d')">
-                            </div>
-                            <div class="verdict-field">
-                                <label>상한공차 (+, mm)</label>
-                                <input type="number" inputmode="decimal" step="0.01" id="dTolUp" oninput="calcVerdict('d')">
-                            </div>
-                            <div class="verdict-field">
-                                <label>하한공차 (−, mm)</label>
-                                <input type="number" inputmode="decimal" step="0.01" id="dTolDown" placeholder="비우면 대칭" oninput="calcVerdict('d')">
-                            </div>
-                        </div>
-                        <div class="verdict-range" id="dRange"></div>
-                        <div class="verdict-result" id="dResult" style="font-size:1.1rem; padding:16px;">기준치와 측정값을 입력하세요</div>
-                        <div class="verdict-range" id="dDeviation" style="margin-top:8px;"></div>
+                <!-- ③ 전체 결과 (측정값 2개 이상일 때) -->
+                <div class="tb-card" id="dmSummaryCard" style="display:none;">
+                    <div class="tb-step"><span class="n">3</span>전체 결과</div>
+                    <div class="tb-sum-grid">
+                        <div class="tb-sum"><div class="k">측정 개수</div><div class="v" id="dmSumN">0</div></div>
+                        <div class="tb-sum ok"><div class="k">합격 OK</div><div class="v" id="dmSumOk">0</div></div>
+                        <div class="tb-sum ng"><div class="k">불합격 NG</div><div class="v" id="dmSumNg">0</div></div>
+                        <div class="tb-sum"><div class="k">가장 작은 값</div><div class="v" id="dmSumMin">-</div></div>
+                        <div class="tb-sum"><div class="k">평균</div><div class="v" id="dmSumAvg">-</div></div>
+                        <div class="tb-sum"><div class="k">가장 큰 값</div><div class="v" id="dmSumMax">-</div></div>
                     </div>
+                    <label class="tb-label">허용범위 안 어디쯤인지 <span class="opt">(초록 = 합격 구간 · 파란 점선 = 기준치)</span></label>
+                    <div class="tb-bar" id="dmBar"></div>
                 </div>
 
-                <!-- 다수 측정값 판정 -->
-                <div id="dt-panel-multi" class="pe-panel" style="display:none;">
-                    <div class="pe-card">
-                        <div class="verdict-grid" style="margin-bottom:10px;">
-                            <div class="verdict-field">
-                                <label>기준치 (mm)</label>
-                                <input type="number" inputmode="decimal" step="0.01" id="dmTarget">
-                            </div>
-                            <div class="verdict-field">
-                                <label>상한공차 (+, mm)</label>
-                                <input type="number" inputmode="decimal" step="0.01" id="dmTolUp">
-                            </div>
-                            <div class="verdict-field">
-                                <label>하한공차 (−, mm)</label>
-                                <input type="number" inputmode="decimal" step="0.01" id="dmTolDown" placeholder="비우면 대칭">
-                            </div>
-                        </div>
-                        <div class="qm-field" style="margin-bottom:10px;">
-                            <label>측정값 목록 (한 줄에 하나씩)</label>
-                            <textarea id="dmValues" rows="6" placeholder="13.57&#10;13.58&#10;13.54&#10;13.59&#10;13.60"></textarea>
-                        </div>
-                        <button class="pe-btn primary" onclick="dtJudgeMulti()">판정하기</button>
-                    </div>
-                    <div class="pe-card" id="dmSummaryCard" style="display:none;">
-                        <h2>판정 결과</h2>
-                        <div class="pe-badge-row" style="margin-bottom:10px;">
-                            <span id="dmTotal"></span>
-                            <span class="pe-badge ok" id="dmOkBadge"></span>
-                            <span class="pe-badge" id="dmNgBadge" style="background:#FEE2E2;color:#991B1B;"></span>
-                        </div>
-                        <div id="dmList"></div>
-                    </div>
-                </div>
+                <button type="button" class="tb-ghost-btn" id="dmClearBtn" style="display:none; margin-bottom:12px;" onclick="dmClearValues()">🗑 측정값 전체 지우기</button>
+                <button type="button" class="tb-ghost-btn gray" onclick="dmClearAll()">↺ 처음부터 다시 (도면 치수까지 지우기)</button>
             </div>
             </div>
         </div>
 
-        <!-- ⏱️ 측정·선별 시간 -->
+        <!-- ⏱️ 측정·선별 시간 (2026-09 개편: 탭 2개 = 시간 재기 / 시간 계산) -->
         <div id="timer-view" class="view">
             <div class="sub-header">
                 <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
             </div>
             <div class="qm-scroll">
             <div class="qm-wrap">
-                <div class="qm-filter-row" style="margin-bottom:12px;">
-                    <button class="qm-chip on" id="st-tab-stopwatch" onclick="stSwitchTab('stopwatch')">측정시간</button>
-                    <button class="qm-chip" id="st-tab-perpiece" onclick="stSwitchTab('perpiece')">1개당 시간</button>
-                    <button class="qm-chip" id="st-tab-perbox" onclick="stSwitchTab('perbox')">1박스 시간</button>
-                    <button class="qm-chip" id="st-tab-byqty" onclick="stSwitchTab('byqty')">수량별 예상</button>
-                    <button class="qm-chip" id="st-tab-bybox" onclick="stSwitchTab('bybox')">박스별 예상</button>
+                <div class="tb-tabs">
+                    <button type="button" id="stTabRec" class="on" onclick="stTab('rec')">⏱️ 시간 재기</button>
+                    <button type="button" id="stTabCalc" onclick="stTab('calc')">🧮 시간 계산</button>
                 </div>
 
-                <!-- 측정시간 스톱워치 -->
-                <div id="st-panel-stopwatch" class="pe-panel pe-card" style="text-align:center;">
-                    <div class="timer-display" id="timerDisplay">00:00.0</div>
-                    <div class="timer-btn-row" style="max-width:none; margin:0 auto 6px;">
-                        <button class="mini-btn done" id="timerStartBtn" type="button" onclick="toggleTimer()">시작</button>
-                        <button class="mini-btn ghost" type="button" onclick="resetTimer()">초기화</button>
-                    </div>
-                    <div class="pe-mapbox" id="timerResultBox" style="display:none; margin-top:10px;"></div>
-                </div>
+                <!-- 탭 1: 시간 재기 (스톱워치 + 기록 + 메모) -->
+                <div id="stPanelRec">
+                    <div class="tb-guide"><b>▶ 시작</b>을 누르고, 끝나면 <b>■ 정지</b>. 정지할 때마다 기록이 아래로 쌓이고, 기록마다 메모를 남길 수 있습니다.</div>
 
-                <!-- 1개당 작업시간 -->
-                <div id="st-panel-perpiece" class="pe-panel" style="display:none;">
-                    <div class="pe-card">
-                        <div class="pe-num-row">
-                            <div class="pe-num-field"><label>작업 수량 (개)</label><input type="number" id="ppQty" placeholder="예: 50"></div>
-                            <div class="pe-num-field"><label>소요시간 - 분</label><input type="number" id="ppMin" placeholder="예: 23"></div>
+                    <div class="tb-card">
+                        <label class="tb-label">1회(1박스) 수량 <span class="opt">— 선택 입력</span></label>
+                        <div class="tb-input-wrap">
+                            <input class="tb-input" type="text" inputmode="numeric" id="stQty" placeholder="예: 50" autocomplete="off" oninput="stOnQty()">
+                            <span class="tb-unit">개</span>
                         </div>
-                        <div class="pe-num-row">
-                            <div class="pe-num-field"><label>소요시간 - 초</label><input type="number" id="ppSec" placeholder="예: 40"></div>
-                        </div>
-                        <button class="pe-btn primary" onclick="stCalcPerPiece()">계산하기</button>
+                        <div class="tb-hint">넣어두면 기록마다 <b>1개당 시간</b>이 자동으로 계산됩니다. 한 개씩 잴 때는 비워두세요.</div>
+
+                        <div class="tb-clock" id="stClock">00:00.0</div>
+                        <div class="tb-clock-status" id="stStatus">대기 중 · 아래 버튼을 누르면 시작합니다</div>
+                        <button type="button" class="tb-big-btn" id="stBigBtn" onclick="stToggle()">▶ 시작</button>
                     </div>
-                    <div class="pe-card" id="ppResultCard" style="display:none; text-align:center;">
-                        <div style="font-size:0.78rem; color:#64748B; margin-bottom:6px;">1개당 평균</div>
-                        <div style="font-size:1.8rem; font-weight:800; color:var(--primary-color);" id="ppResult"></div>
+
+                    <div class="tb-card">
+                        <div class="tb-step"><span class="n">≡</span>측정 기록<small id="stRecCount"></small></div>
+                        <div class="tb-list" id="stRecList" style="margin-top:0;"></div>
+                        <div class="tb-rec-sum" id="stRecSum" style="display:none;"></div>
+                        <button type="button" class="tb-link-btn" id="stUseAvgBtn" style="display:none;" onclick="stUseAverage()">📈 평균으로 앞으로 걸릴 시간 계산하기 →</button>
                     </div>
+
+                    <button type="button" class="tb-ghost-btn" onclick="stResetAll()">↺ 초기화 (기록·메모 전부 지우기)</button>
                 </div>
 
-                <!-- 1박스 선별시간 -->
-                <div id="st-panel-perbox" class="pe-panel" style="display:none;">
-                    <div class="pe-card">
-                        <div class="pe-num-field" style="margin-bottom:10px;"><label>1박스 수량 (개)</label><input type="number" id="pbQty" placeholder="예: 50"></div>
-                        <div class="timer-display" id="pbTimerDisplay" style="font-size:2rem; text-align:center;">00:00.0</div>
-                        <div class="timer-btn-row" style="max-width:none; margin:0 auto;">
-                            <button class="mini-btn done" id="pbStartBtn" type="button" onclick="stTogglePbTimer()">선별 시작</button>
-                            <button class="mini-btn ghost" type="button" onclick="stResetPbTimer()">초기화</button>
+                <!-- 탭 2: 시간 계산 (1개당 + 수량별 + 박스별 통합) -->
+                <div id="stPanelCalc" style="display:none;">
+                    <div class="tb-guide">① <b>작업 수량</b>과 ② <b>걸린 시간</b>을 넣으면 1개당 시간이 나오고, ③에서 <b>앞으로 걸릴 시간</b>을 계산합니다.</div>
+
+                    <div class="tb-card">
+                        <div class="tb-step"><span class="n">1</span>작업 수량</div>
+                        <div class="tb-input-wrap">
+                            <input class="tb-input" type="text" inputmode="numeric" id="tcQty" placeholder="예: 50" autocomplete="off" oninput="tcCalc()">
+                            <span class="tb-unit">개</span>
                         </div>
                     </div>
-                    <div class="pe-card" id="pbResultCard" style="display:none; text-align:center;">
-                        <div style="font-size:0.78rem; color:#64748B;">1박스 선별시간</div>
-                        <div style="font-size:1.4rem; font-weight:800; color:var(--primary-color); margin-bottom:8px;" id="pbResultTime"></div>
-                        <div style="font-size:0.78rem; color:#64748B;">1개당 평균</div>
-                        <div style="font-size:1.4rem; font-weight:800; color:var(--primary-color);" id="pbResultPerPiece"></div>
-                    </div>
-                </div>
 
-                <!-- 수량별 예상시간 -->
-                <div id="st-panel-byqty" class="pe-panel" style="display:none;">
-                    <div class="pe-card">
-                        <div class="pe-num-row">
-                            <div class="pe-num-field"><label>기준 수량 (개)</label><input type="number" id="bqBaseQty" placeholder="예: 50" oninput="stCalcByQty()"></div>
-                            <div class="pe-num-field"><label>기준 작업시간(초)</label><input type="number" id="bqBaseSec" placeholder="예: 1420" oninput="stCalcByQty()"></div>
+                    <div class="tb-card">
+                        <div class="tb-step"><span class="n">2</span>걸린 시간</div>
+                        <div class="tb-two">
+                            <div class="tb-input-wrap">
+                                <input class="tb-input" type="text" inputmode="numeric" id="tcMin" placeholder="0" autocomplete="off" oninput="tcCalc()">
+                                <span class="tb-unit">분</span>
+                            </div>
+                            <div class="tb-input-wrap">
+                                <input class="tb-input" type="text" inputmode="decimal" id="tcSec" placeholder="0" autocomplete="off" oninput="tcCalc()">
+                                <span class="tb-unit">초</span>
+                            </div>
                         </div>
-                        <div class="pe-num-field" style="margin-bottom:10px;"><label>목표 수량 (개)</label><input type="number" id="bqTargetQty" placeholder="예: 300" oninput="stCalcByQty()"></div>
-                    </div>
-                    <div class="pe-card" id="bqResultCard" style="display:none; text-align:center;">
-                        <div style="font-size:0.78rem; color:#64748B;">예상 소요시간</div>
-                        <div style="font-size:1.8rem; font-weight:800; color:var(--primary-color);" id="bqResult"></div>
-                    </div>
-                </div>
-
-                <!-- 박스별 예상시간 -->
-                <div id="st-panel-bybox" class="pe-panel" style="display:none;">
-                    <div class="pe-card">
-                        <div class="pe-num-row">
-                            <div class="pe-num-field"><label>1박스 수량 (개)</label><input type="number" id="bbBoxQty" placeholder="예: 50" oninput="stCalcByBox()"></div>
-                            <div class="pe-num-field"><label>1박스 선별시간(초)</label><input type="number" id="bbBoxSec" placeholder="예: 1420" oninput="stCalcByBox()"></div>
+                        <div class="tb-result idle" id="tcResult">
+                            <div class="k">1개당 시간</div>
+                            <div class="v">①, ②를 채우면 바로 계산됩니다</div>
                         </div>
-                        <div class="pe-num-field" style="margin-bottom:10px;"><label>필요 박스 수</label><input type="number" id="bbBoxCount" placeholder="예: 5" oninput="stCalcByBox()"></div>
                     </div>
-                    <div class="pe-card" id="bbResultCard" style="display:none; text-align:center;">
-                        <div style="font-size:0.78rem; color:#64748B;">예상 소요시간</div>
-                        <div style="font-size:1.8rem; font-weight:800; color:var(--primary-color);" id="bbResult"></div>
-                    </div>
-                </div>
 
-                <div class="memo-box" style="max-width:none; margin-top:4px;">
-                    <label>현장/특이사항 메모 (선택, 캡처에 포함됨)</label>
-                    <input type="text" id="timerMemo" placeholder="예: 2호기 사출 1박스 선별">
+                    <div class="tb-card">
+                        <div class="tb-step"><span class="n">3</span>앞으로 걸릴 시간 예상</div>
+
+                        <label class="tb-label">총 몇 개 할 건가요?</label>
+                        <div class="tb-input-wrap">
+                            <input class="tb-input" type="text" inputmode="numeric" id="tcTarget" placeholder="예: 300" autocomplete="off" oninput="tcCalc()">
+                            <span class="tb-unit">개</span>
+                        </div>
+                        <div class="tb-mini-result idle" id="tcTargetResult">목표 수량을 넣으면 예상 시간이 나옵니다</div>
+
+                        <div class="tb-sub">📦 박스 단위로 계산하기</div>
+                        <div class="tb-two">
+                            <div>
+                                <label class="tb-label">박스 수</label>
+                                <div class="tb-input-wrap">
+                                    <input class="tb-input" type="text" inputmode="numeric" id="tcBoxes" placeholder="예: 5" autocomplete="off" oninput="tcCalc()">
+                                    <span class="tb-unit">박스</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="tb-label">1박스 수량</label>
+                                <div class="tb-input-wrap">
+                                    <input class="tb-input" type="text" inputmode="numeric" id="tcBoxQty" placeholder="예: 50" autocomplete="off" oninput="tcCalc()">
+                                    <span class="tb-unit">개</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tb-hint" id="tcBoxQtyHint">1박스 수량을 비워두면 ①의 작업 수량을 1박스로 봅니다.</div>
+                        <div class="tb-mini-result idle" id="tcBoxResult">박스 수를 넣으면 예상 시간이 나옵니다</div>
+                    </div>
+
+                    <button type="button" class="tb-ghost-btn gray" onclick="tcClear()">↺ 입력값 모두 지우기</button>
                 </div>
             </div>
             </div>
@@ -1220,120 +1357,305 @@
             showToast('보정값이 초기화되었습니다');
         }
 
-        // ✅ 치수 판정 (Go/No-Go) - 치수 판정 화면용
-        function calcVerdict(prefix) {
-            const target = parseFloat(document.getElementById(prefix + 'Target').value);
-            const measured = parseFloat(document.getElementById(prefix + 'Measured').value);
-            const tolUpRaw = document.getElementById(prefix + 'TolUp').value;
-            const tolDownRaw = document.getElementById(prefix + 'TolDown').value;
-            const resultEl = document.getElementById(prefix + 'Result');
-            const rangeEl = document.getElementById(prefix + 'Range');
-            const devEl = document.getElementById(prefix + 'Deviation');
+        // ─────────────────────────────────────────────
+        // 📊 치수 판정 (2026-09 개편)
+        //  - 공차는 글자 해석 대신 "± 같음 / 위·아래 다름" 선택 + 칸 입력
+        //  - 위·아래 공차에 부호(+/−)를 따로 지정 → 편측 공차(+0.20/+0.10)도 정확
+        //  - 측정값은 한 칸에 넣고 추가 → 아래로 쌓이며 즉시 OK/NG 판정
+        //  - 입력 상태는 localStorage(tb_dim_v1)에 저장 → 새로고침해도 유지
+        // ─────────────────────────────────────────────
+        const DM_KEY = 'tb_dim_v1';
+        const DM_EPS = 1e-9; // 부동소수 오차(13.6+0.15=13.750000001 등) 보정
+        let dm = { mode: 'sym', nominal: '', tolSym: '', tolUp: '', tolLo: '', upSign: '+', loSign: '-', values: [] };
 
-            if (isNaN(target) || isNaN(measured)) {
-                resultEl.className = 'verdict-result';
-                resultEl.innerText = '기준치와 측정값을 입력하세요';
-                rangeEl.innerText = '';
-                if (devEl) devEl.innerText = '';
-                return;
-            }
+        function dmNum(str) {
+            if (str === undefined || str === null) return NaN;
+            const t = String(str).trim().replace(/,/g, '.').replace(/[−–]/g, '-').replace(/[^\d.+\-]/g, '');
+            if (t === '' || t === '-' || t === '+' || t === '.') return NaN;
+            const n = parseFloat(t);
+            return isFinite(n) ? n : NaN;
+        }
+        function dmDecimals(str) {
+            const m = String(str || '').trim().replace(/,/g, '.').match(/\.(\d+)/);
+            return m ? m[1].length : 0;
+        }
+        function dmSave() { try { localStorage.setItem(DM_KEY, JSON.stringify(dm)); } catch (e) {} }
 
-            const tolUp = tolUpRaw === '' ? 0 : Math.abs(parseFloat(tolUpRaw));
-            const tolDown = tolDownRaw === '' ? tolUp : Math.abs(parseFloat(tolDownRaw));
-
-            const lower = target - tolDown;
-            const upper = target + tolUp;
-            rangeEl.innerText = `허용범위: ${lower.toFixed(2)} ~ ${upper.toFixed(2)} mm`;
-
-            const dev = measured - target;
-            if (devEl) devEl.innerText = `편차: ${dev >= 0 ? '+' : ''}${dev.toFixed(2)} mm`;
-
-            if (measured >= lower && measured <= upper) {
-                resultEl.className = 'verdict-result pass';
-                resultEl.innerText = '🟢 PASS (합격)';
+        // 현재 입력으로 허용범위 계산 (입력이 덜 됐으면 null)
+        function dmSpec() {
+            const nom = dmNum(dm.nominal);
+            if (isNaN(nom)) return null;
+            let up, lo, dp;
+            if (dm.mode === 'sym') {
+                const t = dmNum(dm.tolSym);
+                if (isNaN(t)) return null;
+                up = Math.abs(t); lo = -Math.abs(t);
+                dp = Math.max(dmDecimals(dm.nominal), dmDecimals(dm.tolSym));
             } else {
-                resultEl.className = 'verdict-result fail';
-                resultEl.innerText = '🔴 FAIL (불합격)';
+                const u = dmNum(dm.tolUp), l = dmNum(dm.tolLo);
+                if (isNaN(u) || isNaN(l)) return null;
+                up = (dm.upSign === '-' ? -1 : 1) * Math.abs(u);
+                lo = (dm.loSign === '-' ? -1 : 1) * Math.abs(l);
+                dp = Math.max(dmDecimals(dm.nominal), dmDecimals(dm.tolUp), dmDecimals(dm.tolLo));
+            }
+            dp = Math.min(4, Math.max(2, dp));
+            return { nom, up, lo, min: nom + Math.min(up, lo), max: nom + Math.max(up, lo), dp, swapped: up < lo, zero: up === lo };
+        }
+
+        function dmFmt(v, dp) { return v.toFixed(dp); }
+        function dmSigned(v, dp) {
+            const r = Number(v.toFixed(dp));
+            if (r === 0) return '0';
+            return (r > 0 ? '+' : '−') + Math.abs(r).toFixed(dp);
+        }
+
+        function dmJudge(v, spec) {
+            if (!spec) return null;
+            if (v < spec.min - DM_EPS) return { ok: false, side: 'low', diff: spec.min - v };
+            if (v > spec.max + DM_EPS) return { ok: false, side: 'high', diff: v - spec.max };
+            return { ok: true };
+        }
+
+        // 입력칸 ↔ 상태 동기화
+        function dmReadInputs() {
+            dm.nominal = document.getElementById('dmNominal').value;
+            dm.tolSym = document.getElementById('dmTolSym').value;
+            dm.tolUp = document.getElementById('dmTolUp').value;
+            dm.tolLo = document.getElementById('dmTolLo').value;
+        }
+        function dmWriteInputs() {
+            document.getElementById('dmNominal').value = dm.nominal;
+            document.getElementById('dmTolSym').value = dm.tolSym;
+            document.getElementById('dmTolUp').value = dm.tolUp;
+            document.getElementById('dmTolLo').value = dm.tolLo;
+        }
+
+        function dmOnSpecInput() { dmReadInputs(); dmSave(); dmRender(); }
+
+        function dmSetMode(mode) {
+            dm.mode = mode;
+            // 모드를 바꿀 때 이미 넣은 값을 옮겨줌 (± 0.05 → 위 +0.05 / 아래 −0.05)
+            if (mode === 'asym' && dm.tolSym !== '' && dm.tolUp === '' && dm.tolLo === '') {
+                dm.tolUp = dm.tolSym; dm.tolLo = dm.tolSym; dm.upSign = '+'; dm.loSign = '-';
+                dmWriteInputs();
+            }
+            dmSave(); dmRender();
+        }
+
+        function dmSetSign(which, sign) {
+            if (which === 'up') dm.upSign = sign; else dm.loSign = sign;
+            dmSave(); dmRender();
+        }
+        ['dmUpSign', 'dmLoSign'].forEach(id => {
+            const box = document.getElementById(id);
+            if (!box) return;
+            box.addEventListener('click', e => {
+                const b = e.target.closest('button[data-s]');
+                if (b) dmSetSign(id === 'dmUpSign' ? 'up' : 'lo', b.dataset.s);
+            });
+        });
+
+        // 측정값 추가 (여러 개가 한 번에 들어오면 전부 추가)
+        function dmSplitValues(text) {
+            return String(text || '').split(/[\s,;\t\r\n]+/).map(s => s.trim()).filter(Boolean);
+        }
+        function dmAddRawList(list) {
+            let added = 0, bad = 0;
+            list.forEach(raw => {
+                const v = dmNum(raw);
+                if (isNaN(v)) { bad++; return; }
+                dm.values.push({ v, raw: String(raw).trim().replace(/,/g, '.') });
+                added++;
+            });
+            if (added) { dmSave(); dmRender(true); }
+            if (bad) showToast(`숫자가 아닌 값 ${bad}개는 건너뛰었습니다`);
+            else if (added > 1) showToast(`측정값 ${added}개를 추가했습니다`);
+            return added;
+        }
+        function dmAddFromInput() {
+            const input = document.getElementById('dmValueInput');
+            const parts = dmSplitValues(input.value);
+            if (parts.length === 0) { showToast('측정값을 입력하세요'); input.focus(); return; }
+            dmAddRawList(parts);
+            input.value = '';
+            input.focus(); // 키보드 유지 → 바로 다음 값 입력
+        }
+        function dmOnPaste(e) {
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            const parts = dmSplitValues(text);
+            if (parts.length > 1) {
+                e.preventDefault();
+                dmAddRawList(parts);
+                document.getElementById('dmValueInput').value = '';
             }
         }
-
-        // 📊 치수 판정 화면 - 탭 전환
-        function dtSwitchTab(tab) {
-            document.getElementById('dt-tab-single').classList.toggle('on', tab === 'single');
-            document.getElementById('dt-tab-multi').classList.toggle('on', tab === 'multi');
-            document.getElementById('dt-panel-single').style.display = tab === 'single' ? '' : 'none';
-            document.getElementById('dt-panel-multi').style.display = tab === 'multi' ? '' : 'none';
+        function dmDeleteValue(i) {
+            dm.values.splice(i, 1);
+            dmSave(); dmRender();
+        }
+        function dmClearValues() {
+            if (!dm.values.length) return;
+            if (!confirm(`측정값 ${dm.values.length}개를 모두 지울까요?`)) return;
+            dm.values = [];
+            dmSave(); dmRender();
+        }
+        function dmClearAll() {
+            if (!confirm('도면 치수와 측정값을 모두 지우고 처음부터 할까요?')) return;
+            dm = { mode: 'sym', nominal: '', tolSym: '', tolUp: '', tolLo: '', upSign: '+', loSign: '-', values: [] };
+            dmWriteInputs(); dmSave(); dmRender();
+            document.getElementById('dmNominal').focus();
         }
 
-        // 공차 표기 해석: "13.6 +0/-0.05", "13.6 ±0.05" 등 지원
-        function dtParseSpecString(str) {
-            if (!str) return null;
-            str = str.trim().replace(/\s+/g, ' ');
-            let m = str.match(/^(-?[\d.]+)\s*±\s*([\d.]+)$/);
-            if (m) return { base: parseFloat(m[1]), upper: parseFloat(m[2]), lower: parseFloat(m[2]) };
-            m = str.match(/^(-?[\d.]+)\s*\+\s*([\d.]+)\s*\/\s*-\s*([\d.]+)$/);
-            if (m) return { base: parseFloat(m[1]), upper: parseFloat(m[2]), lower: parseFloat(m[3]) };
-            m = str.match(/^(-?[\d.]+)\s*-\s*([\d.]+)\s*\/\s*\+\s*([\d.]+)$/);
-            if (m) return { base: parseFloat(m[1]), upper: parseFloat(m[3]), lower: parseFloat(m[2]) };
-            return null;
-        }
+        function dmRender(justAdded) {
+            const spec = dmSpec();
+            const $ = id => document.getElementById(id);
 
-        function dtParseSpec() {
-            const raw = document.getElementById('dtSpecInput').value;
-            const parsed = dtParseSpecString(raw);
-            const resEl = document.getElementById('dtSpecResult');
-            resEl.style.display = 'block';
-            if (!parsed) {
-                resEl.style.color = '#991B1B';
-                resEl.innerText = '해석할 수 없는 표기입니다. 예: 13.6 +0/-0.05, 13.6 ±0.05';
-                return;
-            }
-            resEl.style.color = '#1E3A8A';
-            resEl.innerText = `기준치 ${parsed.base.toFixed(2)}mm · 최소값 ${(parsed.base - parsed.lower).toFixed(2)}mm · 최대값 ${(parsed.base + parsed.upper).toFixed(2)}mm`;
+            // 모드 표시
+            $('dmModeSym').classList.toggle('on', dm.mode === 'sym');
+            $('dmModeAsym').classList.toggle('on', dm.mode === 'asym');
+            $('dmSymBox').style.display = dm.mode === 'sym' ? '' : 'none';
+            $('dmAsymBox').style.display = dm.mode === 'asym' ? '' : 'none';
+            $('dmUpSign').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === dm.upSign));
+            $('dmLoSign').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === dm.loSign));
 
-            const multiActive = document.getElementById('dt-panel-multi').style.display !== 'none';
-            if (multiActive) {
-                document.getElementById('dmTarget').value = parsed.base;
-                document.getElementById('dmTolUp').value = parsed.upper;
-                document.getElementById('dmTolDown').value = parsed.lower;
+            // 도면 표기 미리보기 + 허용범위
+            const warn = $('dmWarn');
+            warn.style.display = 'none';
+            if (spec) {
+                const nomTxt = dmFmt(spec.nom, spec.dp);
+                $('dmDrawing').innerHTML = dm.mode === 'sym'
+                    ? `도면 표기 확인 → <b>${nomTxt} ±${Math.abs(spec.up).toFixed(spec.dp)}</b>`
+                    : `도면 표기 확인 → <b>${nomTxt} ${dmSigned(spec.up, spec.dp)} / ${dmSigned(spec.lo, spec.dp)}</b>`;
+                $('dmMin').innerText = dmFmt(spec.min, spec.dp);
+                $('dmMax').innerText = dmFmt(spec.max, spec.dp);
+                $('dmRangeBox').classList.remove('idle');
+                if (spec.swapped) {
+                    warn.style.display = 'block';
+                    warn.innerText = '⚠️ 위 공차가 아래 공차보다 작습니다. 작은 값을 최소, 큰 값을 최대로 계산했습니다. 도면을 다시 확인하세요.';
+                } else if (spec.zero) {
+                    warn.style.display = 'block';
+                    warn.innerText = '⚠️ 허용범위가 0입니다 (최소 = 최대). 공차 값을 확인하세요.';
+                }
             } else {
-                document.getElementById('dTarget').value = parsed.base;
-                document.getElementById('dTolUp').value = parsed.upper;
-                document.getElementById('dTolDown').value = parsed.lower;
-                calcVerdict('d');
+                $('dmDrawing').innerHTML = isNaN(dmNum(dm.nominal))
+                    ? '기준치와 공차를 넣으면 허용범위가 나옵니다'
+                    : '공차 칸을 채워주세요';
+                $('dmMin').innerText = '-';
+                $('dmMax').innerText = '-';
+                $('dmRangeBox').classList.add('idle');
             }
-        }
 
-        // 다수 측정값 판정
-        function dtJudgeMulti() {
-            const target = parseFloat(document.getElementById('dmTarget').value);
-            if (isNaN(target)) { showToast('기준치를 입력하세요'); return; }
-            const tolUpRaw = document.getElementById('dmTolUp').value;
-            const tolDownRaw = document.getElementById('dmTolDown').value;
-            const tolUp = tolUpRaw === '' ? 0 : Math.abs(parseFloat(tolUpRaw));
-            const tolDown = tolDownRaw === '' ? tolUp : Math.abs(parseFloat(tolDownRaw));
-            const lower = target - tolDown, upper = target + tolUp;
-
-            const raw = document.getElementById('dmValues').value;
-            const values = raw.split(/\r?\n/).map(s => s.trim()).filter(s => s !== '').map(parseFloat).filter(v => !isNaN(v));
-            if (values.length === 0) { showToast('측정값을 입력하세요'); return; }
-
-            let okCount = 0, ngCount = 0;
-            const rows = values.map((v, i) => {
-                const ok = v >= lower && v <= upper;
-                if (ok) okCount++; else ngCount++;
-                return `<div class="qm-item" style="padding:10px 12px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                    <span>#${i + 1} · ${v.toFixed(2)}mm</span>
-                    <span style="font-weight:800; color:${ok ? '#065F46' : '#991B1B'};">${ok ? '🟢 OK' : '🔴 NG'}</span>
+            // 측정값 목록 (소수 자릿수는 도면 기준과 입력값 중 큰 쪽)
+            const n = dm.values.length;
+            $('dmCountLabel').innerText = n ? `${n}개 입력됨` : '';
+            const listEl = $('dmList');
+            let ok = 0, ng = 0;
+            listEl.innerHTML = dm.values.map((item, i) => {
+                const dp = Math.min(4, Math.max(spec ? spec.dp : 2, dmDecimals(item.raw)));
+                const j = dmJudge(item.v, spec);
+                let cls = '', badge = '판정 대기', dev = '';
+                if (j) {
+                    if (j.ok) { ok++; cls = 'ok'; badge = '🟢 OK'; } else { ng++; cls = 'ng'; badge = '🔴 NG'; }
+                    dev = `기준 대비 ${dmSigned(item.v - spec.nom, dp)}`;
+                }
+                return `<div class="tb-item ${cls}">
+                    <span class="no">#${i + 1}</span>
+                    <div><div class="val">${item.v.toFixed(dp)}</div>${dev ? `<div class="dev">${dev}</div>` : ''}</div>
+                    <span class="badge">${badge}</span>
+                    <button type="button" class="tb-del" title="이 값 삭제" onclick="dmDeleteValue(${i})">×</button>
                 </div>`;
             }).join('');
 
-            document.getElementById('dmSummaryCard').style.display = 'block';
-            document.getElementById('dmTotal').innerText = `총 측정 ${values.length}개 (허용범위 ${lower.toFixed(2)}~${upper.toFixed(2)})`;
-            document.getElementById('dmOkBadge').innerText = `OK ${okCount}`;
-            document.getElementById('dmNgBadge').innerText = `NG ${ngCount}`;
-            document.getElementById('dmList').innerHTML = rows;
+            // 가장 최근 값 크게 표시
+            const latest = $('dmLatest');
+            if (n === 0) {
+                latest.className = 'tb-latest';
+                latest.innerHTML = spec ? '측정값을 넣고 <b>+ 추가</b>를 누르세요' : '도면 치수와 측정값을 넣으면<br>여기에 합격/불합격이 크게 나옵니다';
+            } else {
+                const last = dm.values[n - 1];
+                const dp = Math.min(4, Math.max(spec ? spec.dp : 2, dmDecimals(last.raw)));
+                const j = dmJudge(last.v, spec);
+                if (!j) {
+                    latest.className = 'tb-latest wait';
+                    latest.innerHTML = `<div class="big">⏳ 판정 대기</div><div class="sub">①에 도면 치수를 넣으면 바로 판정됩니다</div>`;
+                } else if (j.ok) {
+                    latest.className = 'tb-latest ok';
+                    latest.innerHTML = `<div class="big">🟢 합격 (OK)</div><div class="sub">#${n} 측정값 ${last.v.toFixed(dp)} · 허용범위 안</div>`;
+                } else {
+                    latest.className = 'tb-latest ng';
+                    const why = j.side === 'high'
+                        ? `최대(${dmFmt(spec.max, spec.dp)})보다 ${j.diff.toFixed(dp)} 큼`
+                        : `최소(${dmFmt(spec.min, spec.dp)})보다 ${j.diff.toFixed(dp)} 작음`;
+                    latest.innerHTML = `<div class="big">🔴 불합격 (NG)</div><div class="sub">#${n} 측정값 ${last.v.toFixed(dp)} · ${why}</div>`;
+                }
+            }
+            $('dmClearBtn').style.display = n ? '' : 'none';
+
+            // 전체 결과 (2개 이상)
+            const card = $('dmSummaryCard');
+            if (n >= 2) {
+                card.style.display = '';
+                const vals = dm.values.map(x => x.v);
+                const dp = Math.min(4, Math.max(spec ? spec.dp : 2, ...dm.values.map(x => dmDecimals(x.raw))));
+                const vMin = Math.min(...vals), vMax = Math.max(...vals);
+                const avg = vals.reduce((a, b) => a + b, 0) / n;
+                $('dmSumN').innerText = n;
+                $('dmSumOk').innerText = spec ? ok : '-';
+                $('dmSumNg').innerText = spec ? ng : '-';
+                $('dmSumMin').innerText = vMin.toFixed(dp);
+                $('dmSumAvg').innerText = avg.toFixed(Math.min(4, dp + 1));
+                $('dmSumMax').innerText = vMax.toFixed(dp);
+                dmRenderBar(spec, vals);
+            } else {
+                card.style.display = 'none';
+            }
+
+            if (justAdded) {
+                const scroller = document.querySelector('#dimension-view .qm-scroll');
+                const inputRow = $('dmValueInput');
+                // 입력칸이 화면 위쪽에 머물도록 살짝만 스크롤
+                if (scroller && inputRow) {
+                    const r = inputRow.getBoundingClientRect();
+                    if (r.top < 60 || r.top > window.innerHeight * 0.5) inputRow.scrollIntoView({ block: 'start', behavior: 'smooth' });
+                }
+            }
         }
+
+        // 허용범위 막대 + 측정값 점
+        function dmRenderBar(spec, vals) {
+            const bar = document.getElementById('dmBar');
+            if (!spec) { bar.innerHTML = '<div class="tb-hint" style="text-align:center;padding-top:14px;">도면 치수를 넣으면 막대가 표시됩니다</div>'; return; }
+            const span = Math.max(spec.max - spec.min, 1e-6);
+            const lo = Math.min(spec.min - span * 0.25, ...vals);
+            const hi = Math.max(spec.max + span * 0.25, ...vals);
+            const pad = (hi - lo) * 0.04;
+            const L = lo - pad, R = hi + pad;
+            const pos = v => ((v - L) / (R - L)) * 100;
+            let html = '<div class="axis"></div>';
+            html += `<div class="zone" style="left:${pos(spec.min)}%; width:${pos(spec.max) - pos(spec.min)}%;"></div>`;
+            html += `<div class="nom" style="left:${pos(spec.nom)}%;"></div>`;
+            html += `<div class="tb-tick" style="left:${pos(spec.min)}%;">${dmFmt(spec.min, spec.dp)}</div>`;
+            html += `<div class="tb-tick" style="left:${pos(spec.max)}%;">${dmFmt(spec.max, spec.dp)}</div>`;
+            html += `<div class="tb-tick top" style="left:${pos(spec.nom)}%;">기준 ${dmFmt(spec.nom, spec.dp)}</div>`;
+            vals.forEach(v => {
+                const j = dmJudge(v, spec);
+                html += `<div class="dot ${j && !j.ok ? 'ng' : ''}" style="left:${pos(v)}%;" title="${v}"></div>`;
+            });
+            bar.innerHTML = html;
+        }
+
+        function dmLoad() {
+            try {
+                const s = JSON.parse(localStorage.getItem(DM_KEY) || 'null');
+                if (s && typeof s === 'object') {
+                    dm = Object.assign(dm, s);
+                    if (!Array.isArray(dm.values)) dm.values = [];
+                }
+            } catch (e) {}
+            dmWriteInputs();
+            dmRender();
+        }
+        dmLoad();
 
         // 📐 측정기 화면 - 각도기 레이어 토글 (스마트자는 항상 유지)
         let angleLayerOn = false;
@@ -1418,155 +1740,262 @@
             showToast('영점이 설정되었습니다.');
         }
 
-        // ⏱️ 측정·선별 시간 - 탭 전환
-        function stSwitchTab(tab) {
-            ['stopwatch', 'perpiece', 'perbox', 'byqty', 'bybox'].forEach(t => {
-                document.getElementById('st-tab-' + t).classList.toggle('on', t === tab);
-                document.getElementById('st-panel-' + t).style.display = (t === tab) ? '' : 'none';
-            });
+        // ─────────────────────────────────────────────
+        // ⏱️ 측정·선별 시간 (2026-09 개편)
+        //  탭 1 "시간 재기": 시작/정지 → 기록이 아래로 쌓임, 기록마다 메모,
+        //                   1회(1박스) 수량을 넣으면 1개당 시간 자동 계산
+        //                   (기존 '측정시간'·'1박스 시간' 스톱워치 통합)
+        //  탭 2 "시간 계산": 작업 수량 + 분/초 → 1개당 시간 → 목표 수량·박스 수 예상
+        //                   (기존 '1개당'·'수량별'·'박스별' 통합)
+        //  기록은 localStorage(tb_timer_v1)에 저장 → 새로고침·화면 꺼짐에도 유지,
+        //  초기화 버튼을 누르면 전부 삭제
+        // ─────────────────────────────────────────────
+        const ST_KEY = 'tb_timer_v1';
+        let st = { running: false, startTs: 0, qty: '', records: [] };
+        let stTickTimer = null;
+
+        function stSave() { try { localStorage.setItem(ST_KEY, JSON.stringify(st)); } catch (e) {} }
+        function stPosInt(str) {
+            const n = parseFloat(String(str || '').replace(/,/g, '').replace(/[^\d.]/g, ''));
+            return isFinite(n) && n > 0 ? n : null;
         }
 
-        // ⏱️ 측정시간 (단순 스톱워치)
-        let timerRunning = false;
-        let timerStartTs = 0;
-        let timerElapsedBase = 0; // ms, 정지된 구간까지 누적된 시간
-        let timerInterval = null;
-
-        function currentElapsedMs() {
-            return timerElapsedBase + (timerRunning ? Date.now() - timerStartTs : 0);
-        }
-
-        function formatTime(ms) {
-            const totalSec = ms / 1000;
-            const m = Math.floor(totalSec / 60);
-            const s = totalSec - m * 60;
-            return `${String(m).padStart(2, '0')}:${s.toFixed(1).padStart(4, '0')}`;
-        }
-
-        function updateTimerDisplay() {
-            document.getElementById('timerDisplay').innerText = formatTime(currentElapsedMs());
-        }
-
-        function toggleTimer() {
-            const btn = document.getElementById('timerStartBtn');
-            if (!timerRunning) {
-                timerRunning = true;
-                timerStartTs = Date.now();
-                timerInterval = setInterval(updateTimerDisplay, 50);
-                btn.innerText = '정지';
-                document.getElementById('timerResultBox').style.display = 'none';
-            } else {
-                timerRunning = false;
-                timerElapsedBase += Date.now() - timerStartTs;
-                clearInterval(timerInterval);
-                btn.innerText = '시작';
-                const box = document.getElementById('timerResultBox');
-                box.style.display = 'block';
-                box.innerText = `측정 소요시간: ${formatTime(timerElapsedBase)}`;
-            }
-        }
-
-        function resetTimer() {
-            timerRunning = false;
-            clearInterval(timerInterval);
-            timerElapsedBase = 0;
-            timerStartTs = 0;
-            document.getElementById('timerDisplay').innerText = '00:00.0';
-            document.getElementById('timerStartBtn').innerText = '시작';
-            document.getElementById('timerResultBox').style.display = 'none';
-        }
-
-        // ⏱️ 1개당 작업시간
-        function stCalcPerPiece() {
-            const qty = parseFloat(document.getElementById('ppQty').value);
-            const min = parseFloat(document.getElementById('ppMin').value) || 0;
-            const sec = parseFloat(document.getElementById('ppSec').value) || 0;
-            if (!qty || qty <= 0) { showToast('작업 수량을 입력하세요'); return; }
-            const totalSec = min * 60 + sec;
-            if (totalSec <= 0) { showToast('소요시간을 입력하세요'); return; }
-            const perPiece = totalSec / qty;
-            document.getElementById('ppResultCard').style.display = 'block';
-            document.getElementById('ppResult').innerText = `${perPiece.toFixed(1)}초`;
-
-            // 수량별 예상시간 탭에 기준값으로 자동 반영
-            document.getElementById('bqBaseQty').value = qty;
-            document.getElementById('bqBaseSec').value = totalSec;
-            stCalcByQty();
-        }
-
-        // ⏱️ 1박스 선별시간 (전용 스톱워치)
-        let pbRunning = false, pbStartTs = 0, pbElapsed = 0, pbInterval = null;
-        function stTogglePbTimer() {
-            const btn = document.getElementById('pbStartBtn');
-            if (!pbRunning) {
-                pbRunning = true;
-                pbStartTs = Date.now();
-                pbInterval = setInterval(() => {
-                    document.getElementById('pbTimerDisplay').innerText = formatTime(pbElapsed + (Date.now() - pbStartTs));
-                }, 50);
-                btn.innerText = '선별 완료';
-                document.getElementById('pbResultCard').style.display = 'none';
-            } else {
-                pbRunning = false;
-                pbElapsed += Date.now() - pbStartTs;
-                clearInterval(pbInterval);
-                btn.innerText = '선별 시작';
-                const qty = parseFloat(document.getElementById('pbQty').value);
-                document.getElementById('pbResultCard').style.display = 'block';
-                document.getElementById('pbResultTime').innerText = formatTime(pbElapsed);
-                if (qty > 0) {
-                    document.getElementById('pbResultPerPiece').innerText = `${(pbElapsed / 1000 / qty).toFixed(1)}초`;
-                    // 박스별 예상시간 탭에 기준값으로 자동 반영
-                    document.getElementById('bbBoxQty').value = qty;
-                    document.getElementById('bbBoxSec').value = Math.round(pbElapsed / 1000);
-                    stCalcByBox();
-                } else {
-                    document.getElementById('pbResultPerPiece').innerText = '수량 미입력';
-                }
-            }
-        }
-        function stResetPbTimer() {
-            pbRunning = false;
-            clearInterval(pbInterval);
-            pbElapsed = 0;
-            document.getElementById('pbTimerDisplay').innerText = '00:00.0';
-            document.getElementById('pbStartBtn').innerText = '선별 시작';
-            document.getElementById('pbResultCard').style.display = 'none';
-        }
-
-        // ⏱️ 수량별 예상시간
-        function stCalcByQty() {
-            const baseQty = parseFloat(document.getElementById('bqBaseQty').value);
-            const baseSec = parseFloat(document.getElementById('bqBaseSec').value);
-            const targetQty = parseFloat(document.getElementById('bqTargetQty').value);
-            const card = document.getElementById('bqResultCard');
-            if (!baseQty || !baseSec || !targetQty) { card.style.display = 'none'; return; }
-            const totalSec = (baseSec / baseQty) * targetQty;
-            card.style.display = 'block';
-            document.getElementById('bqResult').innerText = stFormatDuration(totalSec);
-        }
-
-        // ⏱️ 박스별 예상시간
-        function stCalcByBox() {
-            const boxQty = parseFloat(document.getElementById('bbBoxQty').value);
-            const boxSec = parseFloat(document.getElementById('bbBoxSec').value);
-            const boxCount = parseFloat(document.getElementById('bbBoxCount').value);
-            const card = document.getElementById('bbResultCard');
-            if (!boxQty || !boxSec || !boxCount) { card.style.display = 'none'; return; }
-            const totalSec = boxSec * boxCount;
-            card.style.display = 'block';
-            document.getElementById('bbResult').innerText = stFormatDuration(totalSec);
-        }
-
-        function stFormatDuration(totalSec) {
-            totalSec = Math.round(totalSec);
+        // 00:00.0 형식 (1시간 넘으면 1:02:03)
+        function stClockFmt(ms) {
+            const totalSec = Math.max(0, ms) / 1000;
             const h = Math.floor(totalSec / 3600);
             const m = Math.floor((totalSec % 3600) / 60);
-            const s = totalSec % 60;
-            if (h > 0) return `${h}시간 ${m}분`;
-            if (m > 0) return `${m}분 ${s}초`;
-            return `${s}초`;
+            const s = totalSec - h * 3600 - m * 60;
+            if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(Math.floor(s)).padStart(2, '0')}`;
+            return `${String(m).padStart(2, '0')}:${s.toFixed(1).padStart(4, '0')}`;
         }
+        // 사람이 읽기 쉬운 형식 (2.7초 / 3분 12초 / 1시간 5분)
+        function stHuman(sec) {
+            if (!isFinite(sec) || sec < 0) return '-';
+            if (sec < 1) return `${sec.toFixed(2)}초`;
+            if (sec < 60) return `${sec < 10 ? sec.toFixed(1) : Math.round(sec * 10) / 10}초`;
+            const total = Math.round(sec);
+            const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+            if (h > 0) return m ? `${h}시간 ${m}분` : `${h}시간`;
+            return s ? `${m}분 ${s}초` : `${m}분`;
+        }
+
+        function stTab(tab) {
+            document.getElementById('stTabRec').classList.toggle('on', tab === 'rec');
+            document.getElementById('stTabCalc').classList.toggle('on', tab === 'calc');
+            document.getElementById('stPanelRec').style.display = tab === 'rec' ? '' : 'none';
+            document.getElementById('stPanelCalc').style.display = tab === 'calc' ? '' : 'none';
+            const sc = document.querySelector('#timer-view .qm-scroll');
+            if (sc) sc.scrollTop = 0;
+        }
+
+        function stOnQty() {
+            st.qty = document.getElementById('stQty').value;
+            stSave();
+        }
+
+        function stUpdateClock() {
+            const el = document.getElementById('stClock');
+            el.innerText = stClockFmt(st.running ? Date.now() - st.startTs : 0);
+        }
+        function stStartTicking() {
+            clearInterval(stTickTimer);
+            stTickTimer = setInterval(stUpdateClock, 50);
+            stUpdateClock();
+        }
+
+        function stToggle() {
+            if (!st.running) {
+                st.running = true;
+                st.startTs = Date.now();
+                stStartTicking();
+            } else {
+                const ms = Date.now() - st.startTs;
+                st.running = false;
+                clearInterval(stTickTimer);
+                st.records.push({ ms, qty: stPosInt(st.qty), memo: '', at: Date.now() });
+                stRenderRecords(true);
+            }
+            stSave();
+            stRenderClock();
+        }
+
+        function stRenderClock() {
+            const btn = document.getElementById('stBigBtn');
+            const clock = document.getElementById('stClock');
+            const status = document.getElementById('stStatus');
+            if (st.running) {
+                btn.classList.add('stop'); btn.innerText = '■ 정지 (기록 저장)';
+                clock.classList.add('run');
+                status.classList.add('run');
+                status.innerText = `● ${st.records.length + 1}번째 측정 중…`;
+            } else {
+                btn.classList.remove('stop'); btn.innerText = st.records.length ? `▶ ${st.records.length + 1}번째 측정 시작` : '▶ 시작';
+                clock.classList.remove('run');
+                status.classList.remove('run');
+                status.innerText = st.records.length ? `${st.records.length}번째 기록 저장됨 · 다음 측정을 시작하세요` : '대기 중 · 아래 버튼을 누르면 시작합니다';
+                clock.innerText = '00:00.0';
+            }
+        }
+
+        function stRenderRecords(justAdded) {
+            const list = document.getElementById('stRecList');
+            const recs = st.records;
+            document.getElementById('stRecCount').innerText = recs.length ? `${recs.length}건` : '';
+            if (!recs.length) {
+                list.innerHTML = '<div class="tb-empty">아직 기록이 없습니다.<br>위에서 <b>▶ 시작</b> → <b>■ 정지</b>를 누르면 여기에 쌓입니다.</div>';
+            } else {
+                list.innerHTML = recs.map((r, i) => {
+                    const pp = r.qty ? `<span class="pp">1개당 ${stHuman(r.ms / 1000 / r.qty)}<br><span style="color:#94A3B8;font-weight:700;">${r.qty}개 기준</span></span>` : '';
+                    return `<div class="tb-rec${justAdded && i === recs.length - 1 ? ' new' : ''}">
+                        <div class="tb-rec-head">
+                            <span class="no">${i + 1}번째</span>
+                            <span class="t">${stClockFmt(r.ms)}</span>
+                            ${pp}
+                            <button type="button" class="tb-del" title="이 기록 삭제" onclick="stDeleteRecord(${i})" ${r.qty ? '' : 'style="margin-left:auto;"'}>×</button>
+                        </div>
+                        <input type="text" placeholder="✏️ ${i + 1}번째 측정 메모 (예: 2호기 A품번 1박스)" value="${escapeHtml(r.memo || '')}" oninput="stSetMemo(${i}, this.value)">
+                    </div>`;
+                }).join('');
+            }
+
+            // 합계 / 평균
+            const sumEl = document.getElementById('stRecSum');
+            const avgBtn = document.getElementById('stUseAvgBtn');
+            if (recs.length) {
+                const total = recs.reduce((a, r) => a + r.ms, 0);
+                const avg = total / recs.length;
+                const withQty = recs.filter(r => r.qty);
+                const ppAvg = withQty.length ? withQty.reduce((a, r) => a + r.ms / 1000 / r.qty, 0) / withQty.length : null;
+                sumEl.style.display = '';
+                sumEl.innerHTML = `
+                    <div class="tb-sum"><div class="k">합계</div><div class="v" style="font-size:1rem;">${stHuman(total / 1000)}</div></div>
+                    <div class="tb-sum"><div class="k">1회 평균</div><div class="v" style="font-size:1rem;">${stHuman(avg / 1000)}</div></div>
+                    <div class="tb-sum ok"><div class="k">1개당 평균</div><div class="v" style="font-size:1rem;">${ppAvg !== null ? stHuman(ppAvg) : '수량 없음'}</div></div>`;
+                avgBtn.style.display = '';
+            } else {
+                sumEl.style.display = 'none';
+                avgBtn.style.display = 'none';
+            }
+
+            if (justAdded) {
+                const last = list.lastElementChild;
+                if (last && last.scrollIntoView) last.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+
+        function stSetMemo(i, val) {
+            if (!st.records[i]) return;
+            st.records[i].memo = val;
+            stSave();
+        }
+        function stDeleteRecord(i) {
+            if (!st.records[i]) return;
+            if (!confirm(`${i + 1}번째 기록(${stClockFmt(st.records[i].ms)})을 삭제할까요?`)) return;
+            st.records.splice(i, 1);
+            stSave(); stRenderRecords(); stRenderClock();
+        }
+        function stResetAll() {
+            if (!st.records.length && !st.running) { showToast('지울 기록이 없습니다'); return; }
+            if (!confirm('측정 기록과 메모를 모두 지울까요?\n(지운 기록은 되돌릴 수 없습니다)')) return;
+            clearInterval(stTickTimer);
+            st.running = false; st.startTs = 0; st.records = [];
+            stSave(); stRenderRecords(); stRenderClock();
+            showToast('기록을 모두 지웠습니다');
+        }
+
+        // 기록 평균 → 시간 계산 탭으로 넘기기
+        function stUseAverage() {
+            const recs = st.records;
+            if (!recs.length) return;
+            const withQty = recs.filter(r => r.qty);
+            let qty, sec;
+            if (withQty.length) {
+                const ppAvg = withQty.reduce((a, r) => a + r.ms / 1000 / r.qty, 0) / withQty.length;
+                qty = withQty[withQty.length - 1].qty;
+                sec = ppAvg * qty;
+            } else {
+                qty = 1;
+                sec = recs.reduce((a, r) => a + r.ms, 0) / recs.length / 1000;
+                showToast('수량이 없어 측정 1회 = 1개로 계산합니다');
+            }
+            sec = Math.round(sec * 10) / 10;
+            document.getElementById('tcQty').value = qty;
+            document.getElementById('tcMin').value = Math.floor(sec / 60);
+            document.getElementById('tcSec').value = Math.round((sec % 60) * 10) / 10;
+            stTab('calc');
+            tcCalc();
+            if (withQty.length) showToast(`기록 평균을 불러왔습니다 (${qty}개 기준)`);
+        }
+
+        // 탭 2: 시간 계산
+        function tcCalc() {
+            const $ = id => document.getElementById(id);
+            const qty = stPosInt($('tcQty').value);
+            const min = parseFloat(String($('tcMin').value).replace(/[^\d.]/g, '')) || 0;
+            const sec = parseFloat(String($('tcSec').value).replace(/[^\d.]/g, '')) || 0;
+            const totalSec = min * 60 + sec;
+
+            const res = $('tcResult');
+            const tRes = $('tcTargetResult');
+            const bRes = $('tcBoxResult');
+            const boxQtyIn = stPosInt($('tcBoxQty').value);
+            $('tcBoxQty').placeholder = qty ? String(qty) : '예: 50';
+
+            if (!qty || totalSec <= 0) {
+                res.className = 'tb-result idle';
+                res.innerHTML = `<div class="k">1개당 시간</div><div class="v">${!qty ? '① 작업 수량을 넣어주세요' : '② 걸린 시간(분·초)을 넣어주세요'}</div>`;
+                tRes.className = 'tb-mini-result idle'; tRes.innerHTML = '①, ②를 먼저 채워주세요';
+                bRes.className = 'tb-mini-result idle'; bRes.innerHTML = '①, ②를 먼저 채워주세요';
+                return;
+            }
+
+            const per = totalSec / qty;
+            const perHour = Math.floor(3600 / per);
+            res.className = 'tb-result';
+            res.innerHTML = `<div class="k">1개당 시간</div><div class="v">${stHuman(per)}</div>
+                <div class="s">${qty.toLocaleString()}개에 ${stHuman(totalSec)} · 1시간이면 약 ${perHour.toLocaleString()}개</div>`;
+
+            const target = stPosInt($('tcTarget').value);
+            if (target) {
+                tRes.className = 'tb-mini-result';
+                tRes.innerHTML = `${target.toLocaleString()}개 하려면<b>${stHuman(per * target)}</b>`;
+            } else {
+                tRes.className = 'tb-mini-result idle'; tRes.innerHTML = '목표 수량을 넣으면 예상 시간이 나옵니다';
+            }
+
+            const boxes = stPosInt($('tcBoxes').value);
+            const boxQty = boxQtyIn || qty;
+            if (boxes) {
+                const pcs = boxes * boxQty;
+                bRes.className = 'tb-mini-result';
+                bRes.innerHTML = `${boxes.toLocaleString()}박스 × ${boxQty.toLocaleString()}개 = 총 ${pcs.toLocaleString()}개<b>${stHuman(per * pcs)}</b>1박스당 ${stHuman(per * boxQty)}`;
+            } else {
+                bRes.className = 'tb-mini-result idle'; bRes.innerHTML = '박스 수를 넣으면 예상 시간이 나옵니다';
+            }
+        }
+        function tcClear() {
+            ['tcQty', 'tcMin', 'tcSec', 'tcTarget', 'tcBoxes', 'tcBoxQty'].forEach(id => document.getElementById(id).value = '');
+            tcCalc();
+            document.getElementById('tcQty').focus();
+        }
+
+        function stLoad() {
+            try {
+                const s = JSON.parse(localStorage.getItem(ST_KEY) || 'null');
+                if (s && typeof s === 'object') {
+                    st = Object.assign(st, s);
+                    if (!Array.isArray(st.records)) st.records = [];
+                }
+            } catch (e) {}
+            document.getElementById('stQty').value = st.qty || '';
+            if (st.running && st.startTs) stStartTicking(); // 재는 중에 새로고침해도 이어서
+            else st.running = false;
+            stRenderClock();
+            stRenderRecords();
+            tcCalc();
+        }
+        stLoad();
 
         // 📸 캡처 + 메모 (스냅샷) - 표준 브라우저 다운로드 방식
         function showToast(msg) {
