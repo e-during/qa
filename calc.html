@@ -60,7 +60,7 @@
   .field input[readonly]:focus { border-color: #e0b060; }
   .row2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; min-width: 0; }
   .row2 .field { min-width: 0; }
-  .row2 .field label { font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row2 .field label { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .seg { display: grid; gap: 8px; }
   .seg.g2 { grid-template-columns: 1fr 1fr; }
@@ -100,13 +100,14 @@
   .hist-empty { text-align: center; font-size: 11.5px; color: #94A3B8; padding: 14px 0; }
   .hist-item { padding: 10px 2px; border-bottom: 1px solid #F1F5F9; }
   .hist-item:last-child { border-bottom: none; }
-  .hist-item .he { font-size: 11px; color: #94A3B8; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist-item .he { font-size: 12px; color: #64748B; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .hist-item .hr { margin-top: 2px; font-size: 16px; font-weight: 800; color: #b8863c; font-variant-numeric: tabular-nums; }
   .verdict { text-align: center; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 900; letter-spacing: .5px; margin-top: 4px; }
   .verdict.pass { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
   .verdict.warn { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+  .verdict:not(.pass):not(.warn):not(.fail) { background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; font-size: 13px; letter-spacing: 0; }
   .verdict.fail { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
-  .hint { font-size: 10.5px; color: #94A3B8; line-height: 1.6; margin-top: 10px; }
+  .hint { font-size: 11.5px; color: #64748B; line-height: 1.6; margin-top: 10px; }
 
   /* ---------- 시뮬레이터 ---------- */
   .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -160,12 +161,12 @@
   }
   .tabbar .tbtn {
     flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 6px 2px; border-radius: 12px; background: none; border: none; color: rgba(255,255,255,.4);
+    padding: 6px 2px; border-radius: 12px; background: none; border: none; color: rgba(255,255,255,.62);
     font-family: inherit;
   }
   .tabbar .tbtn.on { color: #e0b060; }
-  .tabbar .tbtn svg { width: 19px; height: 19px; }
-  .tabbar .tbtn .tl { font-size: 8.8px; font-weight: 800; }
+  .tabbar .tbtn svg { width: 20px; height: 20px; }
+  .tabbar .tbtn .tl { font-size: 11px; font-weight: 800; }
 
   /* ==========================================================
      2026-09 개편: 한 화면 · 즉시 계산 (심사·출장·회의용)
@@ -227,14 +228,14 @@
   .cv-row.src { border-color: #e0b060; background: #FFFBF2; box-shadow: 0 0 0 3px rgba(224,176,96,.16); }
   .cv-u { flex: none; width: 84px; }
   .cv-u .n { font-size: 16px; font-weight: 900; color: #0F172A; }
-  .cv-u .d { font-size: 10.5px; font-weight: 700; color: #94A3B8; margin-top: 1px; }
+  .cv-u .d { font-size: 11.5px; font-weight: 700; color: #64748B; margin-top: 1px; }
   .cv-row input { flex: 1; min-width: 0; border: none; background: none; outline: none; text-align: right; font-size: 23px; font-weight: 800; color: #1E293B; font-family: inherit; font-variant-numeric: tabular-nums; caret-color: transparent; cursor: pointer; }
   .cv-row.src input { color: #9a6b1f; }
   .cv-dms { flex: 1; min-width: 0; display: flex; align-items: baseline; justify-content: flex-end; gap: 2px; }
   .cv-dms input { flex: 0 1 54px; width: 54px; min-width: 0; font-size: 21px !important; padding: 2px 0; border-bottom: 1.5px dashed #CBD5E1 !important; }
   .cv-dms input:first-child { flex-basis: 62px; width: 62px; }
   .cv-dms span { font-size: 18px; font-weight: 900; color: #94A3B8; margin-right: 4px; }
-  .cv-tip { font-size: 11px; font-weight: 700; color: #94A3B8; text-align: center; margin-top: 2px; }
+  .cv-tip { font-size: 12px; font-weight: 700; color: #64748B; text-align: center; margin-top: 2px; }
 
   /* ---------- ④ Cpk · 불량률 ---------- */
   .sub { display: none; flex-direction: column; gap: 10px; }
@@ -247,7 +248,7 @@
   .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; max-height: 54px; overflow-y: auto; }
   .chips span { font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 8px; background: #F1F5F9; color: #334155; font-variant-numeric: tabular-nums; cursor: pointer; }
   .chips span.ng { background: #FEE2E2; color: #991B1B; }
-  .chips .none { font-size: 11.5px; font-weight: 700; color: #94A3B8; background: none; padding: 4px 0; cursor: default; }
+  .chips .none { font-size: 12px; font-weight: 700; color: #64748B; background: none; padding: 4px 0; cursor: default; }
   .hero { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #F1F5F9; border: 1px solid #E2E8F0; }
   .hero .k { font-size: 12px; font-weight: 800; color: #64748B; }
   .hero .k small { display: block; font-size: 10.5px; font-weight: 700; margin-top: 2px; opacity: .85; }
@@ -259,12 +260,12 @@
   .hero.fail { background: #FEE2E2; border-color: #FECACA; } .hero.fail .v, .hero.fail .k { color: #991B1B; }
   .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
   .stat-grid > div { background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 10px; padding: 6px 4px; text-align: center; min-width: 0; }
-  .stat-grid .k { font-size: 10.5px; font-weight: 700; color: #94A3B8; }
+  .stat-grid .k { font-size: 11.5px; font-weight: 700; color: #64748B; }
   .stat-grid .v { font-size: 14px; font-weight: 800; color: #1E293B; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .dotplot { display: block; width: 100%; height: 46px; margin-top: 8px; }
   .ref-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
   .ref-table th, .ref-table td { padding: 7px 6px; font-size: 13px; text-align: center; border-bottom: 1px solid #F1F5F9; }
-  .ref-table th { font-size: 11px; font-weight: 800; color: #64748B; }
+  .ref-table th { font-size: 12px; font-weight: 800; color: #64748B; }
   .ref-table td { font-weight: 800; color: #1E293B; }
   .ref-table tr.on td { background: #FBF3E4; color: #9a6b1f; }
 
@@ -297,11 +298,11 @@
   .fl.two { border-top: 1px dashed #E2E8F0; border-radius: 0 0 10px 10px; }
   .fl b.sm { font-size: 11.5px; line-height: 1.15; text-align: right; }
   .fl .t { flex: 1; min-width: 0; font-size: 11px; word-break: keep-all; font-weight: 800; color: #334155; line-height: 1.25; }
-  .fl .t small { display: block; font-size: 9.5px; overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: #94A3B8; }
+  .fl .t small { display: block; font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: #64748B; }
   .fl b { font-size: 13px; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .fit-concl { background: #0b1636; color: #fff; border-radius: 14px; padding: 10px 13px; font-size: 12px; font-weight: 700; line-height: 1.5; }
   .fit-concl b { color: #e0b060; }
-  .fit-concl .s { display: block; margin-top: 4px; font-size: 10.5px; color: rgba(255,255,255,.5); font-weight: 600; }
+  .fit-concl .s { display: block; margin-top: 4px; font-size: 11.5px; color: rgba(255,255,255,.7); font-weight: 600; }
 
   .p3-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 10px; }
   .p3-grid .field { margin-bottom: 8px; }
@@ -309,7 +310,7 @@
   .sym-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .sym-grid button { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 2px 7px; border-radius: 12px; border: 1px solid #E2E8F0; background: #fff; font-family: inherit; color: #0F172A; }
   .sym-grid button svg { width: 24px; height: 24px; }
-  .sym-grid button span { font-size: 10px; font-weight: 800; color: #64748B; white-space: nowrap; }
+  .sym-grid button span { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
   .sym-grid button.on { background: #0b1636; border-color: #0b1636; color: #e0b060; }
   .sym-grid button.on span { color: #fff; }
   .sym-grid .grp { grid-column: 1 / -1; font-size: 10.5px; font-weight: 800; color: #b8863c; margin: 4px 2px -2px; }
@@ -317,7 +318,7 @@
   .sym-card .sh .ic { flex: none; width: 48px; height: 48px; border-radius: 12px; border: 2px solid #0b1636; display: grid; place-items: center; color: #0b1636; }
   .sym-card .sh .ic svg { width: 30px; height: 30px; }
   .sym-card .sh .nm { font-size: 17px; font-weight: 900; color: #0F172A; }
-  .sym-card .sh .en { font-size: 11px; font-weight: 700; color: #94A3B8; margin-top: 1px; }
+  .sym-card .sh .en { font-size: 11.5px; font-weight: 700; color: #64748B; margin-top: 1px; }
   .sym-card .zone { margin-top: 10px; font-size: 13px; font-weight: 700; color: #334155; line-height: 1.55; }
   .sym-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
   .sym-tags span { font-size: 11.5px; font-weight: 800; padding: 5px 9px; border-radius: 999px; background: #F1F5F9; color: #334155; }
@@ -1246,13 +1247,18 @@
   function calculatePosition(){
     const dx = parseNum(id('pos-dx').value) || 0;
     const dy = parseNum(id('pos-dy').value) || 0;
-    const baseTol = parseNum(id('pos-tol').value) || 0;
+    const tolRaw = parseNum(id('pos-tol').value);
+    const baseTol = tolRaw || 0;
     const posError = 2 * Math.sqrt(dx * dx + dy * dy);
-    let bonus = 0, sizeNg = false;
+    let bonus = 0, sizeNg = false, wait = '';
+    if (!(tolRaw > 0)) wait = '위치도 공차를 입력하세요';
     if (mmcMode !== 'none') {
-      const sizeMax = parseNum(id('pos-size-max').value) || 0;
-      const sizeMin = parseNum(id('pos-size-min').value) || 0;
-      const actual = parseNum(id('pos-actual').value) || 0;
+      const sMaxR = parseNum(id('pos-size-max').value), sMinR = parseNum(id('pos-size-min').value), actR = parseNum(id('pos-actual').value);
+      if (!wait && !(isFinite(sMaxR) && isFinite(sMinR))) wait = '최대·최소 치수를 입력하세요';
+      else if (!wait && !isFinite(actR)) wait = '실측 치수를 입력하세요';
+      const sizeMax = sMaxR || 0;
+      const sizeMin = sMinR || 0;
+      const actual = isFinite(actR) ? actR : (featureType === 'hole' ? Math.min(sizeMax, sizeMin) : Math.max(sizeMax, sizeMin));
       const sizeRange = Math.abs(sizeMax - sizeMin);
       const mmcSize = featureType === 'hole' ? sizeMin : sizeMax;
       const lmcSize = featureType === 'hole' ? sizeMax : sizeMin;
@@ -1267,10 +1273,11 @@
     id('res-allow').innerText = 'Ø' + f4(allowable);
     const v = id('res-verdict');
     const margin = allowable - posError;
-    if (sizeNg) { v.className = 'verdict fail'; v.innerText = '치수 자체가 규격 밖'; }
+    if (wait) { v.className = 'verdict'; v.innerText = wait; }
+    else if (sizeNg) { v.className = 'verdict fail'; v.innerText = '치수 자체가 규격 밖'; }
     else if (posError <= allowable + 1e-12) { v.className = 'verdict pass'; v.innerText = `OK · 여유 ${f4(margin)}`; }
     else { v.className = 'verdict fail'; v.innerText = `NG · 초과 ${f4(-margin)}`; }
-    drawPosFig(dx, dy, baseTol, allowable, posError <= allowable + 1e-12 && !sizeNg);
+    drawPosFig(dx, dy, baseTol, allowable, !wait && posError <= allowable + 1e-12 && !sizeNg);
     ST.gd.pos = { ft: featureType, mm: mmcMode }; POS_IDS.forEach(k => ST.gd.pos[k] = id(k).value); saveState();
   }
   function drawPosFig(dx, dy, base, allow, ok){
