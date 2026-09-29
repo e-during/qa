@@ -50,16 +50,6 @@
   .sync { font-size: 11px; color: #888; font-weight: 600; line-height: 1.7; margin-bottom: 12px; }
   .sync .warn { color: var(--red); font-weight: 800; display: block; }
 
-  /* 측정기 가동상태 (읽기 전용) */
-  .equip { display: flex; gap: 8px; margin-bottom: 12px; }
-  .equip-chip { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
-  .equip-chip .n { font-size: 11px; font-weight: 800; color: #333; }
-  .equip-chip .st { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 900; }
-  .equip-chip .st::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-  .equip-chip .st.run { color: #1a9247; }
-  .equip-chip .st.run::before { box-shadow: 0 0 0 3px rgba(26,146,71,.18); animation: pulse 1.2s ease-in-out infinite; }
-  .equip-chip .st.stop { color: var(--red); }
-  .equip-chip .t { font-size: 10px; color: #aaa; font-weight: 600; margin-left: 4px; }
 
   /* TODAY SUMMARY */
   .summary { background: #fff; border: 1px solid #1a1a1a; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
@@ -111,6 +101,24 @@
   .bar i { display: block; height: 100%; border-radius: 3px; background: #111; }
   .bar i.acc { background: linear-gradient(90deg, #ff5a58, var(--red)); }
 
+  /* 정밀측정 실적 */
+  .kpi-sub { margin-top: -4px; margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--sub); }
+  .kpi-sub .up { color: #1a9247; } .kpi-sub .down { color: var(--red); }
+  .perf { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 13px 14px; margin-bottom: 14px; }
+  .perf-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; font-weight: 800; }
+  .perf-cap { font-size: 11px; font-weight: 700; color: var(--sub); }
+  .perf-bars { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; align-items: end; height: 96px; margin-top: 10px; border-bottom: 1px solid #e6e6e6; }
+  .perf-bars .col { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; }
+  .perf-bars .n { font-size: 11px; font-weight: 800; color: #333; margin-bottom: 3px; min-height: 13px; }
+  .perf-bars .b { width: 60%; max-width: 26px; border-radius: 4px 4px 0 0; background: #c9bdf2; min-height: 2px; }
+  .perf-bars .col.cur .b { background: var(--precision); }
+  .perf-bars .col.sel .b { outline: 2px solid #111; outline-offset: 1px; }
+  .perf-mon { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 5px; text-align: center; font-size: 11px; font-weight: 700; color: var(--sub); }
+  .perf-mon .cur { color: var(--precision); font-weight: 900; }
+  .perf-line { margin-top: 10px; padding-top: 9px; border-top: 1px dashed #eee; font-size: 12.5px; font-weight: 700; color: #333; line-height: 1.5; word-break: keep-all; }
+  .perf-line b { font-weight: 900; }
+  .perf-line:empty { display: none; }
+
   /* 필터 */
   .filters { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 4px; margin-bottom: 14px; }
   .f-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -145,7 +153,6 @@
   .empty { text-align: center; padding: 34px 0; color: var(--sub); font-weight: 700; font-size: 13px; background: #fff; border-radius: 12px; border: 1px solid #ececec; }
   .more-note { text-align: center; font-size: 11.5px; color: #999; font-weight: 600; margin-top: 10px; }
 
-  .pc-link { display: block; text-align: center; margin: 22px 0 8px; font-size: 12.5px; font-weight: 700; color: #888; text-decoration: none; padding: 10px; }
 
   /* 챗봇 (바텀시트) */
   .chat-fab {
@@ -270,29 +277,32 @@
     <span class="live">LIVE</span>
   </div>
   <div class="seg" id="deptGroup">
-    <button data-dept="precision" class="active">정밀 측정</button>
-    <button data-dept="inspection">수입검사</button>
+    <button data-dept="inspection" class="active">수입검사</button>
+    <button data-dept="precision">정밀 측정</button>
   </div>
 </header>
 
 <main class="wrap">
   <div class="sync" id="syncInfo"></div>
 
-  <div class="equip" id="equipBox">
-    <div class="equip-chip"><div class="n">3차원 측정기 #1</div><div class="st run" data-eq="m1">가동중</div><span class="t" data-eq-t="m1"></span></div>
-    <div class="equip-chip"><div class="n">3차원 측정기 #2</div><div class="st run" data-eq="m2">가동중</div><span class="t" data-eq-t="m2"></span></div>
-  </div>
 
   <section class="summary">
-    <div class="summary-head"><span>TODAY SUMMARY</span></div>
+    <div class="summary-head"><span id="sumHead">TODAY SUMMARY</span></div>
     <div class="summary-grid">
       <div><div class="l" id="sumLabel1">오늘예정</div><div class="v" id="sumVal1">-</div></div>
       <div><div class="l" id="sumLabel2">진행중</div><div class="v" id="sumVal2">-</div></div>
-      <div class="acc"><div class="l" id="sumLabel3">긴급 대응</div><div class="v" id="sumVal3">-</div></div>
+      <div class="acc" id="sumBox3"><div class="l" id="sumLabel3">긴급 대응</div><div class="v" id="sumVal3">-</div></div>
     </div>
   </section>
 
   <section class="kpi-grid" id="kpiGrid"></section>
+
+  <section class="perf" id="pcPerf" style="display:none;">
+    <div class="perf-head"><span>월별 측정 완료</span><span class="perf-cap" id="perfCap">막대를 누르면 건수</span></div>
+    <div class="perf-bars" id="perfBars"></div>
+    <div class="perf-line" id="perfCust"></div>
+    <div class="perf-line" id="perfNext"></div>
+  </section>
 
   <section class="filters">
     <div class="f-row">
@@ -322,7 +332,6 @@
 
   <section class="list" id="list"></section>
 
-  <a class="pc-link" href="dashboard.html?desktop=1">PC 버전으로 보기</a>
 </main>
 
 <!-- 챗봇 -->
@@ -408,10 +417,13 @@
   const qcQms = loadJson('qc_qms_data_v1');
   const qcProv = loadJson('qc_provisional_v1');
 
-  const pcAll = [
+  // 날짜 형식이 달라도(2026.09.29 · 2026/9/29 · ISO 시각 포함) YYYY-MM-DD로 맞춤
+  function nd(v){ const m = String(v == null ? '' : v).match(/(\d{4})\D(\d{1,2})\D(\d{1,2})/); return m ? `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}` : ''; }
+  const pcAllRaw = [
     ...qcQms.filter(r => !(r.item||'').includes('삭제')).map(r => ({customer:r.customer,item:r.item,dueDate:r.dueDate,completeDate:r.completeDate,assignee:r.assignee,urgent:false})),
     ...qcProv.map(p => ({customer:p.customer,item:p.item,dueDate:p.dueDate||p.planDate,completeDate:p.completed?p.completedAt:'',assignee:p.assignee,urgent:!!p.urgent&&!p.completed}))
   ];
+  const pcAll = pcAllRaw.map(r => Object.assign({}, r, { dueDate: nd(r.dueDate) || r.dueDate || '', completeDate: r.completeDate ? (nd(r.completeDate) || String(r.completeDate)) : '' }));
   const pcIncomplete = pcAll.filter(r => !r.completeDate);
   const pcComplete = pcAll.filter(r => !!r.completeDate);
   const pcToday = pcIncomplete.filter(r => r.dueDate === today);
@@ -424,7 +436,20 @@
   const pcDelayWeek = pcIncomplete.filter(r => r.dueDate && r.dueDate < today).length;
   const pcWeekTotal = pcDoneWeek + pcProgWeek + pcDelayWeek;
   const pcWeekRate = pcWeekTotal > 0 ? Math.round((pcDoneWeek/pcWeekTotal)*100) : 0;
-  const pcRecentDone = [...pcComplete].sort((a,b)=>(b.completeDate||'').localeCompare(a.completeDate||'')).slice(0,20);
+  const pcRecentDone = [...pcComplete].sort((a,b)=>(b.completeDate||'').localeCompare(a.completeDate||''));
+
+  // ---- 정밀측정 실적 (완료 기준) ----
+  const ymOf = d => { const x = new Date(now.getFullYear(), now.getMonth() - d, 1); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`; };
+  const pcMonths = [5,4,3,2,1,0].map(d => { const ym = ymOf(d); return { ym, m: +ym.slice(5), n: pcComplete.filter(r => r.completeDate.startsWith(ym)).length }; });
+  const pcDoneMonth = pcMonths[5].n, pcDonePrev = pcMonths[4].n;
+  const pcDoneYear = pcComplete.filter(r => r.completeDate.startsWith(String(now.getFullYear()))).length;
+  const pcLate = pcIncomplete.filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r.dueDate) && r.dueDate < today).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  const pcOpenSorted = [...pcIncomplete].sort((a,b) => (b.urgent - a.urgent) || (a.dueDate||'9999').localeCompare(b.dueDate||'9999'));
+  const pcNext = pcIncomplete.filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r.dueDate) && r.dueDate >= today).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0] || null;
+  function custLine(ym){
+    const c = {}; pcComplete.filter(r => r.completeDate.startsWith(ym)).forEach(r => { const k = r.customer || '기타'; c[k] = (c[k]||0) + 1; });
+    return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v]) => `${esc(k)} <b>${v}</b>`).join(' · ');
+  }
 
   const pcUrgentKeys = new Set(pcUrgent.map(r => r.customer+r.item));
   const pcTodayOnly = pcToday.filter(r => !pcUrgentKeys.has(r.customer+r.item));
@@ -458,16 +483,16 @@
   // ============================================================
   //  상태 / 렌더링
   // ============================================================
-  let currentDept = 'precision';
+  let currentDept = 'inspection';
   let currentTab = 'todo';
   let statusFilter = 'all';
   let prioFilter = 'all';
 
   function scaledBar(v,max){ return Math.max(4, Math.min(100, Math.round((v/max)*100))); }
-  function kpiCard(tone,value,unit,label,pct){
+  function kpiCard(tone,value,unit,label,pct,sub){
     const acc = tone === 'accent';
     return `<div class="kpi-card"><div class="kpi-title">${label}</div>
-      <div class="kpi-val ${acc?'acc':''}"><b>${value}</b><span>${unit}</span></div>
+      <div class="kpi-val ${acc?'acc':''}"><b>${value}</b><span>${unit}</span></div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
       <div class="bar"><i class="${acc?'acc':''}" style="width:${pct}%"></i></div></div>`;
   }
 
@@ -475,41 +500,66 @@
     const g = document.getElementById('kpiGrid');
     if (currentDept === 'precision'){
       g.innerHTML = [
-        kpiCard('n', pcToday.length,'건','오늘 예정',scaledBar(pcToday.length,10)),
-        kpiCard('n', pcProgress.length,'건','진행중',scaledBar(pcProgress.length,30)),
-        kpiCard('n', pcRegistered,'건','가등록',scaledBar(pcRegistered,10)),
-        kpiCard('accent', pcUrgent.length,'건','긴급',scaledBar(pcUrgent.length,10)),
-        kpiCard('n', pcOverdue.length,'건','장기미완',scaledBar(pcOverdue.length,10)),
-        kpiCard('accent', pcWeekRate,'%','이번주 완료율',pcWeekRate)
+        kpiCard('n', pcDoneWeek,'건','이번 주 완료',scaledBar(pcDoneWeek,10)),
+        kpiCard('n', pcDoneMonth,'건','이번 달 완료',scaledBar(pcDoneMonth,30), `지난달 ${pcDonePrev}건`),
+        kpiCard('n', pcDoneYear,'건',`${now.getFullYear()}년 누적 완료`,scaledBar(pcDoneYear,300)),
+        kpiCard('n', pcIncomplete.length,'건','진행 중',scaledBar(pcIncomplete.length,30), pcRegistered ? `가등록 ${pcRegistered}건 포함` : ''),
+        kpiCard(pcLate.length ? 'accent' : 'n', pcLate.length,'건','예정일 지남',scaledBar(pcLate.length,10)),
+        kpiCard(pcUrgent.length ? 'accent' : 'n', pcUrgent.length,'건','긴급',scaledBar(pcUrgent.length,10))
       ].join('');
     } else {
       g.innerHTML = [
         kpiCard('n', qiMonthTarget.length,'건','이번 달 대상',scaledBar(qiMonthTarget.length,50)),
         kpiCard('n', qiWeekDone.length,'건','이번 주 완료',scaledBar(qiWeekDone.length,30)),
-        kpiCard('n', qiMonthPending.length,'건','미완료',scaledBar(qiMonthPending.length,30)),
-        kpiCard('accent', qiMonthRate,'%','완료율',qiMonthRate)
+        kpiCard(qiUrgent.length ? 'accent' : 'n', qiMonthPending.length,'건','미완료',scaledBar(qiMonthPending.length,30), qiUrgent.length ? `입고 5일 이상 <span class="down">${qiUrgent.length}건</span>` : '입고 5일 이상 지연 없음'),
+        kpiCard('n', qiMonthRate,'%','완료율',qiMonthRate, `완료 ${qiMonthDone.length} / 대상 ${qiMonthTarget.length}건`)
       ].join('');
     }
   }
 
+  let perfSel = 5;
+  function renderPerf(){
+    const box = document.getElementById('pcPerf');
+    box.style.display = currentDept === 'precision' ? '' : 'none';
+    if (currentDept !== 'precision') return;
+    const max = Math.max(1, ...pcMonths.map(x => x.n));
+    document.getElementById('perfBars').innerHTML = pcMonths.map((x,i) => `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 ${x.n}건"><div class="n">${i===5||i===perfSel ? x.n : ''}</div><div class="b" style="height:${Math.round(x.n/max*70)}px"></div></div>`).join('');
+    let mon = document.getElementById('perfMon');
+    if (!mon) { mon = document.createElement('div'); mon.id = 'perfMon'; mon.className = 'perf-mon'; document.getElementById('perfBars').after(mon); }
+    mon.innerHTML = pcMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
+    const sel = pcMonths[perfSel];
+    document.getElementById('perfCap').textContent = perfSel === 5 ? '막대를 누르면 건수' : `${sel.m}월 ${sel.n}건`;
+    const cl = custLine(sel.ym);
+    document.getElementById('perfCust').innerHTML = cl ? `${sel.m}월 고객사별 · ${cl}` : `${sel.m}월 완료 기록 없음`;
+    const last = pcRecentDone[0];
+    const bits = [];
+    if (last) bits.push(`최근 완료 <b>${esc(last.completeDate.slice(5).replace('-','/'))}</b> ${esc(last.item||'')}`);
+    if (pcNext) bits.push(`다음 예정 <b>${esc(pcNext.dueDate.slice(5).replace('-','/'))}</b> ${esc(pcNext.item||'')}${pcNext.customer ? ' · ' + esc(pcNext.customer) : ''}`);
+    document.getElementById('perfNext').innerHTML = bits.join('<br>');
+  }
+  function perfPick(i){ perfSel = perfSel === i ? 5 : i; renderPerf(); }
+
   function renderSummary(){
     const set = (i,l,v) => { document.getElementById('sumLabel'+i).textContent = l; document.getElementById('sumVal'+i).textContent = v + '건'; };
-    if (currentDept === 'precision'){ set(1,'오늘예정',pcToday.length); set(2,'진행중',pcProgress.length); set(3,'긴급 대응',pcUrgent.length); }
+    const pc = currentDept === 'precision';
+    document.getElementById('sumHead').textContent = pc ? `${now.getMonth()+1}월 측정 실적` : 'TODAY SUMMARY';
+    document.getElementById('sumBox3').classList.remove('acc');
+    if (pc){ set(1,'이번 달 완료',pcDoneMonth); set(2,'올해 누적',pcDoneYear); set(3,'진행 중',pcIncomplete.length); }
     else { set(1,'오늘입고',qiTodayIn.length); set(2,'이번주완료',qiWeekDone.length); set(3,'이번달 미완료',qiMonthPending.length); }
   }
 
   function buildRows(){
     if (currentDept === 'precision'){
       return {
-        todo: pcTodoCombined.map(r => ({
-          statusClass: r.tag==='urgent'?'urgent':'ing', statusLabel: r.tag==='urgent'?'긴급':(r.tag==='today'?'오늘예정':'진행중'),
-          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent: r.tag==='urgent', completed:false })),
-        overdue: pcOverdue.map(r => ({
-          statusClass:'hold', statusLabel:'장기미완', name: r.item||'(품명없음)',
-          meta: `${r.customer||'-'} · ${daysBetween(r.dueDate,today)}일 경과`, assignee: r.assignee||'-', date: r.dueDate||'-', urgent:true, completed:false })),
-        done: pcRecentDone.map(r => ({
+        todo: pcRecentDone.map(r => ({
           statusClass:'done', statusLabel:'완료', name: r.item||'(품명없음)', meta: r.customer||'-',
-          assignee: r.assignee||'-', date: r.completeDate||'-', urgent:false, completed:true })),
+          assignee: r.assignee||'-', date: r.completeDate||'-', dl:'완료일', urgent:false, completed:true })),
+        overdue: pcOpenSorted.map(r => ({
+          statusClass: r.urgent?'urgent':(r.dueDate && r.dueDate<today?'hold':'ing'), statusLabel: r.urgent?'긴급':(r.dueDate===today?'오늘예정':(r.dueDate && r.dueDate<today?'예정일 지남':'진행 중')),
+          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent: !!r.urgent, completed:false })),
+        done: pcLate.map(r => ({
+          statusClass:'hold', statusLabel:'예정일 지남', name: r.item||'(품명없음)',
+          meta: `${r.customer||'-'} · ${daysBetween(r.dueDate,today)}일 경과`, assignee: r.assignee||'-', date: r.dueDate||'-', urgent: !!r.urgent, completed:false })),
         history: [...pcAll].sort((a,b)=>(b.dueDate||'').localeCompare(a.dueDate||'')).map(r => ({
           statusClass: r.completeDate?'done':'hold', statusLabel: r.completeDate?'완료':'미완료',
           name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent:!!r.urgent, completed:!!r.completeDate }))
@@ -535,7 +585,7 @@
 
   function updateTabs(rowsByTab){
     const labels = currentDept === 'precision'
-      ? { todo:'오늘 해야할 업무', overdue:'장기미완', done:'최근완료', history:'전체 이력' }
+      ? { todo:'최근 완료', overdue:'진행 중', done:'예정일 지남', history:'전체 이력' }
       : { todo:'오늘 입고', overdue:'이번달 미완료', done:'이번주 완료', history:'전체 이력' };
     document.querySelectorAll('#tabHeader .tab').forEach(btn => {
       const k = btn.dataset.tab;
@@ -561,8 +611,11 @@
     const all = applyFilters(rowsByTab[currentTab]);
     const rows = all.slice(0, MAX_ROWS);
     const list = document.getElementById('list');
-    if (!rows.length){ list.innerHTML = '<div class="empty">표시할 데이터가 없습니다.</div>'; return; }
-    const dateLabel = currentTab === 'done' ? '완료일' : (currentDept === 'precision' ? '완료요청일' : '입고일');
+    if (!rows.length){
+      const msg = currentDept === 'precision' ? ({ todo:'완료 기록이 없습니다', overdue:'진행 중인 측정이 없습니다 · 모두 완료', done:'예정일이 지난 건이 없습니다', history:'표시할 데이터가 없습니다' })[currentTab] : '표시할 데이터가 없습니다.';
+      list.innerHTML = `<div class="empty">${msg}</div>`; return;
+    }
+    const dateLabel = currentDept === 'precision' ? (currentTab === 'todo' ? '완료일' : '완료요청일') : (currentTab === 'done' ? '완료일' : '입고일');
     list.innerHTML = rows.map(r => `
       <div class="item ${r.urgent?'urgent':''}">
         <div class="item-top">
@@ -576,21 +629,9 @@
       + (all.length > MAX_ROWS ? `<div class="more-note">최근 ${MAX_ROWS}건만 표시 (전체 ${all.length}건)</div>` : '');
   }
 
-  function renderAll(){ renderKpi(); renderSummary(); renderList(); }
+  function renderAll(){ renderKpi(); renderSummary(); renderPerf(); renderList(); }
 
-  // 측정기 가동상태: 읽기 전용 표시
-  function renderEquip(){
-    let s = {};
-    try { s = (GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.equipStatus) || JSON.parse(localStorage.getItem('qc_equip_status_v1') || '{}'); } catch(e){ s = {}; }
-    ['m1','m2'].forEach(m => {
-      const st = s[m] === 'stop' ? 'stop' : 'run';
-      const el = document.querySelector(`[data-eq="${m}"]`);
-      el.className = 'st ' + st;
-      el.textContent = st === 'run' ? '가동중' : '비가동';
-      const t = fmtTime(s[m+'_at']);
-      document.querySelector(`[data-eq-t="${m}"]`).textContent = t ? `(${t})` : '';
-    });
-  }
+
 
   // ============================================================
   //  이벤트
@@ -625,7 +666,6 @@
     if (open && !chatInited){ chatInited = true; restartChat(); }
   }
 
-  renderEquip();
   renderAll();
 
   // ============================================================
