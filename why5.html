@@ -105,6 +105,10 @@
   /* v4 · 간소화 */
   .pk .recent button.combo.big { padding: 10px 14px; font-size: 14px; border-radius: 12px; }
   .pk .recent button.combo.on { background: var(--navy); border-color: var(--navy); color: var(--gold); }
+  .unk { display: block; width: 100%; margin-top: 8px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: #fff; font-size: 12.5px; font-weight: 800; color: var(--faint); }
+  .unk small { font-weight: 700; font-size: 11px; margin-left: 2px; }
+  .unk.on { border-color: var(--gold); background: #FBF3E4; color: var(--gold-d); }
+  .badge.p { background: #FEE2E2; color: #B91C1C; }
   .expand { display: block; width: 100%; margin-top: 8px; height: 40px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #fff; font-size: 13px; font-weight: 800; color: var(--muted); }
   .undo-bar { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 86px); transform: translateX(-50%) translateY(20px); z-index: 70; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-radius: 12px; background: rgba(11,22,54,.96); color: #fff; font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: all .2s; width: max-content; max-width: 92vw; }
   .undo-bar.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
@@ -172,7 +176,7 @@
   <div class="home">
     <div class="hero">
       <div class="h">현장에서 1분, 불량 보고</div>
-      <div class="s">급하면 ⚡빠른 보고로 먼저 알리고,<br>원인은 🔍5Why 초안으로 정리해 PC 보고서에 옮기세요.</div>
+      <div class="s">급하면 ⚡빠른 보고로 먼저 알리고,<br>원인은 🔍5Why 초안으로 정리해 PC로 옮기세요.</div>
       <div class="modes">
         <button type="button" class="mode pri" onclick="startQuick()"><div class="i">⚡</div><div class="n">빠른 보고</div><div class="d">출장·현장 · 한 화면<br>수량·사진·즉시 조치</div></button>
         <button type="button" class="mode" onclick="startNew()"><div class="i">🔍</div><div class="n">5Why 초안</div><div class="d">버튼으로 원인 분석<br>추천 채우기 · 2~3분</div></button>
@@ -459,6 +463,7 @@ const TAGOF = {};
 [...Object.values(DATA.defects).flat(), ...Object.values(DATA.why23).flat(), ...DATA.roots, ...Object.values(NEXT).flat()].forEach(([t, g]) => { if (g) TAGOF[t] = g; });
 const FREQ_KEY = 'w5_freq_v1';
 
+const UNK = '(추후 확인)', PERM_UNK = '원인 확인 후 수립';
 const DRAFT_KEY = 'w5_draft_v3', HIST_KEY = 'w5_reports_v1', AUTHOR_KEY = 'w5_author_v1', RECENT_KEY = 'w5_recent_v1';
 const $ = id => document.getElementById(id);
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -687,7 +692,7 @@ let A = null, step = 0;
 function blank() {
   return { id: Date.now(), type: '5why', part: '', customer: '', product: '', ptype: '', pno: '', custOther: false, prodOther: false, typeOther: false, process: '사출', date: today(), ng: '', qty: '', author: load(AUTHOR_KEY, ''),
            defect: '', defectEtc: '', after: [], symptom: '', why: ['', '', '', '', ''], whyTags: [[], [], [], [], []], rootAt: 0,
-           esc: [], escEtc: '', m4: [], temp: [], tempEtc: '', perm: [], permEtc: '', owner: '', kpi: [], actInit: false, tkInit: false, more: false, fromQuick: null };
+           esc: [], escEtc: '', escUnk: false, m4: [], temp: [], tempEtc: '', perm: [], permEtc: '', owner: '', kpi: [], actInit: false, tkInit: false, more: false, fromQuick: null };
 }
 const STEPS = ['info', 'defect', 'after', 'why0', 'why1', 'why2', 'why3', 'why4', 'esc', 'act'];   // 현상·사진은 결과 화면에서
 const WHY_FIRST = 3, ESC = 8, ACT = 9;
@@ -725,7 +730,7 @@ function answer(i) {
   if (k === 'after') return A.after.length ? A.after.join(', ') : '영향 없음';
   if (k === 'symptom') return (A.symptom || '(현상 설명 없음)') + (photos.length ? `\n📷 사진 ${photos.length}장` : '');
   if (k.startsWith('why')) return A.why[+k.slice(3)] || '—';
-  if (k === 'esc') return [...A.esc, A.escEtc].filter(Boolean).join(', ') || DATA.escapeNone;
+  if (k === 'esc') return A.escUnk ? UNK : ([...A.esc, A.escEtc].filter(Boolean).join(', ') || DATA.escapeNone);
   const t = [...A.temp, A.tempEtc].filter(Boolean), p = [...A.perm, A.permEtc].filter(Boolean);
   return `임시: ${t.join(', ') || '-'}\n영구: ${p.join(', ') || '-'}`;
 }
@@ -815,28 +820,32 @@ function render() {
     if (recsL.length) h += `<div class="g">${n === 0 ? `${esc(defName())} 원인 · 하나씩 고르기` : '👍 추천'}</div>` + chipsHTML(recsL, A.why[n], 'pickWhy', true);
     const others = n <= 2 ? Object.assign({}, DATA.why23) : {};
     if (n >= 1) others['근본 원인 (관리 체계)'] = DATA.roots;
-    const openOthers = OTHERS_OPEN || (!recsL.length && !favs.length) || (A.why[n] && !recs.some(r => r[0] === A.why[n]) && !favs.some(f => f[0] === A.why[n]));
+    const openOthers = OTHERS_OPEN || (!recsL.length && !favs.length) || (A.why[n] && A.why[n] !== UNK && !recs.some(r => r[0] === A.why[n]) && !favs.some(f => f[0] === A.why[n]));
     h += '</div>';
     if (openOthers) {
       h += '<div class="chips">';
       Object.entries(others).forEach(([g, list]) => { const l = list.filter(x => !used.has(x[0])); if (l.length) h += `<div class="g2">${n === 0 && recs.length ? '다른 원인 · ' : ''}${g}</div>` + chipsHTML(l, A.why[n], 'pickWhy', true); });
       h += '</div>';
     } else h += `<button type="button" class="expand" onclick="OTHERS_OPEN=true; render()">＋ 다른 원인 보기</button>`;
-    P.innerHTML = h + `<div class="inrow"><input id="fWhy" value="${esc(A.why[n])}" placeholder="직접 입력 (버튼에 없을 때)" autocomplete="off" oninput="A.why[${n}]=this.value; A.whyTags[${n}]=[];"></div>`
+    P.innerHTML = h + `<div class="inrow"><input id="fWhy" value="${A.why[n] === UNK ? '' : esc(A.why[n])}" placeholder="직접 입력 (버튼에 없을 때)" autocomplete="off" oninput="A.why[${n}]=this.value; A.whyTags[${n}]=[];"></div>`
+      + `<button type="button" class="unk${A.why[n] === UNK ? ' on' : ''}" onclick="pickWhyUnk()">❔ 모르겠음 · 추후 확인 <small>(여기서 원인 정리)</small></button>`
       + navHTML({ root: n >= 1 && n < 4, label: n === 4 ? '근본 원인 확정 →' : '다음 →' });
   } else if (k === 'esc') {
-    const none = A.esc.length === 0 && A.escNone;
+    const none = A.esc.length === 0 && A.escNone && !A.escUnk;
     P.innerHTML = `<div class="chips"><button type="button" class="chip${none ? ' on' : ''}" onclick="pickEscNone(this)">✔ ${DATA.escapeNone}</button><div class="g2">유출 원인</div>${chipsHTML(DATA.escape, A.esc, 'toggleEsc')}</div>
-      <div class="inrow"><input id="fEscEtc" value="${esc(A.escEtc)}" placeholder="기타 유출 원인 (선택)" autocomplete="off"></div>${navHTML()}`;
+      <div class="inrow"><input id="fEscEtc" value="${esc(A.escEtc)}" placeholder="기타 유출 원인 (선택)" autocomplete="off"></div>
+      <button type="button" class="unk${A.escUnk ? ' on' : ''}" onclick="pickEscUnk()">❔ 모르겠음 · 추후 확인</button>${navHTML()}`;
   } else if (k === 'act') {
     prepareAct();
     const pick = (list, sel) => ACT_MORE ? list : list.filter(x => sel.includes(x));
     let h = `<div class="act-sec">근본 원인 4M</div><div class="chips">${chipsHTML(DATA.m4.map(m => DATA.m4label[m]), A.m4.map(m => DATA.m4label[m]), 'toggleM4')}</div>`;
     h += `<div class="act-sec">임시 대책 <small>${ACT_MORE ? '즉시 조치' : '선택된 것 · 누르면 해제'}</small></div><div class="chips">${chipsHTML(pick(DATA.temp, A.temp), A.temp, 'toggleF', false, 'temp') || '<span class="hint">없음</span>'}</div>`;
     h += `<div class="act-sec">영구 대책 <small>${ACT_MORE ? '재발 방지' : '원인에 맞춰 선택됨 · 누르면 해제'}</small></div><div class="chips">`;
+    if (ACT_MORE && A.perm.includes(PERM_UNK)) h += chipsHTML([PERM_UNK], A.perm, 'toggleF', false, 'perm');
     if (ACT_MORE) Object.entries(DATA.perm).forEach(([g, list]) => { h += `<div class="g2">${g}</div>` + chipsHTML(list, A.perm, 'toggleF', false, 'perm'); });
-    else h += chipsHTML([].concat(...Object.values(DATA.perm)).filter(x => A.perm.includes(x)), A.perm, 'toggleF', false, 'perm') || '<span class="hint">자동 선택된 대책이 없습니다 · 아래에서 고르세요</span>';
+    else h += chipsHTML([PERM_UNK, ...[].concat(...Object.values(DATA.perm))].filter(x => A.perm.includes(x)), A.perm, 'toggleF', false, 'perm') || '<span class="hint">자동 선택된 대책이 없습니다 · 아래에서 고르세요</span>';
     h += '</div>';
+    if (!A.perm.includes(PERM_UNK)) h += `<button type="button" class="unk" onclick="pickPermUnk()">❔ 모르겠음 · 영구 대책은 원인 확인 후</button>`;
     h += `<div class="act-sec">유효성 확인 지표</div><div class="chips">${chipsHTML(pick(DATA.kpi, A.kpi), A.kpi, 'toggleF', false, 'kpi') || '<span class="hint">없음</span>'}</div>`;
     if (!ACT_MORE) h += `<button type="button" class="expand" onclick="readStep(true); ACT_MORE=true; render()">＋ 대책·지표 더 고르기 · 기타 입력</button>`;
     else h += `<div class="inrow"><input id="fPermEtc" value="${esc(A.permEtc)}" placeholder="기타 대책 (선택)" autocomplete="off"></div>`;
@@ -861,15 +870,31 @@ function toggleF(b) {
   const f = b.dataset.f, v = b.dataset.v, arr = A[f], i = arr.indexOf(v);
   if (i >= 0) arr.splice(i, 1); else arr.push(v);
   b.classList.toggle('on', i < 0);
+  if (f === 'perm' && v !== PERM_UNK && i < 0 && A.perm.includes(PERM_UNK)) { A.perm.splice(A.perm.indexOf(PERM_UNK), 1); render(); return; }
   if (f === 'after') $('panel').querySelector('.next').textContent = A.after.length ? '다음 →' : '영향 없음 · 다음 →';
 }
 function toggleEsc(b) {
   const v = b.dataset.v, i = A.esc.indexOf(v);
   if (i >= 0) A.esc.splice(i, 1); else A.esc.push(v);
-  b.classList.toggle('on', i < 0); A.escNone = false; A.actInit = false;
+  b.classList.toggle('on', i < 0); A.escNone = false; A.escUnk = false; A.actInit = false;
   const n = $('panel').querySelector('.chip'); if (n) n.classList.remove('on');
 }
-function pickEscNone(b) { const before = snap(); A.esc = []; A.escNone = true; A.actInit = false; setTimeout(() => { next(); offerUndo(before, '유출 없음'); }, 200); }
+function pickEscNone(b) { const before = snap(); A.esc = []; A.escNone = true; A.escUnk = false; A.actInit = false; setTimeout(() => { next(); offerUndo(before, '유출 없음'); }, 200); }
+function pickEscUnk() { const before = snap(); A.esc = []; A.escEtc = ''; A.escNone = false; A.escUnk = true; A.actInit = false; step = ACT; render(); offerUndo(before, '유출 원인: 추후 확인'); }
+function pickWhyUnk() {
+  const before = snap(), n = +STEPS[step].slice(3);
+  A.why[n] = UNK; A.whyTags[n] = []; A.rootAt = n + 1; clearAfter(n); A.actInit = false;
+  step = ESC; render(); offerUndo(before, `Why${n + 1}: 추후 확인`);
+}
+function pickPermUnk() { readStep(true); A.perm = [PERM_UNK]; render(); toast('영구 대책: 원인 확인 후 수립'); }
+function pendingList(a) {
+  const out = [], last = (a.rootAt ? a.rootAt : 5) - 1;
+  const wi = a.why.slice(0, last + 1).indexOf(UNK);
+  if (wi >= 0) out.push(`Why${wi + 1} 이후 원인 (근본 원인)`);
+  if (a.escUnk) out.push('유출 원인');
+  if ((a.perm || []).includes(PERM_UNK)) out.push('영구 대책');
+  return out;
+}
 function toggleM4(b) { const key = DATA.m4.find(m => DATA.m4label[m] === b.dataset.v); const i = A.m4.indexOf(key); if (i >= 0) A.m4.splice(i, 1); else A.m4.push(key); b.classList.toggle('on', i < 0); }
 function pickWhy(b) {
   const before = snap();
@@ -946,7 +971,7 @@ function recordFreq() {
   const F = load(FREQ_KEY, { d: {}, n: {} });
   const last = rootIndex();
   for (let i = 0; i <= last; i++) {
-    const w = A.why[i]; if (!w) continue;
+    const w = A.why[i]; if (!w || w === UNK) break;
     const bucket = i === 0 ? (F.d[A.defect] = F.d[A.defect] || {}) : (F.n[A.why[i - 1]] = F.n[A.why[i - 1]] || {});
     bucket[w] = (bucket[w] || 0) + 1;
   }
@@ -957,11 +982,12 @@ function prepareAct() {
   if (!A.actInit) {
     const tags = new Set();
     for (let i = rootIndex(); i >= 0 && tags.size === 0; i--) (A.whyTags[i] || []).forEach(t => tags.add(t));
-    A.m4 = [...tags];
+    A.m4 = A.why[rootIndex()] === UNK ? [] : [...tags];
     const text = [...A.why.slice(0, rootIndex() + 1), ...A.esc, A.escEtc].join(' ');
     const perm = new Set();
     FIX.forEach(([re, list]) => { if (re.test(text)) list.forEach(x => perm.add(x)); });
     A.perm = [...perm];
+    if (A.why[rootIndex()] === UNK) A.perm = [PERM_UNK];
     A.actInit = true;
   }
   if (!A.tkInit) {
@@ -982,14 +1008,15 @@ function readStep(quiet) {
     if (!A.defect && !quiet) { toast('불량 유형을 고르세요'); return false; }
   } else if (k === 'symptom') { A.symptom = $('fSym').value.trim(); }
   else if (k.startsWith('why')) {
-    const n = +k.slice(3); A.why[n] = $('fWhy').value.trim();
+    const n = +k.slice(3); const v = $('fWhy').value.trim(); if (v || A.why[n] !== UNK) A.why[n] = v;
     if (!A.why[n] && !quiet) { toast('원인을 고르거나 입력하세요'); $('fWhy').focus(); return false; }
-  } else if (k === 'esc') { A.escEtc = $('fEscEtc').value.trim(); if (A.escEtc) A.escNone = false; }
+  } else if (k === 'esc') { A.escEtc = $('fEscEtc').value.trim(); if (A.escEtc) { A.escNone = false; A.escUnk = false; } }
   else if (k === 'act') { if ($('fPermEtc')) A.permEtc = $('fPermEtc').value.trim(); A.owner = $('fOwner').value.trim(); }
   return true;
 }
 function next() {
   if (!readStep()) return;
+  if (STEPS[step].startsWith('why')) { const n = +STEPS[step].slice(3); if (A.why[n] === UNK) { A.rootAt = n + 1; clearAfter(n); A.actInit = false; step = ESC; render(); return; } }
   if (STEPS[step] === 'why4') A.rootAt = 0;
   if (step >= ACT) { buildResult(); return; }
   step++;
@@ -1031,7 +1058,7 @@ function buildText() {
   L.push('');
   const escs = [...A.esc, A.escEtc].filter(Boolean);
   L.push('■ 유출 원인');
-  L.push(escs.length ? escs.map(e => `- ${e}`).join('\n') : `- ${DATA.escapeNone}`);
+  L.push(A.escUnk ? `- ${UNK}` : (escs.length ? escs.map(e => `- ${e}`).join('\n') : `- ${DATA.escapeNone}`));
   L.push('');
   L.push('■ 대책');
   const temp = [...A.temp, A.tempEtc].filter(Boolean), perm = [...A.perm, A.permEtc].filter(Boolean);
@@ -1039,6 +1066,8 @@ function buildText() {
   L.push('- 영구 대책'); L.push(perm.length ? perm.map(t => `  · ${t}`).join('\n') : '  · -');
   if (A.owner) L.push(`- 담당/완료 예정: ${A.owner}`);
   if (A.kpi.length) { L.push(''); L.push('■ 유효성 확인 지표'); A.kpi.forEach(k => L.push(`- ${k}`)); }
+  const pend = pendingList(A);
+  if (pend.length) { L.push(''); L.push('■ 추후 확인 항목'); pend.forEach(x => L.push(`- □ ${x}`)); }
   L.push('');
   L.push(`작성: ${A.author || '-'} · ${nowStr()}`);
   L.push('※ 현장 초안 · 정식 보고서는 PC에서 작성');
@@ -1076,7 +1105,7 @@ function editAgain() {
 async function copyReport() { toast(await copyText($('reportText').value) ? '보고서를 복사했습니다' : '복사에 실패했습니다'); }
 async function shareReport() { await shareText($('reportText').value, true); }
 function finishReport() {
-  pushHist({ id: A.id, type: '5why', title: `${A.part} · ${defName()}`, meta: `${A.date || ''}${A.customer ? ' · ' + A.customer : ''} · 근본: ${A.why[rootIndex()] || '-'}`, text: $('reportText').value, data: clone(A) });
+  pushHist({ id: A.id, type: '5why', title: `${A.part} · ${defName()}`, meta: `${A.date || ''}${A.customer ? ' · ' + A.customer : ''} · 근본: ${A.why[rootIndex()] || '-'}`, text: $('reportText').value, data: clone(A), pending: pendingList(A).length });
   addRecent(A); recordFreq();
   localStorage.removeItem(DRAFT_KEY);
   clearPhotos(); A = null;
@@ -1097,7 +1126,7 @@ function renderHome() {
   const list = load(HIST_KEY, []);
   $('histList').innerHTML = list.length ? list.map((r, i) => {
     const quick = r.type === 'quick';
-    return `<div class="it"><div class="t"><span class="badge ${quick ? 'q' : 'w'}">${quick ? '⚡ 빠른 보고' : '🔍 5Why'}</span>${esc(r.title)}</div><div class="m">${esc(r.meta || '')}</div>
+    return `<div class="it"><div class="t"><span class="badge ${quick ? 'q' : 'w'}">${quick ? '⚡ 빠른 보고' : '🔍 5Why'}</span>${r.pending ? `<span class="badge p">확인 필요 ${r.pending}</span>` : ''}${esc(r.title)}</div><div class="m">${esc(r.meta || '')}</div>
       <div class="a"><button type="button" onclick="histCopy(${i})">📋 복사</button><button type="button" onclick="histShare(${i})">💬 공유</button>
       ${r.data ? (quick ? `<button type="button" class="go" onclick="fromQuick(${i})">🔍 5Why로 이어서</button>` : `<button type="button" onclick="copyAsNew(${i})">📝 복사해 새로</button>`) : ''}
       <button type="button" class="del" onclick="histDel(${i})">🗑</button></div></div>`;
