@@ -197,9 +197,10 @@
   .hs-line b { color: #b8863c; }
   #hsMemo { width: 100%; margin-top: 12px; height: 46px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #E2E8F0; background: #F8FAFC; font-size: 15px; font-weight: 700; color: #0F172A; font-family: inherit; }
   #hsMemo:focus { outline: none; border-color: #e0b060; background: #fff; }
-  .hs-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .hs-btns { display: grid; grid-template-columns: 1fr 0.9fr 1.3fr; gap: 8px; margin-top: 12px; }
   .hs-btns button { height: 52px; border-radius: 14px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 14px; font-weight: 800; color: #334155; font-family: inherit; }
-  .hs-btns button.pri { background: #0b1636; border-color: #0b1636; color: #e0b060; }
+  .hs-btns button.pri { background: #e0b060; border-color: #e0b060; color: #1a1206; font-size: 16px; font-weight: 900; }
+  .hs-btns button.soft { background: #fff; color: #64748B; font-size: 12.5px; font-weight: 700; }
   .cs-hist .hi.empty { color: rgba(255,255,255,.28); cursor: default; }
   .cs-expr { margin-top: 4px; text-align: right; font-size: 36px; line-height: 46px; min-height: 46px; font-weight: 800; letter-spacing: -.5px; word-break: break-all; font-variant-numeric: tabular-nums; }
   .cs-expr.m { font-size: 28px; line-height: 36px; }
@@ -609,12 +610,12 @@
   <div class="hs-back" id="hsBack" onclick="closeHistSheet()"></div>
   <div class="hs" id="hs">
     <div class="hs-line" id="hsLine"></div>
-    <input type="text" id="hsMemo" placeholder="✎ 메모 (예: Ø10 내경) — 적으면 바로 저장" autocomplete="off" enterkeyhint="done"
+    <input type="text" id="hsMemo" placeholder="✎ 메모 입력 (예: Ø10 내경)" autocomplete="off" enterkeyhint="done"
            oninput="hsSaveMemo()" onkeydown="if (event.key === 'Enter') { event.preventDefault(); closeHistSheet(); }">
     <div class="hs-btns">
-      <button type="button" class="pri" id="hsUse" onclick="hsUse()">넣기</button>
-      <button type="button" id="hsRe" onclick="hsRe()">식 다시 쓰기</button>
+      <button type="button" class="soft" id="hsUse" onclick="hsUse()">이 값으로 계산</button>
       <button type="button" onclick="hsCopy()">📋 복사</button>
+      <button type="button" class="pri" onclick="closeHistSheet()">완료</button>
     </div>
   </div>
   <div class="toast" id="toast"></div>
@@ -890,7 +891,6 @@
     hsIdx = i;
     id('hsLine').innerHTML = `${escH(h.e)} = <b>${fmtDisp(parseFloat(h.r))}</b>`;
     id('hsMemo').value = h.m || '';
-    id('hsUse').innerText = `${fmtDisp(parseFloat(h.r))} 넣기`;
     id('hs').classList.add('show'); id('hsBack').classList.add('show');
   }
   function closeHistSheet(){ id('hsMemo').blur(); id('hs').classList.remove('show'); id('hsBack').classList.remove('show'); hsIdx = -1; }
