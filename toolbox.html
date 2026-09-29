@@ -294,6 +294,25 @@
         .pe-fold { width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; padding: 0; font-size: 0.82rem; font-weight: 800; color: #1E293B; font-family: inherit; }
         .pe-fold b { margin-left: 6px; color: #9a6b1f; font-weight: 900; }
         .pe-fold span:last-child { font-size: 0.72rem; font-weight: 800; color: #64748B; background: #F1F5F9; border-radius: 8px; padding: 6px 10px; }
+        .pe-ijk-out { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #0b1636; border-radius: 12px; padding: 10px 10px 10px 14px; }
+        .pe-ijk-out span { font-family: monospace; font-size: 1.02rem; font-weight: 800; color: #facc15; letter-spacing: .3px; }
+        .pe-ijk-out button { flex: none; border: none; border-radius: 9px; background: #e0b060; color: #1a1206; font-weight: 900; font-size: 0.74rem; padding: 8px 10px; }
+        .pe-ijk-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; align-items: start; }
+        .pe-ijk-sl .pe-field { margin-bottom: 10px; }
+        .pe-ijk-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .pe-ijk-btns button { border: 1px solid #CBD5E1; background: #F8FAFC; border-radius: 10px; padding: 7px 2px; display: flex; flex-direction: column; align-items: center; gap: 1px; color: #0F172A; }
+        .pe-ijk-btns button b { font-size: 0.95rem; font-weight: 900; }
+        .pe-ijk-btns button small { font-size: 0.62rem; font-weight: 700; color: #64748B; }
+        .pe-ijk-btns button.on { background: var(--primary-color); border-color: var(--primary-color); }
+        .pe-ijk-btns button.on b, .pe-ijk-btns button.on { color: var(--gold); }
+        .pe-ijk-btns button.on small { color: rgba(224,176,96,.75); }
+        .pe-ijk-btns .g { grid-column: 1 / -1; font-size: 0.66rem; font-weight: 800; color: #64748B; margin: 4px 2px -2px; }
+        .pe-ijk-btns button.s45 { font-size: 0.74rem; font-weight: 800; padding: 9px 2px; }
+        .pe-seg4 { display: grid; grid-template-columns: 1fr 1fr 6px 1fr 1fr; gap: 4px; margin-bottom: 12px; }
+        .pe-seg4 button { border: 1px solid #E2E8F0; background: #F1F5F9; color: #334155; font-size: 0.74rem; font-weight: 800; padding: 9px 2px; border-radius: 9px; }
+        .pe-seg4 button.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
+        .pe-mini { display: flex; gap: 4px; margin-top: 5px; }
+        .pe-mini button { flex: 1; min-width: 0; border: 1px solid #E2E8F0; background: #F8FAFC; color: #475569; font-size: 0.68rem; font-weight: 800; padding: 6px 0; border-radius: 7px; white-space: nowrap; }
         .pe-step { display: grid; grid-template-columns: 52px 1fr 52px; gap: 6px; align-items: center; margin-bottom: 8px; }
         .pe-step button { height: 42px; border-radius: 10px; border: 1px solid #CBD5E1; background: #F8FAFC; font-size: 0.8rem; font-weight: 800; color: #334155; }
         .pe-step .pv { text-align: center; }
@@ -1218,78 +1237,85 @@
                     </div>
                 </div>
 
-                <!-- IJK 벡터 탭 -->
+                <!-- IJK 벡터 탭 (왼쪽 슬라이더 · 오른쪽 자주 쓰는 버튼) -->
                 <div id="pe-panel-ijk" class="pe-panel" style="display:none;">
                     <div class="pe-card">
-                        <div class="pe-field">
-                            <div class="pe-slider-row"><span style="color:#dc2626;">I (X축 방향코사인)</span><span class="v" id="pe-val-i">0.000</span></div>
-                            <input type="range" id="pe-slider-i" min="-1" max="1" step="0.01" value="0" oninput="peUpdateIJK()">
+                        <div class="pe-ijk-out">
+                            <span id="pe-ijk-text">0.0000, 0.0000, 1.0000</span>
+                            <button type="button" onclick="peCopyIJK()">📋 복사</button>
                         </div>
-                        <div class="pe-field">
-                            <div class="pe-slider-row"><span style="color:#059669;">J (Y축 방향코사인)</span><span class="v" id="pe-val-j">0.000</span></div>
-                            <input type="range" id="pe-slider-j" min="-1" max="1" step="0.01" value="0" oninput="peUpdateIJK()">
+                        <div class="pe-mapbox" id="pe-ijk-map" style="margin:8px 0 12px;">+Z 방향 면 (윗면) · 수직에서 0.0°</div>
+                        <div class="pe-ijk-grid">
+                            <div class="pe-ijk-sl">
+                                <div class="pe-field">
+                                    <div class="pe-slider-row"><span style="color:#dc2626;">I (X)</span><span class="v" id="pe-val-i">0.000</span></div>
+                                    <input type="range" id="pe-slider-i" min="-1" max="1" step="any" value="0" oninput="peUpdateIJK()">
+                                </div>
+                                <div class="pe-field">
+                                    <div class="pe-slider-row"><span style="color:#059669;">J (Y)</span><span class="v" id="pe-val-j">0.000</span></div>
+                                    <input type="range" id="pe-slider-j" min="-1" max="1" step="any" value="0" oninput="peUpdateIJK()">
+                                </div>
+                                <div class="pe-field" style="margin-bottom:6px;">
+                                    <div class="pe-slider-row"><span style="color:#0284c7;">K (Z)</span><span class="v" id="pe-val-k">1.000</span></div>
+                                    <input type="range" id="pe-slider-k" min="-1" max="1" step="any" value="1" oninput="peUpdateIJK()">
+                                </div>
+                                <div class="pe-badge-row" style="margin:4px 0 6px;">
+                                    <span>|V| <strong id="pe-ijk-mag">1.000</strong></span>
+                                    <span class="pe-badge ok" id="pe-ijk-badge">단위벡터 OK</span>
+                                </div>
+                                <button class="pe-btn outline" style="margin-top:0; padding:9px;" onclick="peNormalizeIJK()">정규화</button>
+                            </div>
+                            <div class="pe-ijk-btns">
+                                <button onclick="peSetIJKPreset(1,0,0)"><b>+X</b><small>1,0,0</small></button>
+                                <button onclick="peSetIJKPreset(-1,0,0)"><b>−X</b><small>−1,0,0</small></button>
+                                <button onclick="peSetIJKPreset(0,1,0)"><b>+Y</b><small>0,1,0</small></button>
+                                <button onclick="peSetIJKPreset(0,-1,0)"><b>−Y</b><small>0,−1,0</small></button>
+                                <button onclick="peSetIJKPreset(0,0,1)"><b>+Z</b><small>윗면</small></button>
+                                <button onclick="peSetIJKPreset(0,0,-1)"><b>−Z</b><small>아랫면</small></button>
+                                <div class="g">45° 경사</div>
+                                <button class="s45" onclick="peSetIJKPreset(0.7071,0,0.7071)">+X+Z</button>
+                                <button class="s45" onclick="peSetIJKPreset(-0.7071,0,0.7071)">−X+Z</button>
+                                <button class="s45" onclick="peSetIJKPreset(0,0.7071,0.7071)">+Y+Z</button>
+                                <button class="s45" onclick="peSetIJKPreset(0,-0.7071,0.7071)">−Y+Z</button>
+                            </div>
                         </div>
-                        <div class="pe-field" style="margin-bottom:6px;">
-                            <div class="pe-slider-row"><span style="color:#0284c7;">K (Z축 방향코사인)</span><span class="v" id="pe-val-k">1.000</span></div>
-                            <input type="range" id="pe-slider-k" min="-1" max="1" step="0.01" value="1" oninput="peUpdateIJK()">
-                        </div>
-                        <div class="pe-badge-row">
-                            <span>벡터 크기 |V| = <strong id="pe-ijk-mag">1.000</strong></span>
-                            <span class="pe-badge ok" id="pe-ijk-badge">단위벡터 OK</span>
-                        </div>
-                        <button class="pe-btn outline" style="margin-top:0;" onclick="peNormalizeIJK()">단위벡터로 정규화</button>
-                        <div class="pe-mapbox" id="pe-ijk-map" style="margin-top:10px;">+Z 방향 면 (윗면) · 수직에서 0.0°</div>
-                        <div class="pe-angle-grid" style="grid-template-columns:repeat(4,1fr); margin-top:10px;">
-                            <button onclick="peSetIJKPreset(0,0,1)">+Z 윗면</button>
-                            <button onclick="peSetIJKPreset(0,0,-1)">−Z 아랫면</button>
-                            <button onclick="peSetIJKPreset(1,0,0)">+X 면</button>
-                            <button onclick="peSetIJKPreset(-1,0,0)">−X 면</button>
-                            <button onclick="peSetIJKPreset(0,1,0)">+Y 면</button>
-                            <button onclick="peSetIJKPreset(0,-1,0)">−Y 면</button>
-                            <button onclick="peSetIJKPreset(0.707,0,0.707)">+X 45° 경사</button>
-                            <button onclick="peSetIJKPreset(0,0.707,0.707)">+Y 45° 경사</button>
-                        </div>
-                        <div class="pe-note"><b>IJK = 측정 면이 바라보는 방향(법선)</b>의 단위벡터입니다. 프로브는 이 방향 바깥에서 반대 방향으로 들어가 면을 찍습니다. I² + J² + K² = 1 이어야 합니다.</div>
+                        <div class="pe-note"><b>IJK = 측정 면이 바라보는 방향(법선)</b>. 프로브는 이 방향 바깥에서 들어와 면을 찍습니다. 대부분 ±1·0 조합이고, 특수 각도만 왼쪽 슬라이더로 확인하세요.</div>
                     </div>
                 </div>
 
                 <!-- DSEC 원측정 탭 -->
                 <div id="pe-panel-dsc" class="pe-panel" style="display:none;">
                     <div class="pe-card">
-                        <div class="pe-chip-row">
-                            <button class="pe-chip on" id="pe-feat-hole" onclick="peSetFeat('hole')">구멍 (볼 안쪽)</button>
-                            <button class="pe-chip" id="pe-feat-shaft" onclick="peSetFeat('shaft')">축 (볼 바깥쪽)</button>
+                        <div class="pe-seg4">
+                            <button class="on" id="pe-feat-hole" onclick="peSetFeat('hole')">구멍</button>
+                            <button id="pe-feat-shaft" onclick="peSetFeat('shaft')">축</button>
+                            <span class="sep"></span>
+                            <button class="on" id="pe-zoom-on" onclick="peSetZoom(true)">🔍 확대</button>
+                            <button id="pe-zoom-off" onclick="peSetZoom(false)">⭕ 전체</button>
                         </div>
-                        <div class="pe-chip-row" style="margin-bottom:12px;">
-                            <button class="pe-chip on" id="pe-zoom-on" onclick="peSetZoom(true)">🔍 호 확대</button>
-                            <button class="pe-chip" id="pe-zoom-off" onclick="peSetZoom(false)">⭕ 전체 원</button>
-                        </div>
-                        <div class="pe-num-field" style="margin-bottom:8px;">
-                            <label>S (시작 각도, °)</label>
-                            <input type="number" id="pe-input-s" value="90" step="15" min="-360" max="360" oninput="peUpdateDSC()">
-                        </div>
-                        <div class="pe-chip-row">
-                            <button class="pe-chip" onclick="peSetSAngle(0)">0°</button>
-                            <button class="pe-chip" onclick="peSetSAngle(90)">90°</button>
-                            <button class="pe-chip" onclick="peSetSAngle(180)">180°</button>
-                            <button class="pe-chip" onclick="peSetSAngle(-90)">-90°</button>
-                        </div>
-                        <div class="pe-num-field" style="margin-bottom:8px;">
-                            <label>E (종료 각도, °)</label>
-                            <input type="number" id="pe-input-e" value="450" step="15" min="-360" max="720" oninput="peUpdateDSC()">
-                        </div>
-                        <div class="pe-chip-row">
-                            <button class="pe-chip" onclick="peSetEFullCircle()">전체원(S+360°)</button>
-                            <button class="pe-chip" onclick="peSetEHalfCircle()">반원(S+180°)</button>
-                            <button class="pe-chip" onclick="peSetEOffset(90)">S+90°</button>
+                        <div class="pe-num-row" style="margin-bottom:0;">
+                            <div class="pe-num-field">
+                                <label>S 시작 각도 (°)</label>
+                                <input type="number" id="pe-input-s" value="90" step="15" min="-360" max="360" oninput="peUpdateDSC()">
+                                <div class="pe-mini">
+                                    <button onclick="peSetSAngle(0)">0</button><button onclick="peSetSAngle(90)">90</button><button onclick="peSetSAngle(180)">180</button><button onclick="peSetSAngle(-90)">−90</button>
+                                </div>
+                            </div>
+                            <div class="pe-num-field">
+                                <label>E 종료 각도 (°)</label>
+                                <input type="number" id="pe-input-e" value="450" step="15" min="-360" max="720" oninput="peUpdateDSC()">
+                                <div class="pe-mini">
+                                    <button onclick="peSetEFullCircle()">전체원</button><button onclick="peSetEHalfCircle()">반원</button><button onclick="peSetEOffset(90)">+90</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="pe-num-row" style="margin-top:10px;margin-bottom:0;">
                             <div class="pe-num-field">
-                                <label>D (직경, mm)</label>
+                                <label>D 직경 (mm)</label>
                                 <input type="number" id="pe-input-d" value="6.5" step="0.1" min="1" max="50" oninput="peUpdateDSC()">
                             </div>
                             <div class="pe-num-field">
-                                <label>C (포인트 개수)</label>
+                                <label>C 포인트 개수</label>
                                 <input type="number" id="pe-input-c" value="8" step="1" min="2" max="32" oninput="peUpdateDSC()">
                             </div>
                         </div>
@@ -3157,6 +3183,12 @@
             document.getElementById('pe-val-i').innerText = peIjkVal.i.toFixed(3);
             document.getElementById('pe-val-j').innerText = peIjkVal.j.toFixed(3);
             document.getElementById('pe-val-k').innerText = peIjkVal.k.toFixed(3);
+            document.getElementById('pe-ijk-text').innerText = [peIjkVal.i, peIjkVal.j, peIjkVal.k].map(v => (Math.abs(v) < 5e-5 ? 0 : v).toFixed(4)).join(', ');
+            document.querySelectorAll('.pe-ijk-btns button').forEach(b => {
+                const m = (b.getAttribute('onclick') || '').match(/\(([^)]*)\)/); if (!m) return;
+                const v = m[1].split(',').map(Number);
+                b.classList.toggle('on', Math.abs(v[0] - peIjkVal.i) < 0.006 && Math.abs(v[1] - peIjkVal.j) < 0.006 && Math.abs(v[2] - peIjkVal.k) < 0.006);
+            });
 
             const mag = Math.sqrt(peIjkVal.i ** 2 + peIjkVal.j ** 2 + peIjkVal.k ** 2);
             document.getElementById('pe-ijk-mag').innerText = mag.toFixed(3);
@@ -3175,6 +3207,15 @@
                 mapEl.innerText = `${face} · 수직에서 ${tilt.toFixed(1)}° 기울어짐`;
             }
             peDrawSimulation();
+        }
+        async function peCopyIJK() {
+            const t = document.getElementById('pe-ijk-text').innerText;
+            let ok = false;
+            try { await navigator.clipboard.writeText(t); ok = true; } catch (e) {
+                const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+                try { ok = document.execCommand('copy'); } catch (e2) {} ta.remove();
+            }
+            showToast(ok ? `복사했습니다 · ${t}` : '복사에 실패했습니다');
         }
         function peNormalizeIJK() {
             const mag = Math.sqrt(peIjkVal.i ** 2 + peIjkVal.j ** 2 + peIjkVal.k ** 2);
