@@ -294,6 +294,9 @@
         .pe-fold { width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; padding: 0; font-size: 0.82rem; font-weight: 800; color: #1E293B; font-family: inherit; }
         .pe-fold b { margin-left: 6px; color: #9a6b1f; font-weight: 900; }
         .pe-fold span:last-child { font-size: 0.72rem; font-weight: 800; color: #64748B; background: #F1F5F9; border-radius: 8px; padding: 6px 10px; }
+        .pe-legend-row { display: flex; align-items: center; gap: 8px; }
+        .pe-legend-row .pe-legend { flex: 1; min-width: 0; font-size: 0.66rem; letter-spacing: -0.02em; }
+        .pe-lcopy { flex: none; margin-top: 8px; border: none; border-radius: 9px; background: #e0b060; color: #1a1206; font-size: 0.9rem; padding: 6px 10px; }
         .pe-ijk-out { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #0b1636; border-radius: 12px; padding: 10px 10px 10px 14px; }
         .pe-ijk-out span { font-family: monospace; font-size: 1.02rem; font-weight: 800; color: #facc15; letter-spacing: .3px; }
         .pe-ijk-out button { flex: none; border: none; border-radius: 9px; background: #e0b060; color: #1a1206; font-weight: 900; font-size: 0.74rem; padding: 8px 10px; }
@@ -1212,20 +1215,20 @@
                 <div class="pe-canvas-card">
                     <div class="pe-viewport-head" id="peViewportTitle">프로브 회전 시각화</div>
                     <canvas id="peCanvas"></canvas>
-                    <div class="pe-legend" id="peLegend"></div>
+                    <div class="pe-legend-row"><div class="pe-legend" id="peLegend"></div><button type="button" class="pe-lcopy" id="peCopyBtn" style="display:none;" onclick="peCopyIJK()">📋</button></div>
                 </div>
 
                 <!-- 프로브 회전 탭 -->
                 <div id="pe-panel-probe" class="pe-panel">
                     <div class="pe-card">
-                        <button type="button" class="pe-fold" onclick="peToggleAngle()"><span>회전 각도 <b id="pe-fold-sum">A 0° · B 0°</b></span><span id="pe-fold-ic">펼치기 ▾</span></button>
-                        <div id="pe-angle-box" style="display:none; margin-top:12px;">
+                        <h2>회전 각도 (A°|B°)</h2>
+                        <div class="pe-angle-grid" id="peAngleGrid"></div>
+                        <button type="button" class="pe-fold" style="margin-top:10px;" onclick="peToggleAngle()"><span>특정 각도 <b id="pe-fold-sum">A 0° · B 0°</b></span><span id="pe-fold-ic">±7.5 펼치기 ▾</span></button>
+                        <div id="pe-angle-box" style="display:none; margin-top:10px;">
                         <div class="pe-step"><button onclick="peStepA(-1)">−7.5</button><div class="pv"><div class="k">A (틸트 0~105°)</div><div class="v" id="pe-a-val">0.0°</div></div><button onclick="peStepA(1)">+7.5</button></div>
                         <div class="pe-step"><button onclick="peStepB(-1)">−7.5</button><div class="pv"><div class="k">B (회전 −180~180°)</div><div class="v" id="pe-b-val">0.0°</div></div><button onclick="peStepB(1)">+7.5</button></div>
-                        <div class="pe-note" style="margin:2px 0 8px;">프리셋을 누르거나, 위 ± 버튼으로 7.5° 단위 특정 각도를 맞추세요.</div>
-                        <div class="pe-angle-grid" id="peAngleGrid"></div>
-                        <div class="pe-note">왼쪽 <b>정면도</b>는 앞에서 본 모습(A 기울기), 오른쪽 <b>평면도</b>는 위에서 본 모습(B 방향)입니다. B=0° 전방 · B=90° 우측 기준입니다.</div>
                         </div>
+                        <div class="pe-note">왼쪽 <b>정면도</b>는 앞에서 본 모습(A 기울기), 오른쪽 <b>평면도</b>는 위에서 본 모습(B 방향)입니다. B=0° 전방 · B=90° 우측 기준입니다.</div>
                     </div>
                     <div class="pe-card">
                         <h2>측정기 / 포트 선택</h2>
@@ -1240,11 +1243,7 @@
                 <!-- IJK 벡터 탭 (왼쪽 슬라이더 · 오른쪽 자주 쓰는 버튼) -->
                 <div id="pe-panel-ijk" class="pe-panel" style="display:none;">
                     <div class="pe-card">
-                        <div class="pe-ijk-out">
-                            <span id="pe-ijk-text">0.0000, 0.0000, 1.0000</span>
-                            <button type="button" onclick="peCopyIJK()">📋 복사</button>
-                        </div>
-                        <div class="pe-mapbox" id="pe-ijk-map" style="margin:8px 0 12px;">+Z 방향 면 (윗면) · 수직에서 0.0°</div>
+                        <div class="pe-mapbox" id="pe-ijk-map" style="margin:0 0 12px;">+Z 방향 면 (윗면) · 수직에서 0.0°</div>
                         <div class="pe-ijk-grid">
                             <div class="pe-ijk-sl">
                                 <div class="pe-field">
@@ -3096,6 +3095,7 @@
         function switchPeTab(tab) {
             if (tab !== 'dsc') pePauseDSCPlayback();
             if (tab === 'dsc') peRenderDscList();
+            document.getElementById('peCopyBtn').style.display = tab === 'ijk' ? '' : 'none';
             peActiveTab = tab;
             ['probe', 'ijk', 'dsc'].forEach(t => {
                 document.getElementById('pe-panel-' + t).style.display = (t === tab) ? 'block' : 'none';
@@ -3151,7 +3151,7 @@
         function peToggleAngle() {
             const box = document.getElementById('pe-angle-box'), open = box.style.display === 'none';
             box.style.display = open ? '' : 'none';
-            document.getElementById('pe-fold-ic').innerText = open ? '접기 ▴' : '펼치기 ▾';
+            document.getElementById('pe-fold-ic').innerText = open ? '접기 ▴' : '±7.5 펼치기 ▾';
         }
         function peStepA(d) { peCurrentAngleA = Math.max(0, Math.min(105, peCurrentAngleA + d * 7.5)); peSyncAB(); }
         function peStepB(d) { let b = peCurrentAngleB + d * 7.5; if (b > 180) b -= 360; if (b < -180) b += 360; if (b === -180) b = 180; peCurrentAngleB = b; peSyncAB(); }
@@ -3183,7 +3183,6 @@
             document.getElementById('pe-val-i').innerText = peIjkVal.i.toFixed(3);
             document.getElementById('pe-val-j').innerText = peIjkVal.j.toFixed(3);
             document.getElementById('pe-val-k').innerText = peIjkVal.k.toFixed(3);
-            document.getElementById('pe-ijk-text').innerText = [peIjkVal.i, peIjkVal.j, peIjkVal.k].map(v => (Math.abs(v) < 5e-5 ? 0 : v).toFixed(4)).join(', ');
             document.querySelectorAll('.pe-ijk-btns button').forEach(b => {
                 const m = (b.getAttribute('onclick') || '').match(/\(([^)]*)\)/); if (!m) return;
                 const v = m[1].split(',').map(Number);
@@ -3209,7 +3208,7 @@
             peDrawSimulation();
         }
         async function peCopyIJK() {
-            const t = document.getElementById('pe-ijk-text').innerText;
+            const t = [peIjkVal.i, peIjkVal.j, peIjkVal.k].map(v => (Math.abs(v) < 5e-5 ? 0 : v).toFixed(4)).join(', ');
             let ok = false;
             try { await navigator.clipboard.writeText(t); ok = true; } catch (e) {
                 const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
