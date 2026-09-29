@@ -1251,6 +1251,14 @@
                 <!-- DSEC 원측정 탭 -->
                 <div id="pe-panel-dsc" class="pe-panel" style="display:none;">
                     <div class="pe-card">
+                        <div class="pe-chip-row">
+                            <button class="pe-chip on" id="pe-feat-hole" onclick="peSetFeat('hole')">구멍 (볼 안쪽)</button>
+                            <button class="pe-chip" id="pe-feat-shaft" onclick="peSetFeat('shaft')">축 (볼 바깥쪽)</button>
+                        </div>
+                        <div class="pe-chip-row" style="margin-bottom:12px;">
+                            <button class="pe-chip on" id="pe-zoom-on" onclick="peSetZoom(true)">🔍 호 확대</button>
+                            <button class="pe-chip" id="pe-zoom-off" onclick="peSetZoom(false)">⭕ 전체 원</button>
+                        </div>
                         <div class="pe-num-field" style="margin-bottom:8px;">
                             <label>S (시작 각도, °)</label>
                             <input type="number" id="pe-input-s" value="90" step="15" min="-360" max="360" oninput="peUpdateDSC()">
@@ -1282,7 +1290,8 @@
                         </div>
                     </div>
                     <div class="pe-card">
-                        <h2>포인트 각도</h2>
+                        <h2>측정 범위 · 포인트 각도</h2>
+                        <div class="pe-mapbox" id="peDscInfo" style="margin-bottom:8px; line-height:1.6;"></div>
                         <div class="pe-dsc-list" id="peDscList"></div>
                         <div class="pe-note">위에서 내려다본 기준 · <b>+X = 0°</b>, <b>+Y = 90°</b> · 각도가 커지면 <b>반시계</b> (E &lt; S 이면 시계 방향). 덕인 NeuroMeasure 화면과 방향이 다르면 알려 주세요.</div>
                     </div>
@@ -3025,6 +3034,7 @@
         let peCurrentAngleA = 0, peCurrentAngleB = 0;
         let peIjkVal = { i: 0, j: 0, k: 1 };
         let peDscVal = { d: 6.5, s: 90, e: 450, c: 8 };
+        let peDscZoom = true, peDscFeat = 'hole';
         let peDscAnim = { playing: false, finished: false, currentSeg: 0, t: 0, segStartTime: 0, segDuration: 700, angles: [], radius: 0, rafId: null };
         let peCanvas, peCtx;
 
@@ -3387,65 +3397,140 @@
             const step = full ? sweep / c : (c > 1 ? sweep / (c - 1) : 0);
             return { sweep, full, step, angles: Array.from({ length: c }, (_, i) => peDscVal.s + i * step) };
         }
+        function peSetFeat(f) { peDscFeat = f; ['hole', 'shaft'].forEach(k => document.getElementById('pe-feat-' + k).classList.toggle('on', k === f)); peRenderDscList(); peDrawSimulation(); }
+        function peSetZoom(z) { peDscZoom = z; document.getElementById('pe-zoom-on').classList.toggle('on', z); document.getElementById('pe-zoom-off').classList.toggle('on', !z); peDrawSimulation(); }
+        function peBallDia() {
+            const port = peProbeData[peCurrentMachine][peSelectedPortIndex];
+            const m = String(port.spec).match(/ø\s*([\d.]+)/);
+            return { dia: m ? parseFloat(m[1]) : 1, port };
+        }
+        function peDscGeom() {
+            const R = peDscVal.d / 2, { dia, port } = peBallDia(), rb = dia / 2;
+            return { R, rb, dia, port, pathR: peDscFeat === 'hole' ? R - rb : R + rb };
+        }
         function peRenderDscList() {
             const el = document.getElementById('peDscList'); if (!el) return;
-            const { angles, full } = peDscPoints();
+            const { angles, full, sweep, step } = peDscPoints();
             el.innerHTML = angles.map((a, i) => `<span class="${i === 0 ? 's' : (!full && i === angles.length - 1 ? 'e' : '')}">P${i + 1} ${(+a.toFixed(2))}°</span>`).join('');
+            const g = peDscGeom(), rad = Math.abs(sweep) * Math.PI / 180;
+            const arcLen = g.R * (full ? 2 * Math.PI : rad), gap = g.R * Math.abs(step) * Math.PI / 180;
+            let warn = '';
+            if (peDscFeat === 'hole' && g.dia >= peDscVal.d) warn = `<br><b style="color:#b91c1c;">⚠ 볼 ø${g.dia}가 구멍 ø${peDscVal.d}보다 크거나 같아 들어가지 않습니다</b>`;
+            else if (peDscFeat === 'hole' && g.dia > peDscVal.d * 0.8) warn = `<br><b style="color:#b45309;">⚠ 볼과 구멍 여유가 ${(peDscVal.d - g.dia).toFixed(2)} mm로 작습니다</b>`;
+            document.getElementById('peDscInfo').innerHTML =
+                `${full ? '전체원 360°' : `호 ${Math.abs(sweep).toFixed(1)}° (${sweep > 0 ? '반시계' : '시계'})`} · 호 길이 <b>${arcLen.toFixed(2)} mm</b><br>`
+                + `점 간격 <b>${gap.toFixed(2)} mm</b> (${Math.abs(step).toFixed(2)}°) · ${peDscVal.c}점<br>`
+                + `볼 ø${g.dia} (측정기 ${peCurrentMachine}번 ${g.port.name}) · ${peDscFeat === 'hole' ? '구멍 안쪽' : '축 바깥쪽'} 접촉${warn}`;
         }
-        function peDrawDSC(cx, cy, minDim) {
+        function peDrawDSC(cx0, cy0, minDim) {
             const { sweep, full, step, angles } = peDscPoints();
+            const g = peDscGeom(), R = g.R, rb = g.rb, pathR = Math.max(0, g.pathR);
+            const W = peCanvas.clientWidth, H = peCanvas.clientHeight;
             const note = peDscAnim.playing ? ' · ▶ 재생 중' : (peDscAnim.finished ? ' · 재생 완료' : '');
+            const zoomed = peDscZoom && !full && Math.abs(sweep) <= 180;
             document.getElementById('peLegend').innerText =
-                `Ø${peDscVal.d} · S ${peDscVal.s}° → E ${peDscVal.e}° (${full ? '전체원' : Math.abs(sweep).toFixed(0) + '° 호 · ' + (sweep > 0 ? '반시계' : '시계')}) · ${peDscVal.c}점${note}`;
-            const r = minDim * 0.32, P = a => [cx + r * Math.cos(a * Math.PI / 180), cy - r * Math.sin(a * Math.PI / 180)];
+                `Ø${peDscVal.d} · S ${peDscVal.s}° → E ${peDscVal.e}° (${full ? '전체원' : Math.abs(sweep).toFixed(0) + '° 호 · ' + (sweep > 0 ? '반시계' : '시계')}) · ${peDscVal.c}점 · 볼 ø${g.dia}${zoomed ? ' · 확대' : ''}${note}`;
 
-            // 축 · 눈금
-            peCtx.strokeStyle = 'rgba(148,163,184,0.35)'; peCtx.lineWidth = 1;
-            peCtx.beginPath(); peCtx.moveTo(cx - r - 22, cy); peCtx.lineTo(cx + r + 22, cy); peCtx.moveTo(cx, cy + r + 22); peCtx.lineTo(cx, cy - r - 22); peCtx.stroke();
-            peArrow(cx + r + 12, cy, cx + r + 26, cy, '#f87171', 1.5); peText('+X', cx + r + 30, cy - 6, '#f87171', 'bold 10px sans-serif', 'left');
-            peArrow(cx, cy - r - 12, cx, cy - r - 26, '#4ade80', 1.5); peText('+Y', cx + 8, cy - r - 22, '#4ade80', 'bold 10px sans-serif', 'left');
-            [[0, 'left'], [90, 'center'], [180, 'right'], [270, 'center']].forEach(([a, al]) => {
-                const rr = r + 12, x = cx + rr * Math.cos(a * Math.PI / 180), y = cy - rr * Math.sin(a * Math.PI / 180);
-                peText(a + '°', x + (a === 0 ? 2 : a === 180 ? -2 : 12), y + (a === 90 ? -2 : a === 270 ? 12 : 13), '#64748b', '9px sans-serif', al);
+            // 월드(mm) → 화면 변환: 확대면 호+볼 범위, 아니면 원 전체
+            const rad = a => a * Math.PI / 180;
+            let minX, maxX, minY, maxY;
+            if (zoomed) {
+                minX = minY = Infinity; maxX = maxY = -Infinity;
+                const n = Math.max(8, Math.ceil(Math.abs(sweep) / 2));
+                for (let k = 0; k <= n; k++) {
+                    const a = rad(peDscVal.s + sweep * k / n);
+                    [R + (peDscFeat === 'hole' ? 0 : 2 * rb), Math.max(0, R - (peDscFeat === 'hole' ? 2 * rb : 0))].forEach(rr => {
+                        const x = rr * Math.cos(a), y = rr * Math.sin(a);
+                        minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+                    });
+                }
+                const pad = Math.max(R * 0.12, rb * 0.6); minX -= pad; maxX += pad; minY -= pad; maxY += pad;
+                const span = Math.max(maxX - minX, maxY - minY, R * 0.35);   // 너무 과한 확대 방지
+                const mx = (minX + maxX) / 2, my = (minY + maxY) / 2;
+                minX = mx - span / 2; maxX = mx + span / 2; minY = my - span / 2; maxY = my + span / 2;
+            } else {
+                const e = R + (peDscFeat === 'shaft' ? 2 * rb : 0) + R * 0.12;
+                minX = minY = -e; maxX = maxY = e;
+            }
+            const m = 30, sc = Math.min((W - 2 * m) / (maxX - minX), (H - 2 * m - 10) / (maxY - minY));
+            const ox = W / 2 - sc * (minX + maxX) / 2, oy = H / 2 - 5 + sc * (minY + maxY) / 2;
+            const T = (x, y) => [ox + sc * x, oy - sc * y];
+            const onRing = (a, rr) => T(rr * Math.cos(rad(a)), rr * Math.sin(rad(a)));
+            const Rpx = R * sc;
+
+            // 축 (원 중심 기준, 화면 전체 폭)
+            const [c0x, c0y] = T(0, 0);
+            peCtx.strokeStyle = 'rgba(148,163,184,0.3)'; peCtx.lineWidth = 1;
+            peCtx.beginPath(); peCtx.moveTo(0, c0y); peCtx.lineTo(W, c0y); peCtx.moveTo(c0x, 0); peCtx.lineTo(c0x, H); peCtx.stroke();
+            const inView = (x, y) => x > 8 && x < W - 8 && y > 8 && y < H - 8;
+            [[0, '0° +X', '#f87171'], [90, '90° +Y', '#4ade80'], [180, '180°', '#64748b'], [270, '270°', '#64748b']].forEach(([a, t, c]) => {
+                const [x, y] = onRing(a, R + 10 / sc);
+                const nearPt = angles.some(p => { const [px, py] = onRing(p, R); return Math.hypot(px - x, py - y) < 22; });
+                if (inView(x, y) && !nearPt) peText(t, x + (a === 0 ? 4 : a === 180 ? -4 : 0), y + (a === 90 ? -4 : a === 270 ? 12 : 4), c, 'bold 10px sans-serif', a === 0 ? 'left' : a === 180 ? 'right' : 'center');
             });
-            peCtx.strokeStyle = '#334155'; peCtx.lineWidth = 2; peCtx.beginPath(); peCtx.arc(cx, cy, r, 0, Math.PI * 2); peCtx.stroke();
+            if (inView(c0x, c0y)) { peCtx.fillStyle = '#64748b'; peCtx.beginPath(); peCtx.arc(c0x, c0y, 2.5, 0, Math.PI * 2); peCtx.fill(); }
 
-            // 측정 구간 (캔버스는 y가 아래로 커지므로 각도 부호를 뒤집음)
-            peCtx.strokeStyle = 'rgba(16,185,129,0.45)'; peCtx.lineWidth = 8;
+            // 원(형상)
+            peCtx.strokeStyle = '#475569'; peCtx.lineWidth = 2; peCtx.beginPath(); peCtx.arc(c0x, c0y, Rpx, 0, Math.PI * 2); peCtx.stroke();
+            if (peDscFeat === 'hole') { peCtx.fillStyle = 'rgba(15,23,42,0.0)'; }
+            else { peCtx.fillStyle = 'rgba(71,85,105,0.25)'; peCtx.beginPath(); peCtx.arc(c0x, c0y, Rpx, 0, Math.PI * 2); peCtx.fill(); }
+
+            // 측정 구간
+            peCtx.strokeStyle = 'rgba(16,185,129,0.5)'; peCtx.lineWidth = 7;
             peCtx.beginPath();
-            if (full) peCtx.arc(cx, cy, r, 0, Math.PI * 2);
-            else peCtx.arc(cx, cy, r, -peDscVal.s * Math.PI / 180, -peDscVal.e * Math.PI / 180, sweep > 0);
+            if (full) peCtx.arc(c0x, c0y, Rpx, 0, Math.PI * 2);
+            else peCtx.arc(c0x, c0y, Rpx, -rad(peDscVal.s), -rad(peDscVal.e), sweep > 0);
             peCtx.stroke();
-            // 진행 방향 화살표 (구간 중앙)
-            const mid = full ? peDscVal.s + step * 0.5 : peDscVal.s + sweep / 2, d = sweep > 0 ? 1 : -1;
-            const [m1x, m1y] = P(mid - d * 4), [m2x, m2y] = P(mid + d * 4);
-            if (Math.abs(sweep) >= 6) peArrow(m1x, m1y, m2x, m2y, '#10b981', 2.5);
 
-            // 포인트
-            const gapPx = r * Math.abs(step) * Math.PI / 180, labelAll = gapPx >= 18;
+            // 볼 (시작·끝 포인트에 흐리게 = 실제 크기 비교)
+            const ballPx = rb * sc;
+            (full ? [angles[0]] : [angles[0], angles[angles.length - 1]]).forEach(a => {
+                const [bx, by] = onRing(a, pathR);
+                peCtx.strokeStyle = 'rgba(248,113,113,0.35)'; peCtx.lineWidth = 1;
+                peCtx.beginPath(); peCtx.arc(bx, by, Math.max(ballPx, 1.5), 0, Math.PI * 2); peCtx.stroke();
+            });
+
+            // 진행 방향 화살표
+            if (Math.abs(sweep) >= 4) {
+                const mid = full ? peDscVal.s + step * 0.5 : peDscVal.s + sweep / 2, d = sweep > 0 ? 1 : -1, da = Math.min(4, Math.abs(sweep) / 6);
+                const [a1x, a1y] = onRing(mid - d * da, R + 12 / sc), [a2x, a2y] = onRing(mid + d * da, R + 12 / sc);
+                peArrow(a1x, a1y, a2x, a2y, '#10b981', 2.5);
+            }
+
+            // 접촉점
+            const gapPx = Rpx * Math.abs(rad(step)), labelAll = gapPx >= 20;
             angles.forEach((a, i) => {
-                const [x, y] = P(a), isS = i === 0, isE = !full && i === angles.length - 1;
+                const [x, y] = onRing(a, R), isS = i === 0, isE = !full && i === angles.length - 1;
                 peCtx.fillStyle = isS ? '#ef4444' : isE ? '#f59e0b' : '#0ea5e9';
                 peCtx.beginPath(); peCtx.arc(x, y, isS || isE ? 6 : 4.5, 0, Math.PI * 2); peCtx.fill();
                 peCtx.strokeStyle = '#fff'; peCtx.lineWidth = 1.2; peCtx.stroke();
                 if (labelAll || isS || isE) {
-                    const [lx, ly] = [cx + (r - 16) * Math.cos(a * Math.PI / 180), cy - (r - 16) * Math.sin(a * Math.PI / 180)];
+                    const [lx, ly] = onRing(a, R + (peDscFeat === 'hole' ? 1 : -1) * 16 / sc);
                     peText('P' + (i + 1), lx, ly + 4, '#cbd5e1', 'bold 9px sans-serif');
                 }
             });
-            // S · E 는 모서리 범례로 (축 라벨과 겹치지 않게)
+
+            // 범례 (좌상단)
             peText(`● S ${peDscVal.s}°`, 10, 18, '#f87171', 'bold 11px sans-serif', 'left');
             if (!full) peText(`● E ${peDscVal.e}°`, 10, 33, '#fbbf24', 'bold 11px sans-serif', 'left');
             peText(full ? '전체원' : (sweep > 0 ? '↺ 반시계' : '↻ 시계'), 10, full ? 33 : 48, '#10b981', 'bold 11px sans-serif', 'left');
-            if (!labelAll) peText(`점 간격이 좁아 P1·P${angles.length}만 표시 (아래 목록 참고)`, cx, peCanvas.clientHeight - 10, '#94a3b8', '10px sans-serif');
+            peText(`○ 볼 ø${g.dia}`, 10, full ? 48 : 63, '#fca5a5', 'bold 11px sans-serif', 'left');
+            // 축척 막대 (우하단)
+            const niceMm = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20].find(v => v * sc >= 40) || 20;
+            const bx2 = W - 12, bx1 = bx2 - niceMm * sc, byy = H - 12;
+            peCtx.strokeStyle = '#94a3b8'; peCtx.lineWidth = 2; peCtx.beginPath(); peCtx.moveTo(bx1, byy); peCtx.lineTo(bx2, byy); peCtx.moveTo(bx1, byy - 4); peCtx.lineTo(bx1, byy + 1); peCtx.moveTo(bx2, byy - 4); peCtx.lineTo(bx2, byy + 1); peCtx.stroke();
+            peText(`${niceMm} mm`, (bx1 + bx2) / 2, byy - 6, '#94a3b8', '9px sans-serif');
+            if (!labelAll) peText(`점 간격이 좁아 P1·P${angles.length}만 표시`, 10, H - 10, '#94a3b8', '10px sans-serif', 'left');
 
-            // 재생 중 프로브 위치
+            // 재생: 볼이 포인트를 따라 이동
             if ((peDscAnim.playing || peDscAnim.finished) && peDscAnim.angles.length >= 2) {
                 const a0 = peDscAnim.angles[peDscAnim.currentSeg], a1 = peDscAnim.angles[peDscAnim.currentSeg + 1];
-                const [mx, my] = P(a0 + (a1 - a0) * peDscAnim.t);
-                peCtx.strokeStyle = 'rgba(250,204,21,0.9)'; peCtx.lineWidth = 2.5; peCtx.beginPath(); peCtx.arc(mx, my, 9, 0, Math.PI * 2); peCtx.stroke();
-                peCtx.fillStyle = '#facc15'; peCtx.beginPath(); peCtx.arc(mx, my, 4, 0, Math.PI * 2); peCtx.fill();
-                peText(peDscAnim.finished ? `측정 완료 (${peDscAnim.angles.length}점)` : `P${peDscAnim.currentSeg + 1} → P${peDscAnim.currentSeg + 2}`, peCanvas.clientWidth - 10, 18, '#facc15', 'bold 11px sans-serif', 'right');
+                const cur = a0 + (a1 - a0) * peDscAnim.t;
+                const [mx, my] = onRing(cur, pathR);
+                peCtx.fillStyle = 'rgba(250,204,21,0.35)'; peCtx.strokeStyle = '#facc15'; peCtx.lineWidth = 2;
+                peCtx.beginPath(); peCtx.arc(mx, my, Math.max(ballPx, 5), 0, Math.PI * 2); peCtx.fill(); peCtx.stroke();
+                peCtx.fillStyle = '#facc15'; peCtx.beginPath(); peCtx.arc(mx, my, 2.5, 0, Math.PI * 2); peCtx.fill();
+                peText(peDscAnim.finished ? `측정 완료 (${peDscAnim.angles.length}점)` : `P${peDscAnim.currentSeg + 1} → P${peDscAnim.currentSeg + 2}`, W - 10, 18, '#facc15', 'bold 11px sans-serif', 'right');
             }
         }
 
