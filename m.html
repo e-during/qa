@@ -136,6 +136,16 @@
   .soon-card .st { font-size: 12.5px; font-weight: 800; color: #fff; }
   .soon-card .sd { margin-top: 3px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
 
+  /* 2026-09-29 첫 화면 정리 */
+  .values { padding-bottom: 26px; }
+  .tap-hint { opacity: 1; filter: none; bottom: 6px; display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 9.5px; font-weight: 800; letter-spacing: .3px; color: rgba(224,176,96,.75); }
+  .tap-hint b { font-size: 11px; font-weight: 400; filter: grayscale(1) brightness(1.8); opacity: .5; display: inline-block; }
+  .values.nudge .tap-hint b { animation: tbTap 1.6s ease-in-out infinite; opacity: .8; }
+  @keyframes tbTap { 0%,60%,100% { transform: translateY(0); } 70% { transform: translateY(-3px); } 80% { transform: translateY(1px); } }
+  .soon-card.off { opacity: .45; }
+  .dash-btn .label, .dash-btn .desc { word-break: keep-all; }
+  .content { padding-bottom: calc(env(safe-area-inset-bottom) + 80px); }
+  @media (max-width: 380px) { .dash-btn .arrow span { display: none; } .dash-btn { gap: 12px; } }
   .credit { margin-top: 16px; text-align: center; }
   .credit .line { width: 30px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 8px; }
   .credit p { font-size: 9.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.5; letter-spacing: .2px; }
@@ -143,22 +153,22 @@
 
   .fab-camera {
     position: fixed; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-    width: 56px; height: 56px; border-radius: 50%;
-    background: linear-gradient(135deg, #ff7a2f, #ff5500);
+    height: 50px; padding: 0 18px 0 16px; border-radius: 999px; gap: 7px;
+    background: linear-gradient(135deg, #ecc47c, #d9a24a);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 10px 24px rgba(255,85,0,.45);
+    box-shadow: 0 10px 24px rgba(224,176,96,.35);
+    color: #1a1206; font-size: 14px; font-weight: 900;
     text-decoration: none; z-index: 20;
     transition: transform .12s ease;
   }
   .fab-camera:active { transform: scale(.93); }
-  .fab-camera svg { width: 25px; height: 25px; stroke: #fff; }
+  .fab-camera svg { width: 21px; height: 21px; stroke: #1a1206; }
 </style>
 </head>
 <body>
 
   <div class="hero">
     <img src="images/hero.jpg" alt="DURING 사옥 전경">
-    <div class="status-pill"><i></i>SYSTEM ONLINE</div>
   </div>
 
   <div class="hero-text">
@@ -181,12 +191,11 @@
           <div class="label">실시간 대시보드 접속</div>
           <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
         </div>
-        <div class="arrow">바로가기<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
-        <div class="watermark">REAL-TIME<br>DASHBOARD</div>
+        <div class="arrow"><span>바로가기</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
       </a>
     </div>
 
-    <a class="values" href="toolbox.html">
+    <a class="values" href="toolbox.html" onclick="tbSeen()">
       <div class="value-item">
         <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L20 6 V12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 V6 Z"></path></svg></div>
         <div class="vt">신뢰</div>
@@ -207,7 +216,7 @@
         <div class="vt">함께</div>
         <div class="vd">더 나은 발전</div>
       </div>
-      <div class="tap-hint">👆</div>
+      <div class="tap-hint"><b>👆</b>현장 툴박스 ›</div>
     </a>
 
     <div class="soon-grid">
@@ -215,9 +224,9 @@
         <div class="soon-badge live">바로가기</div>
         <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg></div>
         <div class="st">계산기</div>
-        <div class="sd">위치도 · MMC 공차 계산</div>
+        <div class="sd">계산 · 단위환산 · GD&amp;T · Cpk</div>
       </a>
-      <div class="soon-card">
+      <div class="soon-card off">
         <div class="soon-badge">개발 중</div>
         <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8Z"></path><path d="M14 2v6h6"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg></div>
         <div class="st">계측기 리스트</div>
@@ -232,8 +241,15 @@
   </div>
 
   <a class="fab-camera" href="mark.html" aria-label="현장 마킹">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>마킹
   </a>
+
+<script>
+  // 툴박스 한 번 들어가면 손 움직임 멈춤 (이 폰 기준)
+  function tbSeen() { try { localStorage.setItem('m_tb_seen_v1', '1'); } catch (e) {} }
+  (function () { var seen = false; try { seen = localStorage.getItem('m_tb_seen_v1') === '1'; } catch (e) {}
+    if (!seen) document.querySelector('.values').classList.add('nudge'); })();
+</script>
 
 </body>
 </html>
