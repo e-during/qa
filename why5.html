@@ -99,6 +99,38 @@
   .panel .nav { position: sticky; bottom: calc(-10px - env(safe-area-inset-bottom)); background: #fff; padding: 8px 0 calc(env(safe-area-inset-bottom) + 10px); margin-bottom: calc(-10px - env(safe-area-inset-bottom)); box-shadow: 0 -8px 12px -8px rgba(255,255,255,1); }
   .hist .it .a button { white-space: nowrap; font-size: 11.5px; padding: 0 4px; }
   .hist .it .a button.go { flex: 1.5; }
+  .result textarea.editing { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
+  .edit-tag { display: none; margin-bottom: 6px; font-size: 12px; font-weight: 800; color: var(--gold-d); }
+  .edit-tag.on { display: block; }
+  /* v4 · 간소화 */
+  .pk .recent button.combo.big { padding: 10px 14px; font-size: 14px; border-radius: 12px; }
+  .pk .recent button.combo.on { background: var(--navy); border-color: var(--navy); color: var(--gold); }
+  .expand { display: block; width: 100%; margin-top: 8px; height: 40px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #fff; font-size: 13px; font-weight: 800; color: var(--muted); }
+  .undo-bar { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 86px); transform: translateX(-50%) translateY(20px); z-index: 70; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-radius: 12px; background: rgba(11,22,54,.96); color: #fff; font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: all .2s; width: max-content; max-width: 92vw; }
+  .undo-bar.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+  .undo-bar button { border: none; background: var(--gold); color: #1a1206; font-weight: 900; font-size: 13px; padding: 7px 12px; border-radius: 9px; }
+  .res-sym { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+  .res-sym .qt { font-size: 12.5px; font-weight: 900; color: var(--ink); margin-bottom: 6px; }
+  .res-sym .qt small { font-weight: 700; color: var(--faint); margin-left: 4px; }
+  .result .res-sym textarea { min-height: 0; width: 100%; height: 54px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); font-size: 14px; font-weight: 700; color: var(--ink); font-family: inherit; resize: none; }
+  /* v3 · 제품 선택 · 4M 색 · 흐름 카드 */
+  .pk-l { font-size: 11.5px; font-weight: 800; color: var(--muted); margin: 10px 2px 5px; display: flex; align-items: center; gap: 6px; }
+  .pk-l:first-child { margin-top: 0; }
+  .pk-l small { font-weight: 700; color: var(--faint); }
+  .pk .chips .chip { padding: 8px 11px; font-size: 12.5px; }
+  .pk .recent button.combo { border-color: #F0DDB8; background: #FBF3E4; color: var(--gold-d); font-weight: 800; }
+  .pk-name { margin-top: 8px; padding: 8px 11px; border-radius: 10px; background: #F1F5F9; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+  .pk-name b { color: var(--ink); }
+  .chip.tag::after { content: none !important; }
+  .chip[data-t]:not([data-t=""])::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: var(--c4); }
+  .chip[data-t="Machine"] { --c4: #2563EB; } .chip[data-t="Method"] { --c4: #16A34A; } .chip[data-t="Material"] { --c4: #EAB308; } .chip[data-t="Man"] { --c4: #EF4444; }
+  .legend4 { display: flex; gap: 10px; flex-wrap: wrap; font-size: 10.5px; font-weight: 700; color: var(--faint); margin: 0 2px 6px; }
+  .legend4 i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; }
+  .flow { display: block; width: 100%; text-align: left; margin-bottom: 6px; padding: 9px 12px; border-radius: 12px; border: 1.5px solid #F0DDB8; background: #FFFBF2; font-size: 12.5px; font-weight: 800; color: var(--ink); line-height: 1.5; }
+  .flow .go { float: right; margin-left: 8px; font-size: 11.5px; font-weight: 900; color: var(--gold-d); }
+  .flow .ar { color: var(--gold-d); font-weight: 900; }
+  .flow:active { transform: scale(.99); }
+  .star::before { content: '⭐'; margin-right: 4px; }
   /* 2026-09-29 v2 · 빠른 보고 · 추천 채우기 */
   .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
   .mode { border: none; border-radius: 16px; padding: 14px 10px; text-align: left; background: rgba(255,255,255,.08); color: #fff; }
@@ -160,9 +192,8 @@
 <section class="screen" id="scrQuick">
   <div class="quick">
     <div class="qcard">
-      <div class="qt">품명·품번 <small>필수</small></div>
-      <input class="fld" id="qPart" placeholder="예: IDB2 HOUSING" autocomplete="off" style="width:100%;">
-      <div class="recent" id="qPartRecent"></div>
+      <div class="qt">품명 <small>버튼으로 선택 · 없으면 ＋직접</small></div>
+      <div id="qPicker"></div>
     </div>
     <div class="qcard">
       <div class="qt">불량 유형</div>
@@ -187,10 +218,9 @@
       <div class="qt">즉시 조치 <small>해당하는 것 모두</small></div>
       <div class="chips" id="qAct"></div>
     </div>
-    <button type="button" class="more" id="qMoreBtn" onclick="toggleQMore()">＋ 고객사·발견 공정·작성자 (선택)</button>
+    <button type="button" class="more" id="qMoreBtn" onclick="toggleQMore()">＋ 발견 공정·작성자 (선택)</button>
     <div class="qcard" id="qMore" style="display:none; margin-top:10px;">
       <div class="form">
-        <div class="full"><label>고객사</label><input class="fld" id="qCust" placeholder="선택" autocomplete="off"><div class="recent" id="qCustRecent"></div></div>
         <div class="full"><label>발견 공정·장소</label><div class="chips" id="qProc"></div></div>
         <div class="full"><label>작성자</label><input class="fld" id="qAuthor" placeholder="예: 품질경영팀 홍길동 (한 번만)" autocomplete="off"></div>
       </div>
@@ -213,20 +243,28 @@
 <!-- 결과 -->
 <section class="screen" id="scrResult">
   <div class="result">
-    <textarea id="reportText" spellcheck="false"></textarea>
-    <div class="hint">보내기 전에 내용을 고쳐도 됩니다 · PC 보고서에 붙여넣어 쓰세요.</div>
-    <div class="photos" id="resPhotos"></div>
+    <div class="res-sym">
+      <div class="qt">현상 · 사진 <small>선택 · 넣으면 보고서에 바로 반영</small></div>
+      <textarea id="rSym" placeholder="예: 게이트 반대편 끝단 미충진 · 3캐비티 중 2번 (🎤 음성 입력 가능)" oninput="refreshReport()"></textarea>
+      <div class="photo-btns"><label>📷 촬영<input type="file" accept="image/*" capture="environment" onchange="addPhotos(this, 'resPhotos')"></label><label>🖼 갤러리<input type="file" accept="image/*" multiple onchange="addPhotos(this, 'resPhotos')"></label></div>
+      <div class="photos" id="resPhotos"></div>
+    </div>
+    <div class="edit-tag" id="editTag">✍️ 직접 고친 내용이 있습니다</div>
+    <textarea id="reportText" spellcheck="false" oninput="onManualEdit()"></textarea>
+    <div class="hint">보고서 칸을 눌러 바로 고칠 수 있습니다 · PC 보고서에 붙여넣어 쓰세요.</div>
     <div class="rbtns">
       <button type="button" class="pri" onclick="shareReport()">💬 공유 (카톡·문자·메일)</button>
       <button type="button" onclick="copyReport()">📋 글 복사</button>
-      <button type="button" id="sharePhotoBtn" onclick="sharePhotosOnly()">🖼 사진만 공유</button>
-      <button type="button" onclick="editAgain()">✏️ 답변 고치기</button>
+      <button type="button" onclick="editManual()">✍️ 글 직접 고치기</button>
+      <button type="button" onclick="editAgain()">↩ 질문으로 돌아가기</button>
+      <button type="button" class="wide" id="sharePhotoBtn" onclick="sharePhotosOnly()">🖼 사진만 공유</button>
       <button type="button" class="wide" onclick="finishReport()">✅ 저장하고 끝내기</button>
     </div>
   </div>
 </section>
 
 <div class="toast" id="toast"></div>
+<div class="undo-bar" id="undoBar"><span id="undoTxt">선택했습니다</span><button type="button" onclick="doUndo()">↩ 취소</button></div>
 
 <script>
 /* ============================================================
@@ -237,6 +275,14 @@
    - 태그: Man(작업자) · Machine(설비·금형) · Material(재료) · Method(방법·조건)
    ============================================================ */
 const DATA = {
+  // 대표 고객사 · 제품 (신규 제품은 여기에 한 줄 추가)
+  customers: {
+    '현대모비스': ['iMEB', 'iMEB2', 'iMEB2.1', 'MEB5', 'MGH60', 'MGH80', 'MGH100'],
+    'HL클레무브': ['SRR30', 'SRR40', 'LRR30'],
+    'HL만도': ['IDB', 'TAS', 'MDPS'],
+    '현대케피코': ['PSCV KEV1', 'PSCV KEV2', 'PSCV KEV3']
+  },
+  partTypes: ['하우징', '커버', '보빈', '커넥터', '브라켓'],
   process: ['사출', '권선', '조립', '수입검사', '출하검사', '고객사 현장', '고객 클레임'],
   defects: {
     '크랙·파손': [['금형 온도 과다 → 수지·인서트 마그네틱 취성 저하', 'Method'], ['금형 상·하 코어 치수 미스매치', 'Machine'], ['형폐 시 금형 간섭', 'Machine']],
@@ -246,22 +292,33 @@ const DATA = {
     '이종 수지 혼입': [['원재료(PBT·PA6 등) 교체 시 호퍼·배관 잔량 제거 미흡', 'Method'], ['작업자 재료 식별 오류', 'Man']],
     '기포·가스(Leak)': [['스크류 회전 속도 과다 → 전단열·가스 발생', 'Method'], ['원재료 예비 건조 미흡', 'Material'], ['살빼기 코어 핀 냉각 부족 → 내부 기공 연결', 'Machine']],
     '파팅라인 미스매치': [['금형 코어 조립부 치수 GAP', 'Machine'], ['설비 노후화 유격', 'Machine']],
-    '핀 누락·단차': [],
-    '칩(Chip) 이물 고착': []
+    '핀 누락·단차': [['인서트 핀(단자) 수동 안착 누락', 'Man'], ['인서트 핀 안착 들뜸·위치 불량', 'Method'], ['금형 인서트 홀더 마모', 'Machine'], ['형폐 시 핀 밀림', 'Machine'], ['핀(단자) 수입품 치수·휨 불량', 'Material']],
+    '칩(Chip) 이물 고착': [['게이트 커팅 칩 잔류', 'Method'], ['금형 내 스크랩 낙하·고착', 'Machine'], ['금형 에어블로우 미실시', 'Method'], ['포장·적재 중 이물 유입', 'Method']],
+    // ↓ 일반 사출 불량 (사내 사례 확인 후 수정·삭제)
+    '싱크마크(수축)': [['보압·보압 시간 부족', 'Method'], ['냉각 시간 부족', 'Method'], ['제품 살두께 편차 과다', 'Machine'], ['게이트 조기 고화(게이트 작음)', 'Machine']],
+    '웰드라인': [['수지·금형 온도 낮음', 'Method'], ['사출 속도 느림', 'Method'], ['가스벤트 막힘', 'Machine']],
+    '은줄(실버)': [['원재료 예비 건조 미흡', 'Material'], ['실린더 체류 시간 과다·과열', 'Method'], ['재생재 과다 혼입', 'Material']]
   },
   after: { '권선 공정': ['와인딩 지그 안착 불량', '와이어 이탈', '정렬 불량', '단선·쇼트'], '조립 공정': ['가스켓·씰 압입 불량', '성능검사 기밀(Leak) 누설'] },
-  afterBy: { 'BURR(지느러미)': ['권선 공정'], '파팅라인 미스매치': ['권선 공정'], '핀 누락·단차': ['권선 공정', '조립 공정'], '칩(Chip) 이물 고착': ['조립 공정'], '변형·뒤틀림(평면도)': ['조립 공정'], '기포·가스(Leak)': ['조립 공정'] },
+  afterBy: { 'BURR(지느러미)': ['권선 공정'], '싱크마크(수축)': ['조립 공정'], '파팅라인 미스매치': ['권선 공정'], '핀 누락·단차': ['권선 공정', '조립 공정'], '칩(Chip) 이물 고착': ['조립 공정'], '변형·뒤틀림(평면도)': ['조립 공정'], '기포·가스(Leak)': ['조립 공정'] },
   why23: {
     '설비·금형': [['금형 코어 마모·GAP 발생', 'Machine'], ['사출기 실린더 패킹·노즐 마모', 'Machine'], ['냉각 호스 온수 순환 분배기 관리 미흡', 'Machine'], ['금형 형체력 셋팅값 저하', 'Machine'], ['가이드 핀·부쉬 마모', 'Machine']],
     '작업·관리': [['설비 재가동 시 퍼징·공타 세부 수량 미준수', 'Method'], ['원재료 교체 시 배관 잔량 제거 절차 누락', 'Method'], ['부적합품 격리·식별 관리 미흡', 'Man'], ['게이트 스크랩 제거 작업 기준 없음', 'Method']],
-    '사출 조건': [['스크류 회전 속도 불합리', 'Method'], ['사출·보압 조건 불합리', 'Method'], ['금형 온도 과도한 상승', 'Method'], ['건조 조건·시간 관리 기준 미흡', 'Material']]
+    '사출 조건': [['스크류 회전 속도 불합리', 'Method'], ['사출·보압 조건 불합리', 'Method'], ['금형 온도 과도한 상승', 'Method']],
+    '재료': [['건조 조건·시간 관리 기준 미흡', 'Material'], ['원재료 Lot 변경(물성 편차)', 'Material'], ['재생재 혼합 비율 과다', 'Material'], ['수입 부품(핀·인서트) 품질 편차', 'Material']]
   },
   // 근본 원인(관리 체계) — 고르면 5Why를 여기서 마무리
   roots: [
     ['금형·설비 정기 점검(PM) 주기 미설정', 'Machine'], ['점검 기준은 있으나 이행·기록 미흡', 'Method'], ['퍼징·공타 세부 수량 기준 없음', 'Method'],
     ['재료 교체 시 잔량 제거 절차 없음', 'Method'], ['변경점(재료·냉각 방식·조건) 관리 누락', 'Method'], ['사출 조건 표준서 미비·미준수', 'Method'],
-    ['초·중·종물 검사 기준 미흡', 'Method'], ['작업자 교육·숙련도 부족', 'Man'], ['재료 식별표시 관리 미흡', 'Man'], ['취출 로봇 흡착 위치 기준 없음', 'Method']
+    ['초·중·종물 검사 기준 미흡', 'Method'], ['작업자 교육·숙련도 부족', 'Man'], ['재료 식별표시 관리 미흡', 'Man'], ['취출 로봇 흡착 위치 기준 없음', 'Method'],
+    ['수동 안착부 확인 수단 없음(시인성)', 'Method'], ['금형 청소·에어블로우 주기 미설정', 'Method'], ['게이트 커팅·칩 제거 기준 없음', 'Method'], ['포장 작업 표준 미흡', 'Method'],
+    ['금형 설계 검토 미흡(살두께·게이트)', 'Method'], ['재생재 혼합 비율 기준 없음', 'Material'], ['수입검사 기준 미흡', 'Method']
   ],
+  // 유출 원인: 왜 공정에서 못 걸렀나 (자동차 부품 보고서의 '유출 원인')
+  escape: ['초물(첫 생산품) 검사 누락', '초·중·종물 검사 주기 과다', 'GO/NO 게이지 미사용·미비', '외관 한도 견본 없음', '판정 기준 모호', '검사원 판정 실수',
+           '샘플링 검사 대상(전수 아님)', '부적합품 격리·식별 누락', '비전·리크 검사 조건 미설정·오작동', '후공정(권선·조립) 검사 미검출'],
+  escapeNone: '사내에서 검출 (유출 없음)',
   m4: ['Man', 'Machine', 'Material', 'Method'],
   m4label: { Man: 'Man(작업자)', Machine: 'Machine(설비·금형)', Material: 'Material(재료)', Method: 'Method(방법·조건)' },
   temp: ['재고 전수 선별', '부적합품 격리·식별표 부착', '사출 조건 복원·재설정', '금형 수리 후 초물 확인', '후공정(권선·조립) 유입품 추적', '고객사 통보·출하 보류'],
@@ -269,7 +326,9 @@ const DATA = {
   perm: {
     '금형·설비 정비': ['노후 실린더 패킹 정기 교체', '가이드 핀·부쉬 정기 교체', '금형 형체력 조건 상향 (BURR 방지)', '냉각 노즐 온도 모니터링계 설치', '금형 타수별 정기 점검·연마'],
     '작업표준·교육': ['퍼징·공타 세부 매뉴얼 현장 게시', '퍼징·공타 체크시트 기록 관리', '재료 교체 시 배관 잔량 제거 항목 수립', '사출 조건 표준서 개정·게시', '작업자 교육 실시'],
-    'Fool-Proof·검사 강화': ['게이트 스크랩 제거 작업표준화', '취출 로봇 흡착 패드 위치 재설정', '수동 안착부 거울·지그 설치', '초·중·종 자주검사 GO/NO 게이지 적용']
+    'Fool-Proof·검사 강화': ['게이트 스크랩 제거 작업표준화', '취출 로봇 흡착 패드 위치 재설정', '수동 안착부 거울·지그 설치', '초·중·종 자주검사 GO/NO 게이지 적용', '금형 청소·에어블로우 주기 설정'],
+    '재료·설계': ['재료 Lot 변경 시 초물 확인', '재생재 혼합 비율 기준 수립', '수입검사 기준 강화', '금형 설계·게이트 검토(수정)'],
+    '유출 방지': ['초물 승인 체크시트 강화', '외관 한도 견본 제작·게시', 'GO/NO 게이지 제작·적용', '검사 주기 단축(초·중·종)', '격리 구역·식별표 관리 강화', '비전·리크 검사 조건 재설정']
   },
   kpi: ['불량 유형별 공정 PPM (목표 대비)', '스크랩(폐기) 수량·금액 추이', '금형 타수별 점검·연마 이행률', '퍼징·공타·격리 체크시트 준수율', '재발 여부 모니터링 (3개월)'],
   kpiDefault: ['불량 유형별 공정 PPM (목표 대비)', '재발 여부 모니터링 (3개월)'],
@@ -300,6 +359,27 @@ const NEXT = {
   '살빼기 코어 핀 냉각 부족 → 내부 기공 연결': [['냉각 호스 온수 순환 분배기 관리 미흡', 'Machine']],
   '금형 코어 조립부 치수 GAP': [['금형 코어 마모·GAP 발생', 'Machine']],
   '설비 노후화 유격': [['가이드 핀·부쉬 마모', 'Machine']],
+  '인서트 핀(단자) 수동 안착 누락': [['수동 안착부 확인 수단 없음(시인성)', 'Method']],
+  '인서트 핀 안착 들뜸·위치 불량': [['수동 안착부 확인 수단 없음(시인성)', 'Method']],
+  '금형 인서트 홀더 마모': [['금형 코어 마모·GAP 발생', 'Machine']],
+  '형폐 시 핀 밀림': [['가이드 핀·부쉬 마모', 'Machine'], ['수동 안착부 확인 수단 없음(시인성)', 'Method']],
+  '핀(단자) 수입품 치수·휨 불량': [['수입 부품(핀·인서트) 품질 편차', 'Material']],
+  '게이트 커팅 칩 잔류': [['게이트 커팅·칩 제거 기준 없음', 'Method']],
+  '금형 내 스크랩 낙하·고착': [['금형 청소·에어블로우 주기 미설정', 'Method']],
+  '금형 에어블로우 미실시': [['금형 청소·에어블로우 주기 미설정', 'Method']],
+  '포장·적재 중 이물 유입': [['포장 작업 표준 미흡', 'Method']],
+  '보압·보압 시간 부족': [['사출·보압 조건 불합리', 'Method']],
+  '냉각 시간 부족': [['사출·보압 조건 불합리', 'Method']],
+  '제품 살두께 편차 과다': [['금형 설계 검토 미흡(살두께·게이트)', 'Method']],
+  '게이트 조기 고화(게이트 작음)': [['금형 설계 검토 미흡(살두께·게이트)', 'Method']],
+  '수지·금형 온도 낮음': [['사출·보압 조건 불합리', 'Method']],
+  '사출 속도 느림': [['사출·보압 조건 불합리', 'Method']],
+  '가스벤트 막힘': [['금형 청소·에어블로우 주기 미설정', 'Method']],
+  '실린더 체류 시간 과다·과열': [['사출 조건 표준서 미비·미준수', 'Method']],
+  '재생재 과다 혼입': [['재생재 혼합 비율 과다', 'Material']],
+  '원재료 Lot 변경(물성 편차)': [['변경점(재료·냉각 방식·조건) 관리 누락', 'Method']],
+  '재생재 혼합 비율 과다': [['재생재 혼합 비율 기준 없음', 'Material']],
+  '수입 부품(핀·인서트) 품질 편차': [['수입검사 기준 미흡', 'Method']],
   // 2단계 → 근본 원인
   '금형 코어 마모·GAP 발생': [['금형·설비 정기 점검(PM) 주기 미설정', 'Machine']],
   '사출기 실린더 패킹·노즐 마모': [['금형·설비 정기 점검(PM) 주기 미설정', 'Machine']],
@@ -328,11 +408,58 @@ const FIX = [
   [/흡착|취출/, ['취출 로봇 흡착 패드 위치 재설정']],
   [/조건 표준서|스크류|보압|금형 온도|히터|건조/, ['사출 조건 표준서 개정·게시']],
   [/식별|교육/, ['작업자 교육 실시']],
-  [/초·중·종/, ['초·중·종 자주검사 GO/NO 게이지 적용']]
+  [/초·중·종/, ['초·중·종 자주검사 GO/NO 게이지 적용']],
+  [/수동 안착|안착|시인성/, ['수동 안착부 거울·지그 설치']],
+  [/에어블로우|청소|스크랩 낙하|가스벤트/, ['금형 청소·에어블로우 주기 설정']],
+  [/게이트 커팅|칩 제거/, ['게이트 스크랩 제거 작업표준화']],
+  [/Lot 변경/, ['재료 Lot 변경 시 초물 확인']],
+  [/재생재/, ['재생재 혼합 비율 기준 수립']],
+  [/수입검사|수입 부품|수입품/, ['수입검사 기준 강화']],
+  [/설계|살두께|게이트 조기/, ['금형 설계·게이트 검토(수정)']],
+  // 유출 원인 → 유출 방지 대책
+  [/초물/, ['초물 승인 체크시트 강화']],
+  [/한도 견본|판정 기준|판정 실수/, ['외관 한도 견본 제작·게시']],
+  [/게이지/, ['GO/NO 게이지 제작·적용']],
+  [/검사 주기|샘플링/, ['검사 주기 단축(초·중·종)']],
+  [/격리·식별 누락/, ['격리 구역·식별표 관리 강화']],
+  [/비전|리크 검사/, ['비전·리크 검사 조건 재설정']]
 ];
 const ROOTSET = new Set(DATA.roots.map(r => r[0]));
+// 버튼에 보일 짧은 이름 (보고서에는 원래 문장이 들어감)
+const SHORT = {
+  '금형 온도 과다 → 수지·인서트 마그네틱 취성 저하': '금형 온도 과다(취성 저하)', '금형 상·하 코어 치수 미스매치': '상·하 코어 미스매치',
+  '청소·정지 후 수동 퍼징 시 계량(충진량) 부족': '퍼징 후 계량 부족', '게이트 내 스크랩 잔존(막힘)': '게이트 스크랩 막힘',
+  '사출기 실린더 패킹 마모 → 자중 하강': '실린더 패킹 마모', '취출 과정 코어 긁힘 데미지': '취출 시 코어 긁힘',
+  '냉각 호스(온수기) 순환 방식 변경': '냉각 순환 방식 변경', '냉각수 IN/OUT 온도 편차 → 수축 불균일': '냉각수 IN/OUT 편차',
+  '취출 로봇 흡착 패드 위치 불합리': '흡착 패드 위치 불량', '원재료(PBT·PA6 등) 교체 시 호퍼·배관 잔량 제거 미흡': '재료 교체 잔량 미제거',
+  '작업자 재료 식별 오류': '재료 식별 오류', '스크류 회전 속도 과다 → 전단열·가스 발생': '스크류 회전 과다',
+  '원재료 예비 건조 미흡': '예비 건조 미흡', '살빼기 코어 핀 냉각 부족 → 내부 기공 연결': '살빼기 핀 냉각 부족',
+  '금형 코어 조립부 치수 GAP': '코어 조립부 GAP',
+  '금형 코어 마모·GAP 발생': '코어 마모·GAP', '사출기 실린더 패킹·노즐 마모': '패킹·노즐 마모', '냉각 호스 온수 순환 분배기 관리 미흡': '냉각 분배기 관리 미흡',
+  '금형 형체력 셋팅값 저하': '형체력 셋팅값 저하', '설비 재가동 시 퍼징·공타 세부 수량 미준수': '퍼징·공타 수량 미준수',
+  '원재료 교체 시 배관 잔량 제거 절차 누락': '잔량 제거 절차 누락', '부적합품 격리·식별 관리 미흡': '격리·식별 미흡',
+  '게이트 스크랩 제거 작업 기준 없음': '스크랩 제거 기준 없음', '스크류 회전 속도 불합리': '스크류 속도 불합리',
+  '금형 온도 과도한 상승': '금형 온도 과상승', '건조 조건·시간 관리 기준 미흡': '건조 조건 관리 미흡',
+  '금형·설비 정기 점검(PM) 주기 미설정': 'PM 주기 미설정', '점검 기준은 있으나 이행·기록 미흡': '점검 이행·기록 미흡',
+  '퍼징·공타 세부 수량 기준 없음': '퍼징·공타 기준 없음', '재료 교체 시 잔량 제거 절차 없음': '잔량 제거 절차 없음',
+  '변경점(재료·냉각 방식·조건) 관리 누락': '변경점 관리 누락', '사출 조건 표준서 미비·미준수': '조건 표준서 미비',
+  '초·중·종물 검사 기준 미흡': '초·중·종물 검사 미흡', '작업자 교육·숙련도 부족': '교육·숙련도 부족',
+  '재료 식별표시 관리 미흡': '식별표시 관리 미흡', '취출 로봇 흡착 위치 기준 없음': '흡착 위치 기준 없음',
+  '인서트 핀(단자) 수동 안착 누락': '핀 수동 안착 누락', '인서트 핀 안착 들뜸·위치 불량': '핀 안착 들뜸', '핀(단자) 수입품 치수·휨 불량': '수입 핀 치수·휨',
+  '금형 내 스크랩 낙하·고착': '금형 내 스크랩 고착', '게이트 조기 고화(게이트 작음)': '게이트 조기 고화', '실린더 체류 시간 과다·과열': '실린더 체류 과다',
+  '원재료 Lot 변경(물성 편차)': '재료 Lot 변경', '수입 부품(핀·인서트) 품질 편차': '수입 부품 편차',
+  '수동 안착부 확인 수단 없음(시인성)': '안착 확인 수단 없음', '금형 청소·에어블로우 주기 미설정': '청소·에어블로우 주기 없음',
+  '게이트 커팅·칩 제거 기준 없음': '칩 제거 기준 없음', '금형 설계 검토 미흡(살두께·게이트)': '금형 설계 검토 미흡',
+  '재생재 혼합 비율 기준 없음': '재생재 비율 기준 없음', '비전·리크 검사 조건 미설정·오작동': '비전·리크 검사 미설정',
+  '후공정(권선·조립) 검사 미검출': '후공정 검사 미검출', '초물(첫 생산품) 검사 누락': '초물 검사 누락'
+};
+const sl = t => SHORT[t] || t;
+// 원인 → 4M 태그 찾기
+const TAGOF = {};
+[...Object.values(DATA.defects).flat(), ...Object.values(DATA.why23).flat(), ...DATA.roots, ...Object.values(NEXT).flat()].forEach(([t, g]) => { if (g) TAGOF[t] = g; });
+const FREQ_KEY = 'w5_freq_v1';
 
-const DRAFT_KEY = 'w5_draft_v2', HIST_KEY = 'w5_reports_v1', AUTHOR_KEY = 'w5_author_v1', RECENT_KEY = 'w5_recent_v1';
+const DRAFT_KEY = 'w5_draft_v3', HIST_KEY = 'w5_reports_v1', AUTHOR_KEY = 'w5_author_v1', RECENT_KEY = 'w5_recent_v1';
 const $ = id => document.getElementById(id);
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function load(k, d) { try { const v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } }
@@ -347,11 +474,73 @@ function fmtN(v) { const n = +String(v).replace(/,/g, ''); return isFinite(n) &&
 function rateTxt(ng, qty) { const a = +String(ng).replace(/,/g, ''), b = +String(qty).replace(/,/g, ''); return a > 0 && b > 0 ? `${(a / b * 100).toFixed(2)}%` : ''; }
 
 /* ---------- 최근 입력 (품명·고객사) ---------- */
-function recent() { return Object.assign({ parts: [], custs: [] }, load(RECENT_KEY, {})); }
-function addRecent(part, cust) {
+function recent() { return Object.assign({ parts: [], custs: [], combos: [], pnos: [] }, load(RECENT_KEY, {})); }
+function addRecent(st) {
   const r = recent();
   const up = (arr, v) => { v = (v || '').trim(); if (!v) return arr; return [v, ...arr.filter(x => x !== v)].slice(0, 6); };
-  r.parts = up(r.parts, part); r.custs = up(r.custs, cust); save(RECENT_KEY, r);
+  r.parts = up(r.parts, st.part); r.custs = up(r.custs, st.customer); r.pnos = up(r.pnos, st.pno);
+  if (st.product || st.ptype) {
+    const key = [st.customer, st.product, st.ptype].join('|');
+    r.combos = [{ c: st.customer || '', p: st.product || '', t: st.ptype || '' }, ...r.combos.filter(x => [x.c, x.p, x.t].join('|') !== key)].slice(0, 6);
+  }
+  save(RECENT_KEY, r);
+}
+/* ---------- 고객사 → 제품 → 부품 선택 (빠른 보고·5Why 공용) ---------- */
+let PKS = null, PKC = '';
+const ownerOf = p => Object.keys(DATA.customers).find(c => DATA.customers[c].includes(p)) || '';
+function composeName(st) { return [st.product, st.ptype].map(x => (x || '').trim()).filter(Boolean).join(' ') + (st.pno ? ` · ${st.pno}` : ''); }
+function renderPicker(cid, st) {
+  PKS = st; PKC = cid;
+  ['qPicker', 'aPicker'].forEach(c => { if (c !== cid && $(c)) $(c).innerHTML = ''; });   // 같은 id가 두 번 생기지 않게
+  const r = recent(), custs = Object.keys(DATA.customers);
+  const prods = st.customer && DATA.customers[st.customer] ? DATA.customers[st.customer] : [].concat(...Object.values(DATA.customers));
+  const one = (list, sel, fn, other) => list.map(v => `<button type="button" class="chip${!other && sel === v ? ' on' : ''}" data-v="${esc(v)}" onclick="${fn}(this)">${esc(v)}</button>`).join('')
+    + `<button type="button" class="chip${other ? ' on' : ''}" data-v="__other" onclick="${fn}(this)">＋직접</button>`;
+  let h = '<div class="pk">';
+  const isCur = c => (c.c || '') === (st.customer || '') && (c.p || '') === (st.product || '') && (c.t || '') === (st.ptype || '');
+  const compact = r.combos.length && !st.pickOpen;
+  if (r.combos.length) h += `<div class="pk-l">최근 <small>${compact ? '누르면 끝' : '한 번에 채우기'}</small></div><div class="recent" style="margin-top:0;">${r.combos.map((c, i) => `<button type="button" class="combo${compact ? ' big' : ''}${isCur(c) ? ' on' : ''}" onclick="pkCombo(${i})">${esc([c.p, c.t].filter(Boolean).join(' ') || c.c)}</button>`).join('')}</div>`;
+  if (compact) {
+    h += `<button type="button" class="expand" onclick="PKS.pickOpen=true; renderPicker(PKC, PKS)">＋ 다른 제품 · 고객사 선택</button>`;
+    h += `<div class="pk-name">품명 → <b id="pkName">${esc(composeName(st) || '위에서 고르세요')}</b>${st.customer ? ` · ${esc(st.customer)}` : ''}</div></div>`;
+    $(cid).innerHTML = h; st.part = composeName(st); return;
+  }
+  h += `<div class="pk-l">고객사</div><div class="chips">${one(custs, st.customer, 'pkCust', st.custOther)}</div>`;
+  if (st.custOther) h += `<div class="inrow"><input id="pkCustIn" value="${esc(st.customer)}" placeholder="고객사 입력" autocomplete="off" oninput="PKS.customer=this.value.trim(); pkUpdate()"></div>`;
+  h += `<div class="pk-l">제품 ${st.customer && !st.custOther ? '' : '<small>누르면 고객사 자동</small>'}</div><div class="chips">${one(st.custOther ? [] : prods, st.product, 'pkProd', st.prodOther)}</div>`;
+  if (st.prodOther) h += `<div class="inrow"><input id="pkProdIn" value="${esc(st.product)}" placeholder="제품·차종 입력" autocomplete="off" oninput="PKS.product=this.value.trim(); pkUpdate()"></div>`;
+  h += `<div class="pk-l">부품</div><div class="chips">${one(DATA.partTypes, st.ptype, 'pkType', st.typeOther)}</div>`;
+  if (st.typeOther) h += `<div class="inrow"><input id="pkTypeIn" value="${esc(st.ptype)}" placeholder="부품명 입력" autocomplete="off" oninput="PKS.ptype=this.value.trim(); pkUpdate()"></div>`;
+  h += `<div class="pk-l">품번 <small>선택</small></div><div class="inrow" style="margin-top:0;"><input id="pkNo" value="${esc(st.pno || '')}" placeholder="예: 316000450" autocomplete="off" oninput="PKS.pno=this.value.trim(); pkUpdate()"></div>`;
+  if (r.pnos.length) h += `<div class="recent">${r.pnos.map(v => `<button type="button" onclick="PKS.pno=this.textContent; document.getElementById('pkNo').value=this.textContent; pkUpdate()">${esc(v)}</button>`).join('')}</div>`;
+  h += `<div class="pk-name">품명 → <b id="pkName">${esc(composeName(st) || '제품·부품을 고르세요')}</b>${st.customer ? ` · ${esc(st.customer)}` : ''}</div></div>`;
+  $(cid).innerHTML = h;
+  st.part = composeName(st);
+}
+function pkUpdate() { PKS.part = composeName(PKS); const n = $('pkName'); if (n) n.textContent = PKS.part || '제품·부품을 고르세요'; }
+function pkCust(b) {
+  const v = b.dataset.v;
+  if (v === '__other') { PKS.custOther = true; PKS.customer = ''; }
+  else { PKS.custOther = false; PKS.customer = PKS.customer === v ? '' : v; if (PKS.product && !PKS.prodOther && PKS.customer && !DATA.customers[PKS.customer].includes(PKS.product)) PKS.product = ''; }
+  renderPicker(PKC, PKS); if (PKS.custOther) $('pkCustIn').focus();
+}
+function pkProd(b) {
+  const v = b.dataset.v;
+  if (v === '__other') { PKS.prodOther = true; PKS.product = ''; }
+  else { PKS.prodOther = false; PKS.product = PKS.product === v ? '' : v; if (PKS.product && !PKS.customer) { PKS.customer = ownerOf(v); PKS.custOther = false; } }
+  renderPicker(PKC, PKS); if (PKS.prodOther) $('pkProdIn').focus();
+}
+function pkType(b) {
+  const v = b.dataset.v;
+  if (v === '__other') { PKS.typeOther = true; PKS.ptype = ''; }
+  else { PKS.typeOther = false; PKS.ptype = PKS.ptype === v ? '' : v; }
+  renderPicker(PKC, PKS); if (PKS.typeOther) $('pkTypeIn').focus();
+}
+function pkCombo(i) {
+  const c = recent().combos[i]; if (!c) return;
+  const custs = Object.keys(DATA.customers);
+  Object.assign(PKS, { customer: c.c, custOther: !!c.c && !custs.includes(c.c), product: c.p, prodOther: !!c.p && !ownerOf(c.p), ptype: c.t, typeOther: !!c.t && !DATA.partTypes.includes(c.t) });
+  renderPicker(PKC, PKS);
 }
 function recentHTML(list, inputId) { return list.map(v => `<button type="button" onclick="document.getElementById('${inputId}').value=this.textContent; this.parentNode.querySelectorAll('button').forEach(b=>b.style.borderColor='');this.style.borderColor='#e0b060';">${esc(v)}</button>`).join(''); }
 
@@ -360,7 +549,7 @@ function chipsHTML(list, sel, onclick, tagged, field) {
   return list.map(it => {
     const [t, tag] = Array.isArray(it) ? it : [it, ''];
     const on = Array.isArray(sel) ? sel.includes(t) : sel === t;
-    return `<button type="button" class="chip${on ? ' on' : ''}${tagged && tag ? ' tag' : ''}" ${tagged && tag ? `data-t="${tag}"` : ''} data-v="${esc(t)}" data-tag="${tag || ''}" ${field ? `data-f="${field}"` : ''} onclick="${onclick}(this)">${esc(t)}</button>`;
+    return `<button type="button" class="chip${on ? ' on' : ''}${tagged && tag ? ' tag' : ''}" ${tagged && tag ? `data-t="${tag}"` : ''} data-v="${esc(t)}" data-tag="${tag || ''}" ${field ? `data-f="${field}"` : ''} onclick="${onclick}(this)" title="${esc(t)}">${esc(sl(t))}</button>`;
   }).join('');
 }
 
@@ -383,8 +572,9 @@ async function addPhotos(inp, target) {
   const files = [...(inp.files || [])]; inp.value = '';
   for (const f of files) { if (photos.length >= 6) { toast('사진은 최대 6장까지'); break; } const r = await resizeImage(f); photos.push({ file: r, url: URL.createObjectURL(r) }); }
   renderPhotos(target);
+  if (target === 'resPhotos') refreshReport();
 }
-function removePhoto(i, target) { URL.revokeObjectURL(photos[i].url); photos.splice(i, 1); renderPhotos(target); }
+function removePhoto(i, target) { URL.revokeObjectURL(photos[i].url); photos.splice(i, 1); renderPhotos(target); if (target === 'resPhotos') refreshReport(); }
 function renderPhotos(target) { const el = $(target); if (el) el.innerHTML = photos.map((p, i) => `<div class="ph"><img src="${p.url}" alt=""><button type="button" onclick="removePhoto(${i}, '${target}')">×</button></div>`).join(''); }
 function clearPhotos() { photos.forEach(p => URL.revokeObjectURL(p.url)); photos = []; }
 
@@ -425,6 +615,7 @@ function show(id, title) {
   $('hdrHome').style.display = id === 'scrHome' ? 'none' : '';
   $('hdrT').textContent = title || '불량 보고';
   window.scrollTo(0, 0);
+  $('undoBar').classList.remove('show'); clearTimeout(undoT); UNDO = null;
 }
 function goHome() { if (A) saveDraft(); renderHome(); show('scrHome'); }
 
@@ -434,12 +625,12 @@ function goHome() { if (A) saveDraft(); renderHome(); show('scrHome'); }
 let Q = null;
 function startQuick() {
   clearPhotos();
-  Q = { id: Date.now(), type: 'quick', part: '', customer: '', process: '', defect: '', defectEtc: '', ng: '', qty: '', memo: '', acts: [], author: load(AUTHOR_KEY, '') };
-  $('qPart').value = ''; $('qCust').value = ''; $('qNg').value = ''; $('qQty').value = ''; $('qMemo').value = ''; $('qDefEtc').value = '';
+  Q = { id: Date.now(), type: 'quick', part: '', customer: '', product: '', ptype: '', pno: '', custOther: false, prodOther: false, typeOther: false, process: '', defect: '', defectEtc: '', ng: '', qty: '', memo: '', acts: [], author: load(AUTHOR_KEY, '') };
+  $('qNg').value = ''; $('qQty').value = ''; $('qMemo').value = ''; $('qDefEtc').value = '';
   $('qAuthor').value = Q.author; $('qRate').textContent = ''; $('qDefEtcRow').style.display = 'none';
   $('qMore').style.display = Q.author ? 'none' : ''; $('qMoreBtn').style.display = Q.author ? '' : 'none';
   const r = recent();
-  $('qPartRecent').innerHTML = recentHTML(r.parts, 'qPart'); $('qCustRecent').innerHTML = recentHTML(r.custs, 'qCust');
+  renderPicker('qPicker', Q);
   $('qDefect').innerHTML = chipsHTML([...Object.keys(DATA.defects), '기타'], '', 'qPickDefect');
   $('qAct').innerHTML = chipsHTML(DATA.quickAct, [], 'qToggleAct');
   $('qProc').innerHTML = chipsHTML(DATA.process, '', 'qPickProc');
@@ -450,12 +641,13 @@ function toggleQMore() { $('qMore').style.display = ''; $('qMoreBtn').style.disp
 function qPickDefect(b) { Q.defect = b.dataset.v; b.parentNode.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b)); $('qDefEtcRow').style.display = Q.defect === '기타' ? '' : 'none'; if (Q.defect === '기타') $('qDefEtc').focus(); }
 function qPickProc(b) { const on = !b.classList.contains('on'); Q.process = on ? b.dataset.v : ''; b.parentNode.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', on && c === b)); }
 function qToggleAct(b) { const v = b.dataset.v, i = Q.acts.indexOf(v); if (i >= 0) Q.acts.splice(i, 1); else Q.acts.push(v); b.classList.toggle('on', i < 0); }
+document.addEventListener('focusout', e => { if (e.target && e.target.id === 'reportText') e.target.classList.remove('editing'); });
 document.addEventListener('input', e => { if (e.target && (e.target.id === 'qNg' || e.target.id === 'qQty')) { const r = rateTxt($('qNg').value, $('qQty').value); $('qRate').textContent = r ? `불량률 ${r} · ${Math.round(+$('qNg').value.replace(/,/g, '') / +$('qQty').value.replace(/,/g, '') * 1e6).toLocaleString('en-US')} ppm` : ''; } });
 function readQuick() {
-  Q.part = $('qPart').value.trim(); Q.customer = $('qCust').value.trim(); Q.ng = $('qNg').value.trim(); Q.qty = $('qQty').value.trim();
+  Q.part = composeName(Q); Q.ng = $('qNg').value.trim(); Q.qty = $('qQty').value.trim();
   Q.memo = $('qMemo').value.trim(); Q.defectEtc = $('qDefEtc').value.trim(); Q.author = $('qAuthor').value.trim();
   if (Q.author) save(AUTHOR_KEY, Q.author);
-  if (!Q.part) { toast('품명·품번을 입력하세요'); $('qPart').focus(); return false; }
+  if (!Q.part) { toast('제품이나 부품을 고르세요'); $('qPicker').scrollIntoView({ block: 'center' }); return false; }
   if (!Q.defect) { toast('불량 유형을 고르세요'); return false; }
   if (Q.defect === '기타' && !Q.defectEtc) { toast('불량 이름을 입력하세요'); $('qDefEtc').focus(); return false; }
   return true;
@@ -477,7 +669,7 @@ function quickSave(goBack) {
   if (!readQuick()) return false;
   const text = quickText();
   pushHist({ id: Q.id, type: 'quick', title: `${Q.part} · ${Q.defect === '기타' ? Q.defectEtc : Q.defect}`, meta: `${nowStr()}${Q.ng ? ` · 불량 ${fmtN(Q.ng)}ea` : ''}${Q.customer ? ' · ' + Q.customer : ''}`, text, data: clone(Q) });
-  addRecent(Q.part, Q.customer);
+  addRecent(Q);
   if (goBack) { toast('저장했습니다'); clearPhotos(); renderHome(); show('scrHome'); }
   return text;
 }
@@ -493,12 +685,12 @@ async function quickShare() {
    ============================================================ */
 let A = null, step = 0;
 function blank() {
-  return { id: Date.now(), type: '5why', part: '', customer: '', process: '사출', date: today(), ng: '', qty: '', author: load(AUTHOR_KEY, ''),
+  return { id: Date.now(), type: '5why', part: '', customer: '', product: '', ptype: '', pno: '', custOther: false, prodOther: false, typeOther: false, process: '사출', date: today(), ng: '', qty: '', author: load(AUTHOR_KEY, ''),
            defect: '', defectEtc: '', after: [], symptom: '', why: ['', '', '', '', ''], whyTags: [[], [], [], [], []], rootAt: 0,
-           m4: [], temp: [], tempEtc: '', perm: [], permEtc: '', owner: '', kpi: [], actInit: false, tkInit: false, more: false, fromQuick: null };
+           esc: [], escEtc: '', m4: [], temp: [], tempEtc: '', perm: [], permEtc: '', owner: '', kpi: [], actInit: false, tkInit: false, more: false, fromQuick: null };
 }
-const STEPS = ['info', 'defect', 'after', 'symptom', 'why0', 'why1', 'why2', 'why3', 'why4', 'act'];
-const WHY_FIRST = 4, ACT = 9;
+const STEPS = ['info', 'defect', 'after', 'why0', 'why1', 'why2', 'why3', 'why4', 'esc', 'act'];   // 현상·사진은 결과 화면에서
+const WHY_FIRST = 3, ESC = 8, ACT = 9;
 const defName = () => A.defect === '기타' ? (A.defectEtc || '불량') : A.defect;
 function afterGroups() {
   const g = new Set(DATA.afterBy[A.defect] || []);
@@ -523,6 +715,7 @@ function question(i) {
     if (n === 0) return [`Why 1 · 왜 "${defName()}"이(가) 발생했나요?`, '직접 원인 · 누르면 바로 다음으로'];
     return [`Why ${n + 1} · 왜 "${A.why[n - 1]}"이(가) 생겼나요?`, n <= 2 ? '추천을 누르거나 다른 원인에서 고르세요' : '관리 체계(기준·점검·교육) 쪽 원인'];
   }
+  if (k === 'esc') return ['유출 원인 · 왜 공정에서 못 걸렀나요?', '해당하는 것 모두 · 사내 검출이면 첫 버튼'];
   return ['대책 · 확인 지표', '원인에 맞춰 미리 골라 두었습니다 · 확인만 하세요'];
 }
 function answer(i) {
@@ -532,6 +725,7 @@ function answer(i) {
   if (k === 'after') return A.after.length ? A.after.join(', ') : '영향 없음';
   if (k === 'symptom') return (A.symptom || '(현상 설명 없음)') + (photos.length ? `\n📷 사진 ${photos.length}장` : '');
   if (k.startsWith('why')) return A.why[+k.slice(3)] || '—';
+  if (k === 'esc') return [...A.esc, A.escEtc].filter(Boolean).join(', ') || DATA.escapeNone;
   const t = [...A.temp, A.tempEtc].filter(Boolean), p = [...A.perm, A.permEtc].filter(Boolean);
   return `임시: ${t.join(', ') || '-'}\n영구: ${p.join(', ') || '-'}`;
 }
@@ -574,23 +768,22 @@ function navHTML(o) {
 }
 
 function render() {
+  if (step !== LAST_STEP) { OTHERS_OPEN = false; ACT_MORE = false; LAST_STEP = step; }
   renderChat(); saveDraft();
   const k = STEPS[step], P = $('panel');
   if (k === 'info') {
-    const r = recent(), showMore = A.more || !A.author;
-    P.innerHTML = `<div class="form">
-      <div class="full"><label>품명·품번 <b>*</b></label><input class="fld" id="fPart" value="${esc(A.part)}" placeholder="예: IDB2 HOUSING" autocomplete="off"><div class="recent">${recentHTML(r.parts, 'fPart')}</div></div>
+    const showMore = A.more || !A.author;
+    P.innerHTML = `<div id="aPicker"></div><div class="form" style="margin-top:10px;">
       <div><label>불량 수량</label><input class="fld" id="fNg" inputmode="numeric" value="${esc(A.ng)}" placeholder="ea" autocomplete="off"></div>
       <div><label>검사(생산) 수량</label><input class="fld" id="fQty" inputmode="numeric" value="${esc(A.qty)}" placeholder="ea" autocomplete="off"></div>
     </div>
-    <button type="button" class="more" id="moreBtn" onclick="A.more=true; document.getElementById('moreBox').style.display=''; this.style.display='none';" style="${showMore ? 'display:none;' : ''}">＋ 고객사 · 발견일 · 공정 · 작성자</button>
+    <button type="button" class="more" id="moreBtn" onclick="A.more=true; document.getElementById('moreBox').style.display=''; this.style.display='none';" style="${showMore ? 'display:none;' : ''}">＋ 발견일 · 공정 · 작성자</button>
     <div class="form" id="moreBox" style="margin-top:8px; ${showMore ? '' : 'display:none;'}">
-      <div><label>고객사</label><input class="fld" id="fCust" value="${esc(A.customer)}" placeholder="선택" autocomplete="off"></div>
-      <div><label>발견일</label><input class="fld" id="fDate" type="date" value="${esc(A.date)}"></div>
-      ${r.custs.length ? `<div class="full"><div class="recent" style="margin-top:0;">${recentHTML(r.custs, 'fCust')}</div></div>` : ''}
+      <div class="full"><label>발견일</label><input class="fld" id="fDate" type="date" value="${esc(A.date)}"></div>
       <div class="full"><label>발견 공정</label><div class="chips">${chipsHTML(DATA.process, A.process, 'pickProcess')}</div></div>
       <div class="full"><label>작성자</label><input class="fld" id="fAuthor" value="${esc(A.author)}" placeholder="예: 품질경영팀 홍길동 (한 번만)" autocomplete="off"></div>
     </div>${navHTML()}`;
+    renderPicker('aPicker', A);
   } else if (k === 'defect') {
     P.innerHTML = `<div class="chips">${chipsHTML([...Object.keys(DATA.defects), '기타'], A.defect, 'pickDefect')}</div>
       <div class="inrow" id="etcRow" style="${A.defect === '기타' ? '' : 'display:none;'}"><input id="fDefEtc" value="${esc(A.defectEtc)}" placeholder="불량 이름 입력" autocomplete="off"></div>${navHTML()}`;
@@ -606,26 +799,48 @@ function render() {
   } else if (k.startsWith('why')) {
     const n = +k.slice(3);
     const recs = n === 0 ? (DATA.defects[A.defect] || []) : (NEXT[A.why[n - 1]] || []);
-    const recSet = new Set(recs.map(r => r[0]));
-    let h = '';
-    if (n >= 1 && recs.length) h += `<button type="button" class="fill" onclick="fillChain(${n})">⚡ 추천으로 끝까지 채우기 <small style="font-weight:700;">(확인만 하세요)</small></button>`;
+    const favs = favorites(n).filter(f => !(n === 0 && false));
+    const used = new Set(favs.map(f => f[0]));
+    let h = '<div class="legend4"><span><i style="background:#2563EB"></i>설비·금형</span><span><i style="background:#16A34A"></i>방법·조건</span><span><i style="background:#EAB308"></i>재료</span><span><i style="background:#EF4444"></i>사람</span></div>';
+    if (favs.length) h += `<div class="chips"><div class="g star">지난번 선택</div>${chipsHTML(favs, A.why[n], 'pickWhy', true)}</div>`;
+    // 흐름 카드: Why1이면 원인별 흐름, Why2~면 지금부터의 흐름
+    const flows = [];
+    if (n === 0) { const heads = [...favs.map(f => f[0]), ...recs.map(r => r[0])].filter((v, i, a) => a.indexOf(v) === i).slice(0, 3); heads.forEach(c => { const ch = chainFrom([c]); if (ch.length >= 2) flows.push(ch); }); }
+    else if (recs.length) { const ch = chainFrom([...A.why.slice(0, n)]).slice(n); if (ch.length) flows.push(ch); }
+    FLOWS = flows.map(f => n === 0 ? f : [...A.why.slice(0, n), ...f]);
+    if (flows.length) h += `<div class="g2" style="margin-top:4px;">⚡ 흐름으로 한 번에 ${n === 0 ? '(Why 전체)' : '(여기서부터)'}</div>` + flows.map((f, i) => `<button type="button" class="flow" onclick="applyFlow(${i})"><span class="go">선택 ›</span>${f.map(x => esc(sl(x))).join(' <span class="ar">→</span> ')}</button>`).join('');
     h += '<div class="chips">';
-    if (recs.length) h += `<div class="g">${n === 0 ? `${esc(defName())} 주요 원인` : '👍 추천'}</div>` + chipsHTML(recs, A.why[n], 'pickWhy', true);
-    const others = n <= 2 ? Object.assign({}, DATA.why23) : { '근본 원인 (관리 체계)': DATA.roots };
-    if (n >= 1 && n <= 2) others['근본 원인 (관리 체계)'] = DATA.roots;
-    Object.entries(others).forEach(([g, list]) => { const l = list.filter(x => !recSet.has(x[0])); if (l.length) h += `<div class="g2">${n === 0 && recs.length ? '다른 원인 · ' : ''}${g}</div>` + chipsHTML(l, A.why[n], 'pickWhy', true); });
+    const recsL = recs.filter(r => !used.has(r[0]));
+    recsL.forEach(r => used.add(r[0]));
+    if (recsL.length) h += `<div class="g">${n === 0 ? `${esc(defName())} 원인 · 하나씩 고르기` : '👍 추천'}</div>` + chipsHTML(recsL, A.why[n], 'pickWhy', true);
+    const others = n <= 2 ? Object.assign({}, DATA.why23) : {};
+    if (n >= 1) others['근본 원인 (관리 체계)'] = DATA.roots;
+    const openOthers = OTHERS_OPEN || (!recsL.length && !favs.length) || (A.why[n] && !recs.some(r => r[0] === A.why[n]) && !favs.some(f => f[0] === A.why[n]));
     h += '</div>';
+    if (openOthers) {
+      h += '<div class="chips">';
+      Object.entries(others).forEach(([g, list]) => { const l = list.filter(x => !used.has(x[0])); if (l.length) h += `<div class="g2">${n === 0 && recs.length ? '다른 원인 · ' : ''}${g}</div>` + chipsHTML(l, A.why[n], 'pickWhy', true); });
+      h += '</div>';
+    } else h += `<button type="button" class="expand" onclick="OTHERS_OPEN=true; render()">＋ 다른 원인 보기</button>`;
     P.innerHTML = h + `<div class="inrow"><input id="fWhy" value="${esc(A.why[n])}" placeholder="직접 입력 (버튼에 없을 때)" autocomplete="off" oninput="A.why[${n}]=this.value; A.whyTags[${n}]=[];"></div>`
       + navHTML({ root: n >= 1 && n < 4, label: n === 4 ? '근본 원인 확정 →' : '다음 →' });
+  } else if (k === 'esc') {
+    const none = A.esc.length === 0 && A.escNone;
+    P.innerHTML = `<div class="chips"><button type="button" class="chip${none ? ' on' : ''}" onclick="pickEscNone(this)">✔ ${DATA.escapeNone}</button><div class="g2">유출 원인</div>${chipsHTML(DATA.escape, A.esc, 'toggleEsc')}</div>
+      <div class="inrow"><input id="fEscEtc" value="${esc(A.escEtc)}" placeholder="기타 유출 원인 (선택)" autocomplete="off"></div>${navHTML()}`;
   } else if (k === 'act') {
     prepareAct();
+    const pick = (list, sel) => ACT_MORE ? list : list.filter(x => sel.includes(x));
     let h = `<div class="act-sec">근본 원인 4M</div><div class="chips">${chipsHTML(DATA.m4.map(m => DATA.m4label[m]), A.m4.map(m => DATA.m4label[m]), 'toggleM4')}</div>`;
-    h += `<div class="act-sec">임시 대책 <small>즉시 조치</small></div><div class="chips">${chipsHTML(DATA.temp, A.temp, 'toggleF', false, 'temp')}</div>`;
-    h += `<div class="act-sec">영구 대책 <small>재발 방지 · 원인에 맞춰 선택됨</small></div><div class="chips">`;
-    Object.entries(DATA.perm).forEach(([g, list]) => { h += `<div class="g2">${g}</div>` + chipsHTML(list, A.perm, 'toggleF', false, 'perm'); });
-    h += `</div><div class="inrow"><input id="fPermEtc" value="${esc(A.permEtc)}" placeholder="기타 대책 (선택)" autocomplete="off"></div>
-      <div class="inrow"><input id="fOwner" value="${esc(A.owner)}" placeholder="담당 / 완료 예정 (예: 생산팀 · 10/15)" autocomplete="off"></div>`;
-    h += `<div class="act-sec">유효성 확인 지표</div><div class="chips">${chipsHTML(DATA.kpi, A.kpi, 'toggleF', false, 'kpi')}</div>`;
+    h += `<div class="act-sec">임시 대책 <small>${ACT_MORE ? '즉시 조치' : '선택된 것 · 누르면 해제'}</small></div><div class="chips">${chipsHTML(pick(DATA.temp, A.temp), A.temp, 'toggleF', false, 'temp') || '<span class="hint">없음</span>'}</div>`;
+    h += `<div class="act-sec">영구 대책 <small>${ACT_MORE ? '재발 방지' : '원인에 맞춰 선택됨 · 누르면 해제'}</small></div><div class="chips">`;
+    if (ACT_MORE) Object.entries(DATA.perm).forEach(([g, list]) => { h += `<div class="g2">${g}</div>` + chipsHTML(list, A.perm, 'toggleF', false, 'perm'); });
+    else h += chipsHTML([].concat(...Object.values(DATA.perm)).filter(x => A.perm.includes(x)), A.perm, 'toggleF', false, 'perm') || '<span class="hint">자동 선택된 대책이 없습니다 · 아래에서 고르세요</span>';
+    h += '</div>';
+    h += `<div class="act-sec">유효성 확인 지표</div><div class="chips">${chipsHTML(pick(DATA.kpi, A.kpi), A.kpi, 'toggleF', false, 'kpi') || '<span class="hint">없음</span>'}</div>`;
+    if (!ACT_MORE) h += `<button type="button" class="expand" onclick="readStep(true); ACT_MORE=true; render()">＋ 대책·지표 더 고르기 · 기타 입력</button>`;
+    else h += `<div class="inrow"><input id="fPermEtc" value="${esc(A.permEtc)}" placeholder="기타 대책 (선택)" autocomplete="off"></div>`;
+    h += `<div class="inrow"><input id="fOwner" value="${esc(A.owner)}" placeholder="담당 / 완료 예정 (선택 · 예: 생산팀 · 10/15)" autocomplete="off"></div>`;
     P.innerHTML = h + navHTML({ label: '📄 보고서 만들기' });
   }
   P.scrollTop = 0;
@@ -634,12 +849,13 @@ function render() {
 /* ---------- 입력 처리 ---------- */
 function pickProcess(b) { A.process = b.dataset.v; b.parentNode.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b)); }
 function pickDefect(b) {
+  const before = snap();
   const v = b.dataset.v;
   if (A.defect !== v) { A.why = ['', '', '', '', '']; A.whyTags = [[], [], [], [], []]; A.rootAt = 0; A.actInit = false; A.after = []; }
   A.defect = v;
   b.parentNode.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b));
   $('etcRow').style.display = v === '기타' ? '' : 'none';
-  if (v !== '기타') setTimeout(next, 200); else $('fDefEtc').focus();
+  if (v !== '기타') setTimeout(() => { next(); offerUndo(before, `불량: ${v}`); }, 200); else $('fDefEtc').focus();
 }
 function toggleF(b) {
   const f = b.dataset.f, v = b.dataset.v, arr = A[f], i = arr.indexOf(v);
@@ -647,22 +863,30 @@ function toggleF(b) {
   b.classList.toggle('on', i < 0);
   if (f === 'after') $('panel').querySelector('.next').textContent = A.after.length ? '다음 →' : '영향 없음 · 다음 →';
 }
+function toggleEsc(b) {
+  const v = b.dataset.v, i = A.esc.indexOf(v);
+  if (i >= 0) A.esc.splice(i, 1); else A.esc.push(v);
+  b.classList.toggle('on', i < 0); A.escNone = false; A.actInit = false;
+  const n = $('panel').querySelector('.chip'); if (n) n.classList.remove('on');
+}
+function pickEscNone(b) { const before = snap(); A.esc = []; A.escNone = true; A.actInit = false; setTimeout(() => { next(); offerUndo(before, '유출 없음'); }, 200); }
 function toggleM4(b) { const key = DATA.m4.find(m => DATA.m4label[m] === b.dataset.v); const i = A.m4.indexOf(key); if (i >= 0) A.m4.splice(i, 1); else A.m4.push(key); b.classList.toggle('on', i < 0); }
 function pickWhy(b) {
+  const before = snap();
   const n = +STEPS[step].slice(3);
   A.why[n] = b.dataset.v; A.whyTags[n] = b.dataset.tag ? [b.dataset.tag] : []; A.actInit = false;
   $('fWhy').value = A.why[n];
   b.parentNode.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b));
   // 관리 체계 원인을 고르면 거기서 근본 원인으로 마무리
-  if (n >= 1 && ROOTSET.has(A.why[n])) { setTimeout(() => { A.rootAt = n + 1; clearAfter(n); step = ACT; render(); toast('근본 원인(관리 체계)으로 정리했습니다'); }, 220); return; }
-  setTimeout(next, 220);
+  if (n >= 1 && ROOTSET.has(A.why[n])) { setTimeout(() => { A.rootAt = n + 1; clearAfter(n); step = ESC; render(); offerUndo(before, '근본 원인으로 정리했습니다'); }, 220); return; }
+  setTimeout(() => { next(); offerUndo(before, `Why${n + 1}: ${sl(A.why[n])}`); }, 220);
 }
 function clearAfter(n) { for (let i = n + 1; i < 5; i++) { A.why[i] = ''; A.whyTags[i] = []; } }
 function markRoot() {
   const n = +STEPS[step].slice(3);
   if (!readStep()) return;
   A.rootAt = n + 1; clearAfter(n); A.actInit = false;
-  step = ACT; render();
+  step = ESC; render();
 }
 // 추천 연결을 따라 Why n~ 을 한 번에 채움
 function fillChain(n) {
@@ -674,8 +898,59 @@ function fillChain(n) {
     if (ROOTSET.has(A.why[i - 1])) break;
   }
   A.rootAt = i < 5 ? i : 0; clearAfter(i - 1); A.actInit = false;
-  step = ACT; render();
+  step = ESC; render();
   toast('추천으로 채웠습니다 · 위 말풍선을 누르면 고칠 수 있어요', 3000);
+}
+let FLOWS = [], OTHERS_OPEN = false, ACT_MORE = false, LAST_STEP = -1;
+/* ---------- 방금 선택 취소 (자동으로 넘어간 뒤 3초) ---------- */
+let UNDO = null, undoT = null;
+function snap() { return { A: clone(A), step }; }
+function offerUndo(prevSnap, msg) {
+  UNDO = prevSnap; $('undoTxt').textContent = msg || '선택했습니다';
+  $('undoBar').classList.add('show'); clearTimeout(undoT);
+  undoT = setTimeout(() => { $('undoBar').classList.remove('show'); UNDO = null; }, 3500);
+}
+function doUndo() {
+  if (!UNDO) return;
+  A = UNDO.A; step = UNDO.step; UNDO = null;
+  $('undoBar').classList.remove('show'); clearTimeout(undoT);
+  show('scrChat', '🔍 5Why 초안'); render();
+}
+// 추천 연결을 따라 근본 원인까지 이어 붙임 (최대 5단계)
+function chainFrom(arr) {
+  const out = arr.slice();
+  while (out.length < 5) {
+    const last = out[out.length - 1];
+    if (ROOTSET.has(last)) break;
+    const r = NEXT[last]; if (!r || !r.length) break;
+    if (out.includes(r[0][0])) break;
+    out.push(r[0][0]);
+  }
+  return out;
+}
+function applyFlow(i) {
+  const f = FLOWS[i]; if (!f) return;
+  const before = snap();
+  for (let k = 0; k < 5; k++) { A.why[k] = f[k] || ''; A.whyTags[k] = f[k] && TAGOF[f[k]] ? [TAGOF[f[k]]] : []; }
+  A.rootAt = f.length < 5 ? f.length : 0; A.actInit = false;
+  step = ESC; render();
+  offerUndo(before, '흐름을 채웠습니다');
+}
+// 자주 고른 원인 (이 폰 기록 기준)
+function favorites(n) {
+  const F = load(FREQ_KEY, { d: {}, n: {} });
+  const m = n === 0 ? (F.d[A.defect] || {}) : (F.n[A.why[n - 1]] || {});
+  return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t]) => [t, TAGOF[t] || '']);
+}
+function recordFreq() {
+  const F = load(FREQ_KEY, { d: {}, n: {} });
+  const last = rootIndex();
+  for (let i = 0; i <= last; i++) {
+    const w = A.why[i]; if (!w) continue;
+    const bucket = i === 0 ? (F.d[A.defect] = F.d[A.defect] || {}) : (F.n[A.why[i - 1]] = F.n[A.why[i - 1]] || {});
+    bucket[w] = (bucket[w] || 0) + 1;
+  }
+  save(FREQ_KEY, F);
 }
 function rootIndex() { return (A.rootAt ? A.rootAt : 5) - 1; }
 function prepareAct() {
@@ -683,7 +958,7 @@ function prepareAct() {
     const tags = new Set();
     for (let i = rootIndex(); i >= 0 && tags.size === 0; i--) (A.whyTags[i] || []).forEach(t => tags.add(t));
     A.m4 = [...tags];
-    const text = A.why.slice(0, rootIndex() + 1).join(' ');
+    const text = [...A.why.slice(0, rootIndex() + 1), ...A.esc, A.escEtc].join(' ');
     const perm = new Set();
     FIX.forEach(([re, list]) => { if (re.test(text)) list.forEach(x => perm.add(x)); });
     A.perm = [...perm];
@@ -698,10 +973,10 @@ function prepareAct() {
 function readStep(quiet) {
   const k = STEPS[step];
   if (k === 'info') {
-    A.part = $('fPart').value.trim(); A.ng = $('fNg').value.trim(); A.qty = $('fQty').value.trim();
-    A.customer = $('fCust').value.trim(); A.date = $('fDate').value; A.author = $('fAuthor').value.trim();
+    A.part = composeName(A); A.ng = $('fNg').value.trim(); A.qty = $('fQty').value.trim();
+    A.date = $('fDate').value; A.author = $('fAuthor').value.trim();
     if (A.author) save(AUTHOR_KEY, A.author);
-    if (!A.part && !quiet) { toast('품명·품번을 입력하세요'); $('fPart').focus(); return false; }
+    if (!A.part && !quiet) { toast('제품이나 부품을 고르세요'); return false; }
   } else if (k === 'defect') {
     if (A.defect === '기타') { A.defectEtc = $('fDefEtc').value.trim(); if (!A.defectEtc && !quiet) { toast('불량 이름을 입력하세요'); return false; } }
     if (!A.defect && !quiet) { toast('불량 유형을 고르세요'); return false; }
@@ -709,7 +984,8 @@ function readStep(quiet) {
   else if (k.startsWith('why')) {
     const n = +k.slice(3); A.why[n] = $('fWhy').value.trim();
     if (!A.why[n] && !quiet) { toast('원인을 고르거나 입력하세요'); $('fWhy').focus(); return false; }
-  } else if (k === 'act') { A.permEtc = $('fPermEtc').value.trim(); A.owner = $('fOwner').value.trim(); }
+  } else if (k === 'esc') { A.escEtc = $('fEscEtc').value.trim(); if (A.escEtc) A.escNone = false; }
+  else if (k === 'act') { if ($('fPermEtc')) A.permEtc = $('fPermEtc').value.trim(); A.owner = $('fOwner').value.trim(); }
   return true;
 }
 function next() {
@@ -749,9 +1025,13 @@ function buildText() {
   const last = rootIndex();
   for (let i = 0; i <= last; i++) if (A.why[i]) L.push(`- Why${i + 1}: ${A.why[i]}`);
   L.push('');
-  L.push('■ 근본 원인');
+  L.push('■ 근본 원인 (발생)');
   L.push(`- ${A.why[last] || '-'}`);
   if (A.m4.length) L.push(`- 4M: ${A.m4.map(m => DATA.m4label[m]).join(', ')}`);
+  L.push('');
+  const escs = [...A.esc, A.escEtc].filter(Boolean);
+  L.push('■ 유출 원인');
+  L.push(escs.length ? escs.map(e => `- ${e}`).join('\n') : `- ${DATA.escapeNone}`);
   L.push('');
   L.push('■ 대책');
   const temp = [...A.temp, A.tempEtc].filter(Boolean), perm = [...A.perm, A.permEtc].filter(Boolean);
@@ -764,18 +1044,40 @@ function buildText() {
   L.push('※ 현장 초안 · 정식 보고서는 PC에서 작성');
   return L.join('\n');
 }
+let builtText = '';
+function isManualEdited() { return $('reportText').value !== builtText; }
+function onManualEdit() { $('editTag').classList.toggle('on', isManualEdited()); }
+function editManual() {
+  const t = $('reportText');
+  t.classList.add('editing');
+  t.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  setTimeout(() => { t.focus(); t.setSelectionRange(t.value.length, t.value.length); }, 250);
+}
+let manualWarned = false;
+function refreshReport() {
+  if (!A) return;
+  A.symptom = $('rSym').value.trim();
+  $('sharePhotoBtn').style.display = photos.length ? '' : 'none';
+  if (isManualEdited()) { if (!manualWarned) { toast('직접 고친 글에는 자동 반영되지 않습니다', 2500); manualWarned = true; } saveDraft(); return; }
+  builtText = buildText(); $('reportText').value = builtText; saveDraft();
+}
 function buildResult() {
-  $('reportText').value = buildText();
+  $('rSym').value = A.symptom || ''; manualWarned = false;
+  builtText = buildText();
+  $('reportText').value = builtText; $('reportText').classList.remove('editing'); onManualEdit();
   renderPhotos('resPhotos');
   $('sharePhotoBtn').style.display = photos.length ? '' : 'none';
   saveDraft(); show('scrResult', '🔍 5Why 초안');
 }
-function editAgain() { step = ACT; show('scrChat', '🔍 5Why 초안'); render(); }
+function editAgain() {
+  if (isManualEdited() && !confirm('보고서 글을 직접 고친 내용이 사라집니다.\n질문으로 돌아갈까요?')) return;
+  step = ACT; show('scrChat', '🔍 5Why 초안'); render();
+}
 async function copyReport() { toast(await copyText($('reportText').value) ? '보고서를 복사했습니다' : '복사에 실패했습니다'); }
 async function shareReport() { await shareText($('reportText').value, true); }
 function finishReport() {
   pushHist({ id: A.id, type: '5why', title: `${A.part} · ${defName()}`, meta: `${A.date || ''}${A.customer ? ' · ' + A.customer : ''} · 근본: ${A.why[rootIndex()] || '-'}`, text: $('reportText').value, data: clone(A) });
-  addRecent(A.part, A.customer);
+  addRecent(A); recordFreq();
   localStorage.removeItem(DRAFT_KEY);
   clearPhotos(); A = null;
   toast('저장했습니다'); renderHome(); show('scrHome');
@@ -809,7 +1111,7 @@ function fromQuick(i) {
   const q = r.data, d = load(DRAFT_KEY, null);
   if (d && d.A && d.A.part && !confirm('작성 중인 5Why를 버리고 이 보고로 시작할까요?')) return;
   clearPhotos(); A = blank();
-  Object.assign(A, { part: q.part, customer: q.customer, process: DATA.process.includes(q.process) ? q.process : (q.process || '사출'), ng: q.ng, qty: q.qty,
+  Object.assign(A, { part: q.part, customer: q.customer, product: q.product || '', ptype: q.ptype || '', pno: q.pno || '', custOther: !!q.custOther, prodOther: !!q.prodOther, typeOther: !!q.typeOther, process: DATA.process.includes(q.process) ? q.process : (q.process || '사출'), ng: q.ng, qty: q.qty,
     defect: q.defect, defectEtc: q.defectEtc, symptom: q.memo, author: q.author || A.author, fromQuick: q.id,
     date: r.at ? new Date(r.at).toISOString().slice(0, 10) : today() });
   A.temp = [...new Set((q.acts || []).map(a => DATA.quickToTemp[a]).filter(Boolean))];
