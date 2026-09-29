@@ -135,6 +135,24 @@
   .sheet .btn-del { background: rgba(220,38,38,.14); color: #fb7185; border: 1px solid rgba(251,113,133,.3) !important; }
   .sheet .btn-confirm { background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff; }
 
+  /* 측정값 입력 · 간이 성적서 */
+  .vals { display: flex; flex-wrap: wrap; gap: 6px; }
+  .vals input { width: 88px; background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px 8px; font-size: 15px; font-weight: 800; color: #fff; font-family: inherit; text-align: center; }
+  .vals input:focus { outline: none; border-color: #e0b060; }
+  .vals button { width: 44px; border-radius: 10px; border: 1px dashed rgba(255,255,255,.3); background: none; color: rgba(255,255,255,.7); font-size: 18px; font-weight: 800; }
+  .legend-item .lvals { flex: none; font-size: 12px; font-weight: 800; color: #e0b060; font-variant-numeric: tabular-nums; max-width: 42%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-report { width: 100%; padding: 14px; border-radius: 14px; border: 1px solid #e0b060; background: rgba(224,176,96,.12); color: #e0b060; font-size: 14.5px; font-weight: 900; font-family: inherit; display: none; }
+  .pno { display: none; gap: 8px; align-items: center; }
+  .pno label { flex: none; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.5); }
+  .pno input { flex: 1; min-width: 0; background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px 12px; font-size: 14px; font-weight: 700; color: #fff; font-family: inherit; }
+  .rp-wrap { position: fixed; inset: 0; z-index: 70; background: rgba(5,10,24,.92); display: none; flex-direction: column; padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 12px); }
+  .rp-wrap.show { display: flex; }
+  .rp-img { flex: 1; min-height: 0; overflow: auto; border-radius: 12px; background: #fff; }
+  .rp-img img { width: 100%; display: block; }
+  .rp-btns { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .rp-btns button { padding: 13px 4px; border-radius: 12px; border: none; font-size: 13.5px; font-weight: 800; font-family: inherit; background: rgba(255,255,255,.1); color: #fff; }
+  .rp-btns button.pri { background: #e0b060; color: #1a1206; }
+  .rp-close { margin-top: 8px; padding: 11px; border-radius: 12px; border: none; background: none; color: rgba(255,255,255,.6); font-size: 13px; font-weight: 800; font-family: inherit; }
   .toast {
     position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translate(-50%, 12px);
     background: rgba(15,23,42,.95); color: #fff; padding: 11px 18px; border-radius: 999px;
@@ -158,7 +176,7 @@
 
     <!-- ============ 시작 화면 ============ -->
     <div id="startScreen">
-      <div class="start-hint">사진을 촬영하거나 불러와서<br>터치 몇 번으로 OK/NG 포인트를 표시하세요</div>
+      <div class="start-hint">사진(제품·도면)을 촬영하거나 불러와서<br>터치 몇 번으로 OK/NG 포인트를 표시하세요 · 측정값을 넣으면 간이 성적서</div>
 
       <label class="pick-btn primary">
         <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
@@ -226,6 +244,8 @@
       <div class="legend" id="legendList"></div>
 
       <button class="btn-primary" onclick="saveImage()">완료 · 갤러리에 저장</button>
+      <div class="pno" id="pnoRow"><label>품번 (선택)</label><input id="pnoInput" placeholder="예: MEB5 하우징" autocomplete="off"></div>
+      <button type="button" class="btn-report" id="reportBtn" onclick="openReport()">📄 간이 성적서 (사진 + 측정값)</button>
       <div class="hint" id="toolHint">사진을 탭하면 포인트가 추가됩니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다</div>
     </div>
 
@@ -241,6 +261,10 @@
     <div class="memo-field" id="memoFieldWrap">
       <label id="memoLabel">메모 (선택)</label>
       <input type="text" id="memoInput" placeholder="예: 웰드라인 발생, 데이텀 A 기준">
+    </div>
+    <div class="sheet-field" id="valsFieldWrap">
+      <label>측정값 (선택 · 여러 개면 ＋)</label>
+      <div class="vals" id="valsBox"></div>
     </div>
     <div class="sheet-field hidden" id="sizeFieldWrap">
       <label>크기 조정</label>
@@ -260,6 +284,16 @@
       <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
       <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
     </div>
+  </div>
+
+  <div class="rp-wrap" id="rpWrap">
+    <div class="rp-img"><img id="rpImg" alt="간이 성적서"></div>
+    <div class="rp-btns">
+      <button type="button" class="pri" onclick="shareReport()">💬 공유</button>
+      <button type="button" onclick="copyTable()">📋 표 복사</button>
+      <button type="button" onclick="saveReport()">💾 저장</button>
+    </div>
+    <button type="button" class="rp-close" onclick="closeReport()">닫기</button>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -357,7 +391,7 @@
     redraw();
   }
 
-  function markerRadius(sizeMul){ return Math.max(16, canvas.width * 0.022) * (sizeMul || 1); }
+  function markerRadius(sizeMul){ return Math.max(22, canvas.width * 0.03) * (sizeMul || 1); }
 
   function drawArrowShape(g, x1, y1, x2, y2, color, alpha){
     const headLen = Math.max(14, canvas.width * 0.02);
@@ -452,6 +486,7 @@
     const points = marks.map((m, i) => ({ m, i })).filter(o => o.m.type === 'point');
     if (points.length === 0){
       wrap.innerHTML = '<div class="legend-empty">아직 표시된 포인트가 없습니다</div>';
+      syncReportBtn();
       return;
     }
     wrap.innerHTML = points.map(({ m, i }) => `
@@ -459,11 +494,17 @@
         <div class="lnum ${m.judge}">${m.num}</div>
         <div class="ltxt">
           <div class="lv ${m.judge}">${m.judge === 'ok' ? 'OK' : 'NG'}</div>
-          <div class="lm">${m.memo ? m.memo : '메모 없음'}</div>
+          <div class="lm">${m.memo ? escH(m.memo) : '메모 없음'}</div>
         </div>
+        ${m.vals && m.vals.length ? `<div class="lvals">${m.vals.map(escH).join(' · ')}</div>` : ''}
       </div>
     `).join('');
+    syncReportBtn();
   }
+
+  function escH(t){ return String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function hasVals(){ return marks.some(m => m.type === 'point' && m.vals && m.vals.length); }
+  function syncReportBtn(){ const on = hasVals(); id('reportBtn').style.display = on ? 'block' : 'none'; id('pnoRow').style.display = on ? 'flex' : 'none'; }
 
   // -------- 좌표/히트테스트 --------
   function getCanvasPoint(e){
@@ -622,6 +663,21 @@
     });
   }
 
+  // -------- 측정값 칸 --------
+  function renderVals(vals){
+    const list = (vals && vals.length ? vals : ['']);
+    id('valsBox').innerHTML = list.map(v => `<input type="text" inputmode="decimal" autocomplete="off" value="${String(v).replace(/"/g, '&quot;')}" placeholder="값">`).join('')
+      + '<button type="button" onclick="addValBox()" aria-label="측정값 추가">＋</button>';
+  }
+  function addValBox(){
+    const box = id('valsBox'), inputs = box.querySelectorAll('input');
+    if (inputs.length >= 10) { showToast('측정값은 10개까지'); return; }
+    const inp = document.createElement('input');
+    inp.type = 'text'; inp.inputMode = 'decimal'; inp.autocomplete = 'off'; inp.placeholder = '값';
+    box.insertBefore(inp, box.lastElementChild); inp.focus();
+  }
+  function readVals(){ return [...id('valsBox').querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean); }
+
   function openNewPointSheet(){
     sheetType = 'point';
     currentJudge = 'ok';
@@ -635,6 +691,7 @@
     id('sizeFieldWrap').classList.remove('hidden');
     id('sizeInput').value = 1;
     id('colorFieldWrap').classList.add('hidden');
+    id('valsFieldWrap').classList.remove('hidden'); renderVals([]);
     id('sheetTitle').innerText = `포인트 ${nextNum} 추가`;
     id('sheetActions').classList.remove('has-del');
     id('sheetActions').innerHTML = `
@@ -655,6 +712,7 @@
     id('sizeFieldWrap').classList.remove('hidden');
     id('sizeInput').value = 1;
     id('colorFieldWrap').classList.add('hidden');
+    id('valsFieldWrap').classList.add('hidden');
     id('sheetTitle').innerText = '텍스트 추가';
     id('sheetActions').classList.remove('has-del');
     id('sheetActions').innerHTML = `
@@ -675,6 +733,7 @@
       id('sizeFieldWrap').classList.add('hidden');
       id('colorFieldWrap').classList.remove('hidden');
       syncSheetColorSwatch(m.color || ARROW_COLOR);
+      id('valsFieldWrap').classList.add('hidden');
       id('sheetTitle').innerText = (m.type === 'arrow' ? '화살표 수정' : '박스 수정');
       id('sheetActions').classList.add('has-del');
       id('sheetActions').innerHTML = `
@@ -697,6 +756,7 @@
       id('sizeFieldWrap').classList.remove('hidden');
       id('sizeInput').value = currentSizeMul;
       id('colorFieldWrap').classList.add('hidden');
+      id('valsFieldWrap').classList.add('hidden');
       id('sheetTitle').innerText = '텍스트 수정';
       id('sheetActions').classList.add('has-del');
       id('sheetActions').innerHTML = `
@@ -721,6 +781,7 @@
     id('sizeFieldWrap').classList.remove('hidden');
     id('sizeInput').value = currentSizeMul;
     id('colorFieldWrap').classList.add('hidden');
+    id('valsFieldWrap').classList.remove('hidden'); renderVals(m.vals || []);
     id('sheetTitle').innerText = `포인트 ${m.num} 수정`;
     id('sheetActions').classList.add('has-del');
     id('sheetActions').innerHTML = `
@@ -748,9 +809,10 @@
       if (editingIndex >= 0){
         marks[editingIndex].judge = currentJudge;
         marks[editingIndex].memo = memo;
+        marks[editingIndex].vals = readVals();
         marks[editingIndex].sizeMul = currentSizeMul;
       } else if (pendingXY){
-        marks.push({ type: 'point', x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, num: nextNum, sizeMul: currentSizeMul });
+        marks.push({ type: 'point', x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, vals: readVals(), num: nextNum, sizeMul: currentSizeMul });
         nextNum++;
       }
     } else if (sheetType === 'text'){
@@ -805,6 +867,7 @@
     resetDrawColor();
     id('markScreen').style.display = 'none';
     id('startScreen').style.display = 'flex';
+    closeReport();
   }
 
   function resetDrawColor(){
@@ -848,7 +911,7 @@
 
         octx.fillStyle = 'rgba(255,255,255,.65)';
         octx.font = '600 12px -apple-system, sans-serif';
-        octx.fillText(m.memo || '메모 없음', legendPad + 66, y - 5);
+        octx.fillText((m.memo || '메모 없음') + (m.vals && m.vals.length ? '  ·  ' + m.vals.join(' / ') : ''), legendPad + 66, y - 5);
         y += legendLineH;
       });
     }
@@ -885,6 +948,101 @@
     const filename = `mark_${Date.now()}.jpg`;
     // 공유 시트(에어드롭/카톡 등 선택 화면)를 거치지 않고 즉시 다운로드해 갤러리에 바로 저장
     triggerDownload(dataUrl, filename);
+  }
+
+  // -------- 간이 성적서: 위 = 마킹 사진, 아래 = 번호별 측정값 표 --------
+  function today(){ const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; }
+  function reportRows(){ return marks.filter(m => m.type === 'point').sort((a, b) => a.num - b.num); }
+  function tableText(){
+    const rows = reportRows(), n = Math.max(1, ...rows.map(m => (m.vals || []).length));
+    const head = ['No', '메모', '표시', ...Array.from({ length: n }, (_, i) => '측정' + (i + 1))];
+    const pno = id('pnoInput').value.trim();
+    const lines = [`간이 측정 기록\t${today()}${pno ? '\t품번: ' + pno : ''}`, head.join('\t')];
+    rows.forEach(m => lines.push([m.num, (m.memo || '').replace(/[\t\n]/g, ' '), m.judge === 'ng' ? 'NG' : 'OK', ...Array.from({ length: n }, (_, i) => (m.vals || [])[i] || '')].join('\t')));
+    return lines.join('\n');
+  }
+  function buildReportCanvas(){
+    const rows = reportRows(), n = Math.max(1, ...rows.map(m => (m.vals || []).length));
+    const W = Math.max(900, Math.min(1400, canvas.width)), pad = Math.round(W * 0.035);
+    const imgW = W - pad * 2, imgH = Math.round(canvas.height * imgW / canvas.width);
+    const fs = Math.round(W * 0.022), rowH = Math.round(fs * 2.1), headH = Math.round(fs * 3.4);
+    const tableH = rowH * (rows.length + 1);
+    const out = document.createElement('canvas');
+    out.width = W; out.height = headH + imgH + pad + tableH + pad + Math.round(fs * 2.2);
+    const g = out.getContext('2d');
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, out.height);
+    // 머리글
+    const pno = id('pnoInput').value.trim();
+    g.fillStyle = '#0b1636'; g.font = `900 ${Math.round(fs * 1.25)}px -apple-system, sans-serif`; g.textBaseline = 'middle'; g.textAlign = 'left';
+    g.fillText('간이 측정 기록' + (pno ? '  ·  ' + pno : ''), pad, headH / 2);
+    g.fillStyle = '#64748b'; g.font = `700 ${fs}px -apple-system, sans-serif`; g.textAlign = 'right';
+    g.fillText(today(), W - pad, headH / 2);
+    // 사진
+    g.drawImage(canvas, pad, headH, imgW, imgH);
+    g.strokeStyle = '#e2e8f0'; g.lineWidth = 2; g.strokeRect(pad, headH, imgW, imgH);
+    // 표
+    const y0 = headH + imgH + pad;
+    const cNo = Math.round(fs * 3), cJ = Math.round(fs * 3.6), vW = Math.round(fs * 5.2);
+    const valsW = vW * n, memoW = Math.max(fs * 6, imgW - cNo - cJ - valsW);
+    const scale = (cNo + memoW + cJ + valsW) > imgW ? imgW / (cNo + memoW + cJ + valsW) : 1;
+    const cols = [['No', cNo * scale, 'center'], ['메모', memoW * scale, 'left'], ['표시', cJ * scale, 'center'], ...Array.from({ length: n }, (_, i) => ['측정' + (i + 1), vW * scale, 'center'])];
+    let y = y0;
+    g.fillStyle = '#0b1636'; g.fillRect(pad, y, imgW, rowH);
+    let x = pad;
+    g.font = `800 ${fs}px -apple-system, sans-serif`; g.fillStyle = '#e0b060';
+    cols.forEach(([t, w]) => { g.textAlign = 'center'; g.fillText(t, x + w / 2, y + rowH / 2); x += w; });
+    y += rowH;
+    rows.forEach((m, ri) => {
+      g.fillStyle = ri % 2 ? '#f8fafc' : '#ffffff'; g.fillRect(pad, y, imgW, rowH);
+      const ng = m.judge === 'ng';
+      const cells = [String(m.num), m.memo || '', ng ? 'NG' : 'OK', ...Array.from({ length: n }, (_, i) => (m.vals || [])[i] || '')];
+      x = pad;
+      cells.forEach((t, ci) => {
+        const [, w, al] = cols[ci];
+        g.fillStyle = ci === 2 ? (ng ? '#dc2626' : '#16a34a') : (ng ? '#b91c1c' : '#0f172a');
+        g.font = `${ci === 0 || ci === 2 ? 900 : 700} ${fs}px -apple-system, sans-serif`;
+        let s = String(t);
+        while (s.length > 1 && g.measureText(s).width > w - fs * 0.6) s = s.slice(0, -2) + '…';
+        g.textAlign = al; g.fillText(s, al === 'left' ? x + fs * 0.4 : x + w / 2, y + rowH / 2);
+        x += w;
+      });
+      g.strokeStyle = '#e2e8f0'; g.lineWidth = 1; g.beginPath(); g.moveTo(pad, y + rowH); g.lineTo(pad + imgW, y + rowH); g.stroke();
+      y += rowH;
+    });
+    g.strokeStyle = '#cbd5e1'; g.lineWidth = 1.5; g.strokeRect(pad, y0, imgW, tableH);
+    g.fillStyle = '#94a3b8'; g.font = `600 ${Math.round(fs * 0.8)}px -apple-system, sans-serif`; g.textAlign = 'left';
+    g.fillText('※ 현장 간이 기록 · 정식 성적서는 PC에서 작성', pad, y + pad * 0.5 + fs);
+    return out;
+  }
+  let reportUrl = '';
+  function openReport(){
+    if (!hasVals()) { showToast('측정값이 있는 포인트가 없습니다'); return; }
+    reportUrl = buildReportCanvas().toDataURL('image/jpeg', 0.92);
+    id('rpImg').src = reportUrl;
+    id('rpWrap').classList.add('show');
+  }
+  function closeReport(){ id('rpWrap').classList.remove('show'); }
+  async function copyText(t){
+    try { await navigator.clipboard.writeText(t); return true; } catch (e) {
+      const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (x) {} ta.remove(); return ok;
+    }
+  }
+  async function copyTable(){ showToast(await copyText(tableText()) ? '표를 복사했습니다 · PC 엑셀에 붙여넣으면 칸이 나뉩니다' : '복사에 실패했습니다'); }
+  function saveReport(){ triggerDownload(reportUrl, `간이성적서_${today()}.jpg`); }
+  async function shareReport(){
+    const text = tableText();
+    await copyText(text);   // 카톡은 사진과 글을 같이 보내면 글이 빠질 수 있어 먼저 복사해 둠
+    try {
+      const file = new File([dataURLtoBlob(reportUrl)], `간이성적서_${today()}.jpg`, { type: 'image/jpeg' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text, title: '간이 측정 기록' });
+        showToast('표 글자는 복사되어 있습니다 · 필요하면 붙여넣으세요');
+        return;
+      }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    saveReport();
+    showToast('사진은 저장, 표는 복사했습니다');
   }
 
   let toastTimer = null;
