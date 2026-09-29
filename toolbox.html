@@ -266,7 +266,7 @@
         .pe-canvas-card { background: #0b1636; border-radius: 16px; padding: 10px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.15); }
         .pe-viewport-head { color: #93c5fd; font-size: 0.74rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
         .pe-canvas-card canvas { width: 100%; height: 260px; display: block; border-radius: 10px; background: #0f172a; }
-        .pe-legend { margin-top: 8px; font-size: 0.66rem; color: #94A3B8; line-height: 1.5; font-family: monospace; white-space: pre-line; }
+        .pe-legend { margin-top: 8px; font-size: 0.72rem; color: #CBD5E1; line-height: 1.5; font-family: monospace; white-space: pre-line; }
 
         .pe-card { background: white; border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid #E2E8F0; }
         .pe-card h2 { font-size: 0.82rem; color: #1E293B; margin-bottom: 10px; }
@@ -291,6 +291,17 @@
         .pe-badge.warn { background: #FEF3C7; color: #92400E; }
         .pe-mapbox { background: #F1F5F9; border-radius: 10px; padding: 8px 10px; font-size: 0.72rem; color: #1E3A8A; font-family: monospace; }
 
+        .pe-step { display: grid; grid-template-columns: 52px 1fr 52px; gap: 6px; align-items: center; margin-bottom: 8px; }
+        .pe-step button { height: 42px; border-radius: 10px; border: 1px solid #CBD5E1; background: #F8FAFC; font-size: 0.8rem; font-weight: 800; color: #334155; }
+        .pe-step .pv { text-align: center; }
+        .pe-step .pv .k { font-size: 0.66rem; font-weight: 700; color: #64748B; }
+        .pe-step .pv .v { font-size: 1.15rem; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; }
+        .pe-note { font-size: 0.7rem; color: #64748B; line-height: 1.55; margin-top: 8px; }
+        .pe-note b { color: #334155; }
+        .pe-dsc-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+        .pe-dsc-list span { font-size: 0.7rem; font-weight: 700; background: #F1F5F9; color: #334155; border-radius: 6px; padding: 4px 7px; font-variant-numeric: tabular-nums; }
+        .pe-dsc-list span.s { background: #FEE2E2; color: #991B1B; }
+        .pe-dsc-list span.e { background: #FEF3C7; color: #92400E; }
         .pe-num-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .pe-num-field label { display: block; font-size: 0.7rem; color: #64748B; margin-bottom: 4px; }
         .pe-num-field input { width: 100%; padding: 9px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; }
@@ -1185,9 +1196,12 @@
                 <!-- 프로브 회전 탭 -->
                 <div id="pe-panel-probe" class="pe-panel">
                     <div class="pe-card">
-                        <h2>회전 각도 프리셋 (A°|B°)</h2>
+                        <h2>회전 각도 (A°|B°)</h2>
+                        <div class="pe-step"><button onclick="peStepA(-1)">−7.5</button><div class="pv"><div class="k">A (틸트 0~105°)</div><div class="v" id="pe-a-val">0.0°</div></div><button onclick="peStepA(1)">+7.5</button></div>
+                        <div class="pe-step"><button onclick="peStepB(-1)">−7.5</button><div class="pv"><div class="k">B (회전 −180~180°)</div><div class="v" id="pe-b-val">0.0°</div></div><button onclick="peStepB(1)">+7.5</button></div>
+                        <div class="pe-note" style="margin:2px 0 8px;">프리셋을 누르거나, 위 ± 버튼으로 7.5° 단위 특정 각도를 맞추세요.</div>
                         <div class="pe-angle-grid" id="peAngleGrid"></div>
-                        <button class="pe-btn outline" onclick="peResetProbeView()">↺ 초기화 (A0° / B0°)</button>
+                        <div class="pe-note">왼쪽 <b>정면도</b>는 앞에서 본 모습(A 기울기), 오른쪽 <b>평면도</b>는 위에서 본 모습(B 방향)입니다. B=0° 전방 · B=90° 우측 기준입니다.</div>
                     </div>
                     <div class="pe-card">
                         <h2>측정기 / 포트 선택</h2>
@@ -1219,12 +1233,18 @@
                             <span class="pe-badge ok" id="pe-ijk-badge">단위벡터 OK</span>
                         </div>
                         <button class="pe-btn outline" style="margin-top:0;" onclick="peNormalizeIJK()">단위벡터로 정규화</button>
-                        <div class="pe-mapbox" id="pe-ijk-map" style="margin-top:10px;">A = 0.0° (틸트) / B = 0.0° (방위각)</div>
-                        <div class="pe-angle-grid" style="grid-template-columns:repeat(3,1fr);">
-                            <button onclick="peSetIJKPreset(0,0,1)">Z상향 0,0,1</button>
-                            <button onclick="peSetIJKPreset(0,1,0)">Y전방 0,1,0</button>
-                            <button onclick="peSetIJKPreset(1,0,0)">X우측 1,0,0</button>
+                        <div class="pe-mapbox" id="pe-ijk-map" style="margin-top:10px;">+Z 방향 면 (윗면) · 수직에서 0.0°</div>
+                        <div class="pe-angle-grid" style="grid-template-columns:repeat(4,1fr); margin-top:10px;">
+                            <button onclick="peSetIJKPreset(0,0,1)">+Z 윗면</button>
+                            <button onclick="peSetIJKPreset(0,0,-1)">−Z 아랫면</button>
+                            <button onclick="peSetIJKPreset(1,0,0)">+X 면</button>
+                            <button onclick="peSetIJKPreset(-1,0,0)">−X 면</button>
+                            <button onclick="peSetIJKPreset(0,1,0)">+Y 면</button>
+                            <button onclick="peSetIJKPreset(0,-1,0)">−Y 면</button>
+                            <button onclick="peSetIJKPreset(0.707,0,0.707)">+X 45° 경사</button>
+                            <button onclick="peSetIJKPreset(0,0.707,0.707)">+Y 45° 경사</button>
                         </div>
+                        <div class="pe-note"><b>IJK = 측정 면이 바라보는 방향(법선)</b>의 단위벡터입니다. 프로브는 이 방향 바깥에서 반대 방향으로 들어가 면을 찍습니다. I² + J² + K² = 1 이어야 합니다.</div>
                     </div>
                 </div>
 
@@ -1260,6 +1280,11 @@
                                 <input type="number" id="pe-input-c" value="8" step="1" min="2" max="32" oninput="peUpdateDSC()">
                             </div>
                         </div>
+                    </div>
+                    <div class="pe-card">
+                        <h2>포인트 각도</h2>
+                        <div class="pe-dsc-list" id="peDscList"></div>
+                        <div class="pe-note">위에서 내려다본 기준 · <b>+X = 0°</b>, <b>+Y = 90°</b> · 각도가 커지면 <b>반시계</b> (E &lt; S 이면 시계 방향). 덕인 NeuroMeasure 화면과 방향이 다르면 알려 주세요.</div>
                     </div>
                     <div class="pe-card">
                         <h2>측정 순서(Path) 애니메이션</h2>
@@ -2980,8 +3005,8 @@
             ],
             2: [
                 { id: 2, name: "포트 2번", spec: "ø2_ (40mm)" },
-                { id: 3, name: "포트 3번", spec: "ø0.5_ (1.0m + se 30mm)" },
-                { id: 5, name: "포트 5번", spec: "ø0.11_ (2.0m + se 30mm)" },
+                { id: 3, name: "포트 3번", spec: "ø0.5_ (1.0mm + se 30mm)" },
+                { id: 5, name: "포트 5번", spec: "ø0.11_ (2.0mm + se 30mm)" },
                 { id: 6, name: "포트 6번", spec: "ø1_ (27.5mm + se 30mm)" }
             ]
         };
@@ -3010,6 +3035,8 @@
                 peInitialized = true;
                 peRenderPortList();
                 peRenderAngleGrid();
+                peSyncAB();
+                peRenderDscList();
                 window.addEventListener('resize', () => { peResizeCanvas(); peDrawSimulation(); });
             }
             peResizeCanvas();
@@ -3027,6 +3054,7 @@
 
         function switchPeTab(tab) {
             if (tab !== 'dsc') pePauseDSCPlayback();
+            if (tab === 'dsc') peRenderDscList();
             peActiveTab = tab;
             ['probe', 'ijk', 'dsc'].forEach(t => {
                 document.getElementById('pe-panel-' + t).style.display = (t === tab) ? 'block' : 'none';
@@ -3068,14 +3096,19 @@
         function peSetAnglePreset(idx) {
             const p = peAnglePresets[idx];
             peCurrentAngleA = p.a; peCurrentAngleB = p.b;
-            peAnglePresets.forEach((_, i) => document.getElementById('pe-angle-' + i).classList.toggle('on', i === idx));
             if (peActiveTab !== 'probe') switchPeTab('probe');
+            peSyncAB();
+        }
+        function peSyncAB() {
+            document.getElementById('pe-a-val').innerText = peCurrentAngleA.toFixed(1) + '°';
+            document.getElementById('pe-b-val').innerText = peCurrentAngleB.toFixed(1) + '°';
+            peAnglePresets.forEach((p, i) => document.getElementById('pe-angle-' + i).classList.toggle('on', p.a === peCurrentAngleA && p.b === peCurrentAngleB));
             peDrawSimulation();
         }
+        function peStepA(d) { peCurrentAngleA = Math.max(0, Math.min(105, peCurrentAngleA + d * 7.5)); peSyncAB(); }
+        function peStepB(d) { let b = peCurrentAngleB + d * 7.5; if (b > 180) b -= 360; if (b < -180) b += 360; if (b === -180) b = 180; peCurrentAngleB = b; peSyncAB(); }
         function peResetProbeView() {
-            peCurrentAngleA = 0; peCurrentAngleB = 0;
-            document.querySelectorAll('#peAngleGrid button').forEach(b => b.classList.remove('on'));
-            peDrawSimulation();
+            peCurrentAngleA = 0; peCurrentAngleB = 0; peSyncAB();
         }
 
         function peLerpHexColor(hex1, hex2, t) {
@@ -3113,9 +3146,11 @@
             if (mag < 0.001) { mapEl.innerText = '벡터 크기가 0에 가까워 각도를 계산할 수 없습니다'; }
             else {
                 const kNorm = Math.max(-1, Math.min(1, peIjkVal.k / mag));
-                const aDeg = Math.acos(kNorm) * (180 / Math.PI);
-                const bDeg = Math.atan2(peIjkVal.j, peIjkVal.i) * (180 / Math.PI);
-                mapEl.innerText = `A = ${aDeg.toFixed(1)}° (틸트) / B = ${bDeg.toFixed(1)}° (방위각)`;
+                const tilt = Math.acos(kNorm) * (180 / Math.PI);
+                const comps = [['X', peIjkVal.i], ['Y', peIjkVal.j], ['Z', peIjkVal.k]].filter(c => Math.abs(c[1] / mag) > 0.2)
+                    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).map(c => (c[1] > 0 ? '+' : '−') + c[0]);
+                const face = comps.length === 1 ? `${comps[0]} 방향 면${comps[0] === '+Z' ? ' (윗면)' : comps[0] === '−Z' ? ' (아랫면)' : ' (옆면)'}` : `${comps.join('·')} 사이 경사면`;
+                mapEl.innerText = `${face} · 수직에서 ${tilt.toFixed(1)}° 기울어짐`;
             }
             peDrawSimulation();
         }
@@ -3142,6 +3177,7 @@
             if (isNaN(peDscVal.e)) peDscVal.e = peDscVal.s + 360;
             peDscVal.c = Math.max(2, parseInt(document.getElementById('pe-input-c').value) || 8);
             peResetDSCPlayback();
+            peRenderDscList();
         }
         function peSetSAngle(a) { document.getElementById('pe-input-s').value = a; peUpdateDSC(); }
         function peSetEFullCircle() { const s = parseFloat(document.getElementById('pe-input-s').value) || 0; document.getElementById('pe-input-e').value = s + 360; peUpdateDSC(); }
@@ -3230,142 +3266,186 @@
             else peDrawDSC(cx, cy, Math.min(w, h));
         }
 
+        // 공통: 화살표
+        function peArrow(x1, y1, x2, y2, color, w) {
+            peCtx.strokeStyle = color; peCtx.fillStyle = color; peCtx.lineWidth = w || 2.5; peCtx.lineCap = 'round';
+            peCtx.beginPath(); peCtx.moveTo(x1, y1); peCtx.lineTo(x2, y2); peCtx.stroke();
+            const ang = Math.atan2(y2 - y1, x2 - x1), L = Math.hypot(x2 - x1, y2 - y1);
+            if (L < 4) return;
+            peCtx.beginPath(); peCtx.moveTo(x2, y2);
+            peCtx.lineTo(x2 - 9 * Math.cos(ang - Math.PI / 7), y2 - 9 * Math.sin(ang - Math.PI / 7));
+            peCtx.lineTo(x2 - 9 * Math.cos(ang + Math.PI / 7), y2 - 9 * Math.sin(ang + Math.PI / 7));
+            peCtx.closePath(); peCtx.fill();
+        }
+        function peText(t, x, y, color, font, align) {
+            peCtx.fillStyle = color; peCtx.font = font || '11px sans-serif'; peCtx.textAlign = align || 'center'; peCtx.fillText(t, x, y);
+        }
+
+        // ---- 프로브 회전: 정면도 + 평면도 ----
         function peDrawProbe(cx, cy) {
             const port = peProbeData[peCurrentMachine][peSelectedPortIndex];
+            const A = peCurrentAngleA, B = peCurrentAngleB;
             document.getElementById('peLegend').innerText =
-                `측정기 ${peCurrentMachine}번 | ${port.name} (${port.spec})\nA: ${peCurrentAngleA}° / B: ${peCurrentAngleB}°`;
+                `측정기 ${peCurrentMachine}번 · ${port.name} (${port.spec})\n${peGetProbeDirectionLabel(A, B).replace('→ ', '')}`;
+            const w = peCanvas.clientWidth, h = peCanvas.clientHeight;
+            const aR = A * Math.PI / 180, bR = B * Math.PI / 180;
+            const side = Math.sin(aR) * Math.sin(bR);      // + 우측
+            const front = Math.sin(aR) * Math.cos(bR);     // + 전방(보는 사람 쪽)
+            const down = Math.cos(aR);                     // + 아래
+            const L = Math.min(72, h * 0.3);
 
-            peCtx.fillStyle = '#334155'; peCtx.strokeStyle = '#64748b'; peCtx.lineWidth = 3;
-            peCtx.beginPath(); peCtx.roundRect(cx - 44, cy - 118, 88, 40, 8); peCtx.fill(); peCtx.stroke();
-            peCtx.fillStyle = '#94a3b8'; peCtx.font = '10px sans-serif'; peCtx.textAlign = 'center';
-            peCtx.fillText('DUKIN PH10 HEAD', cx, cy - 94);
+            // 구분선
+            peCtx.strokeStyle = 'rgba(255,255,255,0.08)'; peCtx.lineWidth = 1;
+            peCtx.beginPath(); peCtx.moveTo(w / 2, 12); peCtx.lineTo(w / 2, h - 12); peCtx.stroke();
 
-            const jx = cx, jy = cy - 68, armLen = 78;
-            const aRad = (peCurrentAngleA * Math.PI) / 180, bRad = (peCurrentAngleB * Math.PI) / 180;
-            // 실기 기준: B=0 → 전방(깊이), B=90 → 우측(가로) — sin/cos을 라벨 규칙에 맞춰 배치
-            const dirDown = Math.cos(aRad), dirSide = Math.sin(aRad) * Math.sin(bRad), dirDepth = Math.sin(aRad) * Math.cos(bRad);
-            const depthSkew = dirDepth >= 0 ? 0.35 : 0.7;
-            const tipX = jx + armLen * dirSide, tipY = jy + armLen * dirDown + armLen * dirDepth * depthSkew;
-
-            const swingRadius = armLen * Math.sin(aRad);
-            if (swingRadius > 2) {
-                peCtx.save(); peCtx.strokeStyle = 'rgba(14,165,233,0.35)'; peCtx.lineWidth = 1.5; peCtx.setLineDash([4, 4]);
-                peCtx.beginPath(); peCtx.ellipse(jx, jy + armLen * dirDown, swingRadius, swingRadius * 0.32, 0, 0, Math.PI * 2); peCtx.stroke();
-                peCtx.setLineDash([]); peCtx.restore();
+            // (1) 정면도: 앞에서 봄 — 좌우 = side, 아래 = down
+            const fx = w * 0.25, fy = h * 0.36;
+            peText('정면도 (앞에서)', fx, 18, '#93c5fd', 'bold 11px sans-serif');
+            peCtx.fillStyle = '#334155'; peCtx.strokeStyle = '#64748b'; peCtx.lineWidth = 2;
+            peCtx.beginPath(); peCtx.roundRect(fx - 22, fy - 36, 44, 26, 6); peCtx.fill(); peCtx.stroke();
+            peText('PH10', fx, fy - 19, '#cbd5e1', 'bold 9px sans-serif');
+            peCtx.strokeStyle = 'rgba(148,163,184,0.35)'; peCtx.setLineDash([3, 3]); peCtx.lineWidth = 1;
+            peCtx.beginPath(); peCtx.moveTo(fx, fy); peCtx.lineTo(fx, fy + L); peCtx.stroke(); peCtx.setLineDash([]);
+            const ftx = fx + L * side, fty = fy + L * down;
+            peCtx.strokeStyle = '#e2e8f0'; peCtx.lineWidth = 5; peCtx.lineCap = 'round';
+            peCtx.beginPath(); peCtx.moveTo(fx, fy); peCtx.lineTo(ftx, fty); peCtx.stroke();
+            peCtx.fillStyle = '#0ea5e9'; peCtx.beginPath(); peCtx.arc(fx, fy, 7, 0, Math.PI * 2); peCtx.fill();
+            const ballR = 7 + front * 2.5;   // 앞으로 나오면 조금 크게
+            peCtx.fillStyle = front > 0.3 ? '#fca5a5' : front < -0.3 ? '#7f1d1d' : '#ef4444';
+            peCtx.beginPath(); peCtx.arc(ftx, fty, ballR, 0, Math.PI * 2); peCtx.fill();
+            peCtx.strokeStyle = '#fecaca'; peCtx.lineWidth = 1.2; peCtx.stroke();
+            if (A > 0.1) {   // A 각도 호
+                peCtx.strokeStyle = '#facc15'; peCtx.lineWidth = 1.5;
+                const a0 = Math.PI / 2, a1 = Math.atan2(fty - fy, ftx - fx);
+                if (Math.hypot(ftx - fx, fty - fy) > 10) { peCtx.beginPath(); peCtx.arc(fx, fy, 24, Math.min(a0, a1), Math.max(a0, a1)); peCtx.stroke(); }
             }
+            if (Math.abs(front) > 0.3) peText(front > 0 ? '보는 쪽(전방)으로 나옴' : '안쪽(후방)으로 들어감', fx, fy + L + 26, '#fca5a5', '10px sans-serif');
+            peText(`A ${A.toFixed(1)}°`, fx, h - 14, '#facc15', 'bold 12px sans-serif');
 
-            peCtx.fillStyle = '#0ea5e9'; peCtx.beginPath(); peCtx.arc(jx, jy, 10, 0, Math.PI * 2); peCtx.fill();
-            peCtx.strokeStyle = '#bae6fd'; peCtx.lineWidth = 2; peCtx.stroke();
-
-            const armWidth = Math.max(3, Math.min(11, 6 + dirDepth * 5));
-            peCtx.strokeStyle = '#e2e8f0'; peCtx.lineWidth = armWidth; peCtx.lineCap = 'round';
-            peCtx.beginPath(); peCtx.moveTo(jx, jy); peCtx.lineTo(tipX, tipY); peCtx.stroke();
-
-            const depthT = (dirDepth + 1) / 2;
-            const ballR = Math.max(3, Math.min(10, 6 + dirDepth * 5));
-            peCtx.fillStyle = peLerpHexColor('#7f1d1d', '#fca5a5', depthT);
-            peCtx.beginPath(); peCtx.arc(tipX, tipY, ballR, 0, Math.PI * 2); peCtx.fill();
-            peCtx.strokeStyle = '#fca5a5'; peCtx.lineWidth = 1.5; peCtx.stroke();
-
-            if (dirDepth < -0.35) {
-                peCtx.fillStyle = '#fca5a5'; peCtx.font = 'bold 10px sans-serif'; peCtx.textAlign = 'left';
-                peCtx.fillText('◀ 후방', tipX + 10, tipY);
-            }
-
-            peCtx.strokeStyle = 'rgba(148,163,184,0.25)'; peCtx.lineWidth = 1; peCtx.setLineDash([3, 3]);
-            peCtx.beginPath(); peCtx.moveTo(jx, jy); peCtx.lineTo(jx, jy + armLen); peCtx.stroke(); peCtx.setLineDash([]);
-
-            peCtx.fillStyle = '#cbd5e1'; peCtx.font = 'bold 12px sans-serif'; peCtx.textAlign = 'center';
-            peCtx.fillText(`A: ${peCurrentAngleA}°  /  B: ${peCurrentAngleB}°`, cx, cy + 78);
-            peCtx.fillStyle = '#38bdf8'; peCtx.font = '10.5px sans-serif';
-            peCtx.fillText(peGetProbeDirectionLabel(peCurrentAngleA, peCurrentAngleB), cx, cy + 96);
+            // (2) 평면도: 위에서 봄 — 오른쪽 = 우측, 아래 = 전방(작업자 쪽)
+            const tx = w * 0.75, ty = h * 0.48, R = Math.max(30, Math.min(58, w / 4 - 40, h * 0.3));
+            peText('평면도 (위에서)', tx, 18, '#93c5fd', 'bold 11px sans-serif');
+            peCtx.strokeStyle = '#334155'; peCtx.lineWidth = 1.5; peCtx.beginPath(); peCtx.arc(tx, ty, R, 0, Math.PI * 2); peCtx.stroke();
+            [['전방 0°', 0, 1], ['우 90°', 1, 0], ['후방 180°', 0, -1], ['좌 −90°', -1, 0]].forEach(([t, dx, dy]) => {
+                peCtx.strokeStyle = '#475569'; peCtx.beginPath(); peCtx.moveTo(tx + dx * (R - 5), ty + dy * (R - 5)); peCtx.lineTo(tx + dx * (R + 3), ty + dy * (R + 3)); peCtx.stroke();
+                if (dx) { const [a, b2] = t.split(' '); peText(a, tx + dx * (R + 16), ty - 1, '#94a3b8', '10px sans-serif'); peText(b2, tx + dx * (R + 16), ty + 11, '#64748b', '9px sans-serif'); } else peText(t, tx, ty + dy * (R + 10) + 4, '#94a3b8', '10px sans-serif');
+            });
+            peCtx.fillStyle = '#0ea5e9'; peCtx.beginPath(); peCtx.arc(tx, ty, 6, 0, Math.PI * 2); peCtx.fill();
+            const reach = Math.sin(aR);   // 옆으로 뻗은 정도
+            if (reach > 0.02) {
+                peArrow(tx, ty, tx + R * reach * Math.sin(bR), ty + R * reach * Math.cos(bR), '#f87171', 4);
+                peCtx.strokeStyle = 'rgba(250,204,21,0.8)'; peCtx.lineWidth = 1.5;
+                const s0 = Math.PI / 2, s1 = Math.PI / 2 - bR;   // 전방(아래)에서 B만큼
+                peCtx.beginPath(); peCtx.arc(tx, ty, 20, Math.min(s0, s1), Math.max(s0, s1)); peCtx.stroke();
+            } else peText('수직 (위에서 보면 점)', tx, ty + 22, '#94a3b8', '10px sans-serif');
+            peText(`B ${B.toFixed(1)}°`, tx, h - 14, '#facc15', 'bold 12px sans-serif');
         }
 
+        // ---- IJK: 등각 투상 (X 빨강 · Y 초록 · Z 파랑) ----
+        function peIso(x, y, z, cx, cy, S) {
+            return [cx + (x - y) * Math.cos(Math.PI / 6) * S, cy + (x + y) * Math.sin(Math.PI / 6) * S - z * S];
+        }
         function peDrawIJK(cx, cy) {
-            document.getElementById('peLegend').innerText =
-                `I: ${peIjkVal.i.toFixed(2)}, J: ${peIjkVal.j.toFixed(2)}, K: ${peIjkVal.k.toFixed(2)}`;
-            const scaleLen = 85;
-            const vx = cx + peIjkVal.i * scaleLen, vy = cy - peIjkVal.j * scaleLen;
-
-            peCtx.strokeStyle = '#0ea5e9'; peCtx.lineWidth = 4;
-            peCtx.beginPath(); peCtx.moveTo(cx, cy); peCtx.lineTo(vx, vy); peCtx.stroke();
-
-            const ang = Math.atan2(vy - cy, vx - cx);
-            peCtx.fillStyle = '#38bdf8';
-            peCtx.beginPath(); peCtx.moveTo(vx, vy);
-            peCtx.lineTo(vx - 10 * Math.cos(ang - Math.PI / 6), vy - 10 * Math.sin(ang - Math.PI / 6));
-            peCtx.lineTo(vx - 10 * Math.cos(ang + Math.PI / 6), vy - 10 * Math.sin(ang + Math.PI / 6));
-            peCtx.closePath(); peCtx.fill();
-
-            peCtx.fillStyle = '#ffffff'; peCtx.beginPath(); peCtx.arc(cx, cy, 5, 0, Math.PI * 2); peCtx.fill();
-
-            peCtx.fillStyle = '#f8fafc'; peCtx.font = '11px monospace'; peCtx.textAlign = 'center';
-            peCtx.fillText(`V = (${peIjkVal.i.toFixed(2)}, ${peIjkVal.j.toFixed(2)}, ${peIjkVal.k.toFixed(2)})`, cx, cy + 96);
+            const { i, j, k } = peIjkVal;
+            const mag = Math.hypot(i, j, k);
+            document.getElementById('peLegend').innerText = `I ${i.toFixed(3)} · J ${j.toFixed(3)} · K ${k.toFixed(3)}  |  |V| = ${mag.toFixed(3)}`;
+            const S = Math.min(78, peCanvas.clientHeight * 0.32), oy = cy + 12;
+            // 축
+            [[1, 0, 0, '#f87171', '+X'], [0, 1, 0, '#4ade80', '+Y'], [0, 0, 1, '#60a5fa', '+Z']].forEach(([x, y, z, c, t]) => {
+                const [nx, ny] = peIso(-x * 0.7, -y * 0.7, -z * 0.7, cx, oy, S), [px, py] = peIso(x, y, z, cx, oy, S);
+                peCtx.strokeStyle = c; peCtx.globalAlpha = 0.35; peCtx.lineWidth = 1.5; peCtx.setLineDash([3, 3]);
+                peCtx.beginPath(); peCtx.moveTo(nx, ny); peCtx.lineTo(cx, oy); peCtx.stroke(); peCtx.setLineDash([]); peCtx.globalAlpha = 1;
+                peArrow(cx, oy, px, py, c, 1.5);
+                const [lx, ly] = peIso(x * 1.15, y * 1.15, z * 1.15, cx, oy, S); peText(t, lx, ly + 4, c, 'bold 11px sans-serif');
+            });
+            if (mag < 0.001) { peText('벡터 크기 0', cx, 20, '#fca5a5', 'bold 12px sans-serif'); return; }
+            const n = [i / mag, j / mag, k / mag];
+            // 면 조각 (법선에 수직인 작은 사각형)
+            const ref = Math.abs(n[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+            const u = [n[1] * ref[2] - n[2] * ref[1], n[2] * ref[0] - n[0] * ref[2], n[0] * ref[1] - n[1] * ref[0]];
+            const ul = Math.hypot(...u); u[0] /= ul; u[1] /= ul; u[2] /= ul;
+            const v = [n[1] * u[2] - n[2] * u[1], n[2] * u[0] - n[0] * u[2], n[0] * u[1] - n[1] * u[0]];
+            const q = 0.55, corners = [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([a, b]) => peIso(q * (a * u[0] + b * v[0]), q * (a * u[1] + b * v[1]), q * (a * u[2] + b * v[2]), cx, oy, S));
+            peCtx.fillStyle = 'rgba(224,176,96,0.28)'; peCtx.strokeStyle = '#e0b060'; peCtx.lineWidth = 1.5;
+            peCtx.beginPath(); corners.forEach(([x, y], idx) => idx ? peCtx.lineTo(x, y) : peCtx.moveTo(x, y)); peCtx.closePath(); peCtx.fill(); peCtx.stroke();
+            // 바닥 그림자 + 법선
+            const [sx, sy] = peIso(n[0], n[1], 0, cx, oy, S), [vx, vy] = peIso(n[0], n[1], n[2], cx, oy, S);
+            peCtx.strokeStyle = 'rgba(148,163,184,0.5)'; peCtx.setLineDash([3, 3]); peCtx.lineWidth = 1;
+            peCtx.beginPath(); peCtx.moveTo(cx, oy); peCtx.lineTo(sx, sy); peCtx.lineTo(vx, vy); peCtx.stroke(); peCtx.setLineDash([]);
+            peArrow(cx, oy, vx, vy, '#facc15', 3.5);
+            // 프로브 접근 (법선 바깥에서 들어옴)
+            const [ax, ay] = peIso(n[0] * 1.7, n[1] * 1.7, n[2] * 1.7, cx, oy, S), [bx, by] = peIso(n[0] * 1.15, n[1] * 1.15, n[2] * 1.15, cx, oy, S);
+            peArrow(ax, ay, bx, by, '#f472b6', 2);
+            peText('● 면 법선 (IJK)', 10, 18, '#facc15', 'bold 10px sans-serif', 'left');
+            peText('● 프로브 접근 방향', 10, 32, '#f472b6', 'bold 10px sans-serif', 'left');
+            peText('● 면', 10, 46, '#e0b060', 'bold 10px sans-serif', 'left');
         }
 
+        // ---- DSEC 원측정: 위에서 본 XY 평면 · +X=0° · 반시계(+) ----
+        function peDscPoints() {
+            const sweep = peDscVal.e - peDscVal.s, full = Math.abs(sweep) >= 359.999, c = peDscVal.c;
+            const step = full ? sweep / c : (c > 1 ? sweep / (c - 1) : 0);
+            return { sweep, full, step, angles: Array.from({ length: c }, (_, i) => peDscVal.s + i * step) };
+        }
+        function peRenderDscList() {
+            const el = document.getElementById('peDscList'); if (!el) return;
+            const { angles, full } = peDscPoints();
+            el.innerHTML = angles.map((a, i) => `<span class="${i === 0 ? 's' : (!full && i === angles.length - 1 ? 'e' : '')}">P${i + 1} ${(+a.toFixed(2))}°</span>`).join('');
+        }
         function peDrawDSC(cx, cy, minDim) {
-            const sweep = peDscVal.e - peDscVal.s;
-            const isFullCircle = Math.abs(sweep) >= 359.999;
-            const playbackNote = peDscAnim.playing ? ' | ▶ 재생 중' : (peDscAnim.finished ? ' | 재생 완료' : '');
+            const { sweep, full, step, angles } = peDscPoints();
+            const note = peDscAnim.playing ? ' · ▶ 재생 중' : (peDscAnim.finished ? ' · 재생 완료' : '');
             document.getElementById('peLegend').innerText =
-                `D:${peDscVal.d}mm S:${peDscVal.s}°→E:${peDscVal.e}° (${isFullCircle ? '전체원' : sweep.toFixed(0) + '° 호'}) C:${peDscVal.c}개${playbackNote}`;
+                `Ø${peDscVal.d} · S ${peDscVal.s}° → E ${peDscVal.e}° (${full ? '전체원' : Math.abs(sweep).toFixed(0) + '° 호 · ' + (sweep > 0 ? '반시계' : '시계')}) · ${peDscVal.c}점${note}`;
+            const r = minDim * 0.32, P = a => [cx + r * Math.cos(a * Math.PI / 180), cy - r * Math.sin(a * Math.PI / 180)];
 
-            const radius = Math.min(peDscVal.d * 10, minDim * 0.34);
-            const startRad = (peDscVal.s * Math.PI) / 180, endRad = (peDscVal.e * Math.PI) / 180;
-            const count = peDscVal.c;
+            // 축 · 눈금
+            peCtx.strokeStyle = 'rgba(148,163,184,0.35)'; peCtx.lineWidth = 1;
+            peCtx.beginPath(); peCtx.moveTo(cx - r - 22, cy); peCtx.lineTo(cx + r + 22, cy); peCtx.moveTo(cx, cy + r + 22); peCtx.lineTo(cx, cy - r - 22); peCtx.stroke();
+            peArrow(cx + r + 12, cy, cx + r + 26, cy, '#f87171', 1.5); peText('+X', cx + r + 30, cy - 6, '#f87171', 'bold 10px sans-serif', 'left');
+            peArrow(cx, cy - r - 12, cx, cy - r - 26, '#4ade80', 1.5); peText('+Y', cx + 8, cy - r - 22, '#4ade80', 'bold 10px sans-serif', 'left');
+            [[0, 'left'], [90, 'center'], [180, 'right'], [270, 'center']].forEach(([a, al]) => {
+                const rr = r + 12, x = cx + rr * Math.cos(a * Math.PI / 180), y = cy - rr * Math.sin(a * Math.PI / 180);
+                peText(a + '°', x + (a === 0 ? 2 : a === 180 ? -2 : 12), y + (a === 90 ? -2 : a === 270 ? 12 : 13), '#64748b', '9px sans-serif', al);
+            });
+            peCtx.strokeStyle = '#334155'; peCtx.lineWidth = 2; peCtx.beginPath(); peCtx.arc(cx, cy, r, 0, Math.PI * 2); peCtx.stroke();
 
-            peCtx.strokeStyle = '#334155'; peCtx.lineWidth = 2;
-            peCtx.beginPath(); peCtx.arc(cx, cy, radius, 0, Math.PI * 2); peCtx.stroke();
-
-            peCtx.strokeStyle = 'rgba(16,185,129,0.35)'; peCtx.lineWidth = 7;
+            // 측정 구간 (캔버스는 y가 아래로 커지므로 각도 부호를 뒤집음)
+            peCtx.strokeStyle = 'rgba(16,185,129,0.45)'; peCtx.lineWidth = 8;
             peCtx.beginPath();
-            if (sweep >= 0) peCtx.arc(cx, cy, radius, startRad, endRad, false);
-            else peCtx.arc(cx, cy, radius, endRad, startRad, false);
+            if (full) peCtx.arc(cx, cy, r, 0, Math.PI * 2);
+            else peCtx.arc(cx, cy, r, -peDscVal.s * Math.PI / 180, -peDscVal.e * Math.PI / 180, sweep > 0);
             peCtx.stroke();
+            // 진행 방향 화살표 (구간 중앙)
+            const mid = full ? peDscVal.s + step * 0.5 : peDscVal.s + sweep / 2, d = sweep > 0 ? 1 : -1;
+            const [m1x, m1y] = P(mid - d * 4), [m2x, m2y] = P(mid + d * 4);
+            if (Math.abs(sweep) >= 6) peArrow(m1x, m1y, m2x, m2y, '#10b981', 2.5);
 
-            const step = isFullCircle ? (sweep / count) : (count > 1 ? (sweep / (count - 1)) : 0);
-            peCtx.strokeStyle = '#10b981'; peCtx.lineWidth = 2.5; peCtx.beginPath();
-            let firstPoint = null, lastPoint = null;
-            for (let i = 0; i < count; i++) {
-                const deg = peDscVal.s + (i * step);
-                const rad = (deg * Math.PI) / 180;
-                const px = cx + radius * Math.cos(rad), py = cy + radius * Math.sin(rad);
-                if (i === 0) { firstPoint = { x: px, y: py }; peCtx.moveTo(px, py); } else peCtx.lineTo(px, py);
-                lastPoint = { x: px, y: py };
-                const isStart = i === 0, isEnd = (i === count - 1) && !isFullCircle;
-                peCtx.fillStyle = isStart ? '#ef4444' : (isEnd ? '#f59e0b' : '#0ea5e9');
-                peCtx.beginPath(); peCtx.arc(px, py, 5, 0, Math.PI * 2); peCtx.fill();
-                peCtx.strokeStyle = '#ffffff'; peCtx.lineWidth = 1.2; peCtx.stroke();
-                peCtx.fillStyle = '#94a3b8'; peCtx.font = '9px monospace';
-                peCtx.fillText(`P${i + 1}`, px + 8, py + 3);
-            }
-            peCtx.stroke();
+            // 포인트
+            const gapPx = r * Math.abs(step) * Math.PI / 180, labelAll = gapPx >= 18;
+            angles.forEach((a, i) => {
+                const [x, y] = P(a), isS = i === 0, isE = !full && i === angles.length - 1;
+                peCtx.fillStyle = isS ? '#ef4444' : isE ? '#f59e0b' : '#0ea5e9';
+                peCtx.beginPath(); peCtx.arc(x, y, isS || isE ? 6 : 4.5, 0, Math.PI * 2); peCtx.fill();
+                peCtx.strokeStyle = '#fff'; peCtx.lineWidth = 1.2; peCtx.stroke();
+                if (labelAll || isS || isE) {
+                    const [lx, ly] = [cx + (r - 16) * Math.cos(a * Math.PI / 180), cy - (r - 16) * Math.sin(a * Math.PI / 180)];
+                    peText('P' + (i + 1), lx, ly + 4, '#cbd5e1', 'bold 9px sans-serif');
+                }
+            });
+            // S · E 는 모서리 범례로 (축 라벨과 겹치지 않게)
+            peText(`● S ${peDscVal.s}°`, 10, 18, '#f87171', 'bold 11px sans-serif', 'left');
+            if (!full) peText(`● E ${peDscVal.e}°`, 10, 33, '#fbbf24', 'bold 11px sans-serif', 'left');
+            peText(full ? '전체원' : (sweep > 0 ? '↺ 반시계' : '↻ 시계'), 10, full ? 33 : 48, '#10b981', 'bold 11px sans-serif', 'left');
+            if (!labelAll) peText(`점 간격이 좁아 P1·P${angles.length}만 표시 (아래 목록 참고)`, cx, peCanvas.clientHeight - 10, '#94a3b8', '10px sans-serif');
 
-            if (firstPoint) {
-                peCtx.fillStyle = '#ef4444'; peCtx.font = 'bold 10px sans-serif'; peCtx.textAlign = 'left';
-                peCtx.fillText(`S=${peDscVal.s}°`, firstPoint.x + 10, firstPoint.y - 8);
-            }
-            if (lastPoint && !isFullCircle) {
-                peCtx.fillStyle = '#f59e0b'; peCtx.font = 'bold 10px sans-serif'; peCtx.textAlign = 'left';
-                peCtx.fillText(`E=${peDscVal.e}°`, lastPoint.x + 10, lastPoint.y + 16);
-            }
-
+            // 재생 중 프로브 위치
             if ((peDscAnim.playing || peDscAnim.finished) && peDscAnim.angles.length >= 2) {
-                const segA = peDscAnim.angles[peDscAnim.currentSeg];
-                const segB = peDscAnim.angles[peDscAnim.currentSeg + 1];
-                const curDeg = segA + (segB - segA) * peDscAnim.t;
-                const curRad = (curDeg * Math.PI) / 180;
-                const mx = cx + radius * Math.cos(curRad), my = cy + radius * Math.sin(curRad);
-                peCtx.save();
-                peCtx.strokeStyle = 'rgba(250,204,21,0.9)'; peCtx.lineWidth = 2.5;
-                peCtx.beginPath(); peCtx.arc(mx, my, 9, 0, Math.PI * 2); peCtx.stroke();
+                const a0 = peDscAnim.angles[peDscAnim.currentSeg], a1 = peDscAnim.angles[peDscAnim.currentSeg + 1];
+                const [mx, my] = P(a0 + (a1 - a0) * peDscAnim.t);
+                peCtx.strokeStyle = 'rgba(250,204,21,0.9)'; peCtx.lineWidth = 2.5; peCtx.beginPath(); peCtx.arc(mx, my, 9, 0, Math.PI * 2); peCtx.stroke();
                 peCtx.fillStyle = '#facc15'; peCtx.beginPath(); peCtx.arc(mx, my, 4, 0, Math.PI * 2); peCtx.fill();
-                peCtx.restore();
-
-                const fromIdx = peDscAnim.currentSeg + 1, toIdx = peDscAnim.currentSeg + 2;
-                const statusText = peDscAnim.finished ? `측정 완료 (${peDscAnim.angles.length}개)` : `이동 중: P${fromIdx} → P${toIdx}`;
-                peCtx.fillStyle = '#facc15'; peCtx.font = 'bold 11px sans-serif'; peCtx.textAlign = 'center';
-                peCtx.fillText(statusText, cx, cy - radius - 16 > 16 ? cy - radius - 16 : 16);
+                peText(peDscAnim.finished ? `측정 완료 (${peDscAnim.angles.length}점)` : `P${peDscAnim.currentSeg + 1} → P${peDscAnim.currentSeg + 2}`, peCanvas.clientWidth - 10, 18, '#facc15', 'bold 11px sans-serif', 'right');
             }
         }
 
