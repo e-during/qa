@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>계측기 현황</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<meta name="theme-color" content="#0b1636">
+<style>
+  :root { --navy: #0b1636; --gold: #e0b060; --gold-d: #9a6b1f; --ink: #0F172A; --body: #334155; --muted: #64748B; --line: #E2E8F0; --bg: #F1F5F9;
+          --bar: #475569; --red: #DC2626; --amber: #D97706; --green: #15803D; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: var(--ink); padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+  header { position: sticky; top: 0; z-index: 20; background: var(--navy); color: #fff; padding: calc(env(safe-area-inset-top) + 10px) 14px 10px; display: flex; align-items: center; gap: 10px; }
+  header a { color: #fff; text-decoration: none; font-size: 12px; font-weight: 800; padding: 7px 11px; border: 1px solid rgba(255,255,255,.3); border-radius: 16px; }
+  header .t { flex: 1; text-align: center; }
+  header .t1 { font-size: 16px; font-weight: 900; }
+  header .t2 { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--gold); }
+  header .d { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.7); white-space: nowrap; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 12px; }
+  .grid { display: grid; gap: 12px; }
+  @media (min-width: 820px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+  .card h2 { font-size: 14px; font-weight: 900; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+  .card h2 small { font-size: 11px; font-weight: 700; color: var(--muted); }
+  .hint { font-size: 11.5px; color: var(--muted); font-weight: 600; margin-top: 8px; line-height: 1.5; }
+
+  /* ① 상태 */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+  .kpi { border: 1px solid var(--line); border-radius: 12px; padding: 9px 4px; text-align: center; background: #fff; }
+  .kpi .k { font-size: 11px; font-weight: 800; color: var(--muted); }
+  .kpi .v { font-size: 21px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi.red .v { color: var(--red); } .kpi.amber .v { color: var(--amber); } .kpi.green .v { color: var(--green); }
+  .kpi.sel { outline: 2px solid var(--gold); }
+  .stack { display: flex; height: 16px; border-radius: 8px; overflow: hidden; gap: 2px; background: #fff; }
+  .stack i { display: block; height: 100%; cursor: pointer; }
+
+  /* ② 월별 */
+  .cols { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; align-items: end; height: 150px; border-bottom: 1px solid var(--line); }
+  .col { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; min-width: 0; }
+  .col .n { font-size: 10px; font-weight: 800; color: var(--body); margin-bottom: 2px; font-variant-numeric: tabular-nums; }
+  .col .b { width: 70%; max-width: 30px; min-height: 3px; border-radius: 4px 4px 0 0; background: var(--bar); }
+  .col.over .b { background: var(--red); } .col.over .n { color: var(--red); }
+  .col.sel .b { background: var(--gold); } .col.sel .n { color: var(--gold-d); }
+  .labs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; margin-top: 4px; }
+  .labs span { font-size: 10px; font-weight: 700; color: var(--muted); text-align: center; white-space: nowrap; overflow: hidden; }
+  .labs span.y { color: var(--ink); font-weight: 900; }
+  .labs span small { font-size: 9px; color: var(--muted); font-weight: 800; }
+
+  /* ③ 부서 */
+  .hbar { display: grid; grid-template-columns: 76px 1fr 44px; align-items: center; gap: 8px; padding: 5px 4px; border-radius: 8px; cursor: pointer; }
+  .hbar.sel { background: #FBF3E4; }
+  .hbar .nm { font-size: 12px; font-weight: 800; color: var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hbar .tr { height: 12px; background: #F1F5F9; border-radius: 0 4px 4px 0; position: relative; }
+  .hbar .tr i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--bar); border-radius: 0 4px 4px 0; }
+  .hbar .tr i.r { background: var(--red); border-right: 2px solid #fff; border-radius: 0; }
+  .hbar.sel .tr i:not(.r) { background: var(--gold); }
+  .hbar .v { font-size: 12px; font-weight: 900; text-align: right; font-variant-numeric: tabular-nums; }
+  .hbar .v small { display: block; font-size: 10px; color: var(--red); font-weight: 800; }
+  .legend { display: flex; gap: 12px; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+
+  /* ④ 장소 타일 */
+  .tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tile { flex: 1 1 auto; min-width: 88px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; cursor: pointer; background: #F8FAFC; }
+  .tile .nm { font-size: 11.5px; font-weight: 800; color: var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+  .tile .v { font-size: 17px; font-weight: 900; margin-top: 2px; }
+  .tile .v small { font-size: 10.5px; font-weight: 800; color: var(--red); margin-left: 4px; }
+  .tile.sel { border-color: var(--gold); background: #FBF3E4; }
+
+  /* ⑤ 목록 */
+  .search { display: flex; gap: 6px; }
+  .search input { flex: 1; min-width: 0; height: 44px; border-radius: 12px; border: 1.5px solid var(--line); padding: 0 12px; font-size: 15px; font-weight: 700; background: #fff; }
+  .search input:focus { outline: none; border-color: var(--gold); }
+  .search button { flex: none; height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: #fff; font-weight: 800; color: var(--muted); }
+  .sel-title { display: flex; justify-content: space-between; align-items: center; margin: 12px 2px 8px; font-size: 13.5px; font-weight: 900; }
+  .sel-title button { border: none; background: none; color: var(--muted); font-size: 12px; font-weight: 800; }
+  .it { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; background: #fff; }
+  .it .r1 { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+  .it .nm { font-size: 13.5px; font-weight: 800; line-height: 1.35; word-break: break-all; }
+  .it .id { font-size: 12px; font-weight: 800; color: var(--gold-d); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .it .m { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 4px; line-height: 1.5; }
+  .it .m b { color: var(--body); }
+  .dd { flex: none; font-size: 11px; font-weight: 900; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+  .dd.red { background: #FEE2E2; color: #991B1B; } .dd.amber { background: #FEF3C7; color: #92400E; } .dd.green { background: #DCFCE7; color: #166534; }
+  .more { width: 100%; height: 42px; border-radius: 12px; border: 1px dashed #CBD5E1; background: #fff; font-weight: 800; color: var(--muted); }
+  .empty { text-align: center; color: var(--muted); font-weight: 700; padding: 24px 0; font-size: 13px; }
+  .asof { background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; border-radius: 12px; padding: 9px 12px; font-size: 12.5px; font-weight: 800; margin-bottom: 12px; line-height: 1.5; display: none; }
+  .asof.old { background: #FEF2F2; border-color: #FECACA; color: #991B1B; }
+  .tip { position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 62px); transform: translateX(-50%); background: rgba(11,22,54,.95); color: #fff; font-size: 13px; font-weight: 800; padding: 9px 14px; border-radius: 10px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 40; width: max-content; max-width: 90vw; }
+  .tip.show { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <a href="m.html">← 홈</a>
+  <div class="t"><div class="t1">계측기 현황</div><div class="t2">GAUGE CALIBRATION</div></div>
+  <div class="d" id="asOf"></div>
+</header>
+
+<div class="wrap">
+  <div class="asof" id="asofBox"></div>
+  <div class="card" id="loadBox" style="text-align:center; padding:28px 14px;"><div style="font-size:15px;font-weight:900;">🔒 계측기 데이터를 여는 중…</div><div class="hint">처음 한 번은 팀 데이터 비밀번호가 필요합니다</div></div>
+  <div class="grid" id="main" style="display:none;">
+    <section class="card">
+      <h2>① 교정 상태 <small>눌러서 목록 보기</small></h2>
+      <div class="kpis" id="kpis"></div>
+      <div class="stack" id="stack"></div>
+    </section>
+
+    <section class="card">
+      <h2>② 월별 교정 도래 <small id="monCap">앞으로 12개월</small></h2>
+      <div class="cols" id="cols"></div>
+      <div class="labs" id="labs"></div>
+      <div class="hint" id="monHint"></div>
+    </section>
+
+    <div class="grid two">
+      <section class="card">
+        <h2>③ 부서별 보유 <small>눌러서 목록 보기</small></h2>
+        <div class="legend"><span><i style="background:var(--bar)"></i>보유</span><span><i style="background:var(--red)"></i>교정 지남</span></div>
+        <div id="depts"></div>
+      </section>
+      <section class="card">
+        <h2>④ 설치장소 상위 <small id="locCap"></small></h2>
+        <div class="tiles" id="tiles"></div>
+        <div class="hint" id="locHint"></div>
+      </section>
+    </div>
+
+    <section class="card" id="listCard">
+      <h2>⑤ 찾기 · 목록</h2>
+      <div class="search">
+        <input id="q" placeholder="관리번호 · 품명 · 기기번호 · 담당자" autocomplete="off" inputmode="search" oninput="onSearch()">
+        <button type="button" onclick="document.getElementById('q').value=''; onSearch();">지우기</button>
+      </div>
+      <div class="sel-title"><span id="selTitle"></span><button type="button" id="selClear" onclick="setSel(null)">선택 해제</button></div>
+      <div id="list"></div>
+    </section>
+  </div>
+</div>
+<div class="tip" id="tip"></div>
+<script src="js/github-config.js"></script>
+<script src="js/github-sync.js"></script>
+
+<script>
+let DATA = [], META = {};
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const now = new Date(); const TODAY = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+const addDays = (ymd, n) => { const d = new Date(ymd + 'T00:00:00'); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const D30 = addDays(TODAY, 30);
+const dday = ymd => ymd ? Math.round((new Date(ymd + 'T00:00:00') - new Date(TODAY + 'T00:00:00')) / 86400000) : null;
+const status = g => !g.n ? 'none' : g.n < TODAY ? 'over' : g.n <= D30 ? 'soon' : 'ok';
+
+let SEL = { type: 'status', key: 'over', label: '🔴 교정 지남' };
+let SHOW = 30;
+function tip(t) { const e = $('tip'); e.textContent = t; e.classList.add('show'); clearTimeout(tip.t); tip.t = setTimeout(() => e.classList.remove('show'), 1600); }
+
+function setSel(s) { SEL = s; SHOW = 30; renderAll(); if (s) $('listCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function isSel(type, key) { return SEL && SEL.type === type && SEL.key === key; }
+
+// ① 상태
+function renderStatus() {
+  const c = { over: 0, soon: 0, ok: 0 };
+  DATA.forEach(g => { if (c[g._s] != null) c[g._s]++; });
+  const K = [['all', '전체', DATA.length, ''], ['over', '🔴 지남', c.over, 'red'], ['soon', '🟡 30일 이내', c.soon, 'amber'], ['ok', '🟢 유효', c.ok, 'green']];
+  $('kpis').innerHTML = K.map(([k, t, v, cls]) => `<div class="kpi ${cls}${isSel('status', k) ? ' sel' : ''}" onclick="setSel({type:'status',key:'${k}',label:'${t}'})"><div class="k">${t}</div><div class="v">${v.toLocaleString()}</div></div>`).join('');
+  const tot = DATA.length || 1;
+  $('stack').innerHTML = [['over', 'var(--red)'], ['soon', 'var(--amber)'], ['ok', 'var(--green)']].filter(([k]) => c[k])
+    .map(([k, col]) => `<i style="flex:${Math.max(c[k] / tot, 0.012)};background:${col}" title="${c[k]}대" onclick="setSel({type:'status',key:'${k}',label:'${K.find(x => x[0] === k)[1]}'})"></i>`).join('');
+}
+
+// ② 월별 (지남 + 앞으로 12개월 + 이후)
+function monthKeys() {
+  const out = [];
+  for (let i = 0; i < 12; i++) { const d = new Date(now.getFullYear(), now.getMonth() + i, 1); out.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}`); }
+  return out;
+}
+function renderMonths() {
+  const ms = monthKeys(), last = ms[ms.length - 1];
+  const cnt = { over: 0, after: 0 }; ms.forEach(m => cnt[m] = 0);
+  DATA.forEach(g => { if (!g.n) return; if (g.n < TODAY) cnt.over++; else { const m = g.n.slice(0, 7); if (m in cnt) cnt[m]++; else if (m > last) cnt.after++; } });
+  const cols = [['over', '지남', cnt.over], ...ms.map(m => [m, m, cnt[m]]), ['after', '이후', cnt.after]];
+  const max = Math.max(1, ...cols.map(c => c[2]));
+  $('cols').innerHTML = cols.map(([k, , v]) => {
+    const lab = k === 'over' ? '교정 지남' : k === 'after' ? `${last.replace('-', '년 ')}월 이후` : `${k.slice(0, 4)}년 ${+k.slice(5)}월`;
+    return `<div class="col${k === 'over' ? ' over' : ''}${isSel('month', k) ? ' sel' : ''}" onclick="setSel({type:'month',key:'${k}',label:'${lab}'}); tip('${lab} · ${v}대')" title="${lab} ${v}대"><div class="n">${v || ''}</div><div class="b" style="height:${v ? Math.max(3, Math.round(v / max * 120)) : 0}px"></div></div>`;
+  }).join('');
+  $('labs').innerHTML = cols.map(([k]) => k === 'over' ? '<span style="color:var(--red)">지남</span>' : k === 'after' ? '<span>이후</span>'
+    : `<span class="${k.endsWith('-01') ? 'y' : ''}">${+k.slice(5)}월${k.endsWith('-01') ? `<br><small>'${k.slice(2, 4)}</small>` : ''}</span>`).join('');
+  const peak = ms.reduce((a, m) => cnt[m] > (cnt[a] || 0) ? m : a, ms[0]);
+  const share = DATA.length ? Math.round(cnt[peak] / DATA.length * 100) : 0;
+  $('monHint').innerHTML = cnt[peak] ? `가장 많은 달: <b>${peak.slice(0, 4)}년 ${+peak.slice(5)}월 ${cnt[peak]}대</b> (전체의 ${share}%)` : '';
+}
+
+// ③ 부서
+function renderDepts() {
+  const m = {};
+  DATA.forEach(g => { const d = g.dp || '(부서 없음)'; m[d] = m[d] || { t: 0, o: 0 }; m[d].t++; if (g._s === 'over') m[d].o++; });
+  const arr = Object.entries(m).sort((a, b) => b[1].t - a[1].t);
+  const max = Math.max(1, ...arr.map(a => a[1].t));
+  $('depts').innerHTML = arr.map(([d, v]) => `<div class="hbar${isSel('dept', d) ? ' sel' : ''}" onclick="setSel({type:'dept',key:'${esc(d)}',label:'${esc(d)}'})" title="${esc(d)} ${v.t}대${v.o ? ' · 지남 ' + v.o : ''}">
+      <div class="nm">${esc(d.replace(/팀$/, ''))}</div>
+      <div class="tr"><i style="width:${v.t / max * 100}%"></i>${v.o ? `<i class="r" style="width:${Math.max(v.o / max * 100, 1.5)}%"></i>` : ''}</div>
+      <div class="v">${v.t}${v.o ? `<small>지남 ${v.o}</small>` : ''}</div></div>`).join('');
+}
+
+// ④ 장소
+function renderLocs() {
+  const m = {}; let blank = 0;
+  DATA.forEach(g => { const l = (g.lc || '').trim(); if (!l) { blank++; return; } m[l] = m[l] || { t: 0, o: 0 }; m[l].t++; if (g._s === 'over') m[l].o++; });
+  const arr = Object.entries(m).sort((a, b) => b[1].t - a[1].t);
+  $('locCap').textContent = `장소 ${arr.length}곳 중 상위 12`;
+  $('tiles').innerHTML = arr.slice(0, 12).map(([l, v]) => `<div class="tile${isSel('loc', l) ? ' sel' : ''}" onclick="setSel({type:'loc',key:'${esc(l)}',label:'${esc(l)}'})"><div class="nm">${esc(l)}</div><div class="v">${v.t}<small>${v.o ? '지남 ' + v.o : ''}</small></div></div>`).join('')
+    + (blank ? `<div class="tile${isSel('loc', '') ? ' sel' : ''}" onclick="setSel({type:'loc',key:'',label:'설치장소 빈칸'})"><div class="nm">설치장소 빈칸</div><div class="v" style="color:var(--muted)">${blank}</div></div>` : '');
+  $('locHint').textContent = blank ? `설치장소가 비어 있는 계측기 ${blank}대는 부서·담당자로만 찾을 수 있습니다.` : '';
+}
+
+// ⑤ 목록
+function filtered() {
+  const q = $('q').value.trim().toLowerCase();
+  if (q) return { rows: DATA.filter(g => [g.id, g.nm, g.dv, g.ow, g.lc, g.dp].join(' ').toLowerCase().includes(q)), title: `검색 "${$('q').value.trim()}"` };
+  if (!SEL) return { rows: [], title: '위 그림을 누르거나 검색하세요' };
+  let rows;
+  if (SEL.type === 'status') rows = SEL.key === 'all' ? DATA : DATA.filter(g => g._s === SEL.key);
+  else if (SEL.type === 'month') { const ms = monthKeys(); rows = DATA.filter(g => SEL.key === 'over' ? g._s === 'over' : SEL.key === 'after' ? g.n && g.n.slice(0, 7) > ms[ms.length - 1] : g.n && g.n >= TODAY && g.n.startsWith(SEL.key)); }
+  else if (SEL.type === 'dept') rows = DATA.filter(g => (g.dp || '(부서 없음)') === SEL.key);
+  else rows = DATA.filter(g => (g.lc || '').trim() === SEL.key);
+  return { rows, title: SEL.label };
+}
+function ddBadge(g) {
+  const d = dday(g.n); if (d == null) return '';
+  const cls = d < 0 ? 'red' : d <= 30 ? 'amber' : 'green';
+  return `<span class="dd ${cls}">${d < 0 ? `D+${-d} 지남` : d === 0 ? 'D-DAY' : 'D-' + d}</span>`;
+}
+function renderList() {
+  const { rows, title } = filtered();
+  const sorted = [...rows].sort((a, b) => (a.n || '9999').localeCompare(b.n || '9999'));
+  $('selTitle').innerHTML = `${esc(title)} <span style="color:var(--muted);font-weight:700;">· ${sorted.length}대</span>`;
+  $('selClear').style.display = SEL || $('q').value ? '' : 'none';
+  if (!sorted.length) { $('list').innerHTML = `<div class="empty">${SEL || $('q').value ? '해당 계측기가 없습니다' : ''}</div>`; return; }
+  $('list').innerHTML = sorted.slice(0, SHOW).map(g => `<div class="it">
+      <div class="r1"><div><div class="nm">${esc(g.nm)}</div><div class="id">${esc(g.id)}${g.dv ? ' · ' + esc(g.dv) : ''}</div></div>${ddBadge(g)}</div>
+      <div class="m">📍 <b>${esc(g.lc || '설치장소 미기재')}</b> · ${esc(g.dp)} · 👤 ${esc(g.ow || '-')}</div>
+      <div class="m">차기교정 <b>${esc(g.n || '-')}</b> · 주기 ${esc(g.cy || '-')}개월${g.sp ? ' · 규격 ' + esc(g.sp) : ''}${g.u ? ' · 불확도 ' + esc(g.u) : ''}</div>
+    </div>`).join('') + (sorted.length > SHOW ? `<button type="button" class="more" onclick="SHOW+=50; renderList()">＋ 더 보기 (${sorted.length - SHOW}대 남음)</button>` : '');
+}
+function onSearch() { SHOW = 30; renderList(); }
+
+function renderAll() { renderStatus(); renderMonths(); renderDepts(); renderLocs(); renderList(); }
+$('asOf').textContent = '오늘 ' + TODAY.slice(5).replace('-', '/');
+function showAsOf() {
+  const a = META.asOf || '', b = $('asofBox');
+  if (!a) return;
+  const age = -dday(a);
+  b.style.display = 'block';
+  b.classList.toggle('old', age > 30);
+  b.innerHTML = `📅 <b>${a} 기준</b> 계측기 마스터 · 참조용 (최신은 QMS 확인)`
+    + (age > 30 ? `<br>⚠ ${age}일 지난 데이터입니다 · 이후 교정한 계측기도 '지남'으로 보일 수 있어 갱신이 필요합니다` : '');
+}
+(async function load() {
+  let d = null;
+  if (window.GitHubSync) d = await GitHubSync.pullJSON('gauges.json', null);
+  if (!d || !Array.isArray(d.items)) {
+    $('loadBox').innerHTML = '<div style="font-size:15px;font-weight:900;">계측기 데이터를 열 수 없습니다</div><div class="hint">비밀번호를 취소했거나, 아직 gauges.json이 올라가 있지 않습니다.<br>인터넷 연결을 확인하고 다시 열어 주세요.</div><button type="button" class="more" style="margin-top:12px;" onclick="location.reload()">↻ 다시 시도</button>';
+    return;
+  }
+  META = d; DATA = d.items;
+  DATA.forEach(g => g._s = status(g));
+  $('loadBox').style.display = 'none'; $('main').style.display = '';
+  showAsOf(); renderAll();
+})();
+</script>
+</body>
+</html>
