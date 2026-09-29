@@ -579,6 +579,24 @@
         .hb .hub-note { padding: 16px 0 8px; }
         .hb .hub-banner { padding: 2px 0 16px; }
 
+        /* 🔍 5Why 버튼 (스케줄러 옆 · 2026-09-29) */
+        .hb-top { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; margin-top: 10px; }
+        .hb-top .hb-sched { margin-top: 0; min-width: 0; }
+        .hb-why { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 5px 4px; border-radius: 14px; background: #fff; border: 1px solid #E2E8F0; box-shadow: 0 4px 10px -4px rgba(15,23,42,.12); text-decoration: none; transition: transform .1s; }
+        .hb-why:active { transform: scale(.97); }
+        .hb-why .ic { width: 26px; height: 26px; border-radius: 8px; background: var(--primary-color); display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgba(224,176,96,.3); }
+        .hb-why .ic svg { width: 15px; height: 15px; stroke: var(--gold); }
+        .hb-why .t { font-size: 0.78rem; font-weight: 900; color: #0F172A; white-space: nowrap; margin-top: 1px; line-height: 1.2; }
+        .hb-why .s { font-size: 0.62rem; font-weight: 700; color: #64748B; white-space: nowrap; line-height: 1.2; }
+        /* 맨 윗줄 2개 (스케줄러 · 불량 보고) — 일반 카드와 같은 모양 */
+        .hb-top2 { margin-top: 10px; }
+        .hb .hb-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        .hb .hb-card { min-width: 0; }
+        .hb .hb-card .tx { flex: 1; }
+        .hb-feat { text-decoration: none; border-color: rgba(224,176,96,.65); }
+        .hb-cal { display: flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+        .hb-cal .d { font-size: 15px; font-weight: 900; color: #fff; line-height: 1; }
+        .hb-cal .w { font-size: 9px; font-weight: 800; color: var(--gold); line-height: 1; }
         /* 📏 허브 압축 (2026-09-28) — 배너 2장까지 한 화면에 */
         .hb-sched { margin-top: 10px; padding: 8px 12px 8px 9px; gap: 10px; border-radius: 14px; }
         .hb-date { width: 42px; border-radius: 10px; }
@@ -742,14 +760,18 @@
           <div class="hub-wrap hb">
 
             <!-- 📅 업무 스케줄러 (버튼 2칸 크기) -->
-            <a class="hb-sched" href="work.html">
-                <div class="hb-date"><div class="m" id="hbMon">9월</div><div class="d" id="hbDay">28</div><div class="w" id="hbWd">월</div></div>
-                <div class="hb-sched-txt">
-                    <div class="t">업무 스케줄러<span class="cnt" id="hbCnt" style="display:none;"></span></div>
-                    <div class="s" id="hbDesc">일정 · 업무 기록 · 할 일</div>
-                </div>
-                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
-            </a>
+            <!-- 자주 쓰는 2개 (다른 카드와 같은 모양 · 2026-09-29) -->
+            <div class="hb-grid hb-top2">
+                <a class="hb-card hb-feat" href="work.html">
+                    <div class="ic hb-cal"><div class="d" id="hbDay">29</div><div class="w" id="hbWd">화</div></div>
+                    <div class="tx"><div class="t">업무 스케줄러</div><div class="s" id="hbDesc">일정 · 업무 기록</div></div>
+                    <span id="hbMon" hidden></span><span id="hbCnt" hidden></span>
+                </a>
+                <a class="hb-card hb-feat" href="why5.html">
+                    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path><path d="M12 11v4"></path><path d="M12 18h.01"></path></svg></div>
+                    <div class="tx"><div class="t">불량 보고</div><div class="s">빠른 보고 · 5Why</div></div>
+                </a>
+            </div>
 
             <div class="hb-sec">측정 · 판정</div>
             <div class="hb-grid">
@@ -3711,11 +3733,11 @@
                 const p = n => String(n).padStart(2, '0');
                 document.getElementById('hbMon').textContent = `${now.getMonth() + 1}월`;
                 document.getElementById('hbDay').textContent = now.getDate();
-                document.getElementById('hbWd').textContent = '일월화수목금토'[now.getDay()] + '요일';
+                document.getElementById('hbWd').textContent = '일월화수목금토'[now.getDay()];
                 const desc = document.getElementById('hbDesc');
                 const cnt = document.getElementById('hbCnt');
                 cnt.style.display = 'none';
-                desc.textContent = '일정 · 업무 기록 · 할 일';
+                desc.textContent = '일정 · 업무 기록';
                 const cache = JSON.parse(localStorage.getItem('ws_home_cache') || 'null');
                 if (!cache || !cache.days) return;
                 const today = `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`;
@@ -3724,11 +3746,10 @@
                 if (list.length) {
                     cnt.style.display = ''; cnt.textContent = `오늘 ${list.length}건`;
                     const next = list.find(x => x.t && (x.e || x.t) >= hm) || list.find(x => !x.t);
-                    desc.innerHTML = next ? `다음 <b>${next.t || '종일'}</b> ${escapeHtml(next.title)}` : '오늘 일정을 모두 마쳤어요';
+                    desc.innerHTML = next ? `오늘 ${list.length}건 · <b>${next.t || '종일'}</b> ${escapeHtml(next.title)}` : `오늘 ${list.length}건 · 완료`;
                 } else {
                     const today2 = cache.made === today;
-                    const extra = today2 && cache.streak ? ` · ✍️ 연속 ${cache.streak}일 기록` : (cache.todoOpen ? ` · 할 일 ${cache.todoOpen}개` : '');
-                    desc.textContent = '오늘 일정 없음' + extra;
+                    desc.textContent = today2 && cache.streak ? `🔥 연속 ${cache.streak}일 기록` : (cache.todoOpen ? `할 일 ${cache.todoOpen}개` : '오늘 일정 없음');
                 }
             } catch (e) {}
         }
