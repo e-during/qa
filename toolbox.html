@@ -291,6 +291,9 @@
         .pe-badge.warn { background: #FEF3C7; color: #92400E; }
         .pe-mapbox { background: #F1F5F9; border-radius: 10px; padding: 8px 10px; font-size: 0.72rem; color: #1E3A8A; font-family: monospace; }
 
+        .pe-fold { width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; padding: 0; font-size: 0.82rem; font-weight: 800; color: #1E293B; font-family: inherit; }
+        .pe-fold b { margin-left: 6px; color: #9a6b1f; font-weight: 900; }
+        .pe-fold span:last-child { font-size: 0.72rem; font-weight: 800; color: #64748B; background: #F1F5F9; border-radius: 8px; padding: 6px 10px; }
         .pe-step { display: grid; grid-template-columns: 52px 1fr 52px; gap: 6px; align-items: center; margin-bottom: 8px; }
         .pe-step button { height: 42px; border-radius: 10px; border: 1px solid #CBD5E1; background: #F8FAFC; font-size: 0.8rem; font-weight: 800; color: #334155; }
         .pe-step .pv { text-align: center; }
@@ -1196,12 +1199,14 @@
                 <!-- 프로브 회전 탭 -->
                 <div id="pe-panel-probe" class="pe-panel">
                     <div class="pe-card">
-                        <h2>회전 각도 (A°|B°)</h2>
+                        <button type="button" class="pe-fold" onclick="peToggleAngle()"><span>회전 각도 <b id="pe-fold-sum">A 0° · B 0°</b></span><span id="pe-fold-ic">펼치기 ▾</span></button>
+                        <div id="pe-angle-box" style="display:none; margin-top:12px;">
                         <div class="pe-step"><button onclick="peStepA(-1)">−7.5</button><div class="pv"><div class="k">A (틸트 0~105°)</div><div class="v" id="pe-a-val">0.0°</div></div><button onclick="peStepA(1)">+7.5</button></div>
                         <div class="pe-step"><button onclick="peStepB(-1)">−7.5</button><div class="pv"><div class="k">B (회전 −180~180°)</div><div class="v" id="pe-b-val">0.0°</div></div><button onclick="peStepB(1)">+7.5</button></div>
                         <div class="pe-note" style="margin:2px 0 8px;">프리셋을 누르거나, 위 ± 버튼으로 7.5° 단위 특정 각도를 맞추세요.</div>
                         <div class="pe-angle-grid" id="peAngleGrid"></div>
                         <div class="pe-note">왼쪽 <b>정면도</b>는 앞에서 본 모습(A 기울기), 오른쪽 <b>평면도</b>는 위에서 본 모습(B 방향)입니다. B=0° 전방 · B=90° 우측 기준입니다.</div>
+                        </div>
                     </div>
                     <div class="pe-card">
                         <h2>측정기 / 포트 선택</h2>
@@ -3112,8 +3117,15 @@
         function peSyncAB() {
             document.getElementById('pe-a-val').innerText = peCurrentAngleA.toFixed(1) + '°';
             document.getElementById('pe-b-val').innerText = peCurrentAngleB.toFixed(1) + '°';
+            const f = v => (+v.toFixed(1)) + '°';
+            document.getElementById('pe-fold-sum').innerText = `A ${f(peCurrentAngleA)} · B ${f(peCurrentAngleB)}`;
             peAnglePresets.forEach((p, i) => document.getElementById('pe-angle-' + i).classList.toggle('on', p.a === peCurrentAngleA && p.b === peCurrentAngleB));
             peDrawSimulation();
+        }
+        function peToggleAngle() {
+            const box = document.getElementById('pe-angle-box'), open = box.style.display === 'none';
+            box.style.display = open ? '' : 'none';
+            document.getElementById('pe-fold-ic').innerText = open ? '접기 ▴' : '펼치기 ▾';
         }
         function peStepA(d) { peCurrentAngleA = Math.max(0, Math.min(105, peCurrentAngleA + d * 7.5)); peSyncAB(); }
         function peStepB(d) { let b = peCurrentAngleB + d * 7.5; if (b > 180) b -= 360; if (b < -180) b += 360; if (b === -180) b = 180; peCurrentAngleB = b; peSyncAB(); }
