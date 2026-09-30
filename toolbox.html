@@ -1476,9 +1476,6 @@
 
                         <!-- 불량 -->
                         <div id="qm-fields-defect">
-                            <label class="qx-l">불량 유형<span class="qx-sub">여러 개 선택 가능</span></label>
-                            <div class="qx-types" id="qmTypeChips"></div>
-
                             <label class="qx-l">수량<span class="qx-opt">선택</span></label>
                             <div class="qx-qty">
                                 <label class="qx-qbox"><span>불량</span><input type="text" inputmode="numeric" id="qmNgQty" placeholder="0" autocomplete="off" oninput="qmUpdateRate()"></label>
@@ -1486,6 +1483,10 @@
                                 <label class="qx-qbox"><span>검사</span><input type="text" inputmode="numeric" id="qmTotalQty" placeholder="0" autocomplete="off" oninput="qmUpdateRate()"></label>
                                 <div class="qx-ratebox" id="qmRateHint"><small>불량률</small><b>–</b></div>
                             </div>
+
+                            <label class="qx-l">불량 유형<span class="qx-sub">여러 개 선택 가능</span></label>
+                            <div class="qx-types" id="qmTypeChips"></div>
+
 
                             <label class="qx-l" for="qmDefectContent">불량 내용<span class="qx-sub">위치 · 캐비티 · 로트</span></label>
                             <textarea class="qx-ta" id="qmDefectContent" rows="2" placeholder="예: 2번 캐비티 게이트 반대편 웰드라인"></textarea>

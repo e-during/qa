@@ -217,6 +217,22 @@
   .cw-opt-btn { min-height: 42px; background: #ebebeb; border: none; color: #333; padding: 0 16px; font-size: 13.5px; font-weight: 700; border-radius: 21px; }
   .cw-opt-btn:active { background: #dcdcdc; }
   .cw-opt-btn.primary { background: #111; color: #fff; }
+  /* ---- [2026-09-30] 한 화면 압축: 요약 상자 숨김(KPI와 중복) · KPI 3열 · 막대 낮춤 → 그래프까지 첫 화면 ---- */
+  .summary { display: none; }
+  .sync { margin-bottom: 8px; font-size: 10.5px; line-height: 1.5; }
+  .kpi-cap { display: flex; justify-content: space-between; align-items: baseline; margin: 0 2px 7px; }
+  .kpi-cap b { font-size: 13px; font-weight: 900; }
+  .kpi-cap span { display: none; }
+  .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
+  .kpi-card { padding: 9px 9px 8px; border-radius: 10px; min-width: 0; }
+  .kpi-title { font-size: 11px; margin-bottom: 4px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-val { margin-bottom: 2px; }
+  .kpi-val b { font-size: 21px; }
+  .kpi-val span { font-size: 11px; }
+  .kpi-card .bar { display: none; }
+  .kpi-sub { margin: 1px 0 0; font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .perf { padding: 11px 12px; margin-bottom: 12px; }
+  .perf-bars { height: 80px; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -295,6 +311,7 @@
   <div class="sync" id="syncInfo"></div>
 
 
+  <div class="kpi-cap"><b id="kpiCap"></b><span>누르면 아래 목록</span></div>
   <section class="summary">
     <div class="summary-head"><span id="sumHead">TODAY SUMMARY</span></div>
     <div class="summary-grid">
@@ -520,7 +537,7 @@
     const max = Math.max(1, ...qiMonths.map(x => x.n));
     document.getElementById('perfBars').innerHTML = qiMonths.map((x,i) =>
       `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 검사 ${x.n}건 · 불합격 ${x.ng}건">`
-      + `<div class="n">${(i===5||i===perfSel) ? x.n : ''}${x.ng ? `<i class="ngdot">●${x.ng}</i>` : ''}</div><div class="b" style="height:${Math.round(x.n/max*70)}px"></div></div>`).join('');
+      + `<div class="n">${(i===5||i===perfSel) ? x.n : ''}${x.ng ? `<i class="ngdot">●${x.ng}</i>` : ''}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
     const mon = document.getElementById('perfMon');
     if (mon) mon.innerHTML = qiMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
     const sel = qiMonths[perfSel];
@@ -557,9 +574,9 @@
     if (currentDept === 'precision'){
       g.innerHTML = [
         kpiCard('n', pcDoneWeek,'건','이번 주 완료',scaledBar(pcDoneWeek,10)),
-        kpiCard('n', pcDoneMonth,'건','이번 달 완료',scaledBar(pcDoneMonth,30), `지난달 ${pcDonePrev}건`),
-        kpiCard('n', pcDoneYear,'건',`${now.getFullYear()}년 누적 완료`,scaledBar(pcDoneYear,300)),
-        kpiCard('n', pcIncomplete.length,'건','진행 중',scaledBar(pcIncomplete.length,30), pcRegistered ? `가등록 ${pcRegistered}건 포함` : ''),
+        kpiCard('n', pcDoneMonth,'건','이번 달 완료',scaledBar(pcDoneMonth,30), `지난달 ${pcDonePrev}`),
+        kpiCard('n', pcDoneYear,'건','올해 누적',scaledBar(pcDoneYear,300), `${now.getFullYear()}년`),
+        kpiCard('n', pcIncomplete.length,'건','진행 중',scaledBar(pcIncomplete.length,30), pcRegistered ? `가등록 ${pcRegistered} 포함` : ''),
         kpiCard(pcLate.length ? 'accent' : 'n', pcLate.length,'건','예정일 지남',scaledBar(pcLate.length,10)),
         kpiCard(pcUrgent.length ? 'accent' : 'n', pcUrgent.length,'건','긴급',scaledBar(pcUrgent.length,10))
       ].join('');
@@ -567,11 +584,11 @@
       // [2026-09-30] 정밀측정과 같은 6칸 (실적 + 불합격)
       g.innerHTML = [
         kpiCard('n', qiWeekDone.length,'건','이번 주 완료',scaledBar(qiWeekDone.length,30)),
-        kpiCard('n', qiDoneMonth,'건','이번 달 완료',scaledBar(qiDoneMonth,120), `지난달 ${qiDonePrev}건`),
-        kpiCard('n', qiDoneYear,'건',`${now.getFullYear()}년 누적 완료`,scaledBar(qiDoneYear,1200)),
-        kpiCard(qiUrgent.length ? 'accent' : 'n', qiMonthPending.length,'건','미완료',scaledBar(qiMonthPending.length,30), qiUrgent.length ? `입고 5일 이상 <span class="down">${qiUrgent.length}건</span>` : '입고 5일 이상 지연 없음'),
-        kpiCard('n', qiMonthRate,'%','완료율',qiMonthRate, `완료 ${qiMonthDone.length} / 대상 ${qiMonthTarget.length}건`),
-        kpiCard(qiNgMonth ? 'accent' : 'n', qiNgMonth,'건','이번 달 불합격',scaledBar(qiNgMonth,10), qiNgRate === null ? '판정 데이터 없음' : `불합격률 ${qiNgRate}%`)
+        kpiCard('n', qiDoneMonth,'건','이번 달 완료',scaledBar(qiDoneMonth,120), `지난달 ${qiDonePrev}`),
+        kpiCard('n', qiDoneYear,'건','올해 누적',scaledBar(qiDoneYear,1200), `${now.getFullYear()}년`),
+        kpiCard(qiUrgent.length ? 'accent' : 'n', qiMonthPending.length,'건','미완료',scaledBar(qiMonthPending.length,30), qiUrgent.length ? `입고 5일↑ <span class="down">${qiUrgent.length}건</span>` : '5일↑ 지연 없음'),
+        kpiCard('n', qiMonthRate,'%','완료율',qiMonthRate, `${qiMonthDone.length} / ${qiMonthTarget.length}건`),
+        kpiCard(qiNgMonth ? 'accent' : 'n', qiNgMonth,'건','이번 달 불합격',scaledBar(qiNgMonth,10), qiNgRate === null ? '판정 없음' : `불합격률 ${qiNgRate}%`)
       ].join('');
     }
   }
@@ -586,7 +603,7 @@
     if (!mon0) { mon0 = document.createElement('div'); mon0.id = 'perfMon'; mon0.className = 'perf-mon'; document.getElementById('perfBars').after(mon0); }
     if (currentDept !== 'precision') { renderPerfInsp(); return; }
     const max = Math.max(1, ...pcMonths.map(x => x.n));
-    document.getElementById('perfBars').innerHTML = pcMonths.map((x,i) => `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 ${x.n}건"><div class="n">${i===5||i===perfSel ? x.n : ''}</div><div class="b" style="height:${Math.round(x.n/max*70)}px"></div></div>`).join('');
+    document.getElementById('perfBars').innerHTML = pcMonths.map((x,i) => `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 ${x.n}건"><div class="n">${i===5||i===perfSel ? x.n : ''}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
     let mon = document.getElementById('perfMon');
     if (!mon) { mon = document.createElement('div'); mon.id = 'perfMon'; mon.className = 'perf-mon'; document.getElementById('perfBars').after(mon); }
     mon.innerHTML = pcMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
@@ -627,6 +644,7 @@
     const set = (i,l,v) => { document.getElementById('sumLabel'+i).textContent = l; document.getElementById('sumVal'+i).textContent = v + '건'; };
     const pc = currentDept === 'precision';
     document.getElementById('sumHead').textContent = `${now.getMonth()+1}월 ${pc ? '측정' : '검사'} 실적`;
+    document.getElementById('kpiCap').textContent = `${now.getMonth()+1}월 ${pc ? '측정' : '검사'} 실적`;
     document.getElementById('sumBox3').classList.toggle('acc', !pc && qiUrgent.length > 0);
     if (pc){ set(1,'이번 달 완료',pcDoneMonth); set(2,'올해 누적',pcDoneYear); set(3,'진행 중',pcIncomplete.length); }
     else { set(1,'이번 달 완료',qiDoneMonth); set(2,'올해 누적',qiDoneYear); set(3,'미완료',qiMonthPending.length); }
