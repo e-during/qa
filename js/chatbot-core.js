@@ -25,7 +25,7 @@
  *  - 담당자 이름을 코드에서 삭제 → 암호화 데이터에서 자동 추출 (공개 저장소에 실명 노출 방지,
  *    인원 변동 시 코드 수정 불필요)
  *  - 🔍 품번 조회 (품번·품명 일부 → 정밀측정 이력 + 수입검사 결과) · 최근 조회 버튼
- *  - 📑 월간 요약 (지난달 마감 / 이번 달 누계 · 전월 대비 ▲▼ · 보고용 복사)
+ *  - 📑 월간 요약 — 팀별(정밀측정 / 수입검사 각 부서 메뉴 안) · 지난달 마감 / 이번 달 누계 · 전월 대비 ▲▼ · 보고용 복사
  *  - 🏢 측정 의뢰 비중 (의뢰부서별 / 고객사별)
  *  - 결과 말풍선 📋 복사 · 화면마다 🏠 처음으로 · 인사 반복 정리
  * ============================================================ */
@@ -650,6 +650,7 @@
       const namesForBubble = [...selected];
       appendBubble('user', namesForBubble.join(' / '));
       getOptionsWrap().innerHTML = '';
+      qcbTeam = teamOf(node.backNode);
       const resultHtml = ACTIONS[node.action]({ names: namesForBubble });
       botSay(resultHtml, defaultResultOptions(node.backNode));
     });
@@ -722,7 +723,7 @@
     }
 
     let html = `<b>⏱️ 납기 현황</b> (전체 QMS 데이터 기준)`;
-    html += `<ul class="${UI.statList}">`;
+    html += `<ul class="${UI.statList} kv">`;
     html += `<li>전체 의뢰 건수<span class="${UI.statSub}">${stats.total}건</span></li>`;
     html += `<li>완료 건수<span class="${UI.statSub}">${stats.completed}건</span></li>`;
     html += `<li>진행 중 건수<span class="${UI.statSub}">${stats.inProgress}건</span></li>`;
@@ -816,7 +817,7 @@
     }
 
     let html = `<b>⏱️ 처리 현황</b> (전체 수입검사 데이터 기준)`;
-    html += `<ul class="${UI.statList}">`;
+    html += `<ul class="${UI.statList} kv">`;
     html += `<li>전체 입고 건수<span class="${UI.statSub}">${stats.total}건</span></li>`;
     html += `<li>검사완료 건수<span class="${UI.statSub}">${stats.completed}건</span></li>`;
     html += `<li>검사대기(진행중) 건수<span class="${UI.statSub}">${stats.pending}건</span></li>`;
@@ -898,7 +899,7 @@
     }
 
     let html = `<b>🔴 불량/품질 현황</b> (판정 완료 기준)`;
-    html += `<ul class="${UI.statList}">`;
+    html += `<ul class="${UI.statList} kv">`;
     html += `<li>판정 완료 건수<span class="${UI.statSub}">${stats.total}건</span></li>`;
     html += `<li>불량(NG) 건수<span class="${UI.statSub}"><b class="accent">${stats.ngCount}건</b></span></li>`;
     html += `<li>불량률<span class="${UI.statSub}">${stats.ngRate === null ? '산출 불가' : stats.ngRate + '%'}</span></li>`;
@@ -1012,7 +1013,7 @@
       const mOver = mRows.filter(r => !r.completeDate && r.dueDate && r.dueDate < today).length;
       const iNg = iRows.filter(r => NG_PATTERN.test(r.judgement)).length;
       const parts = new Set([...mRows, ...iRows].map(r => r.partNo).filter(Boolean));
-      html += `<ul class="${UI.statList}">`;
+      html += `<ul class="${UI.statList} kv">`;
       html += `<li>🔧 정밀측정<span class="${UI.statSub}">${mRows.length}건 · 완료 ${mDone} · 진행 ${mRows.length - mDone}${mOver ? ` · <b class="accent">지연 ${mOver}</b>` : ''}</span></li>`;
       html += `<li>📋 수입검사<span class="${UI.statSub}">${iRows.length}건${iRows.length ? ` · 불합격 ${iNg ? `<b class="accent">${iNg}건</b>` : '0건'}` : ''}</span></li>`;
       if (parts.size > 1) html += `<li>일치 품번 ${parts.size}개<span class="${UI.statSub}">${[...parts].slice(0, 6).map(escapeHtml).join(' · ')}${parts.size > 6 ? ' …' : ''}</span></li>`;
@@ -1042,10 +1043,12 @@
     // ---- 📑 월간 요약 ----
     monthSummary(params){
       const { offset, partial } = params;
+      const dept = params.dept === 'i' ? 'i' : 'm';
       const cur = summaryRange(offset, partial), prev = summaryRange(offset + 1, partial);
       const mc = measureMetrics(cur), mp = measureMetrics(prev);
       const ic = inspectMetrics(cur), ip = inspectMetrics(prev);
-      const ttl = `${cur.label} ${partial ? `누계 (1~${Number(cur.end.slice(8))}일)` : '마감'}`;
+      const deptName = dept === 'm' ? '정밀측정' : '수입검사';
+      const ttl = `${deptName} ${cur.label} ${partial ? `누계 (1~${Number(cur.end.slice(8))}일)` : '마감'}`;
       const prevTxt = partial ? `전월 같은 기간 (${prev.start.slice(5)}~${prev.end.slice(5)})` : `전월 (${prev.label})`;
       const lines = [], rows = [];
       function row(section, name, val, dt){ rows.push({ section, name, val, dt }); }
@@ -1060,17 +1063,16 @@
       d = deltaTag(ic.avgProc, ip.avgProc, '일', false, 1); row('i', '평균 검사소요일', na(ic.avgProc === null ? null : ic.avgProc + '일'), d);
       if (ic.vendors.length) row('i', '불합격 다발 협력사', ic.vendors.map(([v, c]) => `${v} ${c}건`).join(', '), { html: '', text: '' });
       if (partial){
-        const due = computeDueOverview(), ins = computeInspectProcessOverview();
-        row('n', '정밀측정 진행 중', `${due.inProgress}건 (지연 ${due.overdue}건)`, { html: '', text: '' });
-        row('n', '수입검사 적체', `${ins.agingRows.length}건 (입고 후 ${INSPECT_AGING_THRESHOLD_DAYS}일 이상)`, { html: '', text: '' });
+        if (dept === 'm'){ const due = computeDueOverview(); row('n', '진행 중', `${due.inProgress}건 (지연 ${due.overdue}건)`, { html: '', text: '' }); }
+        else { const ins = computeInspectProcessOverview(); row('n', '적체', `${ins.agingRows.length}건 (입고 후 ${INSPECT_AGING_THRESHOLD_DAYS}일 이상)`, { html: '', text: '' }); }
       }
       const secName = { m: '🔧 정밀측정', i: '📋 수입검사', n: '📌 현재 시점' };
       let html = `<b>📑 ${escapeHtml(ttl)}</b><div class="${UI.statMore}">비교: ${escapeHtml(prevTxt)} · 팀 단위</div>`;
-      lines.push(`[품질경영팀 월간 요약] ${ttl}`, `※ 괄호 안은 ${prevTxt} 대비`);
-      ['m', 'i', 'n'].forEach(sec => {
+      lines.push(`[${deptName} 월간 요약] ${cur.label} ${partial ? `누계 (1~${Number(cur.end.slice(8))}일)` : '마감'}`, `※ 괄호 안은 ${prevTxt} 대비`);
+      [dept, 'n'].forEach(sec => {
         const rs = rows.filter(r => r.section === sec);
         if (!rs.length) return;
-        html += `<div class="${UI.statMore}"><b>${secName[sec]}</b></div><ul class="${UI.statList}">`;
+        html += `<div class="${UI.statMore}"><b>${secName[sec]}</b></div><ul class="${UI.statList} kv">`;
         html += rs.map(r => `<li>${escapeHtml(r.name)}<span class="${UI.statSub}"><b>${escapeHtml(String(r.val))}</b>${r.dt.html}</span></li>`).join('');
         html += `</ul>`;
         lines.push('', '■ ' + secName[sec].replace(/^\S+\s/, ''));
@@ -1097,7 +1099,7 @@
       const none = cnt['미지정'] || 0;
       if (none) top.push({ name: '미지정', count: none, muted: true });
       let html = `<b>🏢 ${keyName}별 측정 의뢰</b> (최근 3개월 · ${start.slice(0, 7)} ~ 오늘)`;
-      html += `<ul class="${UI.statList}"><li>전체 의뢰<span class="${UI.statSub}">${rows.length}건 · ${keyName} ${named.length}곳</span></li>`;
+      html += `<ul class="${UI.statList} kv"><li>전체 의뢰<span class="${UI.statSub}">${rows.length}건 · ${keyName} ${named.length}곳</span></li>`;
       if (named.length) html += `<li>가장 많은 ${keyName}<span class="${UI.statSub}"><b>${escapeHtml(named[0][0])}</b> ${named[0][1]}건 (${Math.round(named[0][1] / rows.length * 100)}%)</span></li>`;
       html += `</ul>`;
       html += buildHBarChart(top, rows.length);
@@ -1136,7 +1138,7 @@
       const chartHtml = buildBarChart(allCounts, name);
 
       let html = `<b>${escapeHtml(name)}</b>님의 <b>${escapeHtml(period.label)}</b> 실적입니다.`;
-      html += `<ul class="${UI.statList}">`;
+      html += `<ul class="${UI.statList} kv">`;
       html += `<li>측정 완료 건수<span class="${UI.statSub}">${count}건</span></li>`;
       html += `<li>측정 수량<span class="${UI.statSub}">${hasAnyQty ? qtySum + '개 (수량 확인된 ' + qtyCountedRows + '건 기준)' : '데이터 없음'}</span></li>`;
       html += `<li>평균 처리기간<span class="${UI.statSub}">${avgProc === null ? '산출 불가' : avgProc + '일'}</span></li>`;
@@ -1228,7 +1230,7 @@
       const chartHtml = buildBarChart(allCounts, name);
 
       let html = `<b>${escapeHtml(name)}</b>님의 <b>${escapeHtml(period.label)}</b> 검사 실적입니다.`;
-      html += `<ul class="${UI.statList}">`;
+      html += `<ul class="${UI.statList} kv">`;
       html += `<li>검사 완료 건수<span class="${UI.statSub}">${count}건</span></li>`;
       html += `<li>평균 처리기간<span class="${UI.statSub}">${avgProc === null ? '산출 불가' : avgProc + '일'}</span></li>`;
       html += `<li>불량(NG) 비율<span class="${UI.statSub}">${ngRate === null ? '산출 불가' : ngRate + '% (' + ngCount + '건)'}</span></li>`;
@@ -1304,14 +1306,27 @@
   //  ※ 새 시나리오를 추가하려면 start.options에 항목을 추가하고,
   //     아래에 해당 노드(들)를 정의하면 됩니다.
   // ============================================================
+  function summaryNode(dept){
+    const last = monthInfo(1), cur = monthInfo(0), d = now.getDate();
+    const back = dept === 'm' ? 'summary_start' : 'i_summary_start';
+    const name = dept === 'm' ? '🔧 정밀측정' : '📋 수입검사';
+    return {
+      bot: `<b>${name} 월간 요약</b> — 팀 단위 수치 · 전월 대비 ▲▼`,
+      options: [
+        { label: `📑 ${last.label.replace(/^\d{4}년\s*/, '')} 마감`, action: 'monthSummary', params: { dept, offset: 1, partial: false }, backNode: back, star: d <= 10 },
+        { label: `📑 ${cur.label.replace(/^\d{4}년\s*/, '')} 누계 (1~${d}일)`, action: 'monthSummary', params: { dept, offset: 0, partial: true }, backNode: back, star: d > 10 },
+        { label: '🏠 처음으로', next: dept === 'm' ? 'measure_start' : 'inspect_start', primary: true }
+      ]
+    };
+  }
+
   const SCENARIO_TREE = {
     // ---- 최상위: 부서 선택 ----
     start: {
       bot: '안녕하세요! 품질경영팀 업무 챗봇입니다. 무엇을 도와드릴까요?',
       options: [
         { label: '🏠 오늘 한눈에 보기', next: 'today_overview', wide: true },
-        { label: '🔍 품번 조회', next: 'part_search', half: true },
-        { label: '📑 월간 요약', next: 'summary_start', half: true },
+        { label: '🔍 품번 조회', next: 'part_search', wide: true },
         { label: '🔧 정밀측정부', next: 'measure_start', half: true },
         { label: '📋 수입검사부', next: 'inspect_start', half: true }
       ]
@@ -1323,20 +1338,9 @@
       search: true
     },
 
-    // ---- 📑 월간 요약 ----
-    summary_start(){
-      const last = monthInfo(1), cur = monthInfo(0);
-      const d = now.getDate();
-      return {
-        bot: '<b>📑 월간 요약</b> — 팀 단위 수치만 보여드립니다. (전월 대비 ▲▼)',
-        options: [
-          { label: `📑 ${last.label.replace(/^\d{4}년\s*/, '')} 마감 요약`, action: 'monthSummary', params: { offset: 1, partial: false }, backNode: 'summary_start', star: d <= 10 },
-          { label: `📑 ${cur.label.replace(/^\d{4}년\s*/, '')} 누계 (1~${d}일)`, action: 'monthSummary', params: { offset: 0, partial: true }, backNode: 'summary_start', star: d > 10 },
-          { label: '🏢 측정 의뢰 비중', next: 'share_select' },
-          { label: '🏠 처음으로', next: 'start', primary: true }
-        ]
-      };
-    },
+    // ---- 📑 월간 요약 (팀별 · 정밀측정 / 수입검사 따로) ----
+    summary_start(){ return summaryNode('m'); },
+    i_summary_start(){ return summaryNode('i'); },
 
     // ---- 🏢 측정 의뢰 비중 ----
     share_select: {
@@ -1344,7 +1348,7 @@
       options: [
         { label: '🏢 의뢰부서별', action: 'requestShare', params: { key: 'dept' }, backNode: 'share_select', half: true },
         { label: '🚗 고객사별', action: 'requestShare', params: { key: 'customer' }, backNode: 'share_select', half: true },
-        { label: '🏠 처음으로', next: 'start', primary: true, wide: true }
+        { label: '🏠 정밀측정부 처음', next: 'measure_start', primary: true, wide: true }
       ]
     },
 
@@ -1358,7 +1362,7 @@
       const iMonth = periodRowsIn(qiAll, monthInfo(0)).length;
 
       let html = `<b>🏠 오늘 한눈에 보기</b> (${today} 기준)`;
-      html += `<ul class="${UI.statList}">`;
+      html += `<ul class="${UI.statList} kv">`;
       html += `<li>🔧 정밀측정부 오늘 완료<span class="${UI.statSub}">${mToday}건 · 이번 주 ${mWeek}건 · 이번 달 ${mMonth}건</span></li>`;
       html += `<li>📋 수입검사부 오늘 완료<span class="${UI.statSub}">${iToday}건 · 이번 주 ${iWeek}건 · 이번 달 ${iMonth}건</span></li>`;
       html += `</ul>`;
@@ -1382,6 +1386,7 @@
         { label: '📊 인원별 실적 조회', next: 'stat_period' },
         { label: '📈 담당자 3개월 추이', next: 'trend_person' },
         { label: '⏱️ 납기 현황', next: 'due_status' },
+        { label: '📑 월간 요약', next: 'summary_start' },
         { label: '🏢 측정 의뢰 비중', next: 'share_select' },
         { label: '🏠 처음으로', next: 'start', primary: true }
       ]
@@ -1472,6 +1477,7 @@
         { label: '📈 담당자 3개월 추이', next: 'i_trend_person' },
         { label: '⏱️ 처리 현황', next: 'i_process_status' },
         { label: '🔴 불량/품질 현황', next: 'i_quality_status' },
+        { label: '📑 월간 요약', next: 'i_summary_start' },
         { label: '🏠 처음으로', next: 'start', primary: true }
       ]
     },
@@ -1567,7 +1573,8 @@
   function homeNodeFor(backNode){
     // "i_"로 시작하는 노드(수입검사부 시나리오)에서 왔으면 수입검사부 홈으로,
     // 그 외(정밀측정부 시나리오)는 정밀측정부 홈으로 돌아갑니다.
-    if (backNode === 'summary_start' || backNode === 'share_select') return 'start';
+    if (backNode === 'summary_start' || backNode === 'share_select') return 'measure_start';
+    if (backNode === 'i_summary_start') return 'inspect_start';
     return (typeof backNode === 'string' && backNode.indexOf('i_') === 0) ? 'inspect_start' : 'measure_start';
   }
 
@@ -1596,6 +1603,15 @@
     const bubble = document.createElement('div');
     bubble.className = UI.bubble + ' ' + sender;
     bubble.innerHTML = html;
+    // [2026-09-30] 목록·수치·그래프가 있는 답변은 폭 100% 카드로
+    if (sender === 'bot' && /<ul|<table|<svg|qcb-copytext/.test(html)){
+      row.classList.add('qcb-wide');
+      bubble.classList.add('qcb-card', 'team-' + qcbTeam);
+      bubble.querySelectorAll('ul.kv > li').forEach(li => {
+        const sub = li.querySelector('.' + UI.statSub);
+        if (sub && sub.textContent.trim().length > 22) li.classList.add('full');
+      });
+    }
     row.appendChild(bubble);
     chatBody.appendChild(row);
     scrollToBottom();
@@ -1629,6 +1645,9 @@
       btn.addEventListener('click', () => selectOption(opt));
       optionsWrap.appendChild(btn);
     });
+    // 2열 배치에서 보조 버튼 수가 홀수면 마지막 버튼을 가로 전체로 (한쪽만 비는 것 방지)
+    const normal = [...optionsWrap.querySelectorAll('button:not(.primary):not(.opt-wide)')];
+    if (normal.length % 2 === 1) normal[normal.length - 1].classList.add('opt-wide');
   }
 
   // [2026-09-30] 결과 말풍선에 📋 복사 버튼 (목록·표가 있는 말풍선만)
@@ -1661,17 +1680,49 @@
   function injectQcbStyles(){
     if (qcbStylesDone) return; qcbStylesDone = true;
     const st = document.createElement('style');
+    const B = '#' + UI.bodyElId, O = '#' + UI.optionsElId, SL = '.' + UI.statList, SS = '.' + UI.statSub, SM = '.' + UI.statMore;
     st.textContent = `
+      /* ---- [2026-09-30] 챗봇 디자인 개편: 카드 · 2열 수치 · 한 줄 목록 · 2열 버튼 ---- */
+      ${B} .qcb-wide{justify-content:stretch}
+      ${B} .qcb-card{position:relative;max-width:100%!important;width:100%;background:#fff!important;color:#111;border:1px solid #e4e4e4;border-left:4px solid #111;border-radius:12px!important;padding:12px 14px 12px 13px!important;box-shadow:0 3px 10px -6px rgba(0,0,0,.18)}
+      ${B} .qcb-card.team-m{border-left-color:#6b4fd6}
+      ${B} .qcb-card.team-i{border-left-color:#0091a8}
+      ${B} .qcb-card > b:first-child{display:block;padding-right:62px;font-size:1.02em;line-height:1.4}
+      ${B} .qcb-card ${SM}{margin-top:8px}
+      ${B} .qcb-card ${SL}{gap:0!important;margin-top:8px}
+      ${B} .qcb-card ${SL} > li{background:none!important;border:none!important;border-bottom:1px solid #efefef!important;border-radius:0!important;padding:6px 2px!important;font-size:.92em;line-height:1.35}
+      ${B} .qcb-card ${SL} > li:last-child{border-bottom:none!important}
+      ${B} .qcb-card ${SL} > li ${SS}{margin-top:1px}
+      ${B} .qcb-card ${SL}.kv{display:grid!important;grid-template-columns:1fr 1fr;gap:6px!important}
+      ${B} .qcb-card ${SL}.kv > li{background:#f6f6f7!important;border:none!important;border-radius:9px!important;padding:8px 10px!important;font-size:.82em;color:#666;font-weight:800}
+      ${B} .qcb-card ${SL}.kv > li.full{grid-column:1/-1}
+      ${B} .qcb-card ${SL}.kv > li ${SS}{display:block;margin-top:2px;font-size:1.3em;font-weight:900;color:#111;line-height:1.3}
+      ${B} .qcb-card ${SL}.kv > li.full ${SS}{font-size:1.1em}
+      ${B} .qcb-card.team-m ${SL}.kv > li{background:#f4f1fd!important}
+      ${B} .qcb-card.team-i ${SL}.kv > li{background:#eef8fa!important}
+      ${B} .qcb-card .${UI.rankList} li{background:none!important;border:none!important;border-bottom:1px solid #efefef!important;border-radius:0!important;padding:7px 2px!important}
+      ${B} .qcb-card .${UI.chartBox}{border:none!important;background:#fafafa!important;border-radius:10px!important}
+      ${B} .qcb-card .qc-trend-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.9em}
+      ${B} .qcb-card .qc-trend-table th,${B} .qcb-card .qc-trend-table td{padding:6px 4px;border-bottom:1px solid #eee;text-align:center}
+      ${B} .qcb-card .qc-trend-table th{color:#777;font-weight:800}
       .qcb-copy-row{display:flex;justify-content:flex-end;margin-top:8px}
-      .qcb-copy{height:30px;padding:0 12px;border-radius:15px;border:1px solid #d0d0d0;background:#fff;color:#333;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer}
+      ${B} .qcb-card .qcb-copy-row{position:absolute;top:9px;right:10px;margin:0}
+      .qcb-copy{height:28px;padding:0 11px;border-radius:14px;border:1px solid #d6d6d6;background:#fff;color:#333;font-size:11.5px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap}
       .qcb-copy:active{background:#eee}
       .qcb-copying .qcb-copy-row,.qcb-copying .${UI.chartBox}{display:none!important}
       .qcb-hint{margin-top:4px;font-size:12px;color:#777;font-weight:600}
-      .qcb-search{display:flex;gap:6px;width:100%;flex-basis:100%}
+      /* 아래 버튼: 2열 같은 폭 · 처음으로는 끝에 작은 보조 버튼 */
+      ${O}{display:grid!important;grid-template-columns:1fr 1fr;gap:7px!important;align-content:start}
+      ${O} > button{width:100%;margin:0!important;min-height:40px;padding:6px 10px!important;text-align:center;line-height:1.25;word-break:keep-all}
+      ${O} > button.opt-wide{grid-column:1/-1}
+      ${O} > button.primary{grid-column:1/-1;min-height:34px;background:#fff!important;color:#333!important;border:1px solid #d4d4d4!important;font-size:.92em}
+      ${O} > button.primary:hover{background:#f3f3f3!important}
+      ${O} > .qcb-search,${O} > .qcb-recent,${O} > .qc-multiselect-wrap{grid-column:1/-1}
+      .qcb-search{display:flex;gap:6px;width:100%}
       .qcb-search input{flex:1;min-width:0;height:42px;border:1.5px solid #cfcfcf;border-radius:21px;padding:0 16px;font-size:15px;font-weight:700;font-family:inherit;background:#fff;color:#111;outline:none}
       .qcb-search input:focus{border-color:#111}
-      .qcb-search button{flex:none}
-      .qcb-recent{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;flex-basis:100%}
+      .qcb-search button{flex:none;width:auto!important;min-height:42px}
+      .qcb-recent{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%}
       .qcb-recent small{font-size:11.5px;color:#888;font-weight:700;margin-right:2px}
       .qcb-recent .qcb-chip{height:30px;padding:0 12px;border-radius:15px;border:1px solid #d8d8d8;background:#f7f7f7;color:#333;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
     `;
@@ -1729,6 +1780,7 @@
     pushPartRecent(q);
     appendBubble('user', '🔍 ' + escapeHtml(q));
     getOptionsWrap().innerHTML = '';
+    qcbTeam = 'n';
     botSay(ACTIONS.partLookup({ q }), [
       { label: '🔍 다른 품번 조회', next: 'part_search' },
       { label: '🏠 처음으로', next: 'start', primary: true }
@@ -1756,7 +1808,16 @@
     return (typeof node === 'function') ? node() : node;
   }
 
+  // [2026-09-30] 답변 카드 왼쪽 색 띠: 정밀측정=보라, 수입검사=청록, 공통=검정
+  let qcbTeam = 'n';
+  function teamOf(id){
+    if (typeof id !== 'string') return 'n';
+    if (id.indexOf('i_') === 0 || id === 'inspect_start') return 'i';
+    if (/^(measure_start|stat_|trend_person|due_|summary_start|share_select)/.test(id)) return 'm';
+    return 'n';
+  }
   function goTo(nodeId){
+    qcbTeam = teamOf(nodeId);
     const node = resolveNode(nodeId);
     if (!node) return;
     getOptionsWrap().innerHTML = '';
@@ -1788,6 +1849,7 @@
     }
 
     if (opt.action){
+      qcbTeam = (opt.params && opt.params.dept) ? (opt.params.dept === 'i' ? 'i' : 'm') : teamOf(opt.backNode);
       const resultHtml = ACTIONS[opt.action](opt.params);
       botSay(resultHtml, defaultResultOptions(opt.backNode));
     } else if (opt.next){
