@@ -778,6 +778,114 @@
         .cm-add { padding: 11px; }
         .cm-hero { padding: 14px 12px; }
         .cm-hero .v { font-size: 1.5rem; }
+        /* 📝 품질 기록 시인성 개편 (2026-09-30, .qx- 접두사) */
+        #memo-view { --qx-def: #DC2626; --qx-cmm: #2563EB; --qx-etc: #64748B; --qx-ink: #0F172A; --qx-sub: #475569; --qx-line: #CBD5E1; }
+        .qx-tabs { flex-shrink: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0; padding: 8px 12px; background: #fff; border-bottom: 1px solid #E2E8F0; }
+        .qx-tabs button { display: flex; align-items: center; justify-content: center; gap: 7px; height: 44px; border: none; border-radius: 12px; background: #F1F5F9; color: #475569; font-size: 0.98rem; font-weight: 900; font-family: inherit; }
+        .qx-tabs button svg { width: 18px; height: 18px; }
+        .qx-tabs button.on { background: var(--primary-color); color: var(--gold); box-shadow: 0 3px 8px -3px rgba(11,22,54,.5); }
+        .qx-cnt { min-width: 22px; padding: 1px 7px; border-radius: 999px; background: #E2E8F0; color: #0F172A; font-size: 0.74rem; font-weight: 900; }
+        .qx-cnt:empty { display: none; }
+        .qx-tabs button.on .qx-cnt { background: var(--gold); color: #1a1206; }
+        #memo-view .qx-scroll { padding: 12px 12px 24px; }
+        #memo-view.qx-listmode .qx-scroll { padding-bottom: calc(84px + env(safe-area-inset-bottom,0px)); }
+
+        .qx-editbar { display: none; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 10px 12px; border-radius: 12px; background: #FEF3C7; border: 1.5px solid var(--gold); color: #78350F; font-size: 0.9rem; font-weight: 900; }
+        .qx-editbar button { border: none; background: #fff; color: #78350F; font-weight: 900; font-size: 0.82rem; padding: 6px 12px; border-radius: 8px; font-family: inherit; }
+        #memo-view.qx-editing .qx-editbar { display: flex; }
+
+        .qx-cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+        .qx-cats button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 9px; border-radius: 14px; border: 1.5px solid #E2E8F0; background: #fff; color: #64748B; font-size: 0.9rem; font-weight: 900; font-family: inherit; }
+        .qx-cats button svg { width: 22px; height: 22px; }
+        .qx-cats button.c-defect svg { color: var(--qx-def); }
+        .qx-cats button.c-cmm svg { color: var(--qx-cmm); }
+        .qx-cats button.c-etc svg { color: var(--qx-etc); }
+        .qx-cats button.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); box-shadow: 0 4px 10px -4px rgba(11,22,54,.55); }
+        .qx-cats button.on svg { color: var(--gold); }
+
+        .qx-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; box-shadow: 0 2px 8px -4px rgba(15,23,42,.1); }
+        #memo-view.qx-editing .qx-card { border: 2px solid var(--gold); }
+        .qx-l { display: flex; align-items: center; gap: 6px; margin: 14px 0 6px; font-size: 0.9rem; font-weight: 900; color: var(--qx-ink); }
+        .qx-card > .qx-l:first-child { margin-top: 0; }
+        #qm-fields-defect > .qx-l:first-child, #qm-fields-cmm > .qx-l:first-child, #qm-fields-etc > .qx-l:first-child { margin-top: 14px; }
+        .qx-opt { font-size: 0.68rem; font-weight: 800; color: #64748B; background: #F1F5F9; border: 1px solid #E2E8F0; padding: 1px 7px; border-radius: 6px; }
+        .qx-sub { font-size: 0.74rem; font-weight: 700; color: #64748B; }
+        .qx-in, .qx-ta { width: 100%; border: 1.5px solid var(--qx-line); border-radius: 12px; background: #fff; color: var(--qx-ink); font-size: 1rem; font-weight: 700; font-family: inherit; }
+        .qx-in { height: 48px; padding: 0 14px; }
+        .qx-ta { padding: 11px 13px; line-height: 1.5; resize: vertical; font-weight: 600; display: block; }
+        .qx-in::placeholder, .qx-ta::placeholder, .qx-qbox input::placeholder, .qx-search input::placeholder { color: #8391A7; font-weight: 600; opacity: 1; }
+        .qx-in:focus, .qx-ta:focus, .qx-search input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
+
+        .qx-types { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; }
+        .qx-type { min-height: 44px; padding: 4px 2px; border-radius: 10px; border: 1.5px solid #D5DCE6; background: #fff; color: #1E293B; font-size: 0.8rem; font-weight: 800; line-height: 1.2; font-family: inherit; word-break: keep-all; }
+        .qx-type.on { background: var(--qx-def); border-color: var(--qx-def); color: #fff; box-shadow: 0 3px 8px -3px rgba(220,38,38,.6); }
+
+        .qx-qty { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) 92px; align-items: center; gap: 6px; }
+        .qx-qbox { display: flex; align-items: center; height: 48px; border: 1.5px solid var(--qx-line); border-radius: 12px; padding: 0 10px; background: #fff; gap: 6px; }
+        .qx-qbox:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
+        .qx-qbox span { flex: none; font-size: 0.78rem; font-weight: 900; color: #64748B; }
+        .qx-qbox input { flex: 1; min-width: 0; width: 100%; border: none; outline: none; background: transparent; text-align: right; font-size: 1.15rem; font-weight: 900; color: var(--qx-ink); font-variant-numeric: tabular-nums; font-family: inherit; }
+        .qx-slash { color: #94A3B8; font-weight: 900; }
+        .qx-ratebox { height: 48px; border-radius: 12px; background: #F1F5F9; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+        .qx-ratebox small { font-size: 0.66rem; font-weight: 800; color: #64748B; }
+        .qx-ratebox b { font-size: 1rem; font-weight: 900; color: #94A3B8; font-variant-numeric: tabular-nums; }
+        .qx-ratebox.on { background: #FEF2F2; box-shadow: inset 0 0 0 1.5px #FECACA; }
+        .qx-ratebox.on b { color: var(--qx-def); }
+        .qx-ratebox.warn { background: #FFFBEB; box-shadow: inset 0 0 0 1.5px #FDE68A; }
+        .qx-ratebox.warn b { color: #B45309; font-size: 0.74rem; }
+
+        .qx-del { display: none; width: 100%; margin-top: 10px; padding: 11px; border-radius: 12px; border: 1px solid #FECACA; background: #fff; color: #DC2626; font-weight: 900; font-size: 0.88rem; font-family: inherit; }
+        #memo-view.qx-editing .qx-del { display: block; }
+        .qx-dimlink { display: block; width: 100%; margin-top: 12px; padding: 6px; border: none; background: none; color: #64748B; font-size: 0.8rem; font-weight: 700; font-family: inherit; }
+        .qx-dimlink b { color: var(--primary-color); }
+
+        .qx-savebar { flex-shrink: 0; display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom,0px)); background: #fff; border-top: 1px solid #E2E8F0; box-shadow: 0 -6px 16px -10px rgba(15,23,42,.35); }
+        #memo-view.qx-listmode .qx-savebar { display: none; }
+        .qx-save { flex: 1; height: 54px; border: none; border-radius: 14px; background: linear-gradient(135deg, #FF7A2F, #FF5A0A); color: #fff; font-size: 1.12rem; font-weight: 900; font-family: inherit; box-shadow: 0 6px 14px -6px rgba(255,90,10,.7); }
+        .qx-save:active, .qx-cats button:active, .qx-type:active, .qx-tabs button:active { transform: scale(.97); }
+        .qx-cancel { display: none; flex: none; width: 88px; height: 54px; border: none; border-radius: 14px; background: #E2E8F0; color: #334155; font-size: 0.95rem; font-weight: 900; font-family: inherit; }
+        #memo-view.qx-editing .qx-cancel { display: block; }
+
+        .qx-search input { width: 100%; height: 46px; padding: 0 14px 0 40px; border: 1.5px solid var(--qx-line); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--qx-ink); font-family: inherit; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.5' y2='16.5'/%3E%3C/svg%3E") no-repeat 13px center / 18px; }
+        .qx-filters { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; margin: 8px 0 4px; }
+        .qx-filters button { display: flex; align-items: center; justify-content: center; gap: 5px; height: 38px; border-radius: 10px; border: 1.5px solid #E2E8F0; background: #fff; color: #334155; font-size: 0.84rem; font-weight: 900; font-family: inherit; white-space: nowrap; }
+        .qx-filters button i { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+        .qx-filters button em { font-style: normal; font-size: 0.74rem; color: #64748B; }
+        .qx-filters button.on { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+        .qx-filters button.on em { color: var(--gold); }
+
+        .qx-day { display: flex; align-items: center; gap: 8px; margin: 16px 2px 8px; font-size: 0.82rem; font-weight: 900; color: var(--qx-ink); }
+        .qx-day small { font-size: 0.72rem; font-weight: 700; color: #64748B; }
+        .qx-day::after { content: ''; flex: 1; height: 1px; background: #D5DCE6; }
+        .qx-item { position: relative; background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 12px 12px 10px 16px; margin-bottom: 8px; box-shadow: 0 2px 6px -4px rgba(15,23,42,.15); overflow: hidden; }
+        .qx-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--qx-etc); }
+        .qx-item.c-defect::before { background: var(--qx-def); }
+        .qx-item.c-cmm::before { background: var(--qx-cmm); }
+        .qx-item.flash { animation: qxFlash 1.6s ease-out; }
+        @keyframes qxFlash { 0%, 40% { box-shadow: 0 0 0 3px var(--gold); } 100% { box-shadow: 0 2px 6px -4px rgba(15,23,42,.15); } }
+        .qx-row1 { display: flex; align-items: flex-start; gap: 8px; }
+        .qx-part { flex: 1; min-width: 0; font-size: 1.02rem; font-weight: 900; color: var(--qx-ink); line-height: 1.3; word-break: break-all; }
+        .qx-part.none { color: #64748B; font-weight: 800; font-size: 0.92rem; }
+        .qx-rateb { flex: none; font-size: 0.8rem; font-weight: 900; color: #fff; background: var(--qx-def); padding: 3px 9px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+        .qx-meta { margin-top: 3px; font-size: 0.74rem; font-weight: 700; color: #64748B; }
+        .qx-meta .k { font-weight: 900; }
+        .qx-item.c-defect .qx-meta .k { color: var(--qx-def); }
+        .qx-item.c-cmm .qx-meta .k { color: var(--qx-cmm); }
+        .qx-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+        .qx-tags span { font-size: 0.76rem; font-weight: 900; color: #991B1B; background: #FEE2E2; padding: 3px 9px; border-radius: 999px; }
+        .qx-body { margin-top: 8px; font-size: 0.92rem; font-weight: 600; color: #1E293B; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+        .qx-line { margin-top: 6px; display: flex; gap: 6px; font-size: 0.88rem; line-height: 1.45; color: #1E293B; font-weight: 600; }
+        .qx-line .lb { flex: none; font-size: 0.7rem; font-weight: 900; color: #475569; background: #F1F5F9; border-radius: 6px; padding: 2px 6px; margin-top: 1px; height: fit-content; }
+        .qx-line .tx { white-space: pre-wrap; word-break: break-word; min-width: 0; }
+        .qx-qtyline { margin-top: 6px; font-size: 0.8rem; font-weight: 800; color: #475569; font-variant-numeric: tabular-nums; }
+        .qx-acts { display: flex; justify-content: flex-end; gap: 6px; margin-top: 10px; }
+        .qx-acts button { height: 34px; padding: 0 14px; border-radius: 9px; border: 1px solid #D5DCE6; background: #F8FAFC; color: #1E293B; font-size: 0.82rem; font-weight: 900; font-family: inherit; }
+        .qx-acts button.pri { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
+        .qx-empty { text-align: center; padding: 40px 10px; color: #64748B; font-size: 0.9rem; font-weight: 800; }
+        .qx-empty button { margin-top: 12px; height: 42px; padding: 0 18px; border: none; border-radius: 12px; background: var(--primary-color); color: var(--gold); font-weight: 900; font-family: inherit; }
+        .qx-foot { margin-top: 14px; text-align: center; }
+        .qx-foot button { width: 100%; height: 46px; border-radius: 12px; border: 1.5px solid var(--gold); background: #FBF3E4; color: #5B3F0E; font-size: 0.9rem; font-weight: 900; font-family: inherit; }
+        .qx-foot p { margin: 8px 0 0; font-size: 0.72rem; font-weight: 700; color: #64748B; }
     </style>
 </head>
 <body>
@@ -1338,86 +1446,92 @@
             </div>
         </div>
 
-        <!-- 📝 품질 기록 (2026-09 개편: 사출 불량 버튼 · 수량/불량률 · 수정 · 공유 · 엑셀 내보내기) -->
+        <!-- 📝 품질 기록 (2026-09-30 시인성 개편: 쓰기/기록 탭 · 날짜별 목록 · 하단 고정 저장) -->
         <div id="memo-view" class="view">
             <div class="sub-header">
                 <button class="back-btn" onclick="switchView('home-view')">〈 허브로 가기</button>
             </div>
-            <div class="qm-scroll">
+            <div class="qx-tabs">
+                <button type="button" id="qx-tab-write" class="on" onclick="qmSetTab('write')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>쓰기</button>
+                <button type="button" id="qx-tab-list" onclick="qmSetTab('list')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>기록<span class="qx-cnt" id="qmTabCount"></span></button>
+            </div>
+            <div class="qm-scroll qx-scroll">
             <div class="qm-wrap">
-                <div class="tb-guide">종류를 고르고 → 칸을 채운 뒤 → <b>💾 저장</b>. 저장한 기록은 아래 목록에서 <b>수정 · 카톡 공유 · 엑셀 내보내기</b>를 할 수 있습니다.</div>
+                <div id="qmOldQuickNotice" class="tb-warn" style="margin:0 0 10px; display:none;"></div>
 
-                <div id="qmOldQuickNotice" class="tb-warn" style="margin:0 0 12px;"></div>
-
-                <!-- 새 기록 쓰기 -->
-                <div class="tb-card" id="qmFormCard">
-                    <div class="tb-step"><span class="n">✎</span><span id="qmFormTitle">새 기록 쓰기</span></div>
-
-                    <div class="qm-seg3">
-                        <button type="button" id="qm-cat-defect" class="on" onclick="qmSetCategory('defect')">🔴<br>불량</button>
-                        <button type="button" id="qm-cat-cmm" onclick="qmSetCategory('cmm')">📐<br>3차원측정</button>
-                        <button type="button" id="qm-cat-etc" onclick="qmSetCategory('etc')">📝<br>기타</button>
+                <!-- ✎ 쓰기 -->
+                <section id="qm-pane-write">
+                    <div class="qx-editbar" id="qmEditBar">✏️ 기록 수정 중<button type="button" onclick="qmCancelEdit()">취소</button></div>
+                    <div class="qx-cats">
+                        <button type="button" id="qm-cat-defect" class="on c-defect" onclick="qmSetCategory('defect')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>불량</span></button>
+                        <button type="button" id="qm-cat-cmm" class="c-cmm" onclick="qmSetCategory('cmm')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/><line x1="12" y1="1.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22.5" y2="12"/></svg><span>3차원측정</span></button>
+                        <button type="button" id="qm-cat-etc" class="c-etc" onclick="qmSetCategory('etc')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg><span>기타</span></button>
                     </div>
-                    <button type="button" class="qm-goto-dim" onclick="switchView('dimension-view')">🧮 치수 측정값 합격/불합격은 → <b>치수 판정</b>에서</button>
 
-                    <label class="tb-label">품번 / 도면번호 <span class="opt">— 선택</span></label>
-                    <input class="tb-input cm-sm" type="text" id="qmPartName" placeholder="예: XX-1234 브라켓" autocomplete="off" style="margin-bottom:14px;">
+                    <div class="qx-card" id="qmFormCard">
+                        <label class="qx-l" for="qmPartName">품번 / 도면번호<span class="qx-opt">선택</span></label>
+                        <input class="qx-in" type="text" id="qmPartName" placeholder="예: XX-1234 브라켓" autocomplete="off">
 
-                    <!-- 🔴 불량 -->
-                    <div id="qm-fields-defect">
-                        <label class="tb-label">불량 유형 <span class="opt">— 해당하는 것 모두 누르세요</span></label>
-                        <div class="qm-types" id="qmTypeChips"></div>
+                        <!-- 불량 -->
+                        <div id="qm-fields-defect">
+                            <label class="qx-l">불량 유형<span class="qx-sub">여러 개 선택 가능</span></label>
+                            <div class="qx-types" id="qmTypeChips"></div>
 
-                        <label class="tb-label">수량 <span class="opt">— 선택 (넣으면 불량률 자동 계산)</span></label>
-                        <div class="tb-two">
-                            <div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="qmNgQty" placeholder="불량" autocomplete="off" oninput="qmUpdateRate()"><span class="tb-unit">개</span></div>
-                            <div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="qmTotalQty" placeholder="검사" autocomplete="off" oninput="qmUpdateRate()"><span class="tb-unit">개</span></div>
+                            <label class="qx-l">수량<span class="qx-opt">선택</span></label>
+                            <div class="qx-qty">
+                                <label class="qx-qbox"><span>불량</span><input type="text" inputmode="numeric" id="qmNgQty" placeholder="0" autocomplete="off" oninput="qmUpdateRate()"></label>
+                                <span class="qx-slash">/</span>
+                                <label class="qx-qbox"><span>검사</span><input type="text" inputmode="numeric" id="qmTotalQty" placeholder="0" autocomplete="off" oninput="qmUpdateRate()"></label>
+                                <div class="qx-ratebox" id="qmRateHint"><small>불량률</small><b>–</b></div>
+                            </div>
+
+                            <label class="qx-l" for="qmDefectContent">불량 내용<span class="qx-sub">위치 · 캐비티 · 로트</span></label>
+                            <textarea class="qx-ta" id="qmDefectContent" rows="2" placeholder="예: 2번 캐비티 게이트 반대편 웰드라인"></textarea>
+                            <label class="qx-l" for="qmDefectAction">조치사항<span class="qx-opt">선택</span></label>
+                            <textarea class="qx-ta" id="qmDefectAction" rows="2" placeholder="예: 금형온도 +10℃ 후 재검사"></textarea>
                         </div>
-                        <div class="tb-hint" id="qmRateHint" style="margin-bottom:12px;">왼쪽 = 불량 수량, 오른쪽 = 전체 검사 수량</div>
 
-                        <label class="tb-label">불량 내용 <span class="opt">— 위치·캐비티·로트 등</span></label>
-                        <textarea class="qm-ta" id="qmDefectContent" rows="3" placeholder="예: 2번 캐비티 게이트 반대편 웰드라인"></textarea>
-                        <label class="tb-label">조치사항 <span class="opt">— 선택</span></label>
-                        <textarea class="qm-ta" id="qmDefectAction" rows="2" placeholder="예: 금형온도 +10℃, 사출속도 조정 후 재검사"></textarea>
-                    </div>
-
-                    <!-- 📐 3차원측정 -->
-                    <div id="qm-fields-cmm" style="display:none;">
-                        <label class="tb-label">측정 내용</label>
-                        <textarea class="qm-ta" id="qmCmmContent" rows="3" placeholder="예: A90 B0 인덱싱으로 측정 중 평면도 초과"></textarea>
-                        <label class="tb-label">특이사항 <span class="opt">— 선택</span></label>
-                        <textarea class="qm-ta" id="qmCmmNote" rows="2" placeholder="예: 재측정 필요, 고객 통보 예정"></textarea>
-                    </div>
-
-                    <!-- 📝 기타 -->
-                    <div id="qm-fields-etc" style="display:none;">
-                        <label class="tb-label">내용</label>
-                        <textarea class="qm-ta" id="qmContent" rows="4" placeholder="예: 기타 특이사항"></textarea>
-                    </div>
-
-                    <button type="button" class="tb-big-btn" id="qm-save-btn" style="height:60px; font-size:1.2rem;" onclick="qmSaveMemo()">💾 저장</button>
-                    <button type="button" class="tb-ghost-btn gray" id="qm-cancel-btn" style="display:none; margin-top:8px;" onclick="qmCancelEdit()">수정 취소</button>
-                </div>
-
-                <!-- 저장된 기록 -->
-                <div id="qm-list-section">
-                    <div class="tb-step" style="margin:6px 2px 10px;"><span class="n">≡</span>저장된 기록<small id="qmListCount"></small></div>
-                    <div class="qm-list-head">
-                        <input type="text" id="qmSearch" placeholder="🔍 품번·내용으로 찾기" oninput="qmRenderList()">
-                        <div class="qm-filter-row">
-                            <button class="qm-chip on" id="qm-filter-all" onclick="qmSetFilter('all')">전체</button>
-                            <button class="qm-chip" id="qm-filter-defect" onclick="qmSetFilter('defect')">🔴 불량</button>
-                            <button class="qm-chip" id="qm-filter-cmm" onclick="qmSetFilter('cmm')">📐 3차원측정</button>
-                            <button class="qm-chip" id="qm-filter-etc" onclick="qmSetFilter('etc')">📝 기타</button>
+                        <!-- 3차원측정 -->
+                        <div id="qm-fields-cmm" style="display:none;">
+                            <label class="qx-l" for="qmCmmContent">측정 내용</label>
+                            <textarea class="qx-ta" id="qmCmmContent" rows="3" placeholder="예: A90 B0 인덱싱 · 평면도 0.12 초과"></textarea>
+                            <label class="qx-l" for="qmCmmNote">특이사항<span class="qx-opt">선택</span></label>
+                            <textarea class="qx-ta" id="qmCmmNote" rows="2" placeholder="예: 재측정 필요, 고객 통보 예정"></textarea>
                         </div>
+
+                        <!-- 기타 -->
+                        <div id="qm-fields-etc" style="display:none;">
+                            <label class="qx-l" for="qmContent">내용</label>
+                            <textarea class="qx-ta" id="qmContent" rows="4" placeholder="예: 금형 교체 후 초품 확인"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="button" class="qx-del" id="qm-del-btn" onclick="qmDeleteMemo(qmEditingId)">🗑 이 기록 삭제</button>
+                    <button type="button" class="qx-dimlink" onclick="switchView('dimension-view')">치수 측정값 합격/불합격은 <b>치수 판정 →</b></button>
+                </section>
+
+                <!-- ≡ 기록 -->
+                <section id="qm-pane-list" style="display:none;">
+                    <div class="qx-search"><input type="text" id="qmSearch" placeholder="품번 · 내용으로 찾기" oninput="qmRenderList()"></div>
+                    <div class="qx-filters">
+                        <button type="button" class="on" id="qm-filter-all" onclick="qmSetFilter('all')">전체</button>
+                        <button type="button" id="qm-filter-defect" onclick="qmSetFilter('defect')">불량</button>
+                        <button type="button" id="qm-filter-cmm" onclick="qmSetFilter('cmm')">3차원</button>
+                        <button type="button" id="qm-filter-etc" onclick="qmSetFilter('etc')">기타</button>
                     </div>
                     <div id="qmList"></div>
-                    <button type="button" class="tb-link-btn" onclick="qmExportCsv()">📊 보이는 기록을 엑셀(CSV)로 내보내기</button>
-                    <div class="disclaimer-banner" style="margin:10px 0 0; white-space:normal;">📵 이 휴대폰(브라우저)에만 저장됩니다 · 중요한 기록은 엑셀로 내보내거나 📸로 남겨두세요</div>
-                </div>
+                    <div class="qx-foot">
+                        <button type="button" onclick="qmExportCsv()">📊 보이는 기록 엑셀(CSV)로 내보내기</button>
+                        <p>이 휴대폰에만 저장 · 중요한 기록은 엑셀로 보관하세요</p>
+                    </div>
+                </section>
             </div>
             </div>
-            <button class="capture-btn light" id="qmCaptureBtn" onclick="captureView('memo-view', '품질기록')" title="화면 캡처 저장(갤러리)">📸</button>
+            <div class="qx-savebar" id="qmSaveBar">
+                <button type="button" class="qx-cancel" id="qm-cancel-btn" onclick="qmCancelEdit()">취소</button>
+                <button type="button" class="qx-save" id="qm-save-btn" onclick="qmSaveMemo()">💾 저장</button>
+            </div>
+            <button class="capture-btn light" id="qmCaptureBtn" style="display:none;" onclick="captureView('memo-view', '품질기록')" title="화면 캡처 저장(갤러리)">📸</button>
         </div>
     </div>
 
@@ -3601,6 +3715,22 @@
         let qmInitialized = false;
         let qmSelTypes = [];
         let qmEditingId = null;
+        let qmTab = 'write';
+        let qmFlashId = null;
+
+        function qmSetTab(tab) {
+            qmTab = tab;
+            const v = document.getElementById('memo-view');
+            v.classList.toggle('qx-listmode', tab === 'list');
+            document.getElementById('qx-tab-write').classList.toggle('on', tab === 'write');
+            document.getElementById('qx-tab-list').classList.toggle('on', tab === 'list');
+            document.getElementById('qm-pane-write').style.display = tab === 'write' ? '' : 'none';
+            document.getElementById('qm-pane-list').style.display = tab === 'list' ? '' : 'none';
+            document.getElementById('qmCaptureBtn').style.display = tab === 'list' ? '' : 'none';
+            if (tab === 'list') qmRenderList();
+            const sc = document.querySelector('#memo-view .qm-scroll');
+            if (sc) sc.scrollTop = 0;
+        }
 
         function initMemo() {
             if (!qmInitialized) {
@@ -3609,6 +3739,7 @@
                 qmRenderTypeChips();
                 qmCheckOldQuick();
             }
+            qmSetTab(qmTab);
             qmRenderList();
         }
 
@@ -3626,7 +3757,7 @@
 
         function qmRenderTypeChips() {
             document.getElementById('qmTypeChips').innerHTML = QM_DEFECT_TYPES.map(t =>
-                `<button type="button" class="qm-type${qmSelTypes.includes(t) ? ' on' : ''}" onclick="qmToggleType(this, '${t}')">${t}</button>`
+                `<button type="button" class="qx-type${qmSelTypes.includes(t) ? ' on' : ''}" onclick="qmToggleType(this, '${t}')">${t}</button>`
             ).join('');
         }
         function qmToggleType(btn, t) {
@@ -3647,14 +3778,14 @@
         function qmUpdateRate() {
             const ng = qmNum(document.getElementById('qmNgQty').value);
             const total = qmNum(document.getElementById('qmTotalQty').value);
-            const hint = document.getElementById('qmRateHint');
+            const box = document.getElementById('qmRateHint');
             const r = qmRate(ng, total);
             if (r === null) {
-                hint.className = 'tb-hint'; hint.innerHTML = '왼쪽 = 불량 수량, 오른쪽 = 전체 검사 수량';
+                box.className = 'qx-ratebox'; box.innerHTML = '<small>불량률</small><b>–</b>';
             } else if (ng > total) {
-                hint.className = 'tb-hint qm-rate warn'; hint.innerHTML = '⚠️ 불량 수량이 검사 수량보다 많습니다';
+                box.className = 'qx-ratebox warn'; box.innerHTML = '<small>확인</small><b>불량&gt;검사</b>';
             } else {
-                hint.className = 'tb-hint qm-rate'; hint.innerHTML = `불량률 <b>${qmFmtRate(r)}</b> (${ng}/${total}개)`;
+                box.className = 'qx-ratebox on'; box.innerHTML = `<small>불량률</small><b>${qmFmtRate(r)}</b>`;
             }
         }
 
@@ -3721,6 +3852,7 @@
             m.content = qmBuildContent(m);
 
             if (qmEditingId !== null) {
+                qmFlashId = qmEditingId;
                 const idx = qmMemos.findIndex(x => x.id === qmEditingId);
                 if (idx >= 0) qmMemos[idx] = Object.assign({}, qmMemos[idx], m, { edited: new Date().toISOString() });
                 qmEditingId = null;
@@ -3730,17 +3862,19 @@
                 m.id = Date.now();
                 m.ts = new Date().toISOString();
                 qmMemos.unshift(m);
+                qmFlashId = m.id;
                 if (qmSaveToStorage()) showToast('저장했습니다 ✅');
             }
             qmClearForm();
-            qmRenderList();
+            qmActiveFilter = 'all';
+            document.getElementById('qmSearch').value = '';
+            ['all', 'defect', 'cmm', 'etc'].forEach(c => document.getElementById('qm-filter-' + c).classList.toggle('on', c === 'all'));
+            qmSetTab('list');
         }
 
         function qmSetEditMode(on) {
-            document.getElementById('qmFormTitle').innerText = on ? '✏️ 기록 수정 중' : '새 기록 쓰기';
             document.getElementById('qm-save-btn').innerText = on ? '✅ 수정 완료' : '💾 저장';
-            document.getElementById('qm-cancel-btn').style.display = on ? '' : 'none';
-            document.getElementById('qmFormCard').classList.toggle('editing', on);
+            document.getElementById('memo-view').classList.toggle('qx-editing', on);
         }
 
         function qmEditMemo(id) {
@@ -3782,15 +3916,18 @@
             }
             qmEditingId = id;
             qmSetEditMode(true);
-            document.querySelector('#memo-view .qm-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+            qmSetTab('write');
         }
         function qmCancelEdit() {
+            const wasEditing = qmEditingId !== null;
             qmEditingId = null;
             qmSetEditMode(false);
             qmClearForm();
+            if (wasEditing) qmSetTab('list');
         }
 
         function qmDeleteMemo(id) {
+            if (id === null || id === undefined) return;
             if (!confirm('이 기록을 삭제할까요?\n(삭제하면 되돌릴 수 없습니다)')) return;
             qmMemos = qmMemos.filter(m => m.id !== id);
             if (qmEditingId === id) qmCancelEdit();
@@ -3836,40 +3973,104 @@
             return list;
         }
 
+        function qmDayKey(iso) {
+            const d = new Date(iso);
+            return isNaN(d.getTime()) ? '' : `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        }
+        function qmDayLabel(iso) {
+            const d = new Date(iso);
+            if (isNaN(d.getTime())) return ['날짜 없음', ''];
+            const t = new Date(); t.setHours(0, 0, 0, 0);
+            const x = new Date(d); x.setHours(0, 0, 0, 0);
+            const diff = Math.round((t - x) / 86400000);
+            const wd = '일월화수목금토'[d.getDay()];
+            const md = `${d.getMonth() + 1}월 ${d.getDate()}일 (${wd})`;
+            const md2 = (d.getFullYear() !== t.getFullYear() ? d.getFullYear() + '년 ' : '') + md;
+            if (diff === 0) return ['오늘', md];
+            if (diff === 1) return ['어제', md];
+            return [md2, ''];
+        }
+        function qmHm(iso) {
+            const d = new Date(iso);
+            if (isNaN(d.getTime())) return '';
+            return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
         function qmRenderList() {
             const wrap = document.getElementById('qmList');
             const list = qmFilteredList();
-            document.getElementById('qmListCount').innerText = qmMemos.length ? `${list.length} / 전체 ${qmMemos.length}건` : '';
+            const cnt = { all: qmMemos.length, defect: 0, cmm: 0, etc: 0 };
+            qmMemos.forEach(m => { if (cnt[m.cat] !== undefined) cnt[m.cat]++; else cnt.etc++; });
+            document.getElementById('qmTabCount').innerText = qmMemos.length ? qmMemos.length : '';
+            const dot = { defect: 'var(--qx-def)', cmm: 'var(--qx-cmm)', etc: 'var(--qx-etc)' };
+            const nm = { all: '전체', defect: '불량', cmm: '3차원', etc: '기타' };
+            ['all', 'defect', 'cmm', 'etc'].forEach(c => {
+                document.getElementById('qm-filter-' + c).innerHTML =
+                    (c === 'all' ? '' : `<i style="background:${dot[c]}"></i>`) + nm[c] + (cnt[c] ? ` <em>${cnt[c]}</em>` : '');
+            });
             if (list.length === 0) {
-                wrap.innerHTML = `<div class="qm-empty">${qmMemos.length ? '조건에 맞는 기록이 없습니다' : '아직 저장된 기록이 없습니다'}</div>`;
+                wrap.innerHTML = qmMemos.length
+                    ? '<div class="qx-empty">조건에 맞는 기록이 없습니다</div>'
+                    : '<div class="qx-empty">아직 저장된 기록이 없습니다<br><button type="button" onclick="qmSetTab(\'write\')">✎ 첫 기록 쓰기</button></div>';
                 return;
             }
-            wrap.innerHTML = list.map(m => {
-                let chips = '';
-                if (m.cat === 'defect' && Array.isArray(m.types) && m.types.length) {
-                    chips = `<div class="qm-item-types">${m.types.map(t => `<span>${qmEscapeHtml(t)}</span>`).join('')}</div>`;
+            const catName = { defect: '불량', cmm: '3차원측정', etc: '기타', quick: '간이측정' };
+            let lastDay = null, html = '';
+            list.forEach(m => {
+                const dk = qmDayKey(m.ts);
+                if (dk !== lastDay) {
+                    lastDay = dk;
+                    const [l1, l2] = qmDayLabel(m.ts);
+                    html += `<div class="qx-day">${l1}${l2 ? ` <small>${l2}</small>` : ''}</div>`;
                 }
+                const cat = (m.cat === 'defect' || m.cat === 'cmm') ? m.cat : 'etc';
+                const structured = m.detail !== undefined || m.types !== undefined;
                 const r = m.cat === 'defect' ? qmRate(qmNum(m.ng), qmNum(m.total)) : null;
-                const rate = r !== null ? `<span class="qm-item-rate">불량률 ${qmFmtRate(r)}</span>` : '';
-                // 구조화된 기록은 유형 줄을 칩으로 보여주므로 본문에서 제외
-                const body = (m.content || '').split('\n').filter(l => !(chips && l.startsWith('[불량유형]'))).join('\n');
-                return `
-                <div class="qm-item${qmEditingId === m.id ? ' editing' : ''}">
-                    <div class="qm-item-head">
-                        <span class="qm-badge ${m.cat}">${QM_CAT_LABEL[m.cat] || m.cat}</span>
-                        ${rate}
-                        <span class="qm-item-time">${qmFormatTime(m.ts)}${m.edited ? ' (수정됨)' : ''}</span>
-                    </div>
-                    ${m.part ? `<div class="qm-item-part">${qmEscapeHtml(m.part)}</div>` : ''}
-                    ${chips}
-                    <div class="qm-item-content">${qmEscapeHtml(body)}</div>
-                    <div class="qm-item-actions">
+                const types = (m.cat === 'defect' && Array.isArray(m.types) && m.types.length)
+                    ? `<div class="qx-tags">${m.types.map(t => `<span>${qmEscapeHtml(t)}</span>`).join('')}</div>` : '';
+                let body = '';
+                if (structured) {
+                    if (m.cat === 'defect') {
+                        if (m.ng) body += `<div class="qx-qtyline">불량 ${qmEscapeHtml(m.ng)}개${m.total ? ` / 검사 ${qmEscapeHtml(m.total)}개` : ''}</div>`;
+                        if (m.detail) body += `<div class="qx-body">${qmEscapeHtml(m.detail)}</div>`;
+                        if (m.action) body += `<div class="qx-line"><span class="lb">조치</span><span class="tx">${qmEscapeHtml(m.action)}</span></div>`;
+                    } else if (m.cat === 'cmm') {
+                        if (m.detail) body += `<div class="qx-body">${qmEscapeHtml(m.detail)}</div>`;
+                        if (m.action) body += `<div class="qx-line"><span class="lb">특이</span><span class="tx">${qmEscapeHtml(m.action)}</span></div>`;
+                    } else {
+                        body = `<div class="qx-body">${qmEscapeHtml(m.detail || '')}</div>`;
+                    }
+                } else {
+                    // 예전 형식 "[라벨] 내용" 줄은 라벨 칩으로 보기 좋게
+                    const lines = (m.content || '').split('\n').filter(l => !(types && l.startsWith('[불량유형]')));
+                    const plain = [];
+                    lines.forEach(l => {
+                        const mm = l.match(/^\[([^\]]{1,12})\]\s*(.*)$/);
+                        if (mm && mm[2]) {
+                            if (plain.length) { body += `<div class="qx-body">${qmEscapeHtml(plain.join('\n'))}</div>`; plain.length = 0; }
+                            body += `<div class="qx-line"><span class="lb">${qmEscapeHtml(mm[1].replace(/^불량/, ''))}</span><span class="tx">${qmEscapeHtml(mm[2])}</span></div>`;
+                        } else plain.push(l);
+                    });
+                    if (plain.length) body += `<div class="qx-body">${qmEscapeHtml(plain.join('\n'))}</div>`;
+                }
+                const title = m.part ? `<div class="qx-part">${qmEscapeHtml(m.part)}</div>` : `<div class="qx-part none">품번 없음</div>`;
+                html += `
+                <div class="qx-item c-${cat}${qmFlashId === m.id ? ' flash' : ''}" id="qx-item-${m.id}">
+                    <div class="qx-row1">${title}${r !== null ? `<span class="qx-rateb">${qmFmtRate(r)}</span>` : ''}</div>
+                    <div class="qx-meta"><span class="k">${catName[m.cat] || m.cat}</span> · ${qmHm(m.ts)}${m.edited ? ' · 수정됨' : ''}</div>
+                    ${types}${body}
+                    <div class="qx-acts">
                         <button type="button" onclick="qmEditMemo(${m.id})">✏️ 수정</button>
-                        <button type="button" onclick="qmShareMemo(${m.id})">💬 공유·복사</button>
-                        <button type="button" class="del" onclick="qmDeleteMemo(${m.id})">🗑 삭제</button>
+                        <button type="button" class="pri" onclick="qmShareMemo(${m.id})">💬 공유</button>
                     </div>
                 </div>`;
-            }).join('');
+            });
+            wrap.innerHTML = html;
+            if (qmFlashId !== null) {
+                const el = document.getElementById('qx-item-' + qmFlashId);
+                qmFlashId = null;
+                if (el) setTimeout(() => el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
+            }
         }
 
         function qmEscapeHtml(str) {
