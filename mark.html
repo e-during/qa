@@ -196,6 +196,48 @@
   .rp-btns button { padding: 13px 4px; border-radius: 12px; border: none; font-size: 13.5px; font-weight: 800; font-family: inherit; background: rgba(255,255,255,.1); color: #fff; }
   .rp-btns button.pri { background: #e0b060; color: #1a1206; }
   .rp-close { margin-top: 8px; padding: 11px; border-radius: 12px; border: none; background: none; color: rgba(255,255,255,.6); font-size: 13px; font-weight: 800; font-family: inherit; }
+  /* ===== 2026-09-30 디자인 다듬기 (공간 절약 · 한 단계 업그레이드) ===== */
+  header { padding-right: 18px; }
+  .hsave { position: absolute; right: 14px; top: calc(env(safe-area-inset-top) + 11px); display: none; align-items: center; gap: 5px; height: 34px; padding: 0 13px 0 11px; border-radius: 999px; border: none; background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff; font-size: 13px; font-weight: 900; font-family: inherit; box-shadow: 0 6px 16px -6px rgba(255,85,0,.7); z-index: 2; }
+  .hsave svg { width: 15px; height: 15px; }
+  .hsave.show { display: flex; }
+  .hsave:active { transform: scale(.95); }
+  main { padding-top: 12px; }
+  #markScreen { gap: 10px; }
+  .tool-seg { gap: 3px; padding: 3px; border-radius: 14px; background: #0c1730; border: 1px solid rgba(255,255,255,.08); }
+  .tool-seg button { flex-direction: row; justify-content: center; gap: 4px; height: 36px; padding: 0 2px; border: none; border-radius: 11px; background: transparent; color: rgba(255,255,255,.5); font-size: 11.5px; white-space: nowrap; }
+  .tool-seg button svg { width: 14px; height: 14px; flex: none; }
+  .tool-seg button.on { background: linear-gradient(180deg, rgba(224,176,96,.24), rgba(224,176,96,.12)); color: #f0c77a; box-shadow: inset 0 0 0 1px rgba(224,176,96,.55); }
+  .optbar { height: 38px; padding: 0 6px; gap: 7px; border-radius: 12px; background: rgba(12,23,48,.7); border-color: rgba(255,255,255,.07); }
+  .ob-j { gap: 4px; }
+  .ob-j button { height: 28px; padding: 0 10px; border-radius: 8px; font-size: 12.5px; border-width: 1px; }
+  .ob-col { gap: 6px; }
+  .ob-col .sw { width: 22px; height: 22px; }
+  .ob-col .sw[data-color='#111827'], .szrow .sw[data-color='#111827'] { border-color: rgba(255,255,255,.55); }
+  .ob-sz { gap: 3px; }
+  .ob-sz button { width: 30px; height: 28px; border-radius: 8px; border-width: 1px; }
+  .ob-hint { font-size: 12px; }
+  .ob-bg { height: 28px; padding: 0 9px; border-radius: 8px; font-size: 12px; border-width: 1px; }
+  .ob-div { height: 18px; }
+  .tool-hint { margin-top: -4px; font-size: 11px; }
+  .canvas-wrap { border-radius: 14px; border-color: rgba(255,255,255,.08); box-shadow: 0 10px 30px -14px rgba(0,0,0,.8); }
+  .toolbar { gap: 6px; }
+  .toolbar button { display: flex; align-items: center; justify-content: center; gap: 5px; height: 38px; padding: 0 4px; border-radius: 11px; border-color: rgba(255,255,255,.08); background: rgba(12,23,48,.7); color: rgba(255,255,255,.72); font-size: 12px; white-space: nowrap; }
+  .toolbar button svg { width: 14px; height: 14px; flex: none; opacity: .85; }
+  .legend { gap: 5px; }
+  .legend-item { gap: 10px; padding: 8px 12px; border-radius: 11px; background: rgba(255,255,255,.025); border-color: rgba(255,255,255,.06); }
+  .legend-item:active { background: rgba(224,176,96,.08); }
+  .legend-item .lnum { width: 26px; height: 26px; font-size: 12px; box-shadow: 0 0 0 2px rgba(255,255,255,.85); }
+  .legend-item .ltxt { display: flex; align-items: baseline; gap: 8px; }
+  .legend-item .lv { flex: none; font-size: 12px; }
+  .legend-item .lm { margin-top: 0; font-size: 12px; color: rgba(255,255,255,.55); }
+  .legend-item .lvals { font-size: 13px; }
+  .legend-empty { font-size: 11.5px; padding: 6px; }
+  .rp-card { display: none; flex-direction: column; gap: 8px; padding: 10px; border-radius: 14px; background: linear-gradient(180deg, rgba(224,176,96,.1), rgba(224,176,96,.04)); border: 1px solid rgba(224,176,96,.4); }
+  .pno label { font-size: 12px; font-weight: 800; color: #e0b060; width: 34px; }
+  .pno input { height: 40px; padding: 0 12px; border-color: rgba(224,176,96,.25); }
+  .btn-report { align-items: center; justify-content: center; gap: 8px; height: 46px; padding: 0; border: none; background: #e0b060; color: #1a1206; font-size: 14.5px; box-shadow: 0 6px 16px -8px rgba(224,176,96,.8); }
+  .btn-report small { font-size: 11px; font-weight: 800; opacity: .65; }
   .toast {
     position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translate(-50%, 12px);
     background: rgba(15,23,42,.95); color: #fff; padding: 11px 18px; border-radius: 999px;
@@ -213,6 +255,7 @@
       <div class="t1">현장 마킹</div>
       <div class="t2">QUICK MARKING</div>
     </div>
+    <button type="button" class="hsave" id="hdrSave" onclick="saveImage()" aria-label="갤러리에 저장"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>저장</button>
   </header>
 
   <main>
@@ -273,16 +316,17 @@
       </div>
 
       <div class="toolbar">
-        <button onclick="undoMark()">↩ 실행취소</button>
-        <button onclick="clearMarks()">🗑 전체 지우기</button>
-        <button onclick="resetPhoto()">📷 새 사진</button>
+        <button type="button" onclick="undoMark()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>실행취소</button>
+        <button type="button" onclick="clearMarks()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>전체 지우기</button>
+        <button type="button" onclick="resetPhoto()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>새 사진</button>
       </div>
 
       <div class="legend" id="legendList"></div>
 
-      <button class="btn-primary" onclick="saveImage()">완료 · 갤러리에 저장</button>
-      <div class="pno" id="pnoRow"><label>품번 (선택)</label><input id="pnoInput" placeholder="예: MEB5 하우징" autocomplete="off"></div>
-      <button type="button" class="btn-report" id="reportBtn" onclick="openReport()">📄 간이 성적서 (사진 + 측정값)</button>
+      <div class="rp-card" id="rpCard">
+        <div class="pno" id="pnoRow"><label>품번</label><input id="pnoInput" placeholder="선택 · 예: MEB5 하우징" autocomplete="off"></div>
+        <button type="button" class="btn-report" id="reportBtn" onclick="openReport()">📄 간이 성적서 만들기 <small>사진 + 측정값</small></button>
+      </div>
     </div>
 
   </main>
@@ -397,13 +441,14 @@
     currentTool = t;
     ['point','arrow','box','text','move'].forEach(k => id('tool-'+k).classList.toggle('on', k===t));
     id('toolHint').innerText = TOOL_HINTS[t];
+    id('toolHint').style.display = t === 'move' ? '' : 'none';
     renderOptBar();
   }
 
   function sizeIcon(kind, i){
-    if (kind === 'point'){ const r = [4,6,8,10][i]; return `<span class="ic-dot" style="width:${r*2}px;height:${r*2}px"></span>`; }
-    if (kind === 'line'){ const w = [2,4,7][i]; return `<span class="ic-line" style="height:${w}px"></span>`; }
-    const f = [12,16,21][i]; return `<span class="ic-ga" style="font-size:${f}px">가</span>`;
+    if (kind === 'point'){ const r = [3,4.5,6,8][i]; return `<span class="ic-dot" style="width:${r*2}px;height:${r*2}px"></span>`; }
+    if (kind === 'line'){ const w = [2,3.5,6][i]; return `<span class="ic-line" style="height:${w}px"></span>`; }
+    const f = [11,14,18][i]; return `<span class="ic-ga" style="font-size:${f}px">가</span>`;
   }
   function sizeBtns(kind, list, cur, fn){
     return '<div class="ob-sz">' + list.map(([l, v], i) =>
@@ -452,6 +497,7 @@
       setupCanvas();
       id('startScreen').style.display = 'none';
       id('markScreen').style.display = 'flex';
+      id('hdrSave').classList.add('show');
       URL.revokeObjectURL(url);
     };
     img.onerror = () => { showToast('이미지를 불러오지 못했습니다'); };
@@ -607,7 +653,7 @@
 
   function escH(t){ return String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
   function hasVals(){ return marks.some(m => m.type === 'point' && m.vals && m.vals.length); }
-  function syncReportBtn(){ const on = hasVals(); id('reportBtn').style.display = on ? 'block' : 'none'; id('pnoRow').style.display = on ? 'flex' : 'none'; }
+  function syncReportBtn(){ const on = hasVals(); id('reportBtn').style.display = on ? 'flex' : 'none'; id('pnoRow').style.display = on ? 'flex' : 'none'; id('rpCard').style.display = on ? 'flex' : 'none'; }
 
   // -------- 좌표/히트테스트 --------
   function getCanvasPoint(e){
@@ -1003,6 +1049,7 @@
     setTool('point');
     id('markScreen').style.display = 'none';
     id('startScreen').style.display = 'flex';
+    id('hdrSave').classList.remove('show');
     closeReport();
   }
 
