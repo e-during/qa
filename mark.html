@@ -66,6 +66,28 @@
   .color-strip .clabel { font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.4); margin-right: 2px; }
   .color-strip .cswatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.15); padding: 0; }
   .color-strip .cswatch.on { border-color: #fff; box-shadow: 0 0 0 2px rgba(224,176,96,.65); }
+  /* 도구별 옵션 바 (한 줄) */
+  .optbar { display: flex; align-items: center; gap: 8px; height: 46px; padding: 0 8px; border-radius: 12px; background: #0c1730; border: 1px solid rgba(255,255,255,.1); overflow: hidden; }
+  .ob-div { flex: none; width: 1px; height: 24px; background: rgba(255,255,255,.14); }
+  .ob-j { display: flex; gap: 6px; }
+  .ob-j button { height: 34px; padding: 0 12px; border-radius: 9px; border: 1.5px solid rgba(255,255,255,.16); background: transparent; color: rgba(255,255,255,.55); font-size: 13.5px; font-weight: 900; font-family: inherit; white-space: nowrap; }
+  .ob-j button.ok.on { background: #16a34a; border-color: #16a34a; color: #fff; box-shadow: 0 3px 10px -3px rgba(22,163,74,.7); }
+  .ob-j button.ng.on { background: #dc2626; border-color: #dc2626; color: #fff; box-shadow: 0 3px 10px -3px rgba(220,38,38,.7); }
+  .ob-col { display: flex; gap: 7px; }
+  .ob-col .sw, .szrow .sw { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); padding: 0; flex: none; }
+  .ob-col .sw.on, .szrow .sw.on { border-color: #fff; box-shadow: 0 0 0 2px #e0b060; }
+  .ob-sz { display: flex; gap: 4px; }
+  .ob-sz button { width: 34px; height: 34px; border-radius: 9px; border: 1.5px solid rgba(255,255,255,.14); background: transparent; display: flex; align-items: center; justify-content: center; padding: 0; color: rgba(255,255,255,.6); font-family: inherit; }
+  .ob-sz button.on { border-color: #e0b060; background: rgba(224,176,96,.16); color: #e0b060; }
+  .ic-dot { display: block; border-radius: 50%; background: currentColor; }
+  .ic-line { display: block; width: 20px; border-radius: 4px; background: currentColor; transform: rotate(-35deg); }
+  .ic-ga { font-weight: 900; line-height: 1; }
+  .ob-hint { font-size: 12.5px; font-weight: 800; color: rgba(255,255,255,.72); white-space: nowrap; }
+  .ob-bg { flex: none; height: 34px; padding: 0 10px; border-radius: 9px; border: 1.5px solid rgba(255,255,255,.16); background: transparent; color: rgba(255,255,255,.55); font-size: 12.5px; font-weight: 900; font-family: inherit; margin-left: auto; }
+  .ob-bg.on { background: #fff; border-color: #fff; color: #0b1636; }
+  .tool-hint { margin-top: -6px; font-size: 11.5px; font-weight: 700; color: rgba(224,176,96,.85); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .szrow { display: flex; align-items: center; gap: 8px; }
+  .szrow .ob-sz button { width: 44px; height: 40px; }
   .canvas-wrap { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); background: #0c1730; line-height: 0; }
   #markCanvas { width: 100%; display: block; touch-action: none; }
 
@@ -132,12 +154,33 @@
   .sheet .sheet-actions.has-del { grid-template-columns: auto 1fr 1fr; }
   .sheet .sheet-actions button { padding: 13px 10px; border-radius: 12px; border: none; font-size: 13.5px; font-weight: 800; font-family: inherit; }
   .sheet .btn-cancel { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
-  .sheet .btn-del { background: rgba(220,38,38,.14); color: #fb7185; border: 1px solid rgba(251,113,133,.3) !important; }
+  .sheet .btn-del { background: #dc2626; color: #fff; padding-left: 14px !important; padding-right: 14px !important; }
   .sheet .btn-confirm { background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff; }
 
+  /* 포인트 입력창 (측정값 중심) */
+  .ptsheet { padding: 14px 14px calc(env(safe-area-inset-bottom) + 12px); }
+  .pt-head { display: flex; align-items: center; gap: 10px; }
+  .pt-no { flex: none; min-width: 52px; font-size: 22px; font-weight: 900; color: #e0b060; line-height: 1; white-space: nowrap; }
+  .pt-no small { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.4); margin-left: 2px; }
+  .pt-seg { flex: 1; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; gap: 3px; border-radius: 12px; background: #0c1730; border: 1px solid rgba(255,255,255,.12); }
+  .pt-seg button { height: 36px; border: none; border-radius: 9px; background: transparent; color: rgba(255,255,255,.45); font-size: 14px; font-weight: 900; font-family: inherit; }
+  .pt-seg button.ok.on { background: #16a34a; color: #fff; box-shadow: 0 3px 10px -4px rgba(22,163,74,.8); }
+  .pt-seg button.ng.on { background: #dc2626; color: #fff; box-shadow: 0 3px 10px -4px rgba(220,38,38,.8); }
+  .pt-del { flex: none; width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(251,113,133,.45); background: rgba(220,38,38,.16); font-size: 17px; }
+  .pt-vals { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .pt-vals input { width: calc((100% - 58px) / 3); height: 50px; background: #0c1730; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 0 6px; font-size: 18px; font-weight: 900; color: #fff; font-family: inherit; text-align: center; font-variant-numeric: tabular-nums; }
+  .pt-vals input::placeholder { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.3); }
+  .pt-vals input:focus, #ptMemo:focus { outline: none; border-color: #e0b060; box-shadow: 0 0 0 2px rgba(224,176,96,.25); }
+  .pt-vals button { flex: none; width: 40px; height: 50px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.3); background: none; color: rgba(255,255,255,.7); font-size: 20px; font-weight: 800; }
+  #ptMemo { display: block; width: 100%; height: 48px; margin-top: 8px; background: #0c1730; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 0 14px; font-size: 15px; font-weight: 700; color: #fff; font-family: inherit; }
+  #ptMemo::placeholder { color: rgba(255,255,255,.3); font-weight: 700; }
+  .pt-nav { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; margin-top: 12px; }
+  .pt-nav button { height: 50px; border-radius: 12px; border: none; font-size: 15px; font-weight: 900; font-family: inherit; background: rgba(255,255,255,.08); color: rgba(255,255,255,.85); }
+  .pt-nav button:disabled { opacity: .3; }
+  .pt-nav button.pri { background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff; }
   /* 측정값 입력 · 간이 성적서 */
   .vals { display: flex; flex-wrap: wrap; gap: 6px; }
-  .vals input { width: 88px; background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px 8px; font-size: 15px; font-weight: 800; color: #fff; font-family: inherit; text-align: center; }
+  .vals input { width: 84px; height: 44px; background: #0c1730; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px 8px; font-size: 15px; font-weight: 800; color: #fff; font-family: inherit; text-align: center; }
   .vals input:focus { outline: none; border-color: #e0b060; }
   .vals button { width: 44px; border-radius: 10px; border: 1px dashed rgba(255,255,255,.3); background: none; color: rgba(255,255,255,.7); font-size: 18px; font-weight: 800; }
   .legend-item .lvals { flex: none; font-size: 12px; font-weight: 800; color: #e0b060; font-variant-numeric: tabular-nums; max-width: 42%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -176,7 +219,7 @@
 
     <!-- ============ 시작 화면 ============ -->
     <div id="startScreen">
-      <div class="start-hint">사진(제품·도면)을 촬영하거나 불러와서<br>터치 몇 번으로 OK/NG 포인트를 표시하세요 · 측정값을 넣으면 간이 성적서</div>
+      <div class="start-hint">사진(제품·도면)을 촬영하거나 불러와서<br>누르는 대로 ① ② ③ 번호가 찍힙니다 · 측정값을 넣으면 간이 성적서</div>
 
       <label class="pick-btn primary">
         <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
@@ -222,14 +265,8 @@
         </button>
       </div>
 
-      <div class="color-strip" id="colorStrip" style="display:none;">
-        <span class="clabel">색상</span>
-        <button type="button" class="cswatch on" data-color="#e0b060" style="background:#e0b060" onclick="setDrawColor('#e0b060', this)"></button>
-        <button type="button" class="cswatch" data-color="#dc2626" style="background:#dc2626" onclick="setDrawColor('#dc2626', this)"></button>
-        <button type="button" class="cswatch" data-color="#16a34a" style="background:#16a34a" onclick="setDrawColor('#16a34a', this)"></button>
-        <button type="button" class="cswatch" data-color="#3b82f6" style="background:#3b82f6" onclick="setDrawColor('#3b82f6', this)"></button>
-        <button type="button" class="cswatch" data-color="#ffffff" style="background:#ffffff" onclick="setDrawColor('#ffffff', this)"></button>
-      </div>
+      <div class="optbar" id="optBar"></div>
+      <div class="tool-hint" id="toolHint"></div>
 
       <div class="canvas-wrap">
         <canvas id="markCanvas"></canvas>
@@ -246,7 +283,6 @@
       <button class="btn-primary" onclick="saveImage()">완료 · 갤러리에 저장</button>
       <div class="pno" id="pnoRow"><label>품번 (선택)</label><input id="pnoInput" placeholder="예: MEB5 하우징" autocomplete="off"></div>
       <button type="button" class="btn-report" id="reportBtn" onclick="openReport()">📄 간이 성적서 (사진 + 측정값)</button>
-      <div class="hint" id="toolHint">사진을 탭하면 포인트가 추가됩니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다</div>
     </div>
 
   </main>
@@ -262,27 +298,33 @@
       <label id="memoLabel">메모 (선택)</label>
       <input type="text" id="memoInput" placeholder="예: 웰드라인 발생, 데이텀 A 기준">
     </div>
-    <div class="sheet-field" id="valsFieldWrap">
-      <label>측정값 (선택 · 여러 개면 ＋)</label>
-      <div class="vals" id="valsBox"></div>
-    </div>
+    <div class="sheet-field hidden" id="valsFieldWrap"></div>
     <div class="sheet-field hidden" id="sizeFieldWrap">
-      <label>크기 조정</label>
-      <input type="range" id="sizeInput" min="0.6" max="2.2" step="0.1" value="1" oninput="onSizeInput(this.value)">
+      <label id="sizeLabel">크기</label>
+      <div class="szrow" id="sheetSizeBox"></div>
     </div>
     <div class="sheet-field hidden" id="colorFieldWrap">
-      <label>색상 선택</label>
-      <div class="color-strip" id="sheetColorStrip">
-        <button type="button" class="cswatch" data-color="#e0b060" style="background:#e0b060" onclick="setSheetColor('#e0b060', this)"></button>
-        <button type="button" class="cswatch" data-color="#dc2626" style="background:#dc2626" onclick="setSheetColor('#dc2626', this)"></button>
-        <button type="button" class="cswatch" data-color="#16a34a" style="background:#16a34a" onclick="setSheetColor('#16a34a', this)"></button>
-        <button type="button" class="cswatch" data-color="#3b82f6" style="background:#3b82f6" onclick="setSheetColor('#3b82f6', this)"></button>
-        <button type="button" class="cswatch" data-color="#ffffff" style="background:#ffffff" onclick="setSheetColor('#ffffff', this)"></button>
-      </div>
+      <label>색상</label>
+      <div class="szrow" id="sheetColorStrip"></div>
     </div>
     <div class="sheet-actions" id="sheetActions">
       <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
       <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
+    </div>
+  </div>
+
+  <!-- 포인트 번호 입력창: 측정값 중심 · 다음 번호로 빠르게 -->
+  <div class="sheet ptsheet" id="ptSheet">
+    <div class="pt-head">
+      <span class="pt-no" id="ptNo"></span>
+      <div class="pt-seg"><button type="button" class="ok" id="ptOk" onclick="setPtJudge('ok')">✓ OK</button><button type="button" class="ng" id="ptNg" onclick="setPtJudge('ng')">✕ NG</button></div>
+      <button type="button" class="pt-del" onclick="deletePt()" aria-label="이 포인트 삭제">🗑</button>
+    </div>
+    <div class="pt-vals" id="valsBox"></div>
+    <input type="text" id="ptMemo" placeholder="📝 메모 (선택)" autocomplete="off" enterkeyhint="next">
+    <div class="pt-nav">
+      <button type="button" id="ptPrev" onclick="ptGo(-1)"></button>
+      <button type="button" class="pri" id="ptNext" onclick="ptGo(1)"></button>
     </div>
   </div>
 
@@ -317,7 +359,13 @@
   let currentJudge = 'ok';
   let currentTool = 'point';  // 'point' | 'arrow' | 'box' | 'text' | 'move'
   let currentSizeMul = 1;     // 시트에서 조정 중인 크기 배율(포인트/텍스트)
-  let currentDrawColor = '#e0b060'; // 새로 그릴 화살표/박스 색상
+  // 옵션 바 상태 (새로 찍는/그리는 항목에 적용)
+  const DRAW_COLORS = [['#dc2626','빨강'],['#111827','검정'],['#2563eb','파랑'],['#16a34a','초록']];
+  const POINT_SIZES = [['S',0.7],['M',1],['L',1.35],['XL',1.75]];
+  const LINE_SIZES  = [['S',0.6],['M',1],['L',1.6]];
+  const TEXT_SIZES  = [['S',0.75],['M',1],['L',1.4]];
+  let barJudge = 'ok', barPointSize = 1, barColor = '#dc2626', barLine = 1, barTextSize = 1, barTextBg = true;
+  let sheetSizeKind = 'point';
 
   // 드래그(화살표/박스 신규 생성) 상태
   let dragging = false;
@@ -338,23 +386,56 @@
   const MAX_DIM = 1600; // 저장/작업용 최대 픽셀 크기 (성능·용량 균형)
 
   const TOOL_HINTS = {
-    point: '사진을 탭하면 포인트가 추가됩니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다',
-    arrow: '사진 위를 드래그하면 화살표가 그려집니다 · 기존 항목을 탭하면 삭제·색상변경할 수 있습니다',
-    box: '사진 위를 드래그하면 박스가 그려집니다 · 기존 항목을 탭하면 삭제·색상변경할 수 있습니다',
-    text: '사진을 탭하면 텍스트를 입력할 수 있습니다 · 기존 항목을 탭하면 수정/삭제할 수 있습니다',
-    move: '이동할 항목을 눌러서 드래그하면 위치가 바뀝니다'
+    point: '누르는 대로 ①②③ 찍힘 · 번호를 누르면 메모·측정값',
+    arrow: '드래그해서 그리기 · 그린 화살표 누르면 수정/삭제',
+    box: '그린 박스를 누르면 색 변경/삭제',
+    text: '사진을 누르면 글자 입력 · 쓴 글자 누르면 수정',
+    move: '항목을 눌러서 드래그하면 위치 이동'
   };
 
   function setTool(t){
     currentTool = t;
     ['point','arrow','box','text','move'].forEach(k => id('tool-'+k).classList.toggle('on', k===t));
     id('toolHint').innerText = TOOL_HINTS[t];
-    id('colorStrip').style.display = (t === 'arrow' || t === 'box') ? 'flex' : 'none';
+    renderOptBar();
   }
 
-  function setDrawColor(c, btn){
-    currentDrawColor = c;
-    document.querySelectorAll('#colorStrip .cswatch').forEach(b => b.classList.toggle('on', b === btn));
+  function sizeIcon(kind, i){
+    if (kind === 'point'){ const r = [4,6,8,10][i]; return `<span class="ic-dot" style="width:${r*2}px;height:${r*2}px"></span>`; }
+    if (kind === 'line'){ const w = [2,4,7][i]; return `<span class="ic-line" style="height:${w}px"></span>`; }
+    const f = [12,16,21][i]; return `<span class="ic-ga" style="font-size:${f}px">가</span>`;
+  }
+  function sizeBtns(kind, list, cur, fn){
+    return '<div class="ob-sz">' + list.map(([l, v], i) =>
+      `<button type="button" class="${v === cur ? 'on' : ''}" onclick="${fn}(${v})" aria-label="크기 ${l}">${sizeIcon(kind, i)}</button>`).join('') + '</div>';
+  }
+  function colorBtns(cur, fn){
+    return '<div class="ob-col">' + DRAW_COLORS.map(([c, n]) =>
+      `<button type="button" class="sw${c === cur ? ' on' : ''}" data-color="${c}" style="background:${c}" onclick="${fn}('${c}')" aria-label="${n}"></button>`).join('') + '</div>';
+  }
+  function renderOptBar(){
+    const t = currentTool, D = '<i class="ob-div"></i>';
+    let h = '';
+    if (t === 'point') h = `<div class="ob-j"><button type="button" class="ok${barJudge==='ok'?' on':''}" onclick="setBarJudge('ok')">✓ OK</button><button type="button" class="ng${barJudge==='ng'?' on':''}" onclick="setBarJudge('ng')">✕ NG</button></div>` + D + sizeBtns('point', POINT_SIZES, barPointSize, 'setBarPointSize');
+    else if (t === 'arrow') h = colorBtns(barColor, 'setBarColor') + D + sizeBtns('line', LINE_SIZES, barLine, 'setBarLine');
+    else if (t === 'box') h = colorBtns(barColor, 'setBarColor') + D + '<span class="ob-hint">↔ 드래그해서 그리기</span>';
+    else if (t === 'text') h = colorBtns(barColor, 'setBarColor') + D + sizeBtns('text', TEXT_SIZES, barTextSize, 'setBarTextSize') + `<button type="button" class="ob-bg${barTextBg?' on':''}" onclick="toggleBarTextBg()">바탕</button>`;
+    const b = id('optBar');
+    b.innerHTML = h;
+    b.style.display = h ? 'flex' : 'none';
+  }
+  function setBarJudge(j){ barJudge = j; renderOptBar(); }
+  function setBarPointSize(v){ barPointSize = v; renderOptBar(); }
+  function setBarColor(c){ barColor = c; renderOptBar(); }
+  function setBarLine(v){ barLine = v; renderOptBar(); }
+  function setBarTextSize(v){ barTextSize = v; renderOptBar(); }
+  function toggleBarTextBg(){ barTextBg = !barTextBg; renderOptBar(); showToast(barTextBg ? '글자 뒤에 흰 바탕을 깝니다' : '바탕 없이 글자만 (흰 테두리)'); }
+
+  function addPointQuick(pt){
+    marks.push({ type: 'point', x: pt.x, y: pt.y, judge: barJudge, memo: '', vals: [], num: nextNum, sizeMul: barPointSize });
+    nextNum++;
+    try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
+    redraw();
   }
 
   // -------- 사진 불러오기 --------
@@ -368,7 +449,6 @@
       marks = [];
       nextNum = 1;
       setTool('point');
-      resetDrawColor();
       setupCanvas();
       id('startScreen').style.display = 'none';
       id('markScreen').style.display = 'flex';
@@ -393,15 +473,19 @@
 
   function markerRadius(sizeMul){ return Math.max(22, canvas.width * 0.03) * (sizeMul || 1); }
 
-  function drawArrowShape(g, x1, y1, x2, y2, color, alpha){
-    const headLen = Math.max(14, canvas.width * 0.02);
+  function lineW(mul){ return Math.max(4, canvas.width * 0.006) * (mul || 1); }
+  function drawArrowShape(g, x1, y1, x2, y2, color, alpha, mul){
+    const lw = lineW(mul);
+    const headLen = Math.max(14, canvas.width * 0.02) * Math.pow(mul || 1, 0.75);
     const angle = Math.atan2(y2 - y1, x2 - x1);
     g.save();
     g.globalAlpha = (alpha === undefined) ? 1 : alpha;
     g.strokeStyle = color; g.fillStyle = color;
-    g.lineWidth = Math.max(4, canvas.width * 0.006);
+    g.lineWidth = lw;
     g.lineCap = 'round';
-    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    // 선 끝이 화살촉 밖으로 삐져나오지 않게 조금 짧게
+    const ex = x2 - Math.cos(angle) * headLen * 0.6, ey = y2 - Math.sin(angle) * headLen * 0.6;
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(ex, ey); g.stroke();
     g.beginPath();
     g.moveTo(x2, y2);
     g.lineTo(x2 - headLen * Math.cos(angle - Math.PI/7), y2 - headLen * Math.sin(angle - Math.PI/7));
@@ -410,11 +494,11 @@
     g.restore();
   }
 
-  function drawBoxShape(g, x1, y1, x2, y2, color, alpha){
+  function drawBoxShape(g, x1, y1, x2, y2, color, alpha, mul){
     g.save();
     g.globalAlpha = (alpha === undefined) ? 1 : alpha;
     g.strokeStyle = color;
-    g.lineWidth = Math.max(4, canvas.width * 0.006);
+    g.lineWidth = lineW(mul);
     const x = Math.min(x1, x2), y = Math.min(y1, y2), w = Math.abs(x2 - x1), h = Math.abs(y2 - y1);
     g.strokeRect(x, y, w, h);
     g.restore();
@@ -432,18 +516,33 @@
 
   function drawTextShape(g, m){
     const fontSize = Math.max(20, canvas.width * 0.03) * (m.sizeMul || 1);
+    const color = m.color || '#111827';
+    const bg = m.bg !== false;
+    g.save();
     g.font = `900 ${fontSize}px -apple-system, sans-serif`;
     const metrics = g.measureText(m.text);
-    const padX = 10, padY = 6;
+    const padX = Math.round(fontSize * 0.35), padY = Math.round(fontSize * 0.22);
     const w = metrics.width + padX*2;
     const h = fontSize + padY*2;
     m.w = w; m.h = h;
-    roundRectPath(g, m.x, m.y - h/2, w, h, 8);
-    g.fillStyle = TEXT_BG;
-    g.fill();
-    g.fillStyle = '#0b1636';
+    if (bg){
+      roundRectPath(g, m.x, m.y - h/2, w, h, Math.round(fontSize * 0.28));
+      g.fillStyle = 'rgba(255,255,255,0.92)';
+      g.fill();
+      g.lineWidth = Math.max(2, fontSize * 0.07);
+      g.strokeStyle = color;
+      g.stroke();
+    }
     g.textAlign = 'left'; g.textBaseline = 'middle';
+    if (!bg){
+      g.lineJoin = 'round';
+      g.lineWidth = Math.max(3, fontSize * 0.2);
+      g.strokeStyle = 'rgba(255,255,255,0.95)';
+      g.strokeText(m.text, m.x + padX, m.y);
+    }
+    g.fillStyle = color;
     g.fillText(m.text, m.x + padX, m.y);
+    g.restore();
   }
 
   function drawPointShape(g, m){
@@ -462,6 +561,10 @@
     g.textAlign = 'center';
     g.textBaseline = 'middle';
     g.fillText(String(m.num), m.x, m.y + r*0.06);
+    if (ptIndex >= 0 && marks[ptIndex] === m){
+      g.beginPath(); g.arc(m.x, m.y, r + Math.max(5, r*0.28), 0, Math.PI*2);
+      g.lineWidth = Math.max(4, r*0.2); g.strokeStyle = '#e0b060'; g.stroke();
+    }
   }
 
   function redraw(){
@@ -469,14 +572,14 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(baseImg, 0, 0, canvas.width, canvas.height);
     marks.forEach(m => {
-      if (m.type === 'arrow') drawArrowShape(ctx, m.x1, m.y1, m.x2, m.y2, m.color || ARROW_COLOR);
-      else if (m.type === 'box') drawBoxShape(ctx, m.x1, m.y1, m.x2, m.y2, m.color || ARROW_COLOR);
+      if (m.type === 'arrow') drawArrowShape(ctx, m.x1, m.y1, m.x2, m.y2, m.color || ARROW_COLOR, 1, m.w);
+      else if (m.type === 'box') drawBoxShape(ctx, m.x1, m.y1, m.x2, m.y2, m.color || ARROW_COLOR, 1, m.w);
       else if (m.type === 'text') drawTextShape(ctx, m);
       else drawPointShape(ctx, m);
     });
     if (dragging && dragStart && dragCurrent){
-      if (dragShapeType === 'box') drawBoxShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, currentDrawColor, 0.55);
-      else drawArrowShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, currentDrawColor, 0.55);
+      if (dragShapeType === 'box') drawBoxShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, barColor, 0.55, 1);
+      else drawArrowShape(ctx, dragStart.x, dragStart.y, dragCurrent.x, dragCurrent.y, barColor, 0.55, barLine);
     }
     renderLegend();
   }
@@ -496,7 +599,7 @@
           <div class="lv ${m.judge}">${m.judge === 'ok' ? 'OK' : 'NG'}</div>
           <div class="lm">${m.memo ? escH(m.memo) : '메모 없음'}</div>
         </div>
-        ${m.vals && m.vals.length ? `<div class="lvals">${m.vals.map(escH).join(' · ')}</div>` : ''}
+        ${m.vals && m.vals.length ? `<div class="lvals">${m.vals.map(x => x ? escH(x) : '–').join(' · ')}</div>` : ''}
       </div>
     `).join('');
     syncReportBtn();
@@ -531,7 +634,7 @@
         const r = markerRadius(m.sizeMul);
         if (Math.hypot(m.x - pt.x, m.y - pt.y) <= r + 10) return i;
       } else if (m.type === 'arrow'){
-        if (distToSegment(pt, {x:m.x1,y:m.y1}, {x:m.x2,y:m.y2}) <= 16) return i;
+        if (distToSegment(pt, {x:m.x1,y:m.y1}, {x:m.x2,y:m.y2}) <= Math.max(16, lineW(m.w) * 1.5)) return i;
       } else if (m.type === 'box'){
         const x = Math.min(m.x1,m.x2), y = Math.min(m.y1,m.y2), w = Math.abs(m.x2-m.x1), h = Math.abs(m.y2-m.y1);
         const c = [{x,y},{x:x+w,y},{x:x+w,y:y+h},{x,y:y+h}];
@@ -619,7 +722,7 @@
     if (dragging){
       dragging = false;
       if (moved > 20){
-        marks.push({ type: dragShapeType, x1: dragStart.x, y1: dragStart.y, x2: endPoint.x, y2: endPoint.y, color: currentDrawColor });
+        marks.push({ type: dragShapeType, x1: dragStart.x, y1: dragStart.y, x2: endPoint.x, y2: endPoint.y, color: barColor, w: dragShapeType === 'arrow' ? barLine : 1 });
       }
       dragStart = null; dragCurrent = null; dragShapeType = null;
       redraw();
@@ -629,7 +732,7 @@
       pendingXY = downPoint;
       editingIndex = -1;
       if (currentTool === 'text') openNewTextSheet();
-      else if (currentTool === 'point') openNewPointSheet();
+      else if (currentTool === 'point') addPointQuick(downPoint);
     }
     downPoint = null; downHitIndex = -1; downClient = null;
   });
@@ -641,76 +744,63 @@
     id('segNg').classList.toggle('on', j==='ng');
   }
 
-  function onSizeInput(v){
-    currentSizeMul = parseFloat(v);
+  function renderSheetSize(kind, cur){
+    sheetSizeKind = kind;
+    const list = kind === 'point' ? POINT_SIZES : kind === 'line' ? LINE_SIZES : TEXT_SIZES;
+    id('sizeLabel').innerText = kind === 'line' ? '굵기' : kind === 'text' ? '글자 크기' : '크기';
+    id('sheetSizeBox').innerHTML = sizeBtns(kind, list, cur, 'setSheetSize');
+    id('sizeFieldWrap').classList.remove('hidden');
+  }
+  function setSheetSize(v){
+    currentSizeMul = v;
     if (editingIndex >= 0){
-      marks[editingIndex].sizeMul = currentSizeMul;
+      const m = marks[editingIndex];
+      if (m.type === 'arrow' || m.type === 'box') m.w = v; else m.sizeMul = v;
       redraw();
     }
+    renderSheetSize(sheetSizeKind, v);
   }
-
-  function setSheetColor(c, btn){
+  function renderSheetColor(cur){
+    id('sheetColorStrip').innerHTML = colorBtns(cur, 'setSheetColor');
+    id('colorFieldWrap').classList.remove('hidden');
+  }
+  function setSheetColor(c){
     if (editingIndex >= 0){
       marks[editingIndex].color = c;
       redraw();
     }
-    document.querySelectorAll('#sheetColorStrip .cswatch').forEach(b => b.classList.toggle('on', b === btn));
-  }
-
-  function syncSheetColorSwatch(color){
-    document.querySelectorAll('#sheetColorStrip .cswatch').forEach(b => {
-      b.classList.toggle('on', b.dataset.color === color);
-    });
+    renderSheetColor(c);
   }
 
   // -------- 측정값 칸 --------
   function renderVals(vals){
-    const list = (vals && vals.length ? vals : ['']);
-    id('valsBox').innerHTML = list.map(v => `<input type="text" inputmode="decimal" autocomplete="off" value="${String(v).replace(/"/g, '&quot;')}" placeholder="값">`).join('')
+    const list = (vals || []).slice();
+    while (list.length < 3) list.push('');
+    id('valsBox').innerHTML = list.map((v, k) => `<input type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" value="${String(v).replace(/"/g, '&quot;')}" placeholder="측정${k + 1}">`).join('')
       + '<button type="button" onclick="addValBox()" aria-label="측정값 추가">＋</button>';
   }
   function addValBox(){
     const box = id('valsBox'), inputs = box.querySelectorAll('input');
     if (inputs.length >= 10) { showToast('측정값은 10개까지'); return; }
     const inp = document.createElement('input');
-    inp.type = 'text'; inp.inputMode = 'decimal'; inp.autocomplete = 'off'; inp.placeholder = '값';
+    inp.type = 'text'; inp.inputMode = 'decimal'; inp.autocomplete = 'off'; inp.placeholder = '측정' + (inputs.length + 1); inp.setAttribute('enterkeyhint', 'next');
     box.insertBefore(inp, box.lastElementChild); inp.focus();
   }
-  function readVals(){ return [...id('valsBox').querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean); }
-
-  function openNewPointSheet(){
-    sheetType = 'point';
-    currentJudge = 'ok';
-    currentSizeMul = 1;
-    setJudge('ok');
-    id('segOkngWrap').classList.remove('hidden');
-    id('memoFieldWrap').classList.remove('hidden');
-    id('memoLabel').innerText = '메모 (선택)';
-    id('memoInput').placeholder = '예: 웰드라인 발생, 데이텀 A 기준';
-    id('memoInput').value = '';
-    id('sizeFieldWrap').classList.remove('hidden');
-    id('sizeInput').value = 1;
-    id('colorFieldWrap').classList.add('hidden');
-    id('valsFieldWrap').classList.remove('hidden'); renderVals([]);
-    id('sheetTitle').innerText = `포인트 ${nextNum} 추가`;
-    id('sheetActions').classList.remove('has-del');
-    id('sheetActions').innerHTML = `
-      <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
-      <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
-    `;
-    showSheet();
+  // 적은 칸의 위치는 유지(측정1·측정3만 적어도 측정3 자리에 남음), 맨 뒤 빈 칸만 버림
+  function readVals(){
+    const v = [...id('valsBox').querySelectorAll('input')].map(i => i.value.trim());
+    while (v.length && !v[v.length - 1]) v.pop();
+    return v;
   }
 
   function openNewTextSheet(){
     sheetType = 'text';
-    currentSizeMul = 1;
     id('segOkngWrap').classList.add('hidden');
     id('memoFieldWrap').classList.remove('hidden');
-    id('memoLabel').innerText = '텍스트 내용';
+    id('memoLabel').innerText = '글자 입력';
     id('memoInput').placeholder = '예: 크랙, 데이텀 A, 10.02mm';
     id('memoInput').value = '';
-    id('sizeFieldWrap').classList.remove('hidden');
-    id('sizeInput').value = 1;
+    id('sizeFieldWrap').classList.add('hidden');
     id('colorFieldWrap').classList.add('hidden');
     id('valsFieldWrap').classList.add('hidden');
     id('sheetTitle').innerText = '텍스트 추가';
@@ -720,27 +810,33 @@
       <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
     `;
     showSheet();
+    setTimeout(() => { try { id('memoInput').focus(); } catch (e) {} }, 250);
+  }
+
+  function delActions(label){
+    id('sheetActions').classList.add('has-del');
+    id('sheetActions').innerHTML = `
+      <button type="button" class="btn-del" onclick="deleteCurrent()">🗑 삭제</button>
+      <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
+      <button type="button" class="btn-confirm" onclick="confirmSheet()">${label || '확인'}</button>
+    `;
   }
 
   function openEditSheetByIndex(i){
     editingIndex = i;
     const m = marks[i];
+    id('sizeFieldWrap').classList.add('hidden');
+    id('colorFieldWrap').classList.add('hidden');
 
     if (m.type === 'arrow' || m.type === 'box'){
       sheetType = m.type;
       id('segOkngWrap').classList.add('hidden');
       id('memoFieldWrap').classList.add('hidden');
-      id('sizeFieldWrap').classList.add('hidden');
-      id('colorFieldWrap').classList.remove('hidden');
-      syncSheetColorSwatch(m.color || ARROW_COLOR);
       id('valsFieldWrap').classList.add('hidden');
+      renderSheetColor(m.color || ARROW_COLOR);
+      if (m.type === 'arrow') renderSheetSize('line', m.w || 1);
       id('sheetTitle').innerText = (m.type === 'arrow' ? '화살표 수정' : '박스 수정');
-      id('sheetActions').classList.add('has-del');
-      id('sheetActions').innerHTML = `
-        <button type="button" class="btn-del" onclick="deleteCurrent()">삭제</button>
-        <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
-        <button type="button" class="btn-confirm" onclick="confirmSheet()">완료</button>
-      `;
+      delActions('완료');
       showSheet();
       return;
     }
@@ -750,53 +846,97 @@
       currentSizeMul = m.sizeMul || 1;
       id('segOkngWrap').classList.add('hidden');
       id('memoFieldWrap').classList.remove('hidden');
-      id('memoLabel').innerText = '텍스트 내용';
+      id('memoLabel').innerText = '글자 내용';
       id('memoInput').placeholder = '예: 크랙, 데이텀 A, 10.02mm';
       id('memoInput').value = m.text || '';
-      id('sizeFieldWrap').classList.remove('hidden');
-      id('sizeInput').value = currentSizeMul;
-      id('colorFieldWrap').classList.add('hidden');
+      renderSheetColor(m.color || '#111827');
+      renderSheetSize('text', currentSizeMul);
       id('valsFieldWrap').classList.add('hidden');
       id('sheetTitle').innerText = '텍스트 수정';
-      id('sheetActions').classList.add('has-del');
-      id('sheetActions').innerHTML = `
-        <button type="button" class="btn-del" onclick="deleteCurrent()">삭제</button>
-        <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
-        <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
-      `;
+      delActions();
       showSheet();
       return;
     }
 
-    // point
-    sheetType = 'point';
-    currentJudge = m.judge;
-    currentSizeMul = m.sizeMul || 1;
-    id('segOkngWrap').classList.remove('hidden');
-    id('memoFieldWrap').classList.remove('hidden');
-    id('memoLabel').innerText = '메모 (선택)';
-    id('memoInput').placeholder = '예: 웰드라인 발생, 데이텀 A 기준';
-    setJudge(m.judge);
-    id('memoInput').value = m.memo || '';
-    id('sizeFieldWrap').classList.remove('hidden');
-    id('sizeInput').value = currentSizeMul;
-    id('colorFieldWrap').classList.add('hidden');
-    id('valsFieldWrap').classList.remove('hidden'); renderVals(m.vals || []);
-    id('sheetTitle').innerText = `포인트 ${m.num} 수정`;
-    id('sheetActions').classList.add('has-del');
-    id('sheetActions').innerHTML = `
-      <button type="button" class="btn-del" onclick="deleteCurrent()">삭제</button>
-      <button type="button" class="btn-cancel" onclick="closeSheet()">취소</button>
-      <button type="button" class="btn-confirm" onclick="confirmSheet()">확인</button>
-    `;
-    showSheet();
+    openPtSheet(i);
   }
+
+  // -------- 포인트 입력창 (측정값 중심 · 다음/이전) --------
+  let ptIndex = -1;
+  function circ(n){ return n >= 1 && n <= 20 ? String.fromCharCode(0x2460 + n - 1) : String(n); }
+  function pointsByNum(){ return marks.map((m, i) => ({ m, i })).filter(o => o.m.type === 'point').sort((a, b) => a.m.num - b.m.num); }
+  function openPtSheet(i){
+    ptIndex = i;
+    const m = marks[i], list = pointsByNum(), pos = list.findIndex(o => o.i === i);
+    id('ptNo').innerHTML = `${circ(m.num)}<small>/ ${list.length}</small>`;
+    syncPtJudge();
+    renderVals(m.vals || []);
+    id('ptMemo').value = m.memo || '';
+    const prev = list[pos - 1], next = list[pos + 1];
+    id('ptPrev').disabled = !prev;
+    id('ptPrev').innerText = prev ? `◀ ${circ(prev.m.num)}` : '◀';
+    id('ptNext').innerText = next ? `다음 ${circ(next.m.num)} ▶` : '완료 ✓';
+    id('ptSheet').classList.add('show');
+    id('sheetBackdrop').classList.add('show');
+    redraw();
+    // 키패드가 바로 뜨도록 탭 동작 안에서 곧바로 포커스
+    const first = id('valsBox').querySelector('input');
+    const target = [...id('valsBox').querySelectorAll('input')].find(x => !x.value) || first;
+    try { target.focus({ preventScroll: true }); } catch (e) {}
+  }
+  function syncPtJudge(){
+    const m = marks[ptIndex]; if (!m) return;
+    id('ptOk').classList.toggle('on', m.judge !== 'ng');
+    id('ptNg').classList.toggle('on', m.judge === 'ng');
+  }
+  function setPtJudge(j){
+    const m = marks[ptIndex]; if (!m) return;
+    m.judge = j;
+    syncPtJudge(); redraw();
+  }
+  function savePt(){
+    const m = marks[ptIndex]; if (!m) return;
+    m.memo = id('ptMemo').value.trim();
+    m.vals = readVals();
+  }
+  function ptGo(d){
+    if (ptIndex < 0) return;
+    savePt();
+    const list = pointsByNum(), pos = list.findIndex(o => o.i === ptIndex), t = list[pos + d];
+    if (t) openPtSheet(t.i);
+    else if (d > 0) closePtSheet();
+  }
+  function closePtSheet(){
+    if (ptIndex >= 0) savePt();
+    ptIndex = -1;
+    id('ptSheet').classList.remove('show');
+    id('sheetBackdrop').classList.remove('show');
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    redraw();
+  }
+  function deletePt(){
+    const m = marks[ptIndex]; if (!m) return;
+    if (!confirm(`${circ(m.num)} 포인트를 삭제할까요?\n(뒤 번호가 하나씩 당겨집니다)`)) return;
+    marks.splice(ptIndex, 1);
+    ptIndex = -1;
+    renumber();
+    id('ptSheet').classList.remove('show');
+    id('sheetBackdrop').classList.remove('show');
+    redraw();
+    showToast('삭제했습니다');
+  }
+  // 키패드의 엔터(다음) → 다음 번호
+  document.addEventListener('keydown', e => {
+    if (ptIndex < 0 || e.key !== 'Enter' || e.isComposing) return;
+    if (e.target && (e.target.closest('#valsBox') || e.target.id === 'ptMemo')) { e.preventDefault(); ptGo(1); }
+  });
 
   function showSheet(){
     id('pointSheet').classList.add('show');
     id('sheetBackdrop').classList.add('show');
   }
   function closeSheet(){
+    if (ptIndex >= 0){ closePtSheet(); return; }
     id('pointSheet').classList.remove('show');
     id('sheetBackdrop').classList.remove('show');
     pendingXY = null;
@@ -811,9 +951,6 @@
         marks[editingIndex].memo = memo;
         marks[editingIndex].vals = readVals();
         marks[editingIndex].sizeMul = currentSizeMul;
-      } else if (pendingXY){
-        marks.push({ type: 'point', x: pendingXY.x, y: pendingXY.y, judge: currentJudge, memo, vals: readVals(), num: nextNum, sizeMul: currentSizeMul });
-        nextNum++;
       }
     } else if (sheetType === 'text'){
       const text = id('memoInput').value.trim();
@@ -822,7 +959,7 @@
         marks[editingIndex].text = text;
         marks[editingIndex].sizeMul = currentSizeMul;
       } else if (pendingXY){
-        marks.push({ type: 'text', x: pendingXY.x, y: pendingXY.y, text, sizeMul: currentSizeMul });
+        marks.push({ type: 'text', x: pendingXY.x, y: pendingXY.y, text, sizeMul: barTextSize, color: barColor, bg: barTextBg });
       }
     }
     // arrow/box는 색상 스와치를 탭하는 즉시 반영되므로 여기서는 시트만 닫음
@@ -864,16 +1001,9 @@
     marks = [];
     nextNum = 1;
     setTool('point');
-    resetDrawColor();
     id('markScreen').style.display = 'none';
     id('startScreen').style.display = 'flex';
     closeReport();
-  }
-
-  function resetDrawColor(){
-    currentDrawColor = ARROW_COLOR;
-    const swatches = document.querySelectorAll('#colorStrip .cswatch');
-    swatches.forEach((b, i) => b.classList.toggle('on', i === 0));
   }
 
   // -------- 저장 (이미지 + 범례 합성 후 공유/저장) --------
@@ -911,7 +1041,7 @@
 
         octx.fillStyle = 'rgba(255,255,255,.65)';
         octx.font = '600 12px -apple-system, sans-serif';
-        octx.fillText((m.memo || '메모 없음') + (m.vals && m.vals.length ? '  ·  ' + m.vals.join(' / ') : ''), legendPad + 66, y - 5);
+        octx.fillText((m.memo || '메모 없음') + (m.vals && m.vals.length ? '  ·  ' + m.vals.map(x => x || '–').join(' / ') : ''), legendPad + 66, y - 5);
         y += legendLineH;
       });
     }
