@@ -106,6 +106,13 @@
   /* 정밀측정 실적 */
   .kpi-sub { margin-top: -4px; margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--sub); }
   .kpi-sub .up { color: #1a9247; } .kpi-sub .down { color: var(--red); }
+  .perf-since { white-space: nowrap; margin-left: 8px; font-size: 11px; font-weight: 700; color: #999; }
+  .ngdot { display: inline-block; margin-left: 3px; font-style: normal; font-size: 10.5px; font-weight: 900; color: var(--red); }
+  .ngc { font-size: 10.5px; font-weight: 900; color: #fff; background: var(--red); border-radius: 4px; padding: 0 4px; margin-left: 2px; }
+  .perf.insp .perf-bars .b { background: #b7e3ea; }
+  .perf.insp .perf-bars .col.cur .b { background: var(--inspection); }
+  .perf.insp .perf-mon .cur { color: var(--inspection); }
+  .perf-line .k { display: inline-block; min-width: 62px; font-size: 11px; font-weight: 800; color: var(--sub); }
   .perf { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 13px 14px; margin-bottom: 14px; }
   .perf-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; font-weight: 800; }
   .perf-cap { font-size: 11px; font-weight: 700; color: var(--sub); }
@@ -279,8 +286,8 @@
     <span class="live">LIVE</span>
   </div>
   <div class="seg" id="deptGroup">
-    <button data-dept="inspection" class="active">수입검사</button>
-    <button data-dept="precision">정밀 측정</button>
+    <button data-dept="precision" class="active">정밀 측정</button>
+    <button data-dept="inspection">수입검사</button>
   </div>
 </header>
 
@@ -300,7 +307,7 @@
   <section class="kpi-grid" id="kpiGrid"></section>
 
   <section class="perf" id="pcPerf" style="display:none;">
-    <div class="perf-head"><span>월별 측정 완료</span><span class="perf-cap" id="perfCap">막대를 누르면 건수</span></div>
+    <div class="perf-head"><span id="perfTitle">월별 측정 완료</span><span class="perf-cap" id="perfCap">막대를 누르면 건수</span></div>
     <div class="perf-bars" id="perfBars"></div>
     <div class="perf-line" id="perfCust"></div>
     <div class="perf-line" id="perfNext"></div>
@@ -482,10 +489,57 @@
   const qiMonthRate = qiMonthTarget.length > 0 ? Math.round((qiMonthDone.length/qiMonthTarget.length)*100) : 0;
   const qiUrgent = qiMonthPending.filter(r => r.receiveDate && daysBetween(r.receiveDate, today) >= 5);
 
+  // ---- [2026-09-30] 수입검사 실적 (정밀측정 패널과 같은 틀 · 검사 완료일 기준) ----
+  const QI_NG = /NG|불합격|부적합/i;
+  const qiIsNg = r => QI_NG.test(String(r.judgement || ''));
+  const qiDoneAll = qiQms.filter(r => qiComplete(r)).map(r => ({ r, d: nd(qiCompletedAt(r)) || String(qiCompletedAt(r) || '') }));
+  const qiMonths = [5,4,3,2,1,0].map(k => {
+    const x = new Date(now.getFullYear(), now.getMonth() - k, 1);
+    const ym = `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`;
+    const rows = qiDoneAll.filter(o => o.d.startsWith(ym));
+    return { ym, m: x.getMonth() + 1, n: rows.length, ng: rows.filter(o => qiIsNg(o.r)).length, judged: rows.filter(o => String(o.r.judgement || '').trim()).length };
+  });
+  const qiDoneMonth = qiMonths[5].n, qiDonePrev = qiMonths[4].n;
+  const qiDoneYear = qiDoneAll.filter(o => o.d.startsWith(String(now.getFullYear()))).length;
+  const qiNgMonth = qiMonths[5].ng, qiJudgedMonth = qiMonths[5].judged;
+  const qiNgRate = qiJudgedMonth ? Math.round(qiNgMonth / qiJudgedMonth * 1000) / 10 : null;
+  const qiLastNg = qiDoneAll.filter(o => qiIsNg(o.r)).sort((a,b) => b.d.localeCompare(a.d))[0] || null;
+  const qiOldestPending = qiQms.filter(r => !qiComplete(r) && nd(r.receiveDate)).sort((a,b) => nd(a.receiveDate).localeCompare(nd(b.receiveDate)))[0] || null;
+  function vendorLine(ym){
+    const c = {};
+    qiDoneAll.filter(o => o.d.startsWith(ym)).forEach(o => { const k = o.r.vendor || '기타'; c[k] = c[k] || { n: 0, ng: 0 }; c[k].n++; if (qiIsNg(o.r)) c[k].ng++; });
+    return Object.entries(c).sort((a,b) => (b[1].ng - a[1].ng) || (b[1].n - a[1].n)).slice(0, 5)
+      .map(([k,v]) => `${esc(k)} <b>${v.n}</b>${v.ng ? ` <span class="ngc">NG ${v.ng}</span>` : ''}`).join(' · ');
+  }
+  function ngVendorLine(ym){
+    const c = {};
+    qiDoneAll.filter(o => o.d.startsWith(ym) && qiIsNg(o.r)).forEach(o => { const k = o.r.vendor || '기타'; c[k] = (c[k] || 0) + 1; });
+    return Object.entries(c).sort((a,b) => b[1] - a[1]).slice(0, 3).map(([k,v]) => `${esc(k)} <b>${v}</b>`).join(' · ');
+  }
+  function renderPerfInsp(){
+    const max = Math.max(1, ...qiMonths.map(x => x.n));
+    document.getElementById('perfBars').innerHTML = qiMonths.map((x,i) =>
+      `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 검사 ${x.n}건 · 불합격 ${x.ng}건">`
+      + `<div class="n">${(i===5||i===perfSel) ? x.n : ''}${x.ng ? `<i class="ngdot">●${x.ng}</i>` : ''}</div><div class="b" style="height:${Math.round(x.n/max*70)}px"></div></div>`).join('');
+    const mon = document.getElementById('perfMon');
+    if (mon) mon.innerHTML = qiMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
+    const sel = qiMonths[perfSel];
+    document.getElementById('perfCap').textContent = perfSel === 5 ? '누르면 협력사별 · ●불합격' : `${sel.m}월 선택 · 다시 누르면 이번 달`;
+    const vl = vendorLine(sel.ym);
+    document.getElementById('perfCust').innerHTML = `<span class="k">${sel.m}월 협력사</span>` + (vl || '검사 완료 기록 없음');
+    const bits = [];
+    if (qiLastNg) bits.push(`<span class="k">최근 불합격</span><b>${esc(qiLastNg.d.slice(5).replace('-','/'))}</b> ${esc(qiLastNg.r.item || '')}${qiLastNg.r.vendor ? ' · ' + esc(qiLastNg.r.vendor) : ''}`);
+    else bits.push(`<span class="k">최근 불합격</span>${qiDoneAll.some(o => String(o.r.judgement || '').trim()) ? '없음' : '판정 데이터 없음'}`);
+    if (qiOldestPending) bits.push(`<span class="k">최장 대기</span><b>입고 ${Math.max(0, daysBetween(nd(qiOldestPending.receiveDate), today))}일</b> ${esc(qiOldestPending.item || '')}${qiOldestPending.vendor ? ' · ' + esc(qiOldestPending.vendor) : ''}`);
+    else bits.push(`<span class="k">최장 대기</span>대기 중인 건 없음`);
+    document.getElementById('perfNext').innerHTML = bits.join('<br>');
+    trimPerf(qiMonths, qiDoneAll.map(o => o.d).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0]);
+  }
+
   // ============================================================
   //  상태 / 렌더링
   // ============================================================
-  let currentDept = 'inspection';
+  let currentDept = 'precision'; // [2026-09-30] 원래 순서(정밀측정 먼저)로 복귀
   let currentTab = 'todo';
   let statusFilter = 'all';
   let prioFilter = 'all';
@@ -510,11 +564,14 @@
         kpiCard(pcUrgent.length ? 'accent' : 'n', pcUrgent.length,'건','긴급',scaledBar(pcUrgent.length,10))
       ].join('');
     } else {
+      // [2026-09-30] 정밀측정과 같은 6칸 (실적 + 불합격)
       g.innerHTML = [
-        kpiCard('n', qiMonthTarget.length,'건','이번 달 대상',scaledBar(qiMonthTarget.length,50)),
         kpiCard('n', qiWeekDone.length,'건','이번 주 완료',scaledBar(qiWeekDone.length,30)),
+        kpiCard('n', qiDoneMonth,'건','이번 달 완료',scaledBar(qiDoneMonth,120), `지난달 ${qiDonePrev}건`),
+        kpiCard('n', qiDoneYear,'건',`${now.getFullYear()}년 누적 완료`,scaledBar(qiDoneYear,1200)),
         kpiCard(qiUrgent.length ? 'accent' : 'n', qiMonthPending.length,'건','미완료',scaledBar(qiMonthPending.length,30), qiUrgent.length ? `입고 5일 이상 <span class="down">${qiUrgent.length}건</span>` : '입고 5일 이상 지연 없음'),
-        kpiCard('n', qiMonthRate,'%','완료율',qiMonthRate, `완료 ${qiMonthDone.length} / 대상 ${qiMonthTarget.length}건`)
+        kpiCard('n', qiMonthRate,'%','완료율',qiMonthRate, `완료 ${qiMonthDone.length} / 대상 ${qiMonthTarget.length}건`),
+        kpiCard(qiNgMonth ? 'accent' : 'n', qiNgMonth,'건','이번 달 불합격',scaledBar(qiNgMonth,10), qiNgRate === null ? '판정 데이터 없음' : `불합격률 ${qiNgRate}%`)
       ].join('');
     }
   }
@@ -522,32 +579,57 @@
   let perfSel = 5;
   function renderPerf(){
     const box = document.getElementById('pcPerf');
-    box.style.display = currentDept === 'precision' ? '' : 'none';
-    if (currentDept !== 'precision') return;
+    box.style.display = '';
+    box.classList.toggle('insp', currentDept !== 'precision');
+    document.getElementById('perfTitle').textContent = currentDept === 'precision' ? '월별 측정 완료' : '월별 검사 완료';
+    let mon0 = document.getElementById('perfMon');
+    if (!mon0) { mon0 = document.createElement('div'); mon0.id = 'perfMon'; mon0.className = 'perf-mon'; document.getElementById('perfBars').after(mon0); }
+    if (currentDept !== 'precision') { renderPerfInsp(); return; }
     const max = Math.max(1, ...pcMonths.map(x => x.n));
     document.getElementById('perfBars').innerHTML = pcMonths.map((x,i) => `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 ${x.n}건"><div class="n">${i===5||i===perfSel ? x.n : ''}</div><div class="b" style="height:${Math.round(x.n/max*70)}px"></div></div>`).join('');
     let mon = document.getElementById('perfMon');
     if (!mon) { mon = document.createElement('div'); mon.id = 'perfMon'; mon.className = 'perf-mon'; document.getElementById('perfBars').after(mon); }
     mon.innerHTML = pcMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
     const sel = pcMonths[perfSel];
-    document.getElementById('perfCap').textContent = perfSel === 5 ? '막대를 누르면 건수' : `${sel.m}월 ${sel.n}건`;
+    document.getElementById('perfCap').textContent = perfSel === 5 ? '누르면 고객사별' : `${sel.m}월 ${sel.n}건`;
     const cl = custLine(sel.ym);
-    document.getElementById('perfCust').innerHTML = cl ? `${sel.m}월 고객사별 · ${cl}` : `${sel.m}월 완료 기록 없음`;
+    document.getElementById('perfCust').innerHTML = `<span class="k">${sel.m}월 고객사</span>` + (cl || '완료 기록 없음');
     const last = pcRecentDone[0];
     const bits = [];
-    if (last) bits.push(`최근 완료 <b>${esc(last.completeDate.slice(5).replace('-','/'))}</b> ${esc(last.item||'')}`);
-    if (pcNext) bits.push(`다음 예정 <b>${esc(pcNext.dueDate.slice(5).replace('-','/'))}</b> ${esc(pcNext.item||'')}${pcNext.customer ? ' · ' + esc(pcNext.customer) : ''}`);
+    if (last) bits.push(`<span class="k">최근 완료</span><b>${esc(last.completeDate.slice(5).replace('-','/'))}</b> ${esc(last.item||'')}`);
+    if (pcNext) bits.push(`<span class="k">다음 예정</span><b>${esc(pcNext.dueDate.slice(5).replace('-','/'))}</b> ${esc(pcNext.item||'')}${pcNext.customer ? ' · ' + esc(pcNext.customer) : ''}`);
     document.getElementById('perfNext').innerHTML = bits.join('<br>');
+    trimPerf(pcMonths, pcComplete.map(r => r.completeDate).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0]);
+  }
+
+  // [2026-09-30] 데이터가 없는 앞쪽 달은 막대에서 빼고, 시작일을 제목 옆에 표시 ("그 달에 일을 안 했다" 오해 방지)
+  function trimPerf(months, minDate){
+    let st = months.findIndex(x => x.n > 0); if (st < 0) st = months.length - 1;
+    const cols = months.length - st;
+    ['perfBars', 'perfMon'].forEach(id => {
+      const el = document.getElementById(id); if (!el) return;
+      [...el.children].forEach((c, i) => { c.style.display = i < st ? 'none' : ''; });
+      el.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    });
+    const t = document.getElementById('perfTitle');
+    const winStart = months[0].ym + '-01';
+    if (st > 0) t.textContent = t.textContent.replace(/\s*\(최근 6개월\)/, '');
+    if (minDate && minDate > winStart){
+      const n = document.createElement('small');
+      n.className = 'perf-since';
+      n.textContent = `데이터 ${+minDate.slice(5, 7)}/${+minDate.slice(8, 10)}부터`;
+      t.appendChild(n);
+    }
   }
   function perfPick(i){ perfSel = perfSel === i ? 5 : i; renderPerf(); }
 
   function renderSummary(){
     const set = (i,l,v) => { document.getElementById('sumLabel'+i).textContent = l; document.getElementById('sumVal'+i).textContent = v + '건'; };
     const pc = currentDept === 'precision';
-    document.getElementById('sumHead').textContent = pc ? `${now.getMonth()+1}월 측정 실적` : 'TODAY SUMMARY';
-    document.getElementById('sumBox3').classList.remove('acc');
+    document.getElementById('sumHead').textContent = `${now.getMonth()+1}월 ${pc ? '측정' : '검사'} 실적`;
+    document.getElementById('sumBox3').classList.toggle('acc', !pc && qiUrgent.length > 0);
     if (pc){ set(1,'이번 달 완료',pcDoneMonth); set(2,'올해 누적',pcDoneYear); set(3,'진행 중',pcIncomplete.length); }
-    else { set(1,'오늘입고',qiTodayIn.length); set(2,'이번주완료',qiWeekDone.length); set(3,'이번달 미완료',qiMonthPending.length); }
+    else { set(1,'이번 달 완료',qiDoneMonth); set(2,'올해 누적',qiDoneYear); set(3,'미완료',qiMonthPending.length); }
   }
 
   function buildRows(){
@@ -648,7 +730,7 @@
     });
   }
   bindGroup('deptGroup','button', b => {
-    currentDept = b.dataset.dept; currentTab = 'todo';
+    currentDept = b.dataset.dept; currentTab = 'todo'; perfSel = 5;
     document.querySelectorAll('#tabHeader .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'todo'));
     renderAll();
   });
