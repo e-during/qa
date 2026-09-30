@@ -20,6 +20,14 @@
  *    결재상태 기반 납기 준수율 관리).
  *  - "📊 인원별 실적 조회"에 측정 수량 / 평균 처리기간 / 완료율 항목 추가.
  *  - 버튼식/고정형 시나리오 구조는 그대로 유지 (자유질문형 AI로 바꾸지 않음).
+ *
+ *  [2026-09-30 업그레이드]
+ *  - 담당자 이름을 코드에서 삭제 → 암호화 데이터에서 자동 추출 (공개 저장소에 실명 노출 방지,
+ *    인원 변동 시 코드 수정 불필요)
+ *  - 🔍 품번 조회 (품번·품명 일부 → 정밀측정 이력 + 수입검사 결과) · 최근 조회 버튼
+ *  - 📑 월간 요약 (지난달 마감 / 이번 달 누계 · 전월 대비 ▲▼ · 보고용 복사)
+ *  - 🏢 측정 의뢰 비중 (의뢰부서별 / 고객사별)
+ *  - 결과 말풍선 📋 복사 · 화면마다 🏠 처음으로 · 인사 반복 정리
  * ============================================================ */
 
 (function () {
@@ -127,14 +135,12 @@
   //  (엑셀에서 담당자 이름에 공백이 섞여 들어오면 실적이 0건으로
   //   보이는 문제를 방지)
   //
-  //  ★ 담당자(assignee) 필드는 "임동혁㈱(LIM DONGHYUK)" 처럼 이름
+  //  ★ 담당자(assignee) 필드는 "홍길동㈱(HONG GILDONG)" 처럼 이름
   //  뒤에 회사명(㈱)이나 영문 이름이 그대로 붙어서 저장되는 경우가
-  //  있습니다. PEOPLE 배열의 순수 이름("임동혁")과 정확히 일치하지
-  //  않으면 실적이 0건으로 보이므로, 문자열 맨 앞의 "한글 연속
-  //  구간"만 추출해서 순수 이름만 남깁니다.
-  //  예) "임동혁㈱(LIM DONGHYUK)" -> "임동혁"
-  //      "이정훈(Lee Jeonghoon)"  -> "이정훈"
-  //      "정충용"                -> "정충용" (그대로)
+  //  있습니다. 순수 이름("홍길동")과 정확히 일치하지 않으면 실적이
+  //  0건으로 보이므로, 문자열 맨 앞의 "한글 연속 구간"만 추출합니다.
+  //  예) "홍길동㈱(HONG GILDONG)" -> "홍길동"
+  //      "홍길동(Hong Gildong)"   -> "홍길동"
   // ------------------------------------------------------------
   function extractName(v){
     const s = safeStr(v);
@@ -223,10 +229,19 @@
   //  ※ 실제 데이터에 담당자 이름이 다르게 들어와 있으면(오타 등)
   //     아래 배열도 함께 맞춰줘야 합니다.
   // ============================================================
-  const PEOPLE = ['정충용', '임동혁', '이정훈']; // 정밀측정부
-  // ⚠ 수입검사부 담당자 목록은 실제 데이터 샘플(임설희/김지영/박창희)을
-  //   참고해 넣어둔 것입니다 - 실제 팀 구성원과 다르면 여기를 고쳐주세요.
-  const PEOPLE_INSPECT = ['임설희', '김지영', '박창희', '김노을']; // 수입검사부
+  //  [2026-09-30] 이름을 코드에 적지 않고 데이터에서 자동으로 뽑습니다.
+  //   - 최근 6개월 완료 건이 있는 담당자만 (퇴사·이동 인원 자동 제외)
+  //   - 6개월 내 기록이 없으면 전체 기간에서 추출
+  //   - 가나다순 (건수순으로 정렬하면 순위처럼 보여서)
+  function peopleFrom(dataset){
+    const since = toYmd(addMonths(now, -6));
+    const valid = n => /^[가-힣]{2,5}$/.test(n) && n !== '미지정';
+    let names = dataset.filter(r => valid(r.assignee) && r.completeDate && r.completeDate >= since).map(r => r.assignee);
+    if (!names.length) names = dataset.filter(r => valid(r.assignee)).map(r => r.assignee);
+    return [...new Set(names)].sort((a, b) => a.localeCompare(b, 'ko'));
+  }
+  const PEOPLE = peopleFrom(pcAll);          // 정밀측정부
+  const PEOPLE_INSPECT = peopleFrom(qiAll);  // 수입검사부
 
   // ============================================================
   //  기간 계산 헬퍼
@@ -911,7 +926,185 @@
   // ============================================================
   //  액션 함수 (동적 데이터 응답 생성) — 새 액션은 여기 추가
   // ============================================================
+  // ============================================================
+  //  [2026-09-30] 공용 헬퍼: 가로 막대 · 증감 표시 · 문자 정규화
+  // ============================================================
+  function buildHBarChart(items, total){ // items: [{name, count}] (정렬된 상태)
+    const rowH = 30, w = 340, labelW = 88, padR = 88;
+    const h = items.length * rowH + 8;
+    const maxVal = Math.max(1, ...items.map(i => i.count));
+    let g = '';
+    items.forEach((it, i) => {
+      const y = 4 + i * rowH;
+      const bw = Math.max(3, Math.round((it.count / maxVal) * (w - labelW - padR)));
+      const pct = total ? Math.round(it.count / total * 1000) / 10 : 0;
+      const nm = it.name.length > 7 ? it.name.slice(0, 6) + '…' : it.name;
+      g += `<text x="${labelW - 8}" y="${y + 18}" text-anchor="end" font-size="13" font-weight="700" fill="${it.muted ? '#999' : '#333'}">${escapeHtml(nm)}</text>`;
+      g += `<rect x="${labelW}" y="${y + 6}" width="${bw}" height="16" rx="4" fill="${it.muted ? '#cfcfcf' : (i === 0 ? '#e62e2d' : '#1a73e8')}" opacity="${i === 0 || it.muted ? 1 : 0.75}"></rect>`;
+      g += `<text x="${labelW + bw + 6}" y="${y + 18}" font-size="13" font-weight="800" fill="#111">${it.count}건 <tspan fill="#888" font-weight="700">${pct}%</tspan></text>`;
+    });
+    return `<div class="${UI.chartBox}"><svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" xmlns="http://www.w3.org/2000/svg">${g}</svg></div>`;
+  }
+  // 증감: goodUp=true면 증가가 좋은 지표(초록), false면 증가가 나쁜 지표(빨강), null이면 중립(회색)
+  function deltaTag(cur, prev, unit, goodUp, digits){
+    if (cur === null || prev === null || cur === undefined || prev === undefined) return { html: '', text: '' };
+    const d = Math.round((cur - prev) * Math.pow(10, digits || 0)) / Math.pow(10, digits || 0);
+    if (d === 0) return { html: ` <span style="color:#888;font-weight:800">(＝)</span>`, text: ' (전월 동일)' };
+    const up = d > 0, arrow = up ? '▲' : '▼';
+    const good = goodUp === null ? null : (up === goodUp);
+    const color = good === null ? '#888' : (good ? '#1a9e5c' : '#e62e2d');
+    const v = Math.abs(d) + (unit || '');
+    return { html: ` <span style="color:${color};font-weight:900">${arrow}${v}</span>`, text: ` (${arrow}${v})` };
+  }
+  function avgOf(list){ return list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length * 10) / 10 : null; }
+  function normKey(v){ return safeStr(v).toLowerCase().replace(/[\s\-_./]/g, ''); }
+  function rangeRows(dataset, start, end, field){
+    return dataset.filter(r => r[field] && r[field] >= start && r[field] <= end);
+  }
+
+  // 월간 요약에 쓰는 기간 계산 (partial=true면 1일~오늘 날짜까지, 전월도 같은 날짜까지로 맞춰 비교)
+  function summaryRange(offset, partial){
+    const info = monthInfo(offset);
+    if (!partial) return { start: info.start, end: info.end, label: info.label };
+    const day = String(Math.min(now.getDate(), Number(info.end.slice(8)))).padStart(2, '0');
+    return { start: info.start, end: info.start.slice(0, 8) + day, label: info.label };
+  }
+  function measureMetrics(rg){
+    const done = rangeRows(pcAll, rg.start, rg.end, 'completeDate');
+    const qms = done.filter(r => r.source === 'qms');
+    const onTime = qms.filter(r => r.dueDate && r.completeDate <= r.dueDate).length;
+    const late = qms.filter(r => r.dueDate && r.completeDate > r.dueDate).length;
+    const proc = done.map(r => daysBetween(r.requestDate, r.completeDate)).filter(v => v !== null && v >= 0);
+    let qty = 0, hasQty = false;
+    done.forEach(r => { const n = Number(r.qty); if (r.qty !== '' && !isNaN(n)) { qty += n; hasQty = true; } });
+    return { done: done.length, qty: hasQty ? qty : null, onTimeRate: (onTime + late) ? Math.round(onTime / (onTime + late) * 100) : null, late, avgProc: avgOf(proc) };
+  }
+  function inspectMetrics(rg){
+    const done = rangeRows(qiAll, rg.start, rg.end, 'completeDate');
+    const judged = done.filter(r => r.judgement);
+    const ng = judged.filter(r => NG_PATTERN.test(r.judgement));
+    const proc = done.map(r => daysBetween(r.receiveDate, r.completeDate)).filter(v => v !== null && v >= 0);
+    const vend = {};
+    ng.forEach(r => { const v = r.vendor || '미지정'; vend[v] = (vend[v] || 0) + 1; });
+    return { done: done.length, judged: judged.length, ng: ng.length, ngRate: judged.length ? Math.round(ng.length / judged.length * 1000) / 10 : null, avgProc: avgOf(proc), vendors: Object.entries(vend).sort((a, b) => b[1] - a[1]).slice(0, 3) };
+  }
+
+  // 품번 조회 최근 기록 (이 기기에만)
+  const PART_RECENT_KEY = 'qcb_part_recent_v1';
+  function partRecent(){ try { const a = JSON.parse(localStorage.getItem(PART_RECENT_KEY)); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function pushPartRecent(q){
+    const list = [q, ...partRecent().filter(x => x !== q)].slice(0, 6);
+    try { localStorage.setItem(PART_RECENT_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+
   const ACTIONS = {
+    // ---- 🔍 품번 조회 ----
+    partLookup(params){
+      const q = safeStr(params.q), k = normKey(q);
+      const hit = r => normKey(r.partNo).includes(k) || normKey(r.item).includes(k);
+      const mRows = pcAll.filter(hit).sort((a, b) => (b.completeDate || b.requestDate || b.dueDate || '').localeCompare(a.completeDate || a.requestDate || a.dueDate || ''));
+      const iRows = qiAll.filter(hit).sort((a, b) => (b.receiveDate || b.completeDate || '').localeCompare(a.receiveDate || a.completeDate || ''));
+      let html = `<b>🔍 "${escapeHtml(q)}" 조회 결과</b>`;
+      if (!mRows.length && !iRows.length){
+        return html + `<div class="${UI.emptyNote}">📭 일치하는 품번·품명이 없습니다. 일부만 입력해 보세요. (예: 품번 앞 4~5자리)</div>`;
+      }
+      const mDone = mRows.filter(r => r.completeDate).length;
+      const mOver = mRows.filter(r => !r.completeDate && r.dueDate && r.dueDate < today).length;
+      const iNg = iRows.filter(r => NG_PATTERN.test(r.judgement)).length;
+      const parts = new Set([...mRows, ...iRows].map(r => r.partNo).filter(Boolean));
+      html += `<ul class="${UI.statList}">`;
+      html += `<li>🔧 정밀측정<span class="${UI.statSub}">${mRows.length}건 · 완료 ${mDone} · 진행 ${mRows.length - mDone}${mOver ? ` · <b class="accent">지연 ${mOver}</b>` : ''}</span></li>`;
+      html += `<li>📋 수입검사<span class="${UI.statSub}">${iRows.length}건${iRows.length ? ` · 불합격 ${iNg ? `<b class="accent">${iNg}건</b>` : '0건'}` : ''}</span></li>`;
+      if (parts.size > 1) html += `<li>일치 품번 ${parts.size}개<span class="${UI.statSub}">${[...parts].slice(0, 6).map(escapeHtml).join(' · ')}${parts.size > 6 ? ' …' : ''}</span></li>`;
+      html += `</ul>`;
+      if (mRows.length){
+        html += `<div class="${UI.statMore}">🔧 정밀측정 최근 ${Math.min(6, mRows.length)}건</div>`;
+        html += `<ul class="${UI.statList}">` + mRows.slice(0, 6).map(r => {
+          const st = r.completeDate ? `완료 ${r.completeDate}` : (r.dueDate && r.dueDate < today ? `<b class="accent">지연</b> (요청 ${r.dueDate})` : `진행 중${r.dueDate ? ' (요청 ' + r.dueDate + ')' : ''}`);
+          return `<li>${escapeHtml(r.item) || '(품명없음)'}${r.partNo ? ' · ' + escapeHtml(r.partNo) : ''}
+            <span class="${UI.statSub}">${escapeHtml(r.customer) || '-'}${r.dept ? ' · ' + escapeHtml(r.dept) : ''} · 의뢰 ${r.requestDate || '-'} · ${st}</span>
+            <span class="${UI.statSub}">담당 ${escapeHtml(r.assignee) || '미지정'}${r.approvalStatus ? ' · ' + escapeHtml(r.approvalStatus) : ''}</span></li>`;
+        }).join('') + `</ul>`;
+      }
+      if (iRows.length){
+        html += `<div class="${UI.statMore}">📋 수입검사 최근 ${Math.min(6, iRows.length)}건</div>`;
+        html += `<ul class="${UI.statList}">` + iRows.slice(0, 6).map(r => {
+          const ng = NG_PATTERN.test(r.judgement);
+          const j = r.judgement ? (ng ? `<b class="accent">${escapeHtml(r.judgement)}</b>` : escapeHtml(r.judgement)) : (r.completeDate ? '판정 미기재' : '검사 대기');
+          return `<li>${escapeHtml(r.item) || '(품명없음)'}${r.partNo ? ' · ' + escapeHtml(r.partNo) : ''}
+            <span class="${UI.statSub}">${escapeHtml(r.vendor) || '-'}${r.lot ? ' · Lot ' + escapeHtml(r.lot) : ''} · 입고 ${r.receiveDate || '-'}${r.completeDate ? ' · 검사 ' + r.completeDate : ''}</span>
+            <span class="${UI.statSub}">판정 ${j}${ng && r.remark ? ' · ' + escapeHtml(r.remark) : ''}</span></li>`;
+        }).join('') + `</ul>`;
+      }
+      return html;
+    },
+
+    // ---- 📑 월간 요약 ----
+    monthSummary(params){
+      const { offset, partial } = params;
+      const cur = summaryRange(offset, partial), prev = summaryRange(offset + 1, partial);
+      const mc = measureMetrics(cur), mp = measureMetrics(prev);
+      const ic = inspectMetrics(cur), ip = inspectMetrics(prev);
+      const ttl = `${cur.label} ${partial ? `누계 (1~${Number(cur.end.slice(8))}일)` : '마감'}`;
+      const prevTxt = partial ? `전월 같은 기간 (${prev.start.slice(5)}~${prev.end.slice(5)})` : `전월 (${prev.label})`;
+      const lines = [], rows = [];
+      function row(section, name, val, dt){ rows.push({ section, name, val, dt }); }
+      const na = v => v === null ? '산출 불가' : v;
+      let d;
+      d = deltaTag(mc.done, mp.done, '건', null); row('m', '측정 완료', mc.done + '건', d);
+      if (mc.qty !== null || mp.qty !== null){ d = deltaTag(mc.qty, mp.qty, '개', null); row('m', '측정 수량', mc.qty === null ? '데이터 없음' : mc.qty.toLocaleString() + '개', d); }
+      d = deltaTag(mc.onTimeRate, mp.onTimeRate, '%p', true); row('m', '납기 준수율', mc.onTimeRate === null ? '산출 불가' : mc.onTimeRate + '%' + (mc.late ? ` (지연 완료 ${mc.late}건)` : ''), d);
+      d = deltaTag(mc.avgProc, mp.avgProc, '일', false, 1); row('m', '평균 처리일', na(mc.avgProc === null ? null : mc.avgProc + '일'), d);
+      d = deltaTag(ic.done, ip.done, '건', null); row('i', '검사 완료', ic.done + '건', d);
+      d = deltaTag(ic.ngRate, ip.ngRate, '%p', false, 1); row('i', '불합격', ic.judged ? `${ic.ng}건 · ${ic.ngRate}%` : '판정 데이터 없음', d);
+      d = deltaTag(ic.avgProc, ip.avgProc, '일', false, 1); row('i', '평균 검사소요일', na(ic.avgProc === null ? null : ic.avgProc + '일'), d);
+      if (ic.vendors.length) row('i', '불합격 다발 협력사', ic.vendors.map(([v, c]) => `${v} ${c}건`).join(', '), { html: '', text: '' });
+      if (partial){
+        const due = computeDueOverview(), ins = computeInspectProcessOverview();
+        row('n', '정밀측정 진행 중', `${due.inProgress}건 (지연 ${due.overdue}건)`, { html: '', text: '' });
+        row('n', '수입검사 적체', `${ins.agingRows.length}건 (입고 후 ${INSPECT_AGING_THRESHOLD_DAYS}일 이상)`, { html: '', text: '' });
+      }
+      const secName = { m: '🔧 정밀측정', i: '📋 수입검사', n: '📌 현재 시점' };
+      let html = `<b>📑 ${escapeHtml(ttl)}</b><div class="${UI.statMore}">비교: ${escapeHtml(prevTxt)} · 팀 단위</div>`;
+      lines.push(`[품질경영팀 월간 요약] ${ttl}`, `※ 괄호 안은 ${prevTxt} 대비`);
+      ['m', 'i', 'n'].forEach(sec => {
+        const rs = rows.filter(r => r.section === sec);
+        if (!rs.length) return;
+        html += `<div class="${UI.statMore}"><b>${secName[sec]}</b></div><ul class="${UI.statList}">`;
+        html += rs.map(r => `<li>${escapeHtml(r.name)}<span class="${UI.statSub}"><b>${escapeHtml(String(r.val))}</b>${r.dt.html}</span></li>`).join('');
+        html += `</ul>`;
+        lines.push('', '■ ' + secName[sec].replace(/^\S+\s/, ''));
+        rs.forEach(r => lines.push(`- ${r.name}: ${r.val}${r.dt.text}`));
+      });
+      html += `<div class="${UI.statMore}">▲▼ 초록 = 좋아짐 · 빨강 = 나빠짐 · 회색 = 증감만</div>`;
+      html += `<textarea class="qcb-copytext" hidden>${escapeHtml(lines.join('\n'))}</textarea>`;
+      return html;
+    },
+
+    // ---- 🏢 측정 의뢰 비중 ----
+    requestShare(params){
+      const key = params.key, keyName = key === 'dept' ? '의뢰부서' : '고객사';
+      const start = monthInfo(2).start;
+      const rows = pcAll.filter(r => { const d = r.requestDate || r.completeDate || r.dueDate; return d && d >= start && d <= today; });
+      if (!rows.length) return `<b>🏢 ${keyName}별 측정 의뢰</b><div class="${UI.emptyNote}">📭 최근 3개월 의뢰 데이터가 없습니다.</div>`;
+      const cnt = {};
+      rows.forEach(r => { const v = safeStr(r[key]) || '미지정'; cnt[v] = (cnt[v] || 0) + 1; });
+      const all = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+      const named = all.filter(([n]) => n !== '미지정');
+      const top = named.slice(0, 8).map(([name, count]) => ({ name, count }));
+      const etc = named.slice(8).reduce((a, [, c]) => a + c, 0);
+      if (etc) top.push({ name: `기타 ${named.length - 8}곳`, count: etc, muted: true });
+      const none = cnt['미지정'] || 0;
+      if (none) top.push({ name: '미지정', count: none, muted: true });
+      let html = `<b>🏢 ${keyName}별 측정 의뢰</b> (최근 3개월 · ${start.slice(0, 7)} ~ 오늘)`;
+      html += `<ul class="${UI.statList}"><li>전체 의뢰<span class="${UI.statSub}">${rows.length}건 · ${keyName} ${named.length}곳</span></li>`;
+      if (named.length) html += `<li>가장 많은 ${keyName}<span class="${UI.statSub}"><b>${escapeHtml(named[0][0])}</b> ${named[0][1]}건 (${Math.round(named[0][1] / rows.length * 100)}%)</span></li>`;
+      html += `</ul>`;
+      html += buildHBarChart(top, rows.length);
+      if (none / rows.length > 0.3) html += `<div class="${UI.emptyNote}">⚠ ${keyName}가 비어 있는 건이 ${Math.round(none / rows.length * 100)}%입니다. QMS 엑셀의 ${keyName} 칸 입력 여부를 확인해주세요.</div>`;
+      return html;
+    },
+
     personStat(params){
       const { name, period } = params;
       let filtered = periodRows(period).filter(r => r.assignee === name);
@@ -1117,8 +1310,41 @@
       bot: '안녕하세요! 품질경영팀 업무 챗봇입니다. 무엇을 도와드릴까요?',
       options: [
         { label: '🏠 오늘 한눈에 보기', next: 'today_overview', wide: true },
+        { label: '🔍 품번 조회', next: 'part_search', half: true },
+        { label: '📑 월간 요약', next: 'summary_start', half: true },
         { label: '🔧 정밀측정부', next: 'measure_start', half: true },
         { label: '📋 수입검사부', next: 'inspect_start', half: true }
+      ]
+    },
+
+    // ---- 🔍 품번 조회 (입력칸 노드) ----
+    part_search: {
+      bot: '품번이나 품명 일부를 입력하세요. (2자 이상)<div class="qcb-hint">정밀측정 이력과 수입검사 결과를 함께 찾아봅니다.</div>',
+      search: true
+    },
+
+    // ---- 📑 월간 요약 ----
+    summary_start(){
+      const last = monthInfo(1), cur = monthInfo(0);
+      const d = now.getDate();
+      return {
+        bot: '<b>📑 월간 요약</b> — 팀 단위 수치만 보여드립니다. (전월 대비 ▲▼)',
+        options: [
+          { label: `📑 ${last.label.replace(/^\d{4}년\s*/, '')} 마감 요약`, action: 'monthSummary', params: { offset: 1, partial: false }, backNode: 'summary_start', star: d <= 10 },
+          { label: `📑 ${cur.label.replace(/^\d{4}년\s*/, '')} 누계 (1~${d}일)`, action: 'monthSummary', params: { offset: 0, partial: true }, backNode: 'summary_start', star: d > 10 },
+          { label: '🏢 측정 의뢰 비중', next: 'share_select' },
+          { label: '🏠 처음으로', next: 'start', primary: true }
+        ]
+      };
+    },
+
+    // ---- 🏢 측정 의뢰 비중 ----
+    share_select: {
+      bot: '<b>🏢 측정 의뢰 비중</b> — 어떤 기준으로 볼까요? (최근 3개월 의뢰 기준)',
+      options: [
+        { label: '🏢 의뢰부서별', action: 'requestShare', params: { key: 'dept' }, backNode: 'share_select', half: true },
+        { label: '🚗 고객사별', action: 'requestShare', params: { key: 'customer' }, backNode: 'share_select', half: true },
+        { label: '🏠 처음으로', next: 'start', primary: true, wide: true }
       ]
     },
 
@@ -1151,11 +1377,13 @@
     //  정밀측정부
     // ============================================================
     measure_start: {
-      bot: '안녕하세요! 정밀측정부 업무 챗봇입니다. 무엇을 도와드릴까요?',
+      bot: '<b>🔧 정밀측정부</b> — 무엇을 볼까요?',
       options: [
         { label: '📊 인원별 실적 조회', next: 'stat_period' },
         { label: '📈 담당자 3개월 추이', next: 'trend_person' },
-        { label: '⏱️ 납기 현황', next: 'due_status' }
+        { label: '⏱️ 납기 현황', next: 'due_status' },
+        { label: '🏢 측정 의뢰 비중', next: 'share_select' },
+        { label: '🏠 처음으로', next: 'start', primary: true }
       ]
     },
 
@@ -1199,7 +1427,8 @@
       const p = currentPeriod;
       return {
         bot: `<b>${escapeHtml(p.label)}</b> 기준, 확인할 담당자를 선택해주세요.`,
-        options: PEOPLE.map(name => ({ label: name, action: 'personStat', params: { name, period: p }, backNode: 'stat_person_select' }))
+        options: PEOPLE.length ? PEOPLE.map(name => ({ label: name, action: 'personStat', params: { name, period: p }, backNode: 'stat_person_select' }))
+                               : [{ label: '📭 데이터에 담당자 없음 · 처음으로', next: 'measure_start', primary: true }]
       };
     },
 
@@ -1237,12 +1466,13 @@
     //  수입검사부
     // ============================================================
     inspect_start: {
-      bot: '안녕하세요! 수입검사부 업무 챗봇입니다. 무엇을 도와드릴까요?',
+      bot: '<b>📋 수입검사부</b> — 무엇을 볼까요?',
       options: [
         { label: '📊 인원별 실적 조회', next: 'i_stat_period' },
         { label: '📈 담당자 3개월 추이', next: 'i_trend_person' },
         { label: '⏱️ 처리 현황', next: 'i_process_status' },
-        { label: '🔴 불량/품질 현황', next: 'i_quality_status' }
+        { label: '🔴 불량/품질 현황', next: 'i_quality_status' },
+        { label: '🏠 처음으로', next: 'start', primary: true }
       ]
     },
 
@@ -1286,7 +1516,8 @@
       const p = currentPeriod;
       return {
         bot: `<b>${escapeHtml(p.label)}</b> 기준, 확인할 담당자를 선택해주세요.`,
-        options: PEOPLE_INSPECT.map(name => ({ label: name, action: 'personStatInspect', params: { name, period: p }, backNode: 'i_stat_person_select' }))
+        options: PEOPLE_INSPECT.length ? PEOPLE_INSPECT.map(name => ({ label: name, action: 'personStatInspect', params: { name, period: p }, backNode: 'i_stat_person_select' }))
+                                       : [{ label: '📭 데이터에 담당자 없음 · 처음으로', next: 'inspect_start', primary: true }]
       };
     },
 
@@ -1336,6 +1567,7 @@
   function homeNodeFor(backNode){
     // "i_"로 시작하는 노드(수입검사부 시나리오)에서 왔으면 수입검사부 홈으로,
     // 그 외(정밀측정부 시나리오)는 정밀측정부 홈으로 돌아갑니다.
+    if (backNode === 'summary_start' || backNode === 'share_select') return 'start';
     return (typeof backNode === 'string' && backNode.indexOf('i_') === 0) ? 'inspect_start' : 'measure_start';
   }
 
@@ -1399,7 +1631,117 @@
     });
   }
 
+  // [2026-09-30] 결과 말풍선에 📋 복사 버튼 (목록·표가 있는 말풍선만)
+  function withCopy(html){
+    if (!/<ul|<table|qcb-copytext/.test(html)) return html;
+    return html + `<div class="qcb-copy-row"><button type="button" class="qcb-copy">📋 복사</button></div>`;
+  }
+  function copyPlain(text){
+    if (navigator.clipboard && window.isSecureContext){
+      return navigator.clipboard.writeText(text).then(() => true, () => fallbackCopy(text));
+    }
+    return Promise.resolve(fallbackCopy(text));
+  }
+  function fallbackCopy(text){
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove(); return ok;
+  }
+  function bubbleText(bubble){
+    const pre = bubble.querySelector('.qcb-copytext');
+    if (pre) return pre.value;
+    bubble.classList.add('qcb-copying');
+    const t = bubble.innerText.replace(/\n{3,}/g, '\n\n').trim();
+    bubble.classList.remove('qcb-copying');
+    return t;
+  }
+  let qcbStylesDone = false;
+  function injectQcbStyles(){
+    if (qcbStylesDone) return; qcbStylesDone = true;
+    const st = document.createElement('style');
+    st.textContent = `
+      .qcb-copy-row{display:flex;justify-content:flex-end;margin-top:8px}
+      .qcb-copy{height:30px;padding:0 12px;border-radius:15px;border:1px solid #d0d0d0;background:#fff;color:#333;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer}
+      .qcb-copy:active{background:#eee}
+      .qcb-copying .qcb-copy-row,.qcb-copying .${UI.chartBox}{display:none!important}
+      .qcb-hint{margin-top:4px;font-size:12px;color:#777;font-weight:600}
+      .qcb-search{display:flex;gap:6px;width:100%;flex-basis:100%}
+      .qcb-search input{flex:1;min-width:0;height:42px;border:1.5px solid #cfcfcf;border-radius:21px;padding:0 16px;font-size:15px;font-weight:700;font-family:inherit;background:#fff;color:#111;outline:none}
+      .qcb-search input:focus{border-color:#111}
+      .qcb-search button{flex:none}
+      .qcb-recent{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;flex-basis:100%}
+      .qcb-recent small{font-size:11.5px;color:#888;font-weight:700;margin-right:2px}
+      .qcb-recent .qcb-chip{height:30px;padding:0 12px;border-radius:15px;border:1px solid #d8d8d8;background:#f7f7f7;color:#333;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
+    `;
+    document.head.appendChild(st);
+  }
+  document.addEventListener('click', e => {
+    const b = e.target && e.target.closest ? e.target.closest('.qcb-copy') : null;
+    if (!b) return;
+    const bubble = b.closest('.' + UI.bubble) || b.parentNode.parentNode;
+    copyPlain(bubbleText(bubble)).then(ok => {
+      b.textContent = ok ? '✅ 복사됨' : '복사 실패';
+      setTimeout(() => { b.textContent = '📋 복사'; }, 1600);
+    });
+  });
+
+  // 🔍 품번 조회 입력칸
+  function renderSearch(){
+    injectQcbStyles();
+    const wrap = getOptionsWrap();
+    wrap.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'qcb-search';
+    const inp = document.createElement('input');
+    inp.type = 'search'; inp.placeholder = '예: 품번 앞자리 또는 품명'; inp.autocomplete = 'off'; inp.enterKeyHint = 'search';
+    const go = document.createElement('button');
+    go.className = UI.optBtn + ' primary'; go.textContent = '조회';
+    box.appendChild(inp); box.appendChild(go);
+    wrap.appendChild(box);
+    const recent = partRecent();
+    if (recent.length){
+      const rw = document.createElement('div');
+      rw.className = 'qcb-recent';
+      rw.innerHTML = '<small>최근</small>';
+      recent.forEach(q => {
+        const c = document.createElement('button');
+        c.type = 'button'; c.className = 'qcb-chip'; c.textContent = q;
+        c.addEventListener('click', () => runSearch(q));
+        rw.appendChild(c);
+      });
+      wrap.appendChild(rw);
+    }
+    const home = document.createElement('button');
+    home.className = UI.optBtn; home.textContent = '🏠 처음으로';
+    home.addEventListener('click', () => { appendBubble('user', '🏠 처음으로'); wrap.innerHTML = ''; goTo('start'); });
+    wrap.appendChild(home);
+    function submit(){
+      const q = inp.value.trim();
+      if (q.replace(/\s/g, '').length < 2){ inp.focus(); inp.placeholder = '2자 이상 입력하세요'; return; }
+      runSearch(q);
+    }
+    go.addEventListener('click', submit);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); submit(); } });
+  }
+  function runSearch(q){
+    pushPartRecent(q);
+    appendBubble('user', '🔍 ' + escapeHtml(q));
+    getOptionsWrap().innerHTML = '';
+    botSay(ACTIONS.partLookup({ q }), [
+      { label: '🔍 다른 품번 조회', next: 'part_search' },
+      { label: '🏠 처음으로', next: 'start', primary: true }
+    ]);
+  }
+
   function botSay(html, options){
+    injectQcbStyles();
+    html = withCopy(html);
+    // 모든 화면에 '처음으로' 보장 (시작 화면 제외)
+    if (options && options.length && !options.some(o => o.primary) && html.indexOf('안녕하세요! 품질경영팀') < 0){
+      options = options.concat([{ label: '🏠 처음으로', next: 'start', primary: true }]);
+    }
     appendTyping();
     setTimeout(() => {
       removeTyping();
@@ -1418,7 +1760,14 @@
     const node = resolveNode(nodeId);
     if (!node) return;
     getOptionsWrap().innerHTML = '';
-    if (node.multiSelect){
+    if (node.search){
+      appendTyping();
+      setTimeout(() => {
+        removeTyping();
+        appendBubble('bot', node.bot);
+        renderSearch();
+      }, 420);
+    } else if (node.multiSelect){
       appendTyping();
       setTimeout(() => {
         removeTyping();
