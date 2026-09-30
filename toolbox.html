@@ -888,6 +888,44 @@
         .qx-foot { margin-top: 14px; text-align: center; }
         .qx-foot button { width: 100%; height: 46px; border-radius: 12px; border: 1.5px solid var(--gold); background: #FBF3E4; color: #5B3F0E; font-size: 0.9rem; font-weight: 900; font-family: inherit; }
         .qx-foot p { margin: 8px 0 0; font-size: 0.72rem; font-weight: 700; color: #64748B; }
+        /* [2026-09-30] 치수 판정 다듬기: ± 글자화 · 통계 3×2 · 측정값 한 줄 목록 */
+        #dimension-view .tb-pm { width: 24px; background: transparent; color: var(--primary-color); font-size: 1.5rem; }
+        #dimension-view .c-sum6 { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        #dimension-view .c-sum6 .tb-sum { padding: 6px 4px; }
+        #dimension-view .c-sum6 .v { font-size: 0.98rem; }
+        #dimension-view .c-bar { margin-top: 20px; }
+        #dimension-view .tb-item.dm-line { padding: 6px 8px 6px 10px; gap: 8px; min-height: 42px; }
+        #dimension-view .dm-line .no { min-width: 26px; }
+        #dimension-view .dm-line .val { font-size: 1.02rem; }
+        #dimension-view .dm-line .dev { flex: 1; min-width: 0; font-size: 0.74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #dimension-view .dm-line .badge { margin-left: 0; padding: 3px 8px; font-size: 0.74rem; }
+        /* [2026-09-30] 소요시간 예측 다듬기: 시작 한 줄 · 측정기+납기 한 줄 · 품목 3칸 · 하단 요약 띠 */
+        .cm-start { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #F8FAFC; border: 1px solid #E2E8F0; }
+        .cm-start .k { font-size: 0.78rem; font-weight: 800; color: #64748B; }
+        .cm-start b { flex: 1; min-width: 0; font-size: 0.95rem; color: #0F172A; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cm-edit { flex: none; border: 1px solid #CBD5E1; background: #fff; border-radius: 999px; padding: 6px 10px; font-size: 0.78rem; font-weight: 800; color: var(--primary-color); font-family: inherit; }
+        .cm-start-edit { margin-top: 8px; gap: 6px; }
+        .cm-start-edit input { min-width: 0; font-size: 0.92rem !important; }
+        .cm-start-edit .cm-now { padding: 0 12px; }
+        .cm-line2 { display: grid; grid-template-columns: 1fr 1.25fr; gap: 8px; margin-top: 2px; }
+        .cm-line2 .tb-label { margin-top: 10px !important; }
+        .cm-mseg { margin-bottom: 0; height: 44px; padding: 3px; }
+        .cm-mseg button { padding: 0 4px; }
+        .cm-line2 .tb-input.cm-sm { height: 44px; font-size: 0.92rem; padding: 0 8px; width: 100%; }
+        .cm-grid3 { display: grid; grid-template-columns: 0.95fr 1.5fr 0.85fr; gap: 6px; margin-top: 4px; }
+        .cm-grid3 .tb-label { margin-top: 8px !important; font-size: 0.74rem; }
+        .cm-grid3 .tb-input { height: 44px; font-size: 0.98rem; padding: 0 22px 0 8px; }
+        .cm-grid3 .tb-unit { right: 6px; font-size: 0.72rem; }
+        .cm-ms { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .cm-import { border: none; background: transparent; padding: 6px 0 0; text-align: left; color: #2563EB; font-size: 0.76rem; }
+        .cm-dock { flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid #E2E8F0; box-shadow: 0 -4px 14px rgba(15,23,42,.06); }
+        .cm-dock-sum { flex: 1; min-width: 0; line-height: 1.2; }
+        .cm-dock-sum .k { display: block; font-size: 0.7rem; font-weight: 800; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cm-dock-sum b { display: block; font-size: 0.98rem; font-weight: 900; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+        .cm-dock-sum.done .k { color: #047857; } .cm-dock-sum.late .k { color: #DC2626; }
+        .cm-dock-calc { flex: none; height: 46px; padding: 0 14px; border: none; border-radius: 12px; background: var(--primary-color); color: var(--gold); font-weight: 900; font-size: 0.92rem; font-family: inherit; }
+        #cmm-view .capture-btn.cm-dock-cap { position: static; flex: none; width: 46px; height: 46px; box-shadow: none; font-size: 1.15rem; }
+        #cmm-view .qm-scroll { padding-bottom: 16px; }
     </style>
 </head>
 <body>
@@ -1050,8 +1088,8 @@
                 <div class="tb-card">
                     <div class="tb-step"><span class="n">1</span>도면 치수</div>
                     <div class="dm-meta">
-                        <input type="text" id="dmPart" placeholder="품명 (선택) 예: A-123" autocomplete="off" oninput="dmOnMetaInput()">
-                        <input type="text" id="dmItem" placeholder="측정항목 (선택) 예: Ø10 내경" autocomplete="off" oninput="dmOnMetaInput()">
+                        <input type="text" id="dmPart" placeholder="품명 (선택)" autocomplete="off" oninput="dmOnMetaInput()">
+                        <input type="text" id="dmItem" placeholder="항목 (선택) 예: Ø10" autocomplete="off" oninput="dmOnMetaInput()">
                     </div>
                     <div class="tb-seg c-seg">
                         <button type="button" id="dmModeSym" class="on" onclick="dmSetMode('sym')">± 위아래 같음</button>
@@ -1230,16 +1268,28 @@
                 <div class="tb-card">
                     <div class="tb-step"><span class="n">1</span>시작 · 측정기 · 납기</div>
 
-                    <label class="tb-label">측정 시작 일시</label>
-                    <div class="tb-row">
+                    <!-- [2026-09-30] 시작 일시는 한 줄로 접고, 누르면 펼침 -->
+                    <div class="cm-start">
+                        <span class="k">시작</span><b id="cmStartText">지금</b>
+                        <button type="button" class="cm-edit" id="cmStartToggle" onclick="cmToggleStart()">✎ 바꾸기</button>
+                    </div>
+                    <div class="tb-row cm-start-edit" id="cmStartEdit" style="display:none;">
                         <input class="tb-input cm-sm" type="datetime-local" id="startDateTime" style="flex:1;">
                         <button type="button" id="nowBtn" class="cm-now">지금</button>
                     </div>
 
-                    <label class="tb-label">측정기 몇 대로 하나요?</label>
-                    <div class="tb-seg">
-                        <button type="button" id="cmMc1" class="on" onclick="cmSetMachines(1)">1대<small>품목 순서대로 측정</small></button>
-                        <button type="button" id="cmMc2" onclick="cmSetMachines(2)">2대<small>나눠서 동시에 측정</small></button>
+                    <div class="cm-line2">
+                        <div>
+                            <label class="tb-label">측정기</label>
+                            <div class="tb-seg cm-mseg">
+                                <button type="button" id="cmMc1" class="on" onclick="cmSetMachines(1)">1대</button>
+                                <button type="button" id="cmMc2" onclick="cmSetMachines(2)">2대</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="tb-label">목표 납기 <span class="opt">선택</span></label>
+                            <input class="tb-input cm-sm" type="date" id="targetDeadline">
+                        </div>
                     </div>
                     <select id="machineCount" style="display:none;">
                         <option value="1" selected>1</option>
@@ -1252,9 +1302,6 @@
                         </label>
                     </div>
 
-                    <label class="tb-label" style="margin-top:4px;">목표 납기일 <span class="opt">— 선택</span></label>
-                    <input class="tb-input cm-sm" type="date" id="targetDeadline">
-                    <div class="tb-hint">넣으면 납기 안에 끝나는지 바로 알려줍니다.</div>
                 </div>
 
                 <!-- ② 품목 -->
@@ -1295,7 +1342,7 @@
                     </details>
                 </div>
 
-                <button type="button" id="calculateBtn" class="tb-big-btn" style="margin-bottom:12px;">📅 계산하기</button>
+                <button type="button" id="calculateBtn" class="tb-big-btn" style="display:none;">📅 계산하기</button>
 
                 <div class="cmm-view">
                     <div id="resultArea"></div>
@@ -1306,7 +1353,12 @@
                 </div>
             </div>
             </div>
-            <button class="capture-btn light" id="cmmCaptureBtn" onclick="captureView('cmm-view', '측정소요시간예측')" title="화면 캡처 저장">📸</button>
+            <!-- [2026-09-30] 하단 고정 요약 + 계산하기 + 캡처 -->
+            <div class="cm-dock">
+                <div class="cm-dock-sum" id="cmDockSum"><span class="k">품목 합계</span><b>-</b></div>
+                <button type="button" class="cm-dock-calc" onclick="performCalculation()">📅 계산하기</button>
+                <button class="capture-btn light cm-dock-cap" id="cmmCaptureBtn" onclick="captureView('cmm-view', '측정소요시간예측')" title="화면 캡처 저장">📸</button>
+            </div>
         </div>
 
         <!-- 🦾 CMM 프로브 교육 시뮬레이터 -->
@@ -1993,11 +2045,11 @@
                 if (j) {
                     if (j.ok && j.near) { ok++; cls = 'near'; badge = '🟡 근접'; }
                     else if (j.ok) { ok++; cls = 'ok'; badge = '🟢 OK'; } else { ng++; cls = 'ng'; badge = '🔴 NG'; }
-                    dev = `기준 대비 ${dmSigned(item.v - spec.nom, dp)} · 공차 ${Math.round(j.use * 100)}%`;
+                    dev = `${dmSigned(item.v - spec.nom, dp)} · ${Math.round(j.use * 100)}%`;
                 }
-                return `<div class="tb-item ${cls}">
+                return `<div class="tb-item dm-line ${cls}">
                     <span class="no">#${i + 1}</span>
-                    <div><div class="val">${item.v.toFixed(dp)}</div>${dev ? `<div class="dev">${dev}</div>` : ''}</div>
+                    <span class="val">${item.v.toFixed(dp)}</span><span class="dev">${dev}</span>
                     <span class="badge">${badge}</span>
                     <button type="button" class="tb-del" title="이 값 삭제" onclick="dmDeleteValue(${i})">×</button>
                 </div>`;
@@ -2908,6 +2960,12 @@
 
             resultArea.innerHTML = html;
             resultArea.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            // 하단 요약 띠에 결과 표시
+            const dock = document.getElementById('cmDockSum');
+            if (dock) {
+                dock.className = 'cm-dock-sum done' + (late ? ' late' : '');
+                dock.innerHTML = `<span class="k">${targetDeadlineStr ? (late ? '⚠ 납기 초과 예상' : '✅ 납기 안에 완료') : '측정 완료 예정'}</span><b>${fmtK(finalFinishDate)}</b>`;
+            }
         }
 
         // ── 품목 카드 (2026-09 개편: 표 → 카드, 1개당 시간 분·초 분리) ──
@@ -2925,23 +2983,49 @@
                     <button type="button" class="tb-del" title="이 품목 삭제" onclick="deleteRow(this)">×</button>
                 </div>
                 <input class="tb-input cm-sm cm-name" type="text" placeholder="품목명 (예: A브라켓)" autocomplete="off" value="${cmAttr(d.name)}">
-                <div class="tb-two" style="margin-top:10px;">
+                <div class="cm-grid3">
                     <div>
-                        <label class="tb-label">측정 수량</label>
-                        <div class="tb-input-wrap"><input class="tb-input cm-qty" type="text" inputmode="numeric" placeholder="예: 100" autocomplete="off" value="${cmAttr(d.qty)}"><span class="tb-unit">개</span></div>
+                        <label class="tb-label">수량</label>
+                        <div class="tb-input-wrap"><input class="tb-input cm-qty" type="text" inputmode="numeric" placeholder="100" autocomplete="off" value="${cmAttr(d.qty)}"><span class="tb-unit">개</span></div>
                     </div>
                     <div>
-                        <label class="tb-label">세팅시간 <span class="opt">(없으면 0)</span></label>
+                        <label class="tb-label">1개당</label>
+                        <div class="cm-ms">
+                            <div class="tb-input-wrap"><input class="tb-input cm-min" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.min)}"><span class="tb-unit">분</span></div>
+                            <div class="tb-input-wrap"><input class="tb-input cm-sec" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.sec)}"><span class="tb-unit">초</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="tb-label">세팅</label>
                         <div class="tb-input-wrap"><input class="tb-input cm-setup" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.setup)}"><span class="tb-unit">분</span></div>
                     </div>
                 </div>
-                <label class="tb-label" style="margin-top:10px;">1개 측정하는 데 걸리는 시간</label>
-                <div class="tb-two">
-                    <div class="tb-input-wrap"><input class="tb-input cm-min" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.min)}"><span class="tb-unit">분</span></div>
-                    <div class="tb-input-wrap"><input class="tb-input cm-sec" type="text" inputmode="numeric" placeholder="0" autocomplete="off" value="${cmAttr(d.sec)}"><span class="tb-unit">초</span></div>
-                </div>
-                <button type="button" class="cm-import" onclick="cmImportAvg(this)">⏱ '측정·선별 시간'에서 잰 평균 넣기</button>
+                <button type="button" class="cm-import" onclick="cmImportAvg(this)">⏱ 측정·선별 시간에서 잰 평균 넣기</button>
                 <div class="cm-item-sum"></div>`;
+        }
+
+        // [2026-09-30] 하단 요약 띠: 입력 중엔 품목 합계, 계산 후엔 완료 예정·납기
+        function cmDockLive() {
+            const el = document.getElementById('cmDockSum'); if (!el) return;
+            let tot = 0;
+            tableBody.querySelectorAll('.cm-item').forEach(card => {
+                const qty = cmNum(card.querySelector('.cm-qty').value);
+                const per = cmNum(card.querySelector('.cm-min').value) + cmNum(card.querySelector('.cm-sec').value) / 60;
+                if (qty && per) tot += qty * per + cmNum(card.querySelector('.cm-setup').value);
+            });
+            el.className = 'cm-dock-sum';
+            el.innerHTML = tot ? `<span class="k">품목 합계 · 계산하면 완료일</span><b>${minutesToHourMin(tot)}</b>` : `<span class="k">품목 합계</span><b>수량·시간을 넣어주세요</b>`;
+        }
+        function cmStartLabel() {
+            const v = startDateTimeInput.value, el = document.getElementById('cmStartText'); if (!el) return;
+            if (!v) { el.textContent = '-'; return; }
+            const d = new Date(v), p2 = n => String(n).padStart(2, '0');
+            el.textContent = `${cmStartTouched ? '' : '지금 · '}${d.getMonth() + 1}/${d.getDate()} (${'일월화수목금토'[d.getDay()]}) ${p2(d.getHours())}:${p2(d.getMinutes())}`;
+        }
+        function cmToggleStart() {
+            const e = document.getElementById('cmStartEdit'), open = e.style.display === 'none';
+            e.style.display = open ? '' : 'none';
+            document.getElementById('cmStartToggle').textContent = open ? '접기 ▴' : '✎ 바꾸기';
         }
 
         function cmRenumber() {
@@ -2995,6 +3079,7 @@
             const card = e.target.closest('.cm-item');
             if (card) cmUpdateItemSum(card);
             cmAutoSave();
+            cmDockLive();
         });
 
         function cmReadItemInputs() {
@@ -3030,6 +3115,7 @@
             document.getElementById('cmMc1').classList.toggle('on', n === 1);
             document.getElementById('cmMc2').classList.toggle('on', n === 2);
             cmAutoSave();
+            if (typeof cmDockLive === 'function') cmDockLive();
         }
 
         function cmPadDT(d) {
@@ -3040,6 +3126,7 @@
         nowBtn.addEventListener('click', () => {
             startDateTimeInput.value = cmPadDT(new Date());
             cmStartTouched = true;
+            cmStartLabel(); cmDockLive();
             showToast('시작 시각을 지금으로 맞췄습니다');
         });
 
@@ -3129,7 +3216,8 @@
 
         let cmInitialized = false;
         let cmStartTouched = false;
-        startDateTimeInput.addEventListener('input', () => { cmStartTouched = true; });
+        startDateTimeInput.addEventListener('input', () => { cmStartTouched = true; cmStartLabel(); cmDockLive(); });
+        targetDeadlineInput.addEventListener('change', () => cmDockLive());
 
         function cmInit() {
             if (!cmInitialized) {
@@ -3144,6 +3232,7 @@
             }
             // 시작 일시는 열 때마다 '지금'으로 (직접 바꾼 경우는 유지)
             if (!cmStartTouched) startDateTimeInput.value = cmPadDT(new Date());
+            cmStartLabel(); cmDockLive();
         }
 
         machineCountSelect.value = '1';

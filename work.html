@@ -216,6 +216,32 @@
   .rp-text { font-size: .86rem !important; font-weight: 600 !important; line-height: 1.55 !important; font-family: inherit; }
   .rp-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
   .rp-actions .btn { height: 48px; font-size: .88rem; }
+  /* [2026-09-30] 달력 디자인 정리: 달력 먼저 · 칸 가볍게 · 필요한 줄만 · 오늘 기록 압축 */
+  .tabs { padding: 3px; margin-bottom: 10px; }
+  .tabs button { padding: 9px 4px; font-size: 0.9rem; }
+  .cal-card { padding: 10px 8px 8px; }
+  .cal-head { margin-bottom: 4px; }
+  .cal-head .ym { font-size: 1.12rem; }
+  .nav-btn { width: 36px; height: 36px; border-radius: 10px; font-size: 1.1rem; }
+  .today-btn { height: 36px; border-radius: 10px; border-width: 1.5px; font-size: 0.8rem; }
+  .dow { padding: 2px 0 4px; font-size: 0.7rem; }
+  .grid { gap: 0; }
+  .cell { min-height: 56px; border-radius: 0; background: #fff; border: none; border-top: 1px solid #EEF2F6; padding: 4px 2px 3px; }
+  .cell .dn { justify-content: flex-start; }
+  .cell .wk { margin-left: 2px; }
+  .cell .dn span.num { display: inline-grid; place-items: center; min-width: 22px; height: 22px; border-radius: 999px; }
+  .cell.today { background: #fff; border-color: #EEF2F6; }
+  .cell.today .dn span.num { background: var(--navy); color: var(--gold); padding: 0 4px; }
+  .cell.sel { background: #F5F7FF; border-radius: 10px; box-shadow: inset 0 0 0 1.5px var(--navy); border-top-color: transparent; }
+  .cell .ev { font-size: 0.58rem; padding: 1px 3px; margin-top: 2px; border-radius: 3px; }
+  .legend { margin-top: 6px; }
+  .day-quick { margin-top: 8px; }
+  .day-quick input { height: 46px; font-size: 0.95rem; }
+  .day-quick button { height: 46px; width: 68px; }
+  .today-card .card-title { margin-bottom: 8px; }
+  .today-foot { display: flex; gap: 8px; margin-top: 10px; }
+  .today-foot .fold-btn { flex: 1; height: 40px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #fff; color: var(--muted); font-weight: 800; font-size: 0.82rem; }
+  .today-foot .rp-mini { flex: 1; height: 40px; border-radius: 10px; border: 1.5px solid var(--navy); background: #fff; color: var(--navy); font-weight: 900; font-size: 0.84rem; }
 </style>
 </head>
 <body>
@@ -237,24 +263,7 @@
 
   <!-- ===== 📅 달력 ===== -->
   <section class="page on" id="pageCal">
-    <!-- ✍️ 오늘 기록 (한 줄 입력 · 근무일 잔디 · 주간 보고) -->
-    <div class="card today-card">
-      <div class="card-title">✍️ 오늘 한 일<small id="streakLabel"></small></div>
-      <div class="quick">
-        <input type="text" id="lineInput" placeholder="한 줄만 적으세요 (예: A브라켓 전수 측정 32ea)" enterkeyhint="done" autocomplete="off"
-               onkeydown="if (event.key === 'Enter') { event.preventDefault(); addTodayLine(); }">
-        <button type="button" onclick="addTodayLine()">기록</button>
-      </div>
-      <div class="today-lines" id="todayLines"></div>
-
-      <div class="grass-head"><span>최근 4주 근무일</span><span class="lg"><i class="g done"></i>기록 <i class="g miss"></i>빈 날 <i class="g hol"></i>휴일</span></div>
-      <div class="grass" id="grass"></div>
-      <div class="hint" style="margin-top:4px;">빈 칸을 누르면 그날 기록을 채울 수 있습니다.</div>
-
-      <button type="button" class="btn line full" style="margin-top:10px;" onclick="openReport()">📋 이번 주 보고서 만들기</button>
-    </div>
-
-    <div class="card" style="padding:12px 8px 10px;">
+    <div class="card cal-card">
       <div class="cal-head">
         <button type="button" class="nav-btn" onclick="moveMonth(-1)" aria-label="이전 달">‹</button>
         <div class="ym" id="ymLabel"></div>
@@ -263,27 +272,44 @@
       </div>
       <div class="dow"><div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div></div>
       <div class="grid" id="calGrid"></div>
-      <div class="legend"><span>날짜를 누르면 아래에 그날 일정이 나옵니다</span><span><i></i>업무기록</span></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">⚡ 빠른 일정 추가<small id="quickDateLabel"></small></div>
-      <div class="quick">
-        <input type="text" id="quickInput" placeholder="예: 14:00 팀 회의" enterkeyhint="done" autocomplete="off"
-               onkeydown="if (event.key === 'Enter') { event.preventDefault(); quickAdd(); }">
-        <button type="button" onclick="quickAdd()">추가</button>
-      </div>
-      <div class="hint">선택한 날짜에 바로 들어갑니다. "오후 3시 미팅", "9시반 보고"처럼 써도 시간이 자동으로 잡힙니다.</div>
+      <div class="legend"><span>날짜를 누르면 아래에 그날 일정</span><span><i></i>업무기록</span></div>
     </div>
 
     <div class="card" id="dayCard">
       <div class="day-head" id="dayHead"></div>
       <div id="dayEvents"></div>
+      <div class="quick day-quick">
+        <input type="text" id="quickInput" placeholder="빠른 추가 (예: 14:00 팀 회의)" enterkeyhint="done" autocomplete="off"
+               onkeydown="if (event.key === 'Enter') { event.preventDefault(); quickAdd(); }">
+        <button type="button" onclick="quickAdd()">추가</button>
+      </div>
+      <div class="hint" id="quickDateLabel" style="margin:4px 2px 0;"></div>
       <div class="btn-row">
         <button type="button" class="btn pri" onclick="openEvent(null)">＋ 일정 추가</button>
         <button type="button" class="btn line" onclick="openWork()">✎ 업무 기록</button>
       </div>
       <div id="dayWork"></div>
+    </div>
+
+    <!-- ✍️ 오늘 기록 (한 줄 입력 · 근무일 잔디 · 주간 보고) -->
+    <div class="card today-card">
+      <div class="card-title">✍️ 오늘 한 일<small id="streakLabel"></small></div>
+      <div class="quick">
+        <input type="text" id="lineInput" placeholder="한 줄 기록 (예: A브라켓 측정 32ea)" enterkeyhint="done" autocomplete="off"
+               onkeydown="if (event.key === 'Enter') { event.preventDefault(); addTodayLine(); }">
+        <button type="button" onclick="addTodayLine()">기록</button>
+      </div>
+      <div class="today-lines" id="todayLines"></div>
+
+      <div class="today-foot">
+        <button type="button" class="fold-btn" id="grassBtn" onclick="toggleGrass()">최근 4주 보기 ▾</button>
+        <button type="button" class="rp-mini" onclick="openReport()">📋 이번 주 보고서</button>
+      </div>
+      <div id="grassWrap" style="display:none;">
+        <div class="grass-head"><span>최근 4주 근무일</span><span class="lg"><i class="g done"></i>기록 <i class="g miss"></i>빈 날 <i class="g hol"></i>휴일</span></div>
+        <div class="grass" id="grass"></div>
+        <div class="hint" style="margin-top:4px;">빈 칸을 누르면 그날 기록을 채울 수 있습니다.</div>
+      </div>
     </div>
 
     <div class="card">
@@ -639,11 +665,12 @@ function renderCalendar() {
   document.getElementById('ymLabel').innerText = `${viewY}년 ${viewM + 1}월`;
   const first = new Date(viewY, viewM, 1);
   const gridStart = addDays(first, -first.getDay());
-  const gridEnd = addDays(gridStart, 41);
+  const rows = Math.ceil((first.getDay() + new Date(viewY, viewM + 1, 0).getDate()) / 7); // 그 달에 필요한 줄 수(4~6)
+  const gridEnd = addDays(gridStart, rows * 7 - 1);
   const occ = occurrences(d2s(gridStart), d2s(gridEnd));
   const today = todayStr();
   let html = '';
-  for (let i = 0; i < 42; i++) {
+  for (let i = 0; i < rows * 7; i++) {
     const d = addDays(gridStart, i);
     const ds = d2s(d);
     const w = d.getDay();
@@ -702,7 +729,7 @@ function renderDay() {
   document.getElementById('dayHead').innerHTML = `<span class="d">${korDate(ds)}</span>
     <span class="pill ${n === 0 ? 'today' : ''}">${n === 0 ? '오늘' : ddayText(ds)}</span>
     ${hol ? `<span class="pill hol">${esc(hol)}</span>` : ''}`;
-  document.getElementById('quickDateLabel').innerText = `${korDate(ds)}에 추가`;
+  document.getElementById('quickDateLabel').innerText = `${korDate(ds)}에 추가 · "오후 3시 미팅"도 시간 인식`;
   const evs = (occurrences(ds, ds)[ds]) || [];
   document.getElementById('dayEvents').innerHTML = evs.length
     ? evs.map(ev => evRowHtml(ev, ds, false)).join('')
@@ -1162,6 +1189,14 @@ function renderGrass() {
   document.getElementById('grass').innerHTML = html;
 }
 function grassTap(ds) { selectDate(ds); openWork(); }
+/* 잔디 접기/펼치기 (기억: 이 폰에서만) */
+function toggleGrass(force) {
+  const w = document.getElementById('grassWrap'), open = typeof force === 'boolean' ? force : w.style.display === 'none';
+  w.style.display = open ? '' : 'none';
+  document.getElementById('grassBtn').textContent = open ? '최근 4주 접기 ▴' : '최근 4주 보기 ▾';
+  try { localStorage.setItem('ws_grass_open', open ? '1' : '0'); } catch (e) {}
+}
+try { if (localStorage.getItem('ws_grass_open') === '1') setTimeout(() => toggleGrass(true), 0); } catch (e) {}
 
 /* ---------- 주간 보고서 ---------- */
 let rpMonday = null;
