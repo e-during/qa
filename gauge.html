@@ -45,6 +45,8 @@
   .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
   .kpi { border: 1px solid var(--line); border-radius: 12px; padding: 9px 2px; text-align: center; cursor: pointer; min-width: 0; }
   .kpi .k { font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi .k i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; }
+  .kpi.red .k i { background: var(--red); } .kpi.amber .k i { background: var(--amber); } .kpi.green .k i { background: var(--green); }
   .kpi .v { font-size: 20px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
   .kpi.red .v { color: var(--red); } .kpi.amber .v { color: var(--amber); } .kpi.green .v { color: var(--green); }
   .stack { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; }
@@ -102,9 +104,13 @@
   .row .id { font-size: 11.5px; font-weight: 800; color: var(--gold-d); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .row .nm { font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .row .lc { font-size: 11.5px; font-weight: 600; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-  .row .dt { grid-column: 1 / -1; background: #F8FAFC; border-radius: 10px; padding: 9px 11px; font-size: 12px; color: var(--body); font-weight: 600; line-height: 1.65; display: none; }
+  /* [2026-09-30] 펼침 상세: 라벨 | 값 표 형태 (날짜·주기는 중간에서 안 꺾이게) */
+  .row .dt { grid-column: 1 / -1; background: #F8FAFC; border-radius: 10px; padding: 9px 12px; font-size: 12px; color: var(--body); font-weight: 600; line-height: 1.5; display: none; grid-template-columns: auto minmax(0, 1fr); gap: 5px 12px; }
+  .row .dt .k { color: var(--muted); font-weight: 700; white-space: nowrap; }
+  .row .dt .v { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; }
   .row .dt b { color: var(--ink); }
-  .row.open .dt { display: block; }
+  .row .dt .nw { white-space: nowrap; }
+  .row.open .dt { display: grid; }
   .row.open .nm, .row.open .lc { white-space: normal; }
   .dd { font-size: 11px; font-weight: 900; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
   .dd.red { background: #FEE2E2; color: #991B1B; } .dd.amber { background: #FEF3C7; color: #92400E; } .dd.green { background: #DCFCE7; color: #166534; } .dd.none { background: #F1F5F9; color: var(--muted); }
@@ -117,6 +123,7 @@
   .gbody { display: none; padding-left: 6px; }
   .grp.open + .gbody { display: block; }
   .empty { text-align: center; color: var(--muted); font-weight: 700; padding: 28px 0; font-size: 13px; }
+  .foot { text-align: center; font-size: 11px; font-weight: 600; color: var(--muted); padding: 4px 0 8px; }
   .shmore { width: 100%; height: 42px; margin-top: 8px; border-radius: 12px; border: 1px dashed #CBD5E1; background: #fff; font-weight: 800; color: var(--muted); }
 </style>
 </head>
@@ -140,7 +147,7 @@
 
   <div id="main" style="display:none;">
     <section class="card">
-      <h2>① 교정 상태 <small>누르면 목록</small></h2>
+      <h2>① 교정 상태 <small id="asofCap">누르면 목록</small></h2>
       <div class="kpis" id="kpis"></div>
       <div class="stack" id="stack"></div>
     </section>
@@ -163,6 +170,7 @@
       <div class="chips" id="locChips"></div>
       <div id="locs"></div>
     </section>
+    <div class="foot" id="foot"></div>
   </div>
 </div>
 
@@ -198,11 +206,11 @@ let K = [];   // 클릭 대상 보관 (이름에 따옴표가 있어도 안전)
 const reg = o => (K.push(o), `openList(K[${K.length - 1}])`);
 
 /* ---------- ① 교정 상태 ---------- */
-const ST = [['all', '전체', ''], ['over', '🔴 지남', 'red'], ['soon', '🟡 30일 이내', 'amber'], ['ok', '🟢 유효', 'green']];
+const ST = [['all', '전체', ''], ['over', '지남', 'red'], ['soon', '30일 내', 'amber'], ['ok', '유효', 'green']];
 function renderStatus() {
   const c = { all: DATA.length, over: 0, soon: 0, ok: 0 };
   DATA.forEach(g => { if (c[g._s] != null) c[g._s]++; });
-  $('kpis').innerHTML = ST.map(([k, t, cls]) => `<div class="kpi ${cls}" onclick="openList({type:'status',key:'${k}'})"><div class="k">${t}</div><div class="v">${c[k].toLocaleString()}</div></div>`).join('');
+  $('kpis').innerHTML = ST.map(([k, t, cls]) => `<div class="kpi ${cls}" onclick="openList({type:'status',key:'${k}'})"><div class="k">${cls ? '<i></i>' : ''}${t}</div><div class="v">${c[k].toLocaleString()}</div></div>`).join('');
   $('stack').innerHTML = [['over', 'var(--red)'], ['soon', 'var(--amber)'], ['ok', 'var(--green)']].filter(([k]) => c[k])
     .map(([k, col]) => `<i style="flex:${c[k]};background:${col}" title="${c[k]}대" onclick="openList({type:'status',key:'${k}'})"></i>`).join('');
 }
@@ -217,7 +225,7 @@ function renderMonths() {
   const max = Math.max(1, ...cols.map(c => c[1]));
   const peak = ms.reduce((a, m) => cnt[m] > cnt[a] ? m : a, ms[0]);
   $('cols').style.setProperty('--n', cols.length); $('labs').style.setProperty('--n', cols.length);
-  $('cols').innerHTML = cols.map(([k, v]) => `<div class="col${k === 'over' ? ' over' : ''}${k === peak && v ? ' peak' : ''}" onclick="openList({type:'month',key:'${k}'})"><div class="n">${v || ''}</div><div class="b" style="height:${v ? Math.max(3, Math.round(v / max * 112)) : 0}px"></div></div>`).join('');
+  $('cols').innerHTML = cols.map(([k, v]) => `<div class="col${k === 'over' ? ' over' : ''}${k === peak && v ? ' peak' : ''}" onclick="openList({type:'month',key:'${k}'})"><div class="n">${v || ''}</div><div class="b" style="height:${v ? Math.max(10, Math.round(v / max * 112)) : 0}px"></div></div>`).join('');
   $('labs').innerHTML = cols.map(([k]) => k === 'over' ? '<span class="r">지남</span>' : k === 'after' ? '<span>이후</span>'
     : `<span class="${k.endsWith('-01') ? 'y' : ''}">${+k.slice(5)}월${k.endsWith('-01') ? `<small>'${k.slice(2, 4)}</small>` : ''}</span>`).join('');
   const share = DATA.length ? Math.round(cnt[peak] / DATA.length * 100) : 0;
@@ -273,7 +281,7 @@ function query(sel) {
 }
 function titleOf(sel) {
   if (sel.type === 'search') return `🔍 "${sel.key}"`;
-  if (sel.type === 'status') return ST.find(s => s[0] === sel.key)[1] + (sel.key === 'all' ? ' 계측기' : '');
+  if (sel.type === 'status') return ({ all: '전체 계측기', over: '🔴 교정 지남', soon: '🟡 30일 내 도래', ok: '🟢 유효' })[sel.key];
   if (sel.type === 'month') return sel.key === 'over' ? '🔴 교정 지남' : sel.key === 'after' ? '12개월 이후 도래' : `${sel.key.slice(0, 4)}년 ${+sel.key.slice(5)}월 교정 도래`;
   if (sel.type === 'dept') return short(sel.key);
   return (sel.key || '설치장소 미기재') + (sel.dept ? ` · ${short(sel.dept)}` : '');
@@ -289,8 +297,14 @@ function rowHTML(g, showLoc) {
     <div class="id">${esc(g.id)}</div>
     <div style="min-width:0;"><div class="nm">${esc(g.nm)}</div>${showLoc ? `<div class="lc">📍 ${esc(locOf(g) || '장소 미기재')} · ${esc(short(deptOf(g)))}</div>` : `<div class="lc">👤 ${esc(g.ow || '-')}</div>`}</div>
     ${ddBadge(g)}
-    <div class="dt">📍 <b>${esc(locOf(g) || '설치장소 미기재')}</b> · ${esc(deptOf(g))}<br>👤 담당 <b>${esc(g.ow || '-')}</b>${g.dv ? ` · 기기번호 ${esc(g.dv)}` : ''}<br>
-      📅 최근교정 ${esc(g.l || '-')} → 차기교정 <b>${esc(g.n || '-')}</b> · 주기 ${esc(g.cy || '-')}개월${g.sp ? `<br>📐 규격 ${esc(g.sp)}` : ''}${g.u ? ` · 불확도 ${esc(g.u)}` : ''}</div>
+    <div class="dt">
+      <span class="k">장소</span><span class="v"><b>${esc(locOf(g) || '설치장소 미기재')}</b> · ${esc(deptOf(g))}</span>
+      <span class="k">담당</span><span class="v"><b>${esc(g.ow || '-')}</b>${g.dv ? ` · 기기번호 <span class="nw">${esc(g.dv)}</span>` : ''}</span>
+      <span class="k">최근 교정</span><span class="v nw">${esc(g.l || '-')}</span>
+      <span class="k">차기 교정</span><span class="v"><b class="nw">${esc(g.n || '-')}</b>${g.cy ? ` <span class="nw">(주기 ${esc(g.cy)}개월)</span>` : ''}</span>
+      ${g.sp ? `<span class="k">규격</span><span class="v">${esc(g.sp)}</span>` : ''}
+      ${g.u ? `<span class="k">불확도</span><span class="v">${esc(g.u)}</span>` : ''}
+    </div>
   </div>`;
 }
 function renderSheet() {
@@ -353,9 +367,14 @@ $('today').textContent = '오늘 ' + TODAY.slice(5).replace('-', '/');
 function showAsOf() {
   const a = META.asOf || '', b = $('asofBox'); if (!a) return;
   const age = -dday(a);
-  b.style.display = 'block'; b.classList.toggle('old', age > 30);
-  b.innerHTML = `📅 <b>${a} 기준</b> 계측기 마스터 · 참조용 (최신은 QMS 확인)`
-    + (age > 30 ? `<br>⚠ ${age}일 지난 데이터입니다 · 이후 교정한 계측기도 '지남'으로 보일 수 있어 갱신이 필요합니다` : '');
+  const md = `${+a.slice(5, 7)}/${+a.slice(8, 10)}`;
+  // [2026-09-30] 평소(30일 이내)는 배너 없이 ① 제목 옆에 짧게, 오래되면 빨간 배너
+  $('asofCap').textContent = `${md} 기준 · 참조용`;
+  $('foot').textContent = `${a} 기준 계측기 마스터 스냅샷 · 최신 교정 정보는 QMS에서 확인`;
+  if (age > 30) {
+    b.style.display = 'block'; b.classList.add('old');
+    b.innerHTML = `⚠ <b>${md} 기준 · ${age}일 지남</b> · 갱신 필요<br><span style="font-weight:600;">이후 교정한 계측기도 '지남'으로 보일 수 있습니다</span>`;
+  } else b.style.display = 'none';
 }
 (async function load() {
   let d = null;
