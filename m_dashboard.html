@@ -510,19 +510,33 @@
   const QI_NG = /NG|불합격|부적합/i;
   const qiIsNg = r => QI_NG.test(String(r.judgement || ''));
   const qiDoneAll = qiQms.filter(r => qiComplete(r)).map(r => ({ r, d: nd(qiCompletedAt(r)) || String(qiCompletedAt(r) || '') }));
+  // [2026-10-01] 수입검사 콘솔은 이번 달·직전 달 시트만 보관 → 그 이전 달은 업로드 때 저장한 '통합데이터 월별 요약'으로 채움
+  const QI_YS = (() => { const m = (GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.meta) || loadJsonLocal('qi_qms_meta_v1');
+    return (m && m.yearSummary && m.yearSummary.months) ? m.yearSummary : null; })();
+  const QI_LIVE_FROM = (() => { const x = new Date(now.getFullYear(), now.getMonth() - 1, 1); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`; })();
+  const qiUseYs = ym => !!(QI_YS && ym < QI_LIVE_FROM && QI_YS.months[ym]);
   const qiMonths = [5,4,3,2,1,0].map(k => {
     const x = new Date(now.getFullYear(), now.getMonth() - k, 1);
     const ym = `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`;
+    if (qiUseYs(ym)) { const y = QI_YS.months[ym]; return { ym, m: x.getMonth() + 1, n: y.done || 0, ng: y.ng || 0, judged: y.judged || 0, ys: true }; }
     const rows = qiDoneAll.filter(o => o.d.startsWith(ym));
     return { ym, m: x.getMonth() + 1, n: rows.length, ng: rows.filter(o => qiIsNg(o.r)).length, judged: rows.filter(o => String(o.r.judgement || '').trim()).length };
   });
   const qiDoneMonth = qiMonths[5].n, qiDonePrev = qiMonths[4].n;
-  const qiDoneYear = qiDoneAll.filter(o => o.d.startsWith(String(now.getFullYear()))).length;
+  const qiYearStr = String(now.getFullYear());
+  // 올해 누적 = (직전 달 이전: 월별 요약) + (직전 달·이번 달: 실시간 데이터). 요약이 없으면 기존처럼 실시간 데이터만
+  const qiDoneYear = (QI_YS ? Object.keys(QI_YS.months).filter(ym => ym.startsWith(qiYearStr) && ym < QI_LIVE_FROM).reduce((s, ym) => s + (QI_YS.months[ym].done || 0), 0) : 0)
+    + qiDoneAll.filter(o => o.d.startsWith(qiYearStr) && (!QI_YS || o.d.slice(0, 7) >= QI_LIVE_FROM)).length;
   const qiNgMonth = qiMonths[5].ng, qiJudgedMonth = qiMonths[5].judged;
   const qiNgRate = qiJudgedMonth ? Math.round(qiNgMonth / qiJudgedMonth * 1000) / 10 : null;
   const qiLastNg = qiDoneAll.filter(o => qiIsNg(o.r)).sort((a,b) => b.d.localeCompare(a.d))[0] || null;
   const qiOldestPending = qiQms.filter(r => !qiComplete(r) && nd(r.receiveDate)).sort((a,b) => nd(a.receiveDate).localeCompare(nd(b.receiveDate)))[0] || null;
   function vendorLine(ym){
+    if (qiUseYs(ym)) {
+      const v = QI_YS.months[ym].v || {};
+      return Object.entries(v).sort((a,b) => (b[1][1] - a[1][1]) || (b[1][0] - a[1][0])).slice(0, 5)
+        .map(([k,x]) => `${esc(k)} <b>${x[0]}</b>${x[1] ? ` <span class="ngc">NG ${x[1]}</span>` : ''}`).join(' · ');
+    }
     const c = {};
     qiDoneAll.filter(o => o.d.startsWith(ym)).forEach(o => { const k = o.r.vendor || '기타'; c[k] = c[k] || { n: 0, ng: 0 }; c[k].n++; if (qiIsNg(o.r)) c[k].ng++; });
     return Object.entries(c).sort((a,b) => (b[1].ng - a[1].ng) || (b[1].n - a[1].n)).slice(0, 5)
@@ -550,7 +564,8 @@
     if (qiOldestPending) bits.push(`<span class="k">최장 대기</span><b>입고 ${Math.max(0, daysBetween(nd(qiOldestPending.receiveDate), today))}일</b> ${esc(qiOldestPending.item || '')}${qiOldestPending.vendor ? ' · ' + esc(qiOldestPending.vendor) : ''}`);
     else bits.push(`<span class="k">최장 대기</span>대기 중인 건 없음`);
     document.getElementById('perfNext').innerHTML = bits.join('<br>');
-    trimPerf(qiMonths, qiDoneAll.map(o => o.d).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0]);
+    const liveMin = qiDoneAll.map(o => o.d).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0];
+    trimPerf(qiMonths, (QI_YS && QI_YS.from && (!liveMin || QI_YS.from < liveMin)) ? QI_YS.from : liveMin);
   }
 
   // ============================================================
