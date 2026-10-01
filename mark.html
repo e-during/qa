@@ -272,6 +272,29 @@
     border: 1px solid rgba(255,255,255,.1); white-space: nowrap;
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  /* ---------- 2026-10-01 시작 화면 개편: 가운데 배치 · 주/보조 버튼 · 3단계 안내 (메인과 같은 톤) ---------- */
+  body { background: radial-gradient(120% 55% at 50% 0%, #0d1838 0%, #060b1c 62%) no-repeat, #060b1c; }
+  #startScreen { margin-top: 0; flex: 1; justify-content: center; gap: 12px; padding-bottom: 6vh; }
+  .pick-btn { border-radius: 18px; padding: 16px; gap: 14px;
+    background: linear-gradient(160deg, #142450 0%, #0f1c40 100%); border: 1px solid rgba(224,176,96,.16);
+    box-shadow: 0 8px 18px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.05); }
+  .pick-btn:active { transform: scale(.98); background: linear-gradient(160deg, #182b5e 0%, #12224a 100%); }
+  .pick-btn .pi { background: rgba(224,176,96,.14); border: none; box-shadow: inset 0 0 0 1px rgba(224,176,96,.45); }
+  .pick-btn .pi svg { stroke: #f1cf8a; }
+  .pick-btn .pd { color: rgba(214,226,255,.55); }
+  .pick-btn.primary { padding: 22px 18px; border-radius: 20px;
+    background: radial-gradient(90% 120% at 100% 0%, rgba(96,140,255,.28) 0%, rgba(96,140,255,0) 55%), linear-gradient(135deg, #1b3577 0%, #12234f 55%, #0e1b3e 100%);
+    border: 1px solid rgba(224,176,96,.4); box-shadow: 0 12px 28px rgba(10,30,90,.5), inset 0 1px 0 rgba(255,255,255,.08); }
+  .pick-btn.primary .pi { width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, #f1cf8a, #d9a24a); box-shadow: 0 6px 14px rgba(224,176,96,.3); }
+  .pick-btn.primary .pi svg { width: 26px; height: 26px; stroke: #10182f; }
+  .pick-btn.primary .pt { font-size: 17px; }
+  .pick-btn.primary .pd { font-size: 12px; }
+  .start-steps { margin-top: 10px; display: flex; align-items: flex-start; justify-content: center; gap: 6px; }
+  .start-steps .st { flex: 1; max-width: 104px; text-align: center; }
+  .start-steps .st span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(224,176,96,.55); color: #e0b060; font-size: 11px; font-weight: 900; }
+  .start-steps .st b { display: block; margin-top: 6px; font-size: 12px; font-weight: 800; color: rgba(255,255,255,.85); }
+  .start-steps .st small { display: block; margin-top: 2px; font-size: 10px; font-weight: 600; color: rgba(255,255,255,.38); }
+  .start-steps i { flex: none; width: 16px; height: 1px; margin-top: 11px; background: rgba(224,176,96,.35); }
 </style>
 </head>
 <body>
@@ -292,8 +315,6 @@
 
     <!-- ============ 시작 화면 ============ -->
     <div id="startScreen">
-      <div class="start-hint">사진(제품·도면)을 촬영하거나 불러와서<br>누르는 대로 ① ② ③ 번호가 찍힙니다 · 측정값을 넣으면 간이 성적서</div>
-
       <label class="pick-btn primary">
         <div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
         <div>
@@ -311,6 +332,14 @@
         </div>
         <input type="file" accept="image/*" style="display:none" onchange="loadImage(event)">
       </label>
+
+      <div class="start-steps">
+        <div class="st"><span>1</span><b>사진</b><small>촬영·불러오기</small></div>
+        <i></i>
+        <div class="st"><span>2</span><b>번호 찍기</b><small>누르는 대로 ①②③</small></div>
+        <i></i>
+        <div class="st"><span>3</span><b>측정값 입력</b><small>간이 성적서</small></div>
+      </div>
     </div>
 
     <!-- ============ 마킹 화면 ============ -->
