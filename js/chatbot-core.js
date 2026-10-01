@@ -223,6 +223,11 @@
     }));
   }
   const qiAll = qiNormalize();
+  // [2026-10-01] 수입검사 콘솔은 이번 달·직전 달 시트만 보관 → 그 이전 달 '완료/불합격' 숫자는 접수대장 업로드 때 저장한 월별 요약(meta.yearSummary)으로 대체
+  const QI_YS = (function(){
+    const m = (GITLAB_INSPECTION && GITLAB_INSPECTION.meta) || (function(){ try { return JSON.parse(localStorage.getItem('qi_qms_meta_v1')); } catch (e) { return null; } })();
+    return (m && m.yearSummary && m.yearSummary.months) ? m.yearSummary : null;
+  })();
 
   // ============================================================
   //  시나리오에서 쓸 담당자 목록 (담당자 추가/변경 시 여기만 수정)
@@ -263,6 +268,11 @@
     const sunday = addDays(monday, 6);
     const label = (offset === 0 ? '이번 주' : `${offset}주 전`) + ` (${toYmd(monday)} ~ ${toYmd(sunday)})`;
     return { type: 'week', label, start: toYmd(monday), end: toYmd(sunday), star: offset === 0 };
+  }
+  function monthInfoByStart(start){ // 'YYYY-MM-01' → 그 달의 monthInfo (말일 계산용)
+    const y = +start.slice(0, 4), m = +start.slice(5, 7);
+    const last = new Date(y, m, 0).getDate();
+    return { start, end: `${start.slice(0, 8)}${String(last).padStart(2, '0')}` };
   }
   function monthInfo(offset){ // 0=이번 달, 1=지난달, 2=지지난달
     const d = addMonths(new Date(now.getFullYear(), now.getMonth(), 1), -offset);
@@ -981,6 +991,17 @@
     return { done: done.length, qty: hasQty ? qty : null, onTimeRate: (onTime + late) ? Math.round(onTime / (onTime + late) * 100) : null, late, avgProc: avgOf(proc) };
   }
   function inspectMetrics(rg){
+    // 직전 달보다 앞선 기간: 실데이터가 일부만 있어 비교가 틀어지므로 월별 요약(한 달 전체일 때만) 또는 '비교 불가'
+    const liveStart = monthInfo(1).start;
+    if (rg.start < liveStart){
+      const y = QI_YS && QI_YS.months[rg.start.slice(0, 7)];
+      const fullMonth = rg.end === monthInfoByStart(rg.start).end;
+      if (y && fullMonth){
+        const vend = Object.entries(y.v || {}).filter(([, x]) => x[1] > 0).map(([v, x]) => [v, x[1]]).sort((a, b) => b[1] - a[1]).slice(0, 3);
+        return { done: y.done || 0, judged: y.judged || 0, ng: y.ng || 0, ngRate: y.judged ? Math.round((y.ng || 0) / y.judged * 1000) / 10 : null, avgProc: null, vendors: vend, fromSummary: true };
+      }
+      return { done: null, judged: 0, ng: 0, ngRate: null, avgProc: null, vendors: [], unavailable: true };
+    }
     const done = rangeRows(qiAll, rg.start, rg.end, 'completeDate');
     const judged = done.filter(r => r.judgement);
     const ng = judged.filter(r => NG_PATTERN.test(r.judgement));
@@ -1015,7 +1036,7 @@
       const parts = new Set([...mRows, ...iRows].map(r => r.partNo).filter(Boolean));
       html += `<ul class="${UI.statList} kv">`;
       html += `<li>🔧 정밀측정<span class="${UI.statSub}">${mRows.length}건 · 완료 ${mDone} · 진행 ${mRows.length - mDone}${mOver ? ` · <b class="accent">지연 ${mOver}</b>` : ''}</span></li>`;
-      html += `<li>📋 수입검사<span class="${UI.statSub}">${iRows.length}건${iRows.length ? ` · 불합격 ${iNg ? `<b class="accent">${iNg}건</b>` : '0건'}` : ''}</span></li>`;
+      html += `<li>📋 수입검사 <small>(최근 2개월)</small><span class="${UI.statSub}">${iRows.length}건${iRows.length ? ` · 불합격 ${iNg ? `<b class="accent">${iNg}건</b>` : '0건'}` : ''}</span></li>`;
       if (parts.size > 1) html += `<li>일치 품번 ${parts.size}개<span class="${UI.statSub}">${[...parts].slice(0, 6).map(escapeHtml).join(' · ')}${parts.size > 6 ? ' …' : ''}</span></li>`;
       html += `</ul>`;
       if (mRows.length){
@@ -1049,7 +1070,9 @@
       const ic = inspectMetrics(cur), ip = inspectMetrics(prev);
       const deptName = dept === 'm' ? '정밀측정' : '수입검사';
       const ttl = `${deptName} ${cur.label} ${partial ? `누계 (1~${Number(cur.end.slice(8))}일)` : '마감'}`;
-      const prevTxt = partial ? `전월 같은 기간 (${prev.start.slice(5)}~${prev.end.slice(5)})` : `전월 (${prev.label})`;
+      let prevTxt = partial ? `전월 같은 기간 (${prev.start.slice(5)}~${prev.end.slice(5)})` : `전월 (${prev.label})`;
+      if (dept === 'i' && ip.unavailable) prevTxt += ' — 수입검사는 최근 2개월 상세만 보관해 비교 생략';
+      else if (dept === 'i' && ip.fromSummary) prevTxt += ' — 전월은 접수대장 월별 요약 기준 (평균 소요일 비교 제외)';
       const lines = [], rows = [];
       function row(section, name, val, dt){ rows.push({ section, name, val, dt }); }
       const na = v => v === null ? '산출 불가' : v;
@@ -1493,8 +1516,8 @@
     },
     i_stat_month_select(){
       return {
-        bot: '몇 월 실적을 확인하시겠어요? (최근 3개월)',
-        options: [0,1,2].map(off => {
+        bot: '몇 월 실적을 확인하시겠어요? (수입검사는 최근 2개월)',
+        options: [0,1].map(off => {
           const info = monthInfo(off);
           return { label: (info.star ? '⭐ ' : '') + info.label, setPeriod: info, next: 'i_stat_person_select', star: info.star };
         })
