@@ -703,7 +703,7 @@
   function updateTabs(rowsByTab){
     const labels = currentDept === 'precision'
       ? { todo:'최근 완료', overdue:'진행 중', done:'예정일 지남', history:'전체 이력' }
-      : { todo:'오늘 입고', overdue:'이번달 미완료', done:'이번주 완료', history:'전체 이력' };
+      : { todo:'오늘 입고', overdue:'이번달 미완료', done:'이번주 완료', history:'최근 2개월' };
     document.querySelectorAll('#tabHeader .tab').forEach(btn => {
       const k = btn.dataset.tab;
       btn.querySelector('.tl').textContent = labels[k];
@@ -743,7 +743,8 @@
         <div class="item-meta">${esc(r.meta)}</div>
         <div class="item-foot"><span>👤 ${esc(r.assignee)}</span><span>${dateLabel} ${esc(r.date)}</span></div>
       </div>`).join('')
-      + (all.length > MAX_ROWS ? `<div class="more-note">최근 ${MAX_ROWS}건만 표시 (전체 ${all.length}건)</div>` : '');
+      + (all.length > MAX_ROWS ? `<div class="more-note">최근 ${MAX_ROWS}건만 표시 (전체 ${all.length}건)</div>` : '')
+      + (currentDept !== 'precision' && currentTab === 'history' ? `<div class="more-note">수입검사는 최근 2개월(이번 달·지난달)만 보관합니다 · 이전 이력은 PC 수입검사 보고서에서 확인</div>` : '');
   }
 
   function renderAll(){ renderKpi(); renderSummary(); renderPerf(); renderList(); }
