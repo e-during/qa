@@ -228,6 +228,19 @@
     const m = (GITLAB_INSPECTION && GITLAB_INSPECTION.meta) || (function(){ try { return JSON.parse(localStorage.getItem('qi_qms_meta_v1')); } catch (e) { return null; } })();
     return (m && m.yearSummary && m.yearSummary.months) ? m.yearSummary : null;
   })();
+  // 직전 달보다 앞선 달이면 월별 요약을, 아니면 null (→ 실데이터 사용)
+  function ysMonth(info){
+    if (!QI_YS || info.start >= monthInfo(1).start) return null;
+    return QI_YS.months[info.start.slice(0, 7)] || null;
+  }
+  // 직전 달보다 앞선 달의 담당자별 완료 건수는 월별 요약(p)에서, 그 외는 실데이터에서
+  function countForInWithSummary(name, info){
+    if (info.start < monthInfo(1).start && QI_YS) {
+      const y = QI_YS.months[info.start.slice(0, 7)];
+      if (y && y.p) { let n = 0; Object.keys(y.p).forEach(k => { if (extractName(k) === name) n += y.p[k]; }); return n; }
+    }
+    return countForIn(qiAll, name, info);
+  }
 
   // ============================================================
   //  시나리오에서 쓸 담당자 목록 (담당자 추가/변경 시 여기만 수정)
@@ -811,6 +824,8 @@
 
     const trend = [2, 1, 0].map(offset => {
       const info = monthInfo(offset);
+      const y = ysMonth(info);
+      if (y && y.pn) return { label: info.label.replace(/^\d{4}년\s*/, ''), count: Math.round(y.pd / y.pn * 10) / 10 };
       const monthRows = qiAll.filter(r => r.completeDate && r.completeDate >= info.start && r.completeDate <= info.end);
       const days = monthRows.map(r => daysBetween(r.receiveDate, r.completeDate)).filter(v => v !== null && v >= 0);
       const avg = days.length ? Math.round((days.reduce((a,b)=>a+b,0) / days.length) * 10) / 10 : 0;
@@ -826,7 +841,7 @@
       return `현재 조회 가능한 수입검사 데이터가 없습니다.<div class="${UI.emptyNote}">📭 조회 데이터 없음</div>`;
     }
 
-    let html = `<b>⏱️ 처리 현황</b> (전체 수입검사 데이터 기준)`;
+    let html = `<b>⏱️ 처리 현황</b> (최근 2개월 데이터 기준 · 이번 달+지난달)`;
     html += `<ul class="${UI.statList} kv">`;
     html += `<li>전체 입고 건수<span class="${UI.statSub}">${stats.total}건</span></li>`;
     html += `<li>검사완료 건수<span class="${UI.statSub}">${stats.completed}건</span></li>`;
@@ -882,6 +897,8 @@
 
     const trend = [2, 1, 0].map(offset => {
       const info = monthInfo(offset);
+      const y = ysMonth(info);
+      if (y) return { label: info.label.replace(/^\d{4}년\s*/, ''), rate: y.judged ? Math.round((y.ng || 0) / y.judged * 1000) / 10 : null };
       const monthRows = judged.filter(r => r.completeDate >= info.start && r.completeDate <= info.end);
       const monthNg = monthRows.filter(r => NG_PATTERN.test(r.judgement)).length;
       const rate = monthRows.length ? Math.round((monthNg / monthRows.length) * 1000) / 10 : null;
@@ -895,6 +912,12 @@
       const v = r.vendor || '미지정';
       vendorCounts[v] = (vendorCounts[v] || 0) + 1;
     });
+    // 지지난달은 실데이터가 일부뿐 → 월별 요약의 협력사별 불합격 수로 대체 (실데이터 중 그 달 건은 빼고 더함)
+    const y2 = ysMonth(monthInfo(2));
+    if (y2) {
+      recentNg.filter(r => r.completeDate < monthInfo(1).start).forEach(r => { const v = r.vendor || '미지정'; vendorCounts[v]--; if (vendorCounts[v] <= 0) delete vendorCounts[v]; });
+      Object.entries(y2.v || {}).forEach(([v, x]) => { if (x[1] > 0) vendorCounts[v] = (vendorCounts[v] || 0) + x[1]; });
+    }
     const vendorRanking = Object.entries(vendorCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
     const recentDefects = [...recentNg].sort((a, b) => (b.completeDate || '').localeCompare(a.completeDate || '')).slice(0, 8);
@@ -908,7 +931,7 @@
       return `현재 판정 데이터가 있는 검사 완료 건이 없습니다.<div class="${UI.emptyNote}">📭 조회 데이터 없음</div>`;
     }
 
-    let html = `<b>🔴 불량/품질 현황</b> (판정 완료 기준)`;
+    let html = `<b>🔴 불량/품질 현황</b> (판정 완료 기준 · 건수는 최근 2개월)`;
     html += `<ul class="${UI.statList} kv">`;
     html += `<li>판정 완료 건수<span class="${UI.statSub}">${stats.total}건</span></li>`;
     html += `<li>불량(NG) 건수<span class="${UI.statSub}"><b class="accent">${stats.ngCount}건</b></span></li>`;
@@ -1286,7 +1309,7 @@
 
       const series = names.map(name => ({
         name,
-        points: monthInfos.map(info => ({ label: info.label.replace(/^\d{4}년\s*/, ''), count: countForIn(qiAll, name, info) }))
+        points: monthInfos.map(info => ({ label: info.label.replace(/^\d{4}년\s*/, ''), count: countForInWithSummary(name, info) }))
       }));
 
       const anyData = series.some(s => s.points.some(p => p.count > 0));
