@@ -210,7 +210,7 @@
   .ts-cell.on { background: rgba(224,176,96,.12); color: #e0b060; }
   .ts-cell.on svg { stroke: #e0b060; }
   .ts-next:active, .ts-cell:active { background: rgba(255,255,255,.04); }
-  @media (max-width: 380px) { body:has(.today-strip.on) .tile { min-height: 92px; } body:has(.today-strip.on) .sec-label { margin-top: 12px; } body:has(.today-strip.on) .credit { margin-top: 10px; } body:has(.today-strip.on) .hero { min-height: 128px; max-height: 136px; } .ts-cell { width: 46px; } .ts-next { padding: 8px 10px 8px 12px; } .today-strip { margin-bottom: 8px; } body:has(.today-strip.on) .values-line { margin-top: 6px; } }
+  @media (max-width: 380px) { body:has(.today-strip.on) .tile { min-height: 92px; } body:has(.today-strip.on) .sec-label { margin-top: 12px; } body:has(.today-strip.on) .credit { margin-top: 10px; } .ts-cell { width: 46px; } .ts-next { padding: 8px 10px 8px 12px; } .today-strip { margin-bottom: 8px; } body:has(.today-strip.on) .values-line { margin-top: 6px; } }
   /* ---------- 2026-10-01 세로 압축: 날짜·가치 줄 제거 · 대시보드 카드 낮춤 ---------- */
   .hero-text { padding-top: 12px; }
   .hero-team { margin-top: 0; }
@@ -222,6 +222,19 @@
   .dash-btn .label { font-size: 15.5px; }
   .dash-btn .desc { margin-top: 2px; }
   .sec-label { margin-top: 14px; }
+  /* ---------- 2026-10-01 배너 사진 안 잘리게 (16:9 그대로) + 아래 카드 높이로 보정 ---------- */
+  .hero { height: auto; min-height: 0; max-height: none; aspect-ratio: 16 / 9; }
+  .hero::after { background: linear-gradient(180deg, rgba(6,11,28,0) 70%, #060b1c 100%); }
+  .hero-text { padding-top: 6px; }
+  .content { padding-top: 10px; }
+  .tile { min-height: 96px; padding: 12px; }
+  .tile .ti { width: 34px; height: 34px; border-radius: 10px; }
+  .tile .ti svg { width: 17px; height: 17px; }
+  .tile .tt { margin-top: 10px; font-size: 14px; }
+  .grid { gap: 8px; }
+  .sec-label { margin-top: 12px; }
+  .credit { margin-top: 12px; }
+  @media (max-width: 380px) { .tile { min-height: 84px; padding: 10px 12px; } .tile .tt { margin-top: 8px; } .dash-btn { padding: 10px 12px; } .sec-label { margin-top: 10px; } }
 </style>
 </head>
 <body>
