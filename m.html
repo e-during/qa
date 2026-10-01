@@ -90,81 +90,127 @@
     font-size: 8px; font-weight: 800; letter-spacing: 1.5px; color: rgba(255,255,255,.10);
   }
 
-  /* ---------- 가치 4개 (카드 안에 통합, 문구 그대로 · 탭하면 현장 툴박스로 이동) ---------- */
-  .values {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    margin: 16px auto 0; width: 100%; max-width: 440px;
-    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07);
-    border-radius: 16px; padding: 12px 4px 16px;
-    text-decoration: none; transition: transform .15s ease;
-    position: relative;
+  /* ---------- 2026-10-01 메인 개편: 날짜 · 가치 한 줄 · 2×2 메뉴 격자 ---------- */
+  .hero-date { font-size: 10.5px; font-weight: 800; letter-spacing: 2px; color: #e0b060; }
+  .values-line { margin-top: 10px; display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .values-line span {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.55);
+    padding: 4px 9px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
   }
-  .values:active { transform: scale(.98); }
-  .value-item { text-align: center; position: relative; padding: 0 2px; }
-  .value-item + .value-item::before {
-    content: ''; position: absolute; left: 0; top: 4px; bottom: 4px; width: 1px;
-    background: rgba(255,255,255,.08);
-  }
-  .value-item .vi { width: 24px; height: 24px; margin: 0 auto 4px; display: flex; align-items: center; justify-content: center; }
-  .value-item .vi svg { width: 15px; height: 15px; stroke: #e0b060; opacity: .85; }
-  .value-item .vt { font-size: 11px; font-weight: 800; color: #fff; }
-  .value-item .vd { margin-top: 2px; font-size: 8px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.3; }
-  .tap-hint {
-    position: absolute; left: 50%; bottom: 3px; transform: translateX(-50%);
-    font-size: 12px; line-height: 1; opacity: .35; filter: grayscale(1) brightness(1.8);
-  }
+  .values-line svg { width: 11px; height: 11px; stroke: #e0b060; opacity: .85; }
 
-  /* ---------- 추가 기능 카드 (메인 카드와 동일 디자인 시스템) ---------- */
-  .soon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px auto 0; width: 100%; max-width: 440px; }
-  .soon-card {
-    position: relative; padding: 14px 12px 12px; border-radius: 16px;
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px auto 0; width: 100%; max-width: 440px; }
+  .tile {
+    position: relative; display: flex; flex-direction: column; justify-content: space-between;
+    min-height: 116px; padding: 14px 14px 13px; border-radius: 16px; text-decoration: none;
     background: #101c38; border: 1px solid rgba(255,255,255,.08);
-    display: block; text-decoration: none; text-align: center;
-    transition: transform .15s ease;
+    box-shadow: 0 6px 16px rgba(0,0,0,.28);
+    transition: transform .12s ease, border-color .15s ease, background .15s ease;
   }
-  .soon-card:active { transform: scale(.98); }
-  .soon-badge {
-    display: inline-block; font-size: 8px; font-weight: 700; letter-spacing: .3px;
-    color: rgba(255,255,255,.5); background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
-    border-radius: 999px; padding: 2px 6px; margin-bottom: 8px;
+  .tile:active { transform: scale(.97); background: #13234a; border-color: rgba(224,176,96,.35); }
+  .tile .ti {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: rgba(224,176,96,.10); box-shadow: inset 0 0 0 1px rgba(224,176,96,.25);
+    display: flex; align-items: center; justify-content: center;
   }
-  .soon-badge.live { color: #e0b060; background: rgba(224,176,96,.10); border-color: rgba(224,176,96,.25); }
-  .soon-card .si {
-    width: 24px; height: 24px; border-radius: 8px; margin: 0 auto 8px;
-    background: rgba(224,176,96,.10); display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 0 0 1px rgba(224,176,96,.2);
-  }
-  .soon-card .si svg { width: 13px; height: 13px; stroke: #e0b060; opacity: .9; }
-  .soon-card .st { font-size: 12.5px; font-weight: 800; color: #fff; }
-  .soon-card .sd { margin-top: 3px; font-size: 9px; font-weight: 600; color: rgba(255,255,255,.35); line-height: 1.4; }
+  .tile .ti svg { width: 21px; height: 21px; stroke: #e0b060; }
+  .tile .chev { position: absolute; top: 14px; right: 12px; width: 16px; height: 16px; stroke: rgba(255,255,255,.28); }
+  .tile .tt { margin-top: 14px; font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -.2px; word-break: keep-all; }
+  .tile .td { margin-top: 3px; font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.42); line-height: 1.35; word-break: keep-all; }
+  /* 현장 마킹: 카메라를 바로 여는 기능이라 금색으로 강조 */
+  .tile.gold { background: linear-gradient(135deg, #ecc47c, #d9a24a); border-color: transparent; box-shadow: 0 8px 20px rgba(224,176,96,.25); }
+  .tile.gold:active { background: linear-gradient(135deg, #e6b968, #cf963c); }
+  .tile.gold .ti { background: rgba(26,18,6,.12); box-shadow: inset 0 0 0 1px rgba(26,18,6,.18); }
+  .tile.gold .ti svg { stroke: #1a1206; }
+  .tile.gold .chev { stroke: rgba(26,18,6,.4); }
+  .tile.gold .tt { color: #1a1206; }
+  .tile.gold .td { color: rgba(26,18,6,.62); }
+  /* 툴박스를 아직 안 들어가 본 폰에서만 NEW 점 */
+  .new-dot { position: absolute; top: 12px; right: 30px; font-size: 8.5px; font-weight: 900; letter-spacing: .5px; color: #060b1c; background: #e0b060; border-radius: 999px; padding: 2px 6px; display: none; }
+  .tile.nudge .new-dot { display: block; animation: nd 1.8s ease-in-out infinite; }
+  @keyframes nd { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
-  /* 2026-09-29 첫 화면 정리 */
-  .values { padding-bottom: 26px; }
-  .tap-hint { opacity: 1; filter: none; bottom: 6px; display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 9.5px; font-weight: 800; letter-spacing: .3px; color: rgba(224,176,96,.75); }
-  .tap-hint b { font-size: 11px; font-weight: 400; filter: grayscale(1) brightness(1.8); opacity: .5; display: inline-block; }
-  .values.nudge .tap-hint b { animation: tbTap 1.6s ease-in-out infinite; opacity: .8; }
-  @keyframes tbTap { 0%,60%,100% { transform: translateY(0); } 70% { transform: translateY(-3px); } 80% { transform: translateY(1px); } }
-  .soon-card.off { opacity: .45; }
   .dash-btn .label, .dash-btn .desc { word-break: keep-all; }
-  .content { padding-bottom: calc(env(safe-area-inset-bottom) + 80px); }
-  @media (max-width: 380px) { .dash-btn .arrow span { display: none; } .dash-btn { gap: 12px; } }
-  .credit { margin-top: 16px; text-align: center; }
+  .content { padding-bottom: calc(env(safe-area-inset-bottom) + 18px); }
+  @media (max-width: 380px) { .dash-btn .arrow span { display: none; } .dash-btn { gap: 12px; } .tile { min-height: 106px; } .tile .tt { font-size: 14px; } }
+  .credit { margin-top: 18px; text-align: center; }
   .credit .line { width: 30px; height: 1px; background: rgba(255,255,255,.14); margin: 0 auto 8px; }
   .credit p { font-size: 9.5px; color: rgba(255,255,255,.3); font-weight: 600; line-height: 1.5; letter-spacing: .2px; }
   .credit a { color: rgba(255,255,255,.35); text-decoration: none; }
 
-  .fab-camera {
-    position: fixed; right: 18px; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-    height: 50px; padding: 0 18px 0 16px; border-radius: 999px; gap: 7px;
-    background: linear-gradient(135deg, #ecc47c, #d9a24a);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 10px 24px rgba(224,176,96,.35);
-    color: #1a1206; font-size: 14px; font-weight: 900;
-    text-decoration: none; z-index: 20;
-    transition: transform .12s ease;
+  /* ---------- 2026-10-01 v3: 절제된 톤 — 남색 단색 + 금색 포인트 하나, 위계는 크기·밝기로 ---------- */
+  body { background: linear-gradient(180deg, #08102a 0%, #060b1c 55%) no-repeat, #060b1c; }
+
+  /* 가치: 박스 없이 한 줄 텍스트 */
+  .values-line { gap: 0; margin-top: 8px; }
+  .values-line span { background: none; border: none; padding: 0 9px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.45); letter-spacing: .5px; position: relative; }
+  .values-line span + span::before { content: ''; position: absolute; left: -1.5px; top: 50%; width: 3px; height: 3px; margin-top: -1.5px; border-radius: 50%; background: rgba(224,176,96,.55); }
+  .values-line svg { display: none; }
+
+  /* 대시보드: 유일한 강조 카드 */
+  .dash-btn {
+    padding: 18px 16px; border-radius: 18px; gap: 14px;
+    background: linear-gradient(180deg, #15244d 0%, #101c3d 100%);
+    border: 1px solid rgba(224,176,96,.32);
+    box-shadow: 0 10px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
   }
-  .fab-camera:active { transform: scale(.93); }
-  .fab-camera svg { width: 21px; height: 21px; stroke: #1a1206; }
+  .dash-btn .icon { width: 48px; height: 48px; border-radius: 14px; background: #e0b060; box-shadow: none; }
+  .dash-btn .icon svg { width: 23px; height: 23px; stroke: #10182f; }
+  .dash-btn .label { font-size: 16.5px; }
+  .dash-btn .desc { color: rgba(255,255,255,.45); }
+  .dash-btn .live { display: inline-flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 800; letter-spacing: 1px; color: rgba(255,255,255,.5); margin-bottom: 3px; }
+  .dash-btn .live i { width: 5px; height: 5px; border-radius: 50%; background: #34d399; }
+  .dash-btn .arrow { width: auto; height: auto; background: none; border: none; color: rgba(224,176,96,.9); }
+  .dash-btn .arrow svg { width: 18px; height: 18px; }
+  .dash-btn .watermark { display: none; }
+
+  /* 섹션 라벨 */
+  .sec-label { width: 100%; max-width: 440px; margin: 20px auto 0; font-size: 10.5px; font-weight: 800; letter-spacing: 1.6px; color: rgba(255,255,255,.32); }
+  .grid { margin-top: 10px; }
+
+  /* 2×2: 모두 같은 중립 카드, 아이콘은 금색 선 */
+  .tile {
+    min-height: 108px; border-radius: 16px; padding: 14px;
+    background: #0f1934; border: 1px solid rgba(255,255,255,.07);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .tile:active { background: #13204a; border-color: rgba(224,176,96,.3); transform: scale(.98); }
+  .tile .ti { width: 38px; height: 38px; border-radius: 11px; background: rgba(224,176,96,.08); box-shadow: inset 0 0 0 1px rgba(224,176,96,.22); }
+  .tile .ti svg { width: 19px; height: 19px; stroke: #e0b060; }
+  .tile .chev { stroke: rgba(255,255,255,.22); width: 15px; height: 15px; }
+  .tile .tt { margin-top: 12px; font-size: 14.5px; }
+  .tile .td { color: rgba(255,255,255,.4); font-size: 10.5px; }
+  .tile.gold { background: #0f1934; border: 1px solid rgba(255,255,255,.07); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+  .tile.gold:active { background: #13204a; }
+  .tile.gold .ti { background: rgba(224,176,96,.08); box-shadow: inset 0 0 0 1px rgba(224,176,96,.22); }
+  .tile.gold .ti svg { stroke: #e0b060; }
+  .tile.gold .tt { color: #fff; }
+  .tile.gold .td { color: rgba(255,255,255,.4); }
+  .tile.gold .chev { stroke: rgba(255,255,255,.22); }
+  .new-dot { top: 15px; right: 32px; padding: 0; width: 6px; height: 6px; font-size: 0; background: #e0b060; border-radius: 50%; animation: none !important; }
+  @media (max-width: 380px) { .sec-label { margin-top: 16px; } .tile { min-height: 100px; } .credit { margin-top: 14px; } .content { padding-bottom: calc(env(safe-area-inset-bottom) + 8px); } }
+  /* ---------- 2026-10-01 오늘 줄 v2: 카드 하나 + 칸 나눔 · 이모지 대신 선 아이콘 ---------- */
+  .today-strip { width: 100%; max-width: 440px; margin: 0 auto 10px; display: none; align-items: stretch;
+    background: #0f1934; border: 1px solid rgba(255,255,255,.07); border-radius: 16px; overflow: hidden; }
+  .today-strip.on { display: flex; }
+  .ts-next { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 14px; text-decoration: none; }
+  .ts-time { flex: none; font-size: 15px; font-weight: 900; color: #e0b060; letter-spacing: .3px; font-variant-numeric: tabular-nums; }
+  .ts-time.none { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.35); letter-spacing: 0; }
+  .ts-txt { min-width: 0; }
+  .ts-k { font-size: 9.5px; font-weight: 800; letter-spacing: 1.2px; color: rgba(255,255,255,.32); }
+  .ts-t { margin-top: 1px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.88); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ts-side { flex: none; display: flex; align-items: stretch; border-left: 1px solid rgba(255,255,255,.07); }
+  .ts-cell { width: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    text-decoration: none; background: none; border: none; font-family: inherit; cursor: pointer; color: rgba(255,255,255,.45); }
+  .ts-cell + .ts-cell { border-left: 1px solid rgba(255,255,255,.07); }
+  .ts-cell svg { width: 18px; height: 18px; stroke: rgba(224,176,96,.75); }
+  .ts-cell span { font-size: 9.5px; font-weight: 800; letter-spacing: .3px; }
+  .ts-cell b { color: #e0b060; }
+  .ts-cell.on { background: rgba(224,176,96,.12); color: #e0b060; }
+  .ts-cell.on svg { stroke: #e0b060; }
+  .ts-next:active, .ts-cell:active { background: rgba(255,255,255,.04); }
+  @media (max-width: 380px) { body:has(.today-strip.on) .tile { min-height: 92px; } body:has(.today-strip.on) .sec-label { margin-top: 12px; } body:has(.today-strip.on) .credit { margin-top: 10px; } body:has(.today-strip.on) .hero { min-height: 128px; max-height: 136px; } .ts-cell { width: 46px; } .ts-next { padding: 8px 10px 8px 12px; } .today-strip { margin-bottom: 8px; } body:has(.today-strip.on) .values-line { margin-top: 6px; } }
 </style>
 </head>
 <body>
@@ -174,15 +220,22 @@
   </div>
 
   <div class="hero-text">
-    <div class="hero-sub">SMART QUALITY PLATFORM</div>
+    <div class="hero-date" id="today">SMART QUALITY PLATFORM</div>
     <div class="hero-team">품질경영팀 PORTAL</div>
+    <div class="values-line">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L20 6 V12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 V6 Z"/></svg>신뢰</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>품질</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 Z"/></svg>효율</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5"/><path d="M10 20c0-3 2.5-5 6-5s6 2 6 5"/></svg>함께</span>
+    </div>
   </div>
 
   <div class="content">
+    <div class="today-strip" id="todayStrip"></div>
     <div class="menu">
       <a class="dash-btn" href="m_dashboard.html">
         <div class="icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#e0b060" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1a1206" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
             <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
             <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
@@ -190,49 +243,37 @@
           </svg>
         </div>
         <div class="text">
+          <div class="live"><i></i>LIVE</div>
           <div class="label">실시간 대시보드 접속</div>
           <div class="desc">수입검사 · 정밀측정 현황 한눈에</div>
         </div>
-        <div class="arrow"><span>바로가기</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+        <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
       </a>
     </div>
 
-    <a class="values" href="toolbox.html" onclick="tbSeen()">
-      <div class="value-item">
-        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L20 6 V12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 V6 Z"></path></svg></div>
-        <div class="vt">신뢰</div>
-        <div class="vd">철저한 데이터</div>
-      </div>
-      <div class="value-item">
-        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"></path><circle cx="12" cy="12" r="9"></circle></svg></div>
-        <div class="vt">품질</div>
-        <div class="vd">지속적인 개선</div>
-      </div>
-      <div class="value-item">
-        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 Z"></path></svg></div>
-        <div class="vt">효율</div>
-        <div class="vd">스마트한 운영</div>
-      </div>
-      <div class="value-item">
-        <div class="vi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5"></path><path d="M10 20c0-3 2.5-5 6-5s6 2 6 5"></path></svg></div>
-        <div class="vt">함께</div>
-        <div class="vd">더 나은 발전</div>
-      </div>
-      <div class="tap-hint"><b>👆</b>현장 툴박스 ›</div>
-    </a>
 
-    <div class="soon-grid">
-      <a class="soon-card" href="calc.html">
-        <div class="soon-badge live">바로가기</div>
-        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg></div>
-        <div class="st">계산기</div>
-        <div class="sd">계산 · 단위환산 · GD&amp;T · Cpk</div>
+    <div class="sec-label">QUICK MENU</div>
+    <div class="grid">
+      <a class="tile" id="tbTile" href="toolbox.html" onclick="tbSeen()">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        <span class="new-dot">NEW</span>
+        <div><div class="tt">현장 툴박스</div><div class="td">판정 · 일정 · 5Why · CMM</div></div>
       </a>
-      <a class="soon-card" href="gauge.html">
-        <div class="soon-badge live">바로가기</div>
-        <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8Z"></path><path d="M14 2v6h6"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg></div>
-        <div class="st">계측기 리스트</div>
-        <div class="sd">교정 현황 · 위치 찾기</div>
+      <a class="tile" href="calc.html">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="15"/><line x1="8" y1="18.5" x2="16" y2="18.5"/></svg></div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        <div><div class="tt">계산기</div><div class="td">환산 · GD&amp;T · Cpk · 불량률</div></div>
+      </a>
+      <a class="tile" href="gauge.html">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8Z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        <div><div class="tt">계측기 리스트</div><div class="td">교정 현황 · 위치 찾기</div></div>
+      </a>
+      <a class="tile" href="mark.html" aria-label="현장 마킹">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        <div><div class="tt">현장 마킹</div><div class="td">사진 찍고 바로 표시</div></div>
       </a>
     </div>
 
@@ -242,15 +283,53 @@
     </div>
   </div>
 
-  <a class="fab-camera" href="mark.html" aria-label="현장 마킹">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>마킹
-  </a>
-
 <script>
-  // 툴박스 한 번 들어가면 손 움직임 멈춤 (이 폰 기준)
+  // 오늘 날짜 (예: 2026. 10. 01 (목))
+  (function () {
+    var d = new Date(), w = '일월화수목금토'.charAt(d.getDay());
+    var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    document.getElementById('today').textContent = d.getFullYear() + '. ' + p(d.getMonth() + 1) + '. ' + p(d.getDate()) + ' (' + w + ')';
+  })();
+  // 툴박스 한 번 들어가면 NEW 표시 사라짐 (이 폰 기준)
   function tbSeen() { try { localStorage.setItem('m_tb_seen_v1', '1'); } catch (e) {} }
   (function () { var seen = false; try { seen = localStorage.getItem('m_tb_seen_v1') === '1'; } catch (e) {}
-    if (!seen) document.querySelector('.values').classList.add('nudge'); })();
+    if (!seen) document.getElementById('tbTile').classList.add('nudge'); })();
+  // 오늘 띠: 업무 스케줄러가 남긴 요약(ws_home_cache) + 운동 기록(ws_v1.gym)만 읽음 → 메인 속도 그대로
+  (function () {
+    var strip = document.getElementById('todayStrip');
+    function p2(n) { return (n < 10 ? '0' : '') + n; }
+    function render() {
+      var d = new Date(), t = d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+      var hm = p2(d.getHours()) + ':' + p2(d.getMinutes());
+      var cache = null, ws = null;
+      try { cache = JSON.parse(localStorage.getItem('ws_home_cache') || 'null'); } catch (e) {}
+      try { ws = JSON.parse(localStorage.getItem('ws_v1') || 'null'); } catch (e) {}
+      if (!cache && !ws) { strip.className = 'today-strip'; return; }   // 스케줄러를 안 쓰면 띠 없음
+      var list = (cache && cache.days && cache.days[t]) || [];
+      var next = list.filter(function (x) { return x.t && (x.e || x.t) >= hm; })[0] || list.filter(function (x) { return !x.t; })[0];
+      var esc = function (v) { return String(v || '').replace(/[<>&"]/g, ''); };
+      var html = '<a class="ts-next" href="work.html">'
+        + (next ? '<div class="ts-time">' + (next.t || '종일') + '</div>' : '<div class="ts-time none">—</div>')
+        + '<div class="ts-txt"><div class="ts-k">' + (next ? 'NEXT' : 'TODAY') + '</div><div class="ts-t">' + (next ? esc(next.title) : '남은 일정 없음') + '</div></div></a>';
+      var todo = (cache && cache.todoOpen) || 0;
+      var done = !!(ws && ws.gym && ws.gym[t]);
+      html += '<div class="ts-side">'
+        + '<a class="ts-cell" href="work.html" aria-label="할 일"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span>' + (todo ? '할 일 <b>' + todo + '</b>' : '할 일') + '</span></a>'
+        + '<button type="button" class="ts-cell' + (done ? ' on' : '') + '" id="stripGym" aria-label="오늘 운동"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg><span>' + (done ? '운동 ✓' : '운동') + '</span></button>'
+        + '</div>';
+      strip.innerHTML = html; strip.className = 'today-strip on';
+      document.getElementById('stripGym').onclick = function () {
+        try {
+          var s = JSON.parse(localStorage.getItem('ws_v1') || 'null') || { events: [], work: {}, todos: [], settings: {} };
+          s.gym = s.gym || {};
+          if (s.gym[t]) delete s.gym[t]; else s.gym[t] = 1;
+          localStorage.setItem('ws_v1', JSON.stringify(s));
+        } catch (e) {}
+        render();
+      };
+    }
+    render();
+  })();
 </script>
 
 </body>
