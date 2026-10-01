@@ -179,6 +179,25 @@
   .card h2 { margin-bottom: 10px; }
   .seg.g5 { grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .seg.g5 button { padding: 10px 2px; font-size: 12.5px; }
+  .seg.g6 { grid-template-columns: repeat(6, 1fr); gap: 5px; }
+  .seg.g6 button { padding: 10px 1px; font-size: 12px; letter-spacing: -0.3px; }
+  /* 불량률 환산 전용 */
+  .rt-sum { margin: 10px 0 10px; padding: 14px 16px; border-radius: 16px; background: linear-gradient(135deg,#0F1B3D,#1E2C55); color: #fff; }
+  .rt-sum .k { font-size: 11.5px; font-weight: 800; letter-spacing: .04em; color: #e0b060; }
+  .rt-sum .v { font-size: 26px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .rt-sum .v small { font-size: 15px; font-weight: 800; color: #CBD5E1; margin-left: 4px; }
+  .rt-sum .s { font-size: 12.5px; font-weight: 700; color: #CBD5E1; margin-top: 4px; }
+  .rt-pre { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
+  .rt-pre button { padding: 8px 0; border-radius: 10px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 13px; font-weight: 800; color: #334155; font-family: inherit; cursor: pointer; }
+  .rt-pre button.on { border-color: #e0b060; background: #FFFBF2; color: #9a6b1f; }
+  .rt-pre-l { font-size: 11.5px; font-weight: 800; color: #64748B; margin: 0 2px 5px; }
+  .rt-lot { margin-top: 12px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 14px; border: 1.5px dashed #CBD5E1; background: #F8FAFC; cursor: pointer; }
+  .rt-lot .l { flex: none; font-size: 13px; font-weight: 900; color: #0F172A; }
+  .rt-lot .l small { display: block; font-size: 11px; font-weight: 700; color: #64748B; }
+  .rt-lot input { flex: 1; min-width: 0; border: none; background: none; outline: none; text-align: right; font-size: 20px; font-weight: 800; color: #1E293B; font-family: inherit; caret-color: transparent; cursor: pointer; }
+  .rt-lot-r { text-align: right; font-size: 13px; font-weight: 800; color: #9a6b1f; margin: 6px 4px 0; min-height: 18px; }
+  .cv-link { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin: 14px 0 0; padding: 11px 14px; border-radius: 12px; border: none; background: #EEF2F7; color: #334155; font-size: 13px; font-weight: 800; font-family: inherit; cursor: pointer; }
+  .cv-link svg { width: 16px; height: 16px; flex: none; }
   .seg button { font-size: 12.5px; }
   .field { margin-bottom: 10px; }
   .field input[type=text] { padding: 10px 12px; }
@@ -332,6 +351,52 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.act.show { pointer-events: auto; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; }
   .toast button { border: none; background: #e0b060; color: #1a1206; font-weight: 900; font-size: 12.5px; font-family: inherit; padding: 7px 12px; border-radius: 9px; }
+  /* ---------- [2026-09-30] GD&T · Cpk 개편 ---------- */
+  .gd-more { display: none; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gd-more.open { display: grid; }
+  .gd-more button { padding: 10px 8px; border-radius: 12px; border: 1px dashed #CBD5E1; background: #fff; color: #334155; font-size: 12.5px; font-weight: 900; font-family: inherit; text-align: left; line-height: 1.3; }
+  .gd-more button small { display: block; font-size: 10.5px; font-weight: 700; color: #94A3B8; margin-top: 2px; }
+  .gd-more button.on { background: #0b1636; border: 1px solid #0b1636; color: #e0b060; }
+  .gd-more button.on small { color: rgba(255,255,255,.65); }
+  .pos-hero { padding: 12px 12px 10px; }
+  .pos-fig { display: block; width: 100%; max-width: 230px; margin: 0 auto; aspect-ratio: 1; }
+  .pos-hero .verdict { margin: 6px 0 8px; font-size: 18px; padding: 12px; }
+  .pos-kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .pos-kv > div { background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 10px; padding: 6px 4px; text-align: center; min-width: 0; }
+  .pos-kv span { display: block; font-size: 11px; font-weight: 700; color: #64748B; }
+  .pos-kv b { display: block; font-size: 14px; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pos-mode { margin-bottom: 12px; }
+  .xy-grid { display: grid; grid-template-columns: 34px 1fr 1fr; gap: 6px 8px; align-items: center; }
+  .xy-grid > b { text-align: center; font-size: 12px; font-weight: 900; color: #0b1636; }
+  .xy-grid > span { font-size: 12px; font-weight: 800; color: #64748B; }
+  .xy-grid .field { margin: 0; }
+  .xy-diff { margin-top: 8px; text-align: center; font-size: 12px; font-weight: 700; color: #64748B; font-variant-numeric: tabular-nums; }
+  .xy-diff b { color: #0F172A; }
+  #gd-pos .pos-d { display: none; }
+  #gd-pos.in-d .pos-d { display: grid; }
+  #gd-pos.in-d .pos-xy { display: none; }
+  .bonus-h { font-size: 13px; font-weight: 900; color: #0F172A; margin-bottom: 8px; }
+  .bonus-h small { font-size: 11px; font-weight: 700; color: #94A3B8; margin-left: 4px; }
+  #gd-pos.no-mmc .mmc-box { display: none; }
+  #gd-pos .mmc-box { visibility: visible !important; }
+  .sym-card .how { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #0b1636; color: #fff; font-size: 12.5px; font-weight: 700; line-height: 1.55; }
+  .sym-card .how b { display: block; color: #e0b060; font-size: 11.5px; margin-bottom: 2px; }
+  .cpk-res .hero { padding: 14px 16px; }
+  .cpk-res .hero .v { font-size: 36px; }
+  .cpk-band { margin: 10px 2px 0; }
+  .cpk-band .bd { position: relative; height: 10px; border-radius: 999px; overflow: hidden; background: #F1F5F9; }
+  .cpk-band .bd i { position: absolute; top: 0; bottom: 0; }
+  .cpk-band .bd b { position: absolute; top: -3px; width: 4px; height: 16px; margin-left: -2px; border-radius: 2px; background: #0b1636; box-shadow: 0 0 0 2px #fff; }
+  .cpk-band .bl { position: relative; height: 16px; margin-top: 3px; font-size: 10px; font-weight: 800; color: #64748B; }
+  .cpk-band .bl span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .cpk-why { margin-top: 8px; padding: 10px 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700; line-height: 1.55; color: #334155; background: #F8FAFC; }
+  .cpk-why:empty { display: none; }
+  .cpk-why.ok { background: #F0FDF4; color: #166534; }
+  .cpk-why.mid { background: #FFFBEB; color: #92400E; }
+  .cpk-why.bad { background: #FEF2F2; color: #991B1B; }
+  .histo { display: block; width: 100%; height: auto; margin-top: 10px; }
+  .sec-t { font-size: 12.5px; font-weight: 900; color: #0b1636; margin: 2px 2px -4px; }
+  #sub-conv.active { margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -386,60 +451,102 @@
 
     <!-- ============ 2. 환산 (한 번 입력 → 모든 단위) ============ -->
     <div id="panel-conv" class="panel">
-      <div class="seg g5" id="cvCats">
+      <div class="seg g6" id="cvCats">
         <button type="button" data-cat="length" onclick="setConvCat('length')">길이</button>
         <button type="button" data-cat="torque" onclick="setConvCat('torque')">토크</button>
         <button type="button" data-cat="force" onclick="setConvCat('force')">힘</button>
         <button type="button" data-cat="pressure" onclick="setConvCat('pressure')">압력</button>
         <button type="button" data-cat="angle" onclick="setConvCat('angle')">각도</button>
+        <button type="button" data-cat="ratio" onclick="setConvCat('ratio')">불량률</button>
+      </div>
+      <div id="rtTop" style="display:none;">
+        <div class="rt-sum" id="rtSum"><div class="k">불량률</div><div class="v">–</div><div class="s">값을 넣거나 아래 버튼을 누르세요</div></div>
+        <div class="rt-pre-l">자주 쓰는 값 (ppm)</div>
+        <div class="rt-pre" id="rtPre">
+          <button type="button" onclick="ratioPreset(10)">10</button><button type="button" onclick="ratioPreset(50)">50</button><button type="button" onclick="ratioPreset(100)">100</button><button type="button" onclick="ratioPreset(500)">500</button><button type="button" onclick="ratioPreset(1000)">1,000</button>
+        </div>
       </div>
       <div class="cv-list" id="cvList"></div>
+      <div id="rtBottom" style="display:none;">
+        <div class="rt-lot" onclick="openKeypad(this.querySelector('input'))">
+          <div class="l">LOT 수량<small>예상 불량 개수 계산</small></div>
+          <input type="text" readonly id="rtLot" data-label="LOT 수량 (개)" placeholder="예: 15,120" oninput="ratioLot(this.value)">
+        </div>
+        <div class="rt-lot-r" id="rtLotR"></div>
+      </div>
       <div class="cv-tip">아무 칸이나 눌러 값을 넣으면 나머지가 바로 바뀝니다</div>
       <div class="hint" id="cvHint" style="text-align:center;margin-top:0;"></div>
+      <button type="button" class="cv-link" id="cvRateLink" style="display:none;" onclick="switchTab('cpk'); setCpkSub('rate');"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>불량 수 ÷ 검사 수로 계산 (Cpk·불량 탭)<span style="color:#94A3B8;">›</span></button>
     </div>
 
     <!-- ============ 3. GD&T (위치도 · 원 맞춤 비교 · 3점 원 · 기호 사전) ============ -->
     <div id="panel-position" class="panel">
-      <div class="seg g4" id="gdSubs">
-        <button type="button" data-sub="pos" onclick="setGdSub('pos')">위치도</button>
-        <button type="button" data-sub="fit" onclick="setGdSub('fit')">원 맞춤</button>
-        <button type="button" data-sub="p3" onclick="setGdSub('p3')">3점 원</button>
-        <button type="button" data-sub="sym" onclick="setGdSub('sym')">기호</button>
+      <!-- [2026-09-30] GD&T 개편: 위치도 판정 중심 · 기호/측정법 · 나머지는 더 보기 -->
+      <div class="seg g3" id="gdSubs">
+        <button type="button" data-sub="pos" onclick="setGdSub('pos')">위치도 판정</button>
+        <button type="button" data-sub="sym" onclick="setGdSub('sym')">기호 · 측정법</button>
+        <button type="button" data-sub="more" onclick="toggleGdMore()">더 보기 ▾</button>
+      </div>
+      <div class="gd-more" id="gdMore">
+        <button type="button" data-sub="fit" onclick="setGdSub('fit')">⭕ 원 맞춤 비교<small>핀·링게이지 vs CMM</small></button>
+        <button type="button" data-sub="p3" onclick="setGdSub('p3')">📍 3점으로 원 구하기<small>현미경·하이트 좌표</small></button>
       </div>
 
-      <!-- 3-1 위치도 -->
+      <!-- 3-1 위치도 판정 -->
       <div class="sub" id="gd-pos">
-        <div class="seg g5x">
-          <button type="button" id="ft-hole" onclick="setFeatureType('hole')">구멍</button>
-          <button type="button" id="ft-shaft" onclick="setFeatureType('shaft')">축</button>
-          <span></span>
-          <button type="button" id="mmc-none" onclick="setMmcMode('none')">RFS</button>
-          <button type="button" id="mmc-mmc" onclick="setMmcMode('mmc')">Ⓜ MMC</button>
-          <button type="button" id="mmc-lmc" onclick="setMmcMode('lmc')">Ⓛ LMC</button>
-        </div>
-        <div class="card gd-res">
-          <svg class="gd-fig" id="posFig" viewBox="0 0 120 120"></svg>
-          <div class="gd-res-r">
-            <div id="res-verdict" class="verdict">계산 대기 중</div>
-            <div class="gd-kv"><span>위치도 오차</span><b id="res-error">–</b></div>
-            <div class="gd-kv"><span>보너스 공차</span><b id="res-bonus">–</b></div>
-            <div class="gd-kv"><span>최종 허용 공차</span><b id="res-allow">–</b></div>
+        <div class="card pos-hero">
+          <svg class="pos-fig" id="posFig" viewBox="0 0 240 240"></svg>
+          <div id="res-verdict" class="verdict">계산 대기 중</div>
+          <div class="pos-kv">
+            <div><span>위치도 오차</span><b id="res-error">–</b></div>
+            <div><span>허용 공차</span><b id="res-allow">–</b></div>
+            <div><span>보너스</span><b id="res-bonus">–</b></div>
           </div>
         </div>
+
         <div class="card">
-          <div class="row2">
+          <div class="seg g2 pos-mode" id="posMode">
+            <button type="button" data-m="xy" onclick="setPosIn('xy')">좌표로 입력</button>
+            <button type="button" data-m="d" onclick="setPosIn('d')">편차로 입력</button>
+          </div>
+          <div class="pos-xy">
+            <div class="xy-grid">
+              <span></span><b>X</b><b>Y</b>
+              <span>도면</span>
+              <div class="field"><input type="text" readonly id="pos-nx" data-label="도면 X (이론 위치)" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <div class="field"><input type="text" readonly id="pos-ny" data-label="도면 Y (이론 위치)" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <span>실측</span>
+              <div class="field"><input type="text" readonly id="pos-mx" data-label="실측 X" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <div class="field"><input type="text" readonly id="pos-my" data-label="실측 Y" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+            </div>
+            <div class="xy-diff" id="posDiff">편차 ΔX – · ΔY –</div>
+          </div>
+          <div class="row2 pos-d">
             <div class="field"><label>X 편차 ΔX (mm)</label><input type="text" readonly id="pos-dx" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
             <div class="field"><label>Y 편차 ΔY (mm)</label><input type="text" readonly id="pos-dy" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
           </div>
-          <div class="row2">
-            <div class="field"><label>위치도 공차 ⌖ Ø (mm)</label><input type="text" readonly id="pos-tol" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
-            <div class="field mmc-only"><label>실제 측정 치수</label><input type="text" readonly id="pos-actual" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+          <div class="field" style="margin-top:10px;"><label>도면 위치도 공차 ⌖ Ø (mm)</label><input type="text" readonly id="pos-tol" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+        </div>
+
+        <div class="card">
+          <div class="bonus-h">보너스 공차 <small>도면 공차 뒤에 Ⓜ·Ⓛ가 있을 때만</small></div>
+          <div class="seg g3">
+            <button type="button" id="mmc-none" onclick="setMmcMode('none')">없음 (RFS)</button>
+            <button type="button" id="mmc-mmc" onclick="setMmcMode('mmc')">Ⓜ MMC</button>
+            <button type="button" id="mmc-lmc" onclick="setMmcMode('lmc')">Ⓛ LMC</button>
           </div>
-          <div class="row2 mmc-only">
-            <div class="field"><label id="lbl-size-max">최대 허용 치수</label><input type="text" readonly id="pos-size-max" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
-            <div class="field"><label id="lbl-size-min">최소 허용 치수</label><input type="text" readonly id="pos-size-min" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+          <div class="mmc-only mmc-box">
+            <div class="seg g2" style="margin-top:10px;">
+              <button type="button" id="ft-hole" onclick="setFeatureType('hole')">구멍 (내경)</button>
+              <button type="button" id="ft-shaft" onclick="setFeatureType('shaft')">축 (외경)</button>
+            </div>
+            <div class="field" style="margin-top:10px;"><label>실제 측정 치수</label><input type="text" readonly id="pos-actual" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+            <div class="row2">
+              <div class="field"><label id="lbl-size-max">최대 허용 치수</label><input type="text" readonly id="pos-size-max" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <div class="field"><label id="lbl-size-min">최소 허용 치수</label><input type="text" readonly id="pos-size-min" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+            </div>
           </div>
-          <div class="hint" style="margin-top:0;">공차 앞에 Ø가 있는 원형 공차역 기준 · 오차 = 2√(ΔX²+ΔY²) · 데이텀 Ⓜ에 의한 추가 여유(데이텀 이동)는 미포함</div>
+          <div class="hint">Ø 원형 공차역 기준 · 오차 = 2√(ΔX²+ΔY²) · 데이텀 Ⓜ에 의한 추가 여유(데이텀 이동)는 미포함</div>
         </div>
       </div>
 
@@ -503,10 +610,10 @@
 
     <!-- ============ 4. Cpk · 불량률 ============ -->
     <div id="panel-cpk" class="panel">
-      <div class="seg g3" id="cpkSubs">
-        <button type="button" data-sub="data" onclick="setCpkSub('data')">측정값 → Cpk</button>
-        <button type="button" data-sub="rate" onclick="setCpkSub('rate')">불량률·PPM</button>
-        <button type="button" data-sub="conv" onclick="setCpkSub('conv')">Cpk ↔ PPM</button>
+      <!-- [2026-09-30] Cpk 개편: 공정능력 한눈에 / 불량 환산(불량률·PPM + Cpk↔PPM 통합) -->
+      <div class="seg g2" id="cpkSubs">
+        <button type="button" data-sub="data" onclick="setCpkSub('data')">공정능력 (Cpk)</button>
+        <button type="button" data-sub="rate" onclick="setCpkSub('rate')">불량 환산</button>
       </div>
 
       <!-- 4-1 측정값으로 바로 -->
@@ -524,8 +631,10 @@
           </div>
           <div class="chips" id="cpkChips"></div>
         </div>
-        <div class="card">
+        <div class="card cpk-res">
           <div class="hero" id="cpkHero"><div class="k">Cpk</div><div class="v">–</div></div>
+          <div class="cpk-band" id="cpkBand"></div>
+          <div class="cpk-why" id="cpkWhy"></div>
           <div class="stat-grid">
             <div><div class="k">평균</div><div class="v" id="st-mean">–</div></div>
             <div><div class="k">표준편차 σ</div><div class="v" id="st-sd">–</div></div>
@@ -534,13 +643,14 @@
             <div><div class="k">최대</div><div class="v" id="st-max">–</div></div>
             <div><div class="k">예상 불량</div><div class="v" id="st-ppm">–</div></div>
           </div>
-          <svg class="dotplot" id="cpkPlot" viewBox="0 0 320 46" preserveAspectRatio="none"></svg>
+          <svg class="histo" id="cpkPlot" viewBox="0 0 320 132"></svg>
           <div class="hint" id="cpkNote">σ = 측정값 전체 표준편차(n−1) → 엄밀히는 Ppk · 기준 예: AIAG PPAP 초기공정 1.67↑, 양산 1.33↑ (고객사 요구 우선)</div>
         </div>
       </div>
 
       <!-- 4-2 불량률 · PPM -->
       <div class="sub" id="sub-rate">
+        <div class="sec-t">① 검사 결과 → 불량률 · PPM</div>
         <div class="card">
           <div class="row2">
             <div class="field"><label>검사 수 (ea)</label><input type="text" readonly id="dr-n" placeholder="예: 5000" onclick="openKeypad(this)" oninput="renderRate(); saveState();"></div>
@@ -561,6 +671,7 @@
 
       <!-- 4-3 Cpk ↔ 예상 불량률 -->
       <div class="sub" id="sub-conv">
+        <div class="sec-t">② Cpk ↔ 예상 불량 PPM</div>
         <div class="card">
           <div class="seg g2" id="cpSides" style="margin-bottom:12px;">
             <button type="button" data-side="two" onclick="setCpSide('two')">양측 규격</button>
@@ -645,7 +756,7 @@
   const STATE_KEY = 'calc_state_v2', HIST_KEY = 'calc_hist_v2';
   let ST = { tab: 'quick', convCat: 'length', conv: {}, cpkSub: 'data', usl: '', lsl: '', data: [], dr: { n: '', d: '', t: '' }, cpSide: 'two', cpk: '1.33' };
   const GD0 = { sub: 'pos', sym: 9,
-    pos: { ft: 'hole', mm: 'none', 'pos-dx': '0.030', 'pos-dy': '0.020', 'pos-tol': '0.100', 'pos-actual': '10.02', 'pos-size-max': '10.05', 'pos-size-min': '9.95' },
+    pos: { in: 'xy', ft: 'hole', mm: 'none', 'pos-nx': '25.000', 'pos-ny': '10.000', 'pos-mx': '25.030', 'pos-my': '10.020', 'pos-dx': '0.030', 'pos-dy': '0.020', 'pos-tol': '0.100', 'pos-actual': '10.02', 'pos-size-max': '10.05', 'pos-size-min': '9.95' },
     fit: { feat: 'hole', shape: 2, amp: 0.04, nom: '10.00' },
     p3: ['5.02', '0.01', '-2.49', '4.34', '-2.51', '-4.32'] };
   let READY = false;
@@ -952,6 +1063,8 @@
                 units: [['N', '뉴턴', 1], ['kN', '킬로뉴턴', 1000], ['kgf', '킬로그램힘', 9.80665], ['gf', '그램힘', 0.00980665], ['lbf', '파운드힘', 4.4482216152605]] },
     pressure: { def: [0, '1'], hint: '1 MPa = 10 bar ≈ 10.197 kgf/cm² ≈ 145.04 psi',
                 units: [['MPa', '메가파스칼', 1], ['kPa', '킬로파스칼', 0.001], ['Pa', '파스칼', 1e-6], ['bar', '바', 0.1], ['kgf/cm²', '킬로그램힘/cm²', 0.0980665], ['psi', 'lbf/in²', 0.006894757293168361]] },
+    ratio:    { def: [0, '100'], hint: '1% = 10,000 ppm · 1 ppm = 1,000 ppb · 100 ppm = 10,000개 중 1개',
+                units: [['ppm', '100만 개당', 1], ['%', '100개당', 10000], ['ppb', '10억 개당', 0.001], ['1/N', 'N개 중 1개꼴', 'inv']] },
     angle:    { def: [0, '1'], hint: '',
                 units: [['°', '도 (십진)'], ['° ′ ″', '도·분·초'], ['rad', '라디안'], ['%', '기울기 (tan×100)']] }
   };
@@ -997,6 +1110,10 @@
         <input type="text" readonly data-i="${i}" data-label="${u[0]} (${u[1]})" oninput="convInput(${i}, this.value)">
       </div>`).join('');
     id('cvHint').innerText = C.hint;
+    const isR = cat === 'ratio';
+    id('cvRateLink').style.display = isR ? 'flex' : 'none';
+    id('rtTop').style.display = id('rtBottom').style.display = isR ? 'block' : 'none';
+    if (isR) id('rtLot').value = ST.ratioLot || '';
     const rows = id('cvList').querySelectorAll('.cv-row');
     if (cat === 'angle' && src.i === DMS_I) {
       const p = String(src.v).split('|'); const ins = rows[DMS_I].querySelectorAll('input');
@@ -1020,15 +1137,53 @@
       return;
     }
     const v = parseNum(sv);
+    // 기준 단위로 변환 ('inv' = 역수 단위: 불량률의 1/N → ppm = 1,000,000 / N)
+    const toBase = (i, x) => C.units[i][2] === 'inv' ? (x > 0 ? 1e6 / x : NaN) : x * C.units[i][2];
+    const fromBase = (i, b) => C.units[i][2] === 'inv' ? (b > 0 ? 1e6 / b : NaN) : b / C.units[i][2];
+    const base = isNaN(v) ? NaN : toBase(si, v);
     rows.forEach((r, i) => {
       if (i === si) return;
-      r.querySelector('input').value = isNaN(v) ? '' : fmtConv(v * C.units[si][2] / C.units[i][2]);
+      const out = isNaN(base) ? NaN : fromBase(i, base);
+      r.querySelector('input').value = isFinite(out) ? (C.units[i][2] === 'inv' ? Math.round(out).toLocaleString('en-US') : fmtConv(out)) : '';
     });
+    if (cat === 'ratio') ratioUpdate(base);
   }
   function convMark(i){ id('cvList').querySelectorAll('.cv-row').forEach((r, k) => r.classList.toggle('src', k === i)); }
   function convInput(i, val){
     ST.conv[ST.convCat] = { i, v: val };
     convMark(i); convFill(i, val); saveState();
+  }
+  /* 불량률 전용: 요약 카드 · 빠른 입력 · LOT 예상 불량 */
+  let RT_BASE = NaN;
+  function nice(x){ return x >= 100 ? Math.round(x).toLocaleString('en-US') : fmtConv(Math.round(x * 100) / 100); }
+  function ratioUpdate(base){
+    RT_BASE = base;
+    const ok = isFinite(base) && base > 0 && base <= 1e6;
+    // 읽기 쉬운 "N개 중 M개" 표현: M이 1 이상이 되는 가장 작은 10의 거듭제곱 기준
+    let sub = '값을 넣거나 아래 버튼을 누르세요';
+    if (ok) {
+      let per = 100; while (per < 1e9 && base * per / 1e6 < 1) per *= 10;
+      const cnt = base * per / 1e6;
+      const perTxt = per >= 1e8 ? (per / 1e8) + '억' : per >= 1e4 ? (per / 1e4).toLocaleString('en-US') + '만' : per.toLocaleString('en-US');
+      const inv = 1e6 / base;
+      sub = `${perTxt}${per >= 1e4 ? ' ' : ''}개 중 ${nice(cnt)}개` + (Math.abs(inv - per) / per < 1e-9 ? '' : ` · ${nice(inv)}개 중 1개꼴`);
+    } else if (isFinite(base) && base > 1e6) sub = '100%(1,000,000 ppm)를 넘을 수 없습니다';
+    id('rtSum').innerHTML = `<div class="k">불량률</div><div class="v">${ok ? nice(base) : '–'}<small>ppm</small>${ok ? `<small>= ${fmtConv(base / 1e4)}%</small>` : ''}</div><div class="s">${sub}</div>`;
+    id('rtPre').querySelectorAll('button').forEach(b => b.classList.toggle('on', ok && Number(b.innerText.replace(/,/g, '')) === base));
+    id('cvHint').innerText = '';
+    ratioLotCalc();
+  }
+  function ratioPreset(ppm){
+    const r0 = id('cvList').querySelectorAll('.cv-row')[0].querySelector('input');
+    r0.value = String(ppm); convInput(0, String(ppm));
+  }
+  function ratioLot(v){ ST.ratioLot = v; saveState(); ratioLotCalc(); }
+  function ratioLotCalc(){
+    const n = parseNum(ST.ratioLot || ''), out = id('rtLotR');
+    if (!(n > 0) || !(RT_BASE > 0) || RT_BASE > 1e6) { out.innerText = ''; return; }
+    const e = n * RT_BASE / 1e6;
+    const eTxt = e < 0.01 ? '0.01 미만' : e < 10 ? (Math.round(e * 10) / 10).toString() : nice(e);
+    out.innerText = `→ ${n.toLocaleString('en-US')}개 LOT에서 예상 불량 약 ${eTxt}개`;
   }
   function convDms(){
     const ins = id('cvList').querySelectorAll('.cv-row')[DMS_I].querySelectorAll('input');
@@ -1059,9 +1214,12 @@
   function decimalsOf(arr){ let d = 0; arr.forEach(v => { const s = String(v); const k = s.includes('.') ? s.split('.')[1].length : 0; if (k > d) d = k; }); return Math.min(Math.max(d, 2), 5); }
 
   function setCpkSub(s){
+    if (s === 'conv') s = 'rate';   // 불량률·PPM + Cpk↔PPM 한 화면(불량 환산)
     ST.cpkSub = s; saveState();
     document.querySelectorAll('#cpkSubs button').forEach(b => b.classList.toggle('on', b.dataset.sub === s));
-    ['data', 'rate', 'conv'].forEach(k => id('sub-' + k).classList.toggle('active', k === s));
+    id('sub-data').classList.toggle('active', s === 'data');
+    id('sub-rate').classList.toggle('active', s === 'rate');
+    id('sub-conv').classList.toggle('active', s === 'rate');
   }
 
   // 4-1 측정값 → Cpk
@@ -1111,7 +1269,7 @@
     const hero = id('cpkHero');
     const set = (k, v) => id(k).innerText = v;
     ['st-mean', 'st-sd', 'st-cp', 'st-min', 'st-max', 'st-ppm'].forEach(k => set(k, '–'));
-    id('cpkPlot').innerHTML = '';
+    id('cpkPlot').innerHTML = ''; id('cpkBand').innerHTML = ''; id('cpkWhy').innerHTML = ''; id('cpkWhy').className = 'cpk-why';
     const heroMsg = (k, v, cls) => { hero.className = 'hero' + (cls ? ' ' + cls : ''); hero.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`; };
 
     if (n === 0) { heroMsg('Cpk', '–'); return; }
@@ -1142,24 +1300,70 @@
     const side = !hasL ? ' · 상한 편측' : !hasU ? ' · 하한 편측' : '';
     const ng = data.filter(v => (hasU && v > usl) || (hasL && v < lsl)).length;
     heroMsg(`Cpk${side}<small>n=${n}${n < 25 ? ' · 25개 미만 참고용' : ''}${ng ? ` · 규격 밖 ${ng}개` : ''}</small>`, `${cpk.toFixed(2)}<small>${word}</small>`, cls);
+    drawBand(cpk);
+    // 왜 이 값인가 (치우침 vs 산포) — 한 줄 진단
+    const why = id('cpkWhy'); let msg = '', wcls = '';
+    const needSd = d2 => d2 / (3 * 1.33);
+    if (hasU && hasL) {
+      const cp = (usl - lsl) / (6 * sd), center = (usl + lsl) / 2, half = (usl - lsl) / 2;
+      const shift = (mean - center) / half * 100, dir = shift > 0 ? '상한' : '하한';
+      if (cpk >= 1.33 && Math.abs(shift) < 25) { msg = `✅ 중심·산포 모두 양호 · 치우침 ${Math.abs(shift).toFixed(0)}%`; wcls = 'ok'; }
+      else if (cp < 1.33) { msg = `📏 <b>산포가 큼</b> · 중앙에 맞춰도 Cp ${cp.toFixed(2)} → σ를 <b>${sd.toFixed(d + 2)} → ${needSd(half).toFixed(d + 2)}</b> 이하로 줄여야 1.33`; wcls = 'bad'; }
+      else { msg = `🎯 <b>평균이 ${dir} 쪽으로 ${Math.abs(shift).toFixed(0)}% 치우침</b> · 중앙(${center.toFixed(d)})으로 옮기면 Cpk <b>${cp.toFixed(2)}</b>`; wcls = 'mid'; }
+    } else {
+      const dist = hasU ? usl - mean : mean - lsl;
+      msg = cpk >= 1.33 ? `✅ 편측 규격 · ${hasU ? '상한' : '하한'}까지 여유 충분` : `📏 편측 규격 · ${hasU ? '상한' : '하한'}까지 거리 ${dist.toFixed(d)} → σ를 <b>${needSd(Math.abs(dist)).toFixed(d + 2)}</b> 이하로 줄이거나 평균을 멀리`;
+      wcls = cpk >= 1.33 ? 'ok' : 'bad';
+    }
+    why.className = 'cpk-why ' + wcls; why.innerHTML = msg;
   }
+  // Cpk 기준 띠 (1.00 · 1.33 · 1.67) + 현재 위치
+  function drawBand(c){
+    const lo = 0.5, hi = 2.17, X = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+    const seg = (a, b, col) => `<i style="left:${X(a)}%;width:${X(b) - X(a)}%;background:${col}"></i>`;
+    id('cpkBand').innerHTML = `<div class="bd">${seg(lo, 1, '#FECACA')}${seg(1, 1.33, '#FDE68A')}${seg(1.33, 1.67, '#BBF7D0')}${seg(1.67, hi, '#86EFAC')}<b style="left:${X(c)}%"></b></div>
+      <div class="bl"><span style="left:${X(1)}%">1.00</span><span style="left:${X(1.33)}%">1.33 양산</span><span style="left:${X(1.67)}%">1.67 초기</span></div>`;
+  }
+  // 히스토그램 + 규격선 + 평균 + 정규 곡선 (분포가 규격 안 어디에 있는지)
   function drawPlot(data, mean, usl, lsl){
-    const W = 320, H = 46, pad = 14;
-    const pts = data.concat(mean, usl == null ? [] : [usl], lsl == null ? [] : [lsl]);
+    const W = 320, H = 132, L = 14, R = 306, T = 18, B = 104;
+    const pts = data.concat(usl == null ? [] : [usl], lsl == null ? [] : [lsl]);
     let lo = Math.min(...pts), hi = Math.max(...pts);
     if (hi === lo) { hi += 1; lo -= 1; }
-    const span = hi - lo; lo -= span * 0.06; hi += span * 0.06;
-    const X = v => pad + (v - lo) / (hi - lo) * (W - pad * 2);
-    let s = `<line x1="${pad}" y1="30" x2="${W - pad}" y2="30" stroke="#CBD5E1" stroke-width="1"/>`;
+    const span = hi - lo; lo -= span * 0.08; hi += span * 0.08;
+    const X = v => L + (v - lo) / (hi - lo) * (R - L);
+    const n = data.length, bins = Math.max(5, Math.min(14, Math.round(Math.sqrt(n) * 1.6)));
+    const dmin = Math.min(...data), dmax = Math.max(...data), bw = (dmax - dmin) / bins || (span || 1) / 10;
+    const cnt = new Array(bins).fill(0), ngc = new Array(bins).fill(0);
+    data.forEach(v => { let k = Math.floor((v - dmin) / bw); if (k >= bins) k = bins - 1; if (k < 0) k = 0; cnt[k]++; if ((usl != null && v > usl) || (lsl != null && v < lsl)) ngc[k]++; });
+    const cmax = Math.max(...cnt, 1);
+    let s = '';
+    if (lsl != null && usl != null) s += `<rect x="${X(lsl)}" y="${T}" width="${X(usl) - X(lsl)}" height="${B - T}" fill="#F0FDF4"/>`;
+    s += `<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="#CBD5E1" stroke-width="1"/>`;
+    for (let k = 0; k < bins; k++) {
+      if (!cnt[k]) continue;
+      const x0 = X(dmin + k * bw), x1 = X(dmin + (k + 1) * bw), h = cnt[k] / cmax * (B - T - 8);
+      s += `<rect x="${x0 + 0.8}" y="${B - h}" width="${Math.max(1, x1 - x0 - 1.6)}" height="${h}" rx="1.5" fill="${ngc[k] ? '#DC2626' : '#0b1636'}" fill-opacity="${ngc[k] ? .85 : .72}"/>`;
+    }
+    if (n >= 2) {
+      const sd = Math.sqrt(data.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
+      if (sd > 0) {
+        const pk = 1 / (sd * Math.sqrt(2 * Math.PI)), scale = cmax * bw * n / n;   // 막대 높이 기준으로 곡선 맞춤
+        let d = '';
+        for (let i = 0; i <= 80; i++) {
+          const v = lo + (hi - lo) * i / 80, f = Math.exp(-0.5 * ((v - mean) / sd) ** 2);
+          const y = B - f * (B - T - 8) * Math.min(1.15, (n * bw * pk) / cmax);
+          d += (i ? 'L' : 'M') + X(v).toFixed(1) + ' ' + y.toFixed(1);
+        }
+        s += `<path d="${d}" fill="none" stroke="#e0b060" stroke-width="1.6"/>`;
+      }
+    }
     [['LSL', lsl], ['USL', usl]].forEach(([t, v]) => {
       if (v == null) return;
-      s += `<line x1="${X(v)}" y1="6" x2="${X(v)}" y2="40" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="3 2"/><text x="${X(v)}" y="5" font-size="8" font-weight="800" fill="#EF4444" text-anchor="middle" dominant-baseline="hanging">${t}</text>`;
+      s += `<line x1="${X(v)}" y1="${T - 4}" x2="${X(v)}" y2="${B}" stroke="#EF4444" stroke-width="1.6" stroke-dasharray="4 3"/><text x="${X(v)}" y="${T - 7}" font-size="9" font-weight="900" fill="#EF4444" text-anchor="middle">${t}</text><text x="${X(v)}" y="${B + 12}" font-size="8.5" font-weight="800" fill="#94A3B8" text-anchor="middle">${v}</text>`;
     });
-    data.forEach((v, i) => {
-      const ng = (usl != null && v > usl) || (lsl != null && v < lsl);
-      s += `<circle cx="${X(v)}" cy="${30 - (i % 3) * 5}" r="3" fill="${ng ? '#DC2626' : '#0b1636'}" fill-opacity="${ng ? 0.9 : 0.5}"/>`;
-    });
-    s += `<line x1="${X(mean)}" y1="14" x2="${X(mean)}" y2="40" stroke="#e0b060" stroke-width="2"/><text x="${X(mean)}" y="44" font-size="8" font-weight="800" fill="#9a6b1f" text-anchor="middle">평균</text>`;
+    s += `<line x1="${X(mean)}" y1="${T}" x2="${X(mean)}" y2="${B}" stroke="#9a6b1f" stroke-width="1.6"/><text x="${X(mean)}" y="${B + 24}" font-size="9" font-weight="900" fill="#9a6b1f" text-anchor="middle">평균 ${mean.toFixed(decimalsOf(ST.data) + 1)}</text>`;
+    if (lsl != null && usl != null) s += `<line x1="${X((usl + lsl) / 2)}" y1="${T}" x2="${X((usl + lsl) / 2)}" y2="${B}" stroke="#16A34A" stroke-width="1" stroke-dasharray="2 3"/>`;
     id('cpkPlot').innerHTML = s;
   }
 
@@ -1222,16 +1426,31 @@
      ========================================================== */
   function setGdSub(s){
     ST.gd.sub = s; saveState();
-    document.querySelectorAll('#gdSubs button').forEach(b => b.classList.toggle('on', b.dataset.sub === s));
+    const more = s === 'fit' || s === 'p3';
+    document.querySelectorAll('#gdSubs button').forEach(b => b.classList.toggle('on', b.dataset.sub === s || (more && b.dataset.sub === 'more')));
+    document.querySelectorAll('#gdMore button').forEach(b => b.classList.toggle('on', b.dataset.sub === s));
+    id('gdMore').classList.toggle('open', more);
     ['pos', 'fit', 'p3', 'sym'].forEach(k => id('gd-' + k).classList.toggle('active', k === s));
     if (s === 'fit') renderFit();
+  }
+  function toggleGdMore(){
+    const m = id('gdMore'); m.classList.toggle('open');
+    id('gdSubs').querySelector('[data-sub="more"]').textContent = m.classList.contains('open') ? '더 보기 ▴' : '더 보기 ▾';
+  }
+  // 위치도 입력 방식: xy = 도면·실측 좌표 / d = 편차 직접
+  let posIn = 'xy';
+  function setPosIn(m){
+    posIn = m === 'd' ? 'd' : 'xy';
+    document.querySelectorAll('#posMode button').forEach(b => b.classList.toggle('on', b.dataset.m === posIn));
+    id('gd-pos').classList.toggle('in-d', posIn === 'd');
+    calculatePosition();
   }
   const f4 = v => isFinite(v) ? v.toFixed(3) : '–';
 
   // ---- 3-1 위치도 ----
   let featureType = 'hole'; // hole(내경) | shaft(외경)
   let mmcMode = 'none';     // none | mmc | lmc
-  const POS_IDS = ['pos-dx', 'pos-dy', 'pos-tol', 'pos-actual', 'pos-size-max', 'pos-size-min'];
+  const POS_IDS = ['pos-nx', 'pos-ny', 'pos-mx', 'pos-my', 'pos-dx', 'pos-dy', 'pos-tol', 'pos-actual', 'pos-size-max', 'pos-size-min'];
   function setFeatureType(t){
     featureType = t;
     id('ft-hole').classList.toggle('on', t === 'hole');
@@ -1247,6 +1466,16 @@
     calculatePosition();
   }
   function calculatePosition(){
+    let xyWait = '';
+    if (posIn === 'xy') {
+      const nx = parseNum(id('pos-nx').value), ny = parseNum(id('pos-ny').value), mx = parseNum(id('pos-mx').value), my = parseNum(id('pos-my').value);
+      if ([nx, ny, mx, my].every(isFinite)) {
+        const ddx = mx - nx, ddy = my - ny;
+        id('pos-dx').value = ddx.toFixed(4).replace(/0+$/, '').replace(/\.$/, '.0');
+        id('pos-dy').value = ddy.toFixed(4).replace(/0+$/, '').replace(/\.$/, '.0');
+        id('posDiff').innerHTML = `편차 ΔX <b>${ddx >= 0 ? '+' : ''}${ddx.toFixed(3)}</b> · ΔY <b>${ddy >= 0 ? '+' : ''}${ddy.toFixed(3)}</b>`;
+      } else { xyWait = '도면·실측 X·Y를 입력하세요'; id('posDiff').innerHTML = '편차 ΔX – · ΔY –'; }
+    }
     const dx = parseNum(id('pos-dx').value) || 0;
     const dy = parseNum(id('pos-dy').value) || 0;
     const tolRaw = parseNum(id('pos-tol').value);
@@ -1254,6 +1483,7 @@
     const posError = 2 * Math.sqrt(dx * dx + dy * dy);
     let bonus = 0, sizeNg = false, wait = '';
     if (!(tolRaw > 0)) wait = '위치도 공차를 입력하세요';
+    if (!wait && xyWait) wait = xyWait;
     if (mmcMode !== 'none') {
       const sMaxR = parseNum(id('pos-size-max').value), sMinR = parseNum(id('pos-size-min').value), actR = parseNum(id('pos-actual').value);
       if (!wait && !(isFinite(sMaxR) && isFinite(sMinR))) wait = '최대·최소 치수를 입력하세요';
@@ -1280,18 +1510,25 @@
     else if (posError <= allowable + 1e-12) { v.className = 'verdict pass'; v.innerText = `OK · 여유 ${f4(margin)}`; }
     else { v.className = 'verdict fail'; v.innerText = `NG · 초과 ${f4(-margin)}`; }
     drawPosFig(dx, dy, baseTol, allowable, !wait && posError <= allowable + 1e-12 && !sizeNg);
-    ST.gd.pos = { ft: featureType, mm: mmcMode }; POS_IDS.forEach(k => ST.gd.pos[k] = id(k).value); saveState();
+    ST.gd.pos = { in: posIn, ft: featureType, mm: mmcMode }; POS_IDS.forEach(k => ST.gd.pos[k] = id(k).value); saveState();
   }
+  // 과녁 그림: 허용 공차원(초록/빨강) · 기본 공차(점선) · 측정점과 오차원
   function drawPosFig(dx, dy, base, allow, ok){
-    const C = 60, rMax = Math.max(allow / 2, Math.hypot(dx, dy), 1e-9) * 1.15;
-    const k = 48 / rMax;
-    let s = `<line x1="8" y1="${C}" x2="112" y2="${C}" stroke="#CBD5E1" stroke-width="1"/><line x1="${C}" y1="8" x2="${C}" y2="112" stroke="#CBD5E1" stroke-width="1"/>`;
-    s += `<circle cx="${C}" cy="${C}" r="${allow / 2 * k}" fill="${ok ? '#DCFCE7' : '#FEE2E2'}" stroke="${ok ? '#16A34A' : '#DC2626'}" stroke-width="1.5"/>`;
-    if (allow - base > 1e-9) s += `<circle cx="${C}" cy="${C}" r="${base / 2 * k}" fill="none" stroke="#64748B" stroke-width="1" stroke-dasharray="3 2"/>`;
+    const C = 120, rE = Math.hypot(dx, dy);
+    const rMax = Math.max(allow / 2, rE, base / 2, 1e-9) * 1.28, k = 100 / rMax;
+    let s = '';
+    for (let i = 1; i <= 4; i++) s += `<circle cx="${C}" cy="${C}" r="${i * 25}" fill="none" stroke="#EEF2F6" stroke-width="1"/>`;
+    s += `<line x1="12" y1="${C}" x2="228" y2="${C}" stroke="#CBD5E1" stroke-width="1"/><line x1="${C}" y1="12" x2="${C}" y2="228" stroke="#CBD5E1" stroke-width="1"/>`;
+    s += `<text x="226" y="${C - 4}" font-size="9" font-weight="800" fill="#94A3B8" text-anchor="end">+X</text><text x="${C + 4}" y="20" font-size="9" font-weight="800" fill="#94A3B8">+Y</text>`;
+    s += `<circle cx="${C}" cy="${C}" r="${allow / 2 * k}" fill="${ok ? '#DCFCE7' : '#FEE2E2'}" fill-opacity=".85" stroke="${ok ? '#16A34A' : '#DC2626'}" stroke-width="2"/>`;
+    if (allow - base > 1e-9) s += `<circle cx="${C}" cy="${C}" r="${base / 2 * k}" fill="none" stroke="#64748B" stroke-width="1.2" stroke-dasharray="4 3"/>`;
+    if (rE > 0) s += `<circle cx="${C}" cy="${C}" r="${rE * k}" fill="none" stroke="#0b1636" stroke-width="1" stroke-dasharray="2 3" opacity=".55"/>`;
     const px = C + dx * k, py = C - dy * k;
-    s += `<line x1="${C}" y1="${C}" x2="${px}" y2="${py}" stroke="#0b1636" stroke-width="1" stroke-dasharray="2 2"/>`;
-    s += `<circle cx="${px}" cy="${py}" r="4" fill="${ok ? '#0b1636' : '#DC2626'}"/>`;
-    s += `<text x="112" y="116" font-size="8" font-weight="700" fill="#94A3B8" text-anchor="end">${allow - base > 1e-9 ? '점선: 기본 공차' : '공차역'}</text>`;
+    s += `<line x1="${C}" y1="${C}" x2="${px}" y2="${py}" stroke="#0b1636" stroke-width="1.4"/>`;
+    s += `<circle cx="${C}" cy="${C}" r="3" fill="#e0b060"/>`;
+    s += `<circle cx="${px}" cy="${py}" r="7" fill="${ok ? '#0b1636' : '#DC2626'}" stroke="#fff" stroke-width="2"/>`;
+    s += `<text x="${C}" y="${C - allow / 2 * k - 6}" font-size="10" font-weight="900" fill="${ok ? '#15803D' : '#B91C1C'}" text-anchor="middle">허용 Ø${f4(allow)}</text>`;
+    s += `<text x="12" y="232" font-size="9" font-weight="700" fill="#94A3B8">● 측정 위치 · ○ 점선: ${allow - base > 1e-9 ? '기본 공차' : '오차 원'}</text>`;
     id('posFig').innerHTML = s;
   }
 
@@ -1419,7 +1656,7 @@
   function p3ToPos(){
     if (!p3Center) { toast('먼저 3점 좌표를 입력하세요'); return; }
     id('pos-dx').value = p3Center[0].toFixed(4); id('pos-dy').value = p3Center[1].toFixed(4);
-    setGdSub('pos'); calculatePosition();
+    setGdSub('pos'); setPosIn('d');
     toast('중심 좌표를 ΔX·ΔY로 넣었습니다 (원점 = 도면 중심일 때)');
   }
 
@@ -1456,6 +1693,23 @@
     ['흔들림', 'cro', '원주 흔들림', 'Circular Runout', '데이텀 축 기준 1회전 시 각 단면의 흔들림 (다이얼 최대−최소)', 'y', '불가', ''],
     ['흔들림', 'tro', '온 흔들림', 'Total Runout', '데이텀 축 기준 회전 + 게이지를 면 전체로 이동하며 흔들림', 'y', '불가', '']
   ];
+  // 현장 측정법 (SYMS 순서와 같음)
+  const SYM_HOW = [
+    '정반 위에서 하이트게이지·다이얼을 길이 방향으로 이동 · CMM 직선 요소',
+    '정반 + 다이얼/하이트게이지로 여러 점 측정 · CMM 평면 (점이 많을수록 정확)',
+    'CMM 원 스캔 (맞춤 방식 확인) · 진원도 측정기 · V블록+다이얼은 참고용',
+    'CMM 원통 (여러 단면 스캔) · 진원도 측정기',
+    'CMM 단면 스캔 · 투영기/형상측정기로 윤곽 비교',
+    'CMM 곡면 측정 (CAD 비교) · 3D 스캐너',
+    '데이텀 면을 정반에 두고 다이얼/하이트게이지 최대−최소 · CMM',
+    '직각 블록·스퀘어 + 다이얼 · CMM (데이텀 면 기준)',
+    '사인바 + 다이얼 · 각도 게이지 · CMM',
+    'CMM 좌표 측정 (데이텀 설정 필수) → 「위치도 판정」 · Ⓜ면 위치도 게이지',
+    'CMM (데이텀 축 기준 중심점) · 현장에선 흔들림으로 대체하는 경우 많음',
+    'CMM 중간면 · 하이트게이지로 양쪽 면을 재서 차이 ÷ 2',
+    'V블록·센터 지지 + 다이얼, 1회전 최대−최소',
+    '센터 지지 회전 + 다이얼을 축 방향으로 이동하며 전체 최대−최소'
+  ];
   const symSvg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${SYM_ICON[k]}</svg>`;
   function renderSymGrid(){
     let html = '', grp = '';
@@ -1470,6 +1724,7 @@
     const dat = s[5] === 'y' ? ['y', '데이텀 필요'] : s[5] === 's' ? ['', '데이텀 선택'] : ['n', '데이텀 없음'];
     const mm = /불가/.test(s[6]) ? 'n' : 'y';
     id('symCard').innerHTML = `<div class="sh"><div class="ic">${symSvg(s[1])}</div><div><div class="nm">${s[2]}</div><div class="en">${s[0]} 공차 · ${s[3]}</div></div></div>
+      <div class="how"><b>🔧 현장 측정</b>${SYM_HOW[i] || ''}</div>
       <div class="zone">공차역: ${s[4]}</div>
       <div class="sym-tags"><span class="${dat[0]}">${dat[1]}</span><span class="${mm}">Ⓜ ${s[6]}</span></div>
       ${s[7] ? `<div class="tip">💡 ${s[7]}</div>` : ''}`;
@@ -1487,7 +1742,8 @@
   renderCpk(); renderRate();
   POS_IDS.forEach(k => id(k).value = ST.gd.pos[k] != null ? ST.gd.pos[k] : '');
   featureType = ST.gd.pos.ft === 'shaft' ? 'shaft' : 'hole';
-  setMmcMode(['none', 'mmc', 'lmc'].includes(ST.gd.pos.mm) ? ST.gd.pos.mm : 'none'); setFeatureType(featureType);
+  posIn = ST.gd.pos.in === 'd' ? 'd' : 'xy';
+  setMmcMode(['none', 'mmc', 'lmc'].includes(ST.gd.pos.mm) ? ST.gd.pos.mm : 'none'); setFeatureType(featureType); setPosIn(posIn);
   id('fit-nom').value = ST.gd.fit.nom; id('fit-amp').value = ST.gd.fit.amp;
   P3_IDS.forEach((k, i) => id(k).value = ST.gd.p3[i]);
   renderSymGrid(); showSym(ST.gd.sym);
