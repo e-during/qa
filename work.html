@@ -242,21 +242,8 @@
   .today-foot { display: flex; gap: 8px; margin-top: 10px; }
   .today-foot .fold-btn { flex: 1; height: 40px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #fff; color: var(--muted); font-weight: 800; font-size: 0.82rem; }
   .today-foot .rp-mini { flex: 1; height: 40px; border-radius: 10px; border: 1.5px solid var(--navy); background: #fff; color: var(--navy); font-weight: 900; font-size: 0.84rem; }
-  /* [2026-10-01] 🏋 운동 체크 — 달력 맨 위 한 줄 · 한 번 누르면 오늘 체크 */
-  .gym-bar { display: flex; align-items: center; gap: 10px; background: #fff; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 8px 10px 8px 8px; margin-bottom: 10px; }
-  .gym-bar.nudge { border-color: rgba(224,176,96,.8); box-shadow: 0 0 0 3px rgba(224,176,96,.18); }
-  .gym-btn { flex: none; height: 44px; padding: 0 14px; border-radius: 11px; border: 2px dashed #CBD5E1; background: #F8FAFC; color: var(--muted); font-size: .95rem; font-weight: 900; display: flex; align-items: center; gap: 6px; }
-  .gym-btn.on { border: 2px solid var(--navy); background: var(--navy); color: var(--gold); }
-  .gym-info { flex: 1; min-width: 0; }
-  .gym-info .l1 { font-size: .8rem; font-weight: 900; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .gym-info .l1 small { font-weight: 700; color: var(--muted); margin-left: 4px; }
-  .gym-week { display: flex; gap: 4px; margin-top: 5px; }
-  .gym-week span { flex: 1; max-width: 22px; height: 18px; border-radius: 5px; background: #EEF2F6; font-size: .58rem; font-weight: 800; color: #94A3B8; display: grid; place-items: center; }
-  .gym-week span.on { background: var(--gold); color: #5b3d0c; }
-  .gym-week span.td { box-shadow: 0 0 0 1.5px var(--navy); }
+  /* [2026-10-01] 🏋 운동한 날 표시 (체크는 홈 화면에서) */
   .cell .gy { position: absolute; top: 3px; right: 3px; font-size: .62rem; line-height: 1; }
-  .day-head .gym-chip { margin-left: auto; height: 30px; padding: 0 10px; border-radius: 999px; border: 1.5px dashed #CBD5E1; background: #fff; color: var(--muted); font-size: .78rem; font-weight: 900; }
-  .day-head .gym-chip.on { border: 1.5px solid var(--navy); background: var(--navy); color: var(--gold); }
 </style>
 </head>
 <body>
@@ -278,10 +265,6 @@
 
   <!-- ===== 📅 달력 ===== -->
   <section class="page on" id="pageCal">
-    <div class="gym-bar" id="gymBar">
-      <button type="button" class="gym-btn" id="gymBtn" onclick="toggleGym(todayStr())">🏋 오늘 운동</button>
-      <div class="gym-info"><div class="l1" id="gymL1"></div><div class="gym-week" id="gymWeek"></div></div>
-    </div>
     <div class="card cal-card">
       <div class="cal-head">
         <button type="button" class="nav-btn" onclick="moveMonth(-1)" aria-label="이전 달">‹</button>
@@ -748,8 +731,7 @@ function renderDay() {
   const n = daysBetween(todayStr(), ds);
   document.getElementById('dayHead').innerHTML = `<span class="d">${korDate(ds)}</span>
     <span class="pill ${n === 0 ? 'today' : ''}">${n === 0 ? '오늘' : ddayText(ds)}</span>
-    ${hol ? `<span class="pill hol">${esc(hol)}</span>` : ''}
-    ${n <= 0 ? `<button type="button" class="gym-chip ${S.gym[ds] ? 'on' : ''}" onclick="toggleGym('${ds}')">${S.gym[ds] ? '🏋 운동함' : '🏋 운동 체크'}</button>` : ''}`;
+    ${hol ? `<span class="pill hol">${esc(hol)}</span>` : ''}`;
   document.getElementById('quickDateLabel').innerText = `${korDate(ds)}에 추가 · "오후 3시 미팅"도 시간 인식`;
   const evs = (occurrences(ds, ds)[ds]) || [];
   document.getElementById('dayEvents').innerHTML = evs.length
@@ -792,47 +774,12 @@ function renderUpcoming() {
     ? list.map(x => evRowHtml(x.ev, x.ds, true)).join('')
     : '<div class="empty">앞으로 30일 동안 일정이 없습니다</div>';
 }
-function renderAll() { renderGym(); renderToday(); renderCalendar(); renderDay(); renderUpcoming(); renderTodoBadge(); }
+function renderAll() { renderToday(); renderCalendar(); renderDay(); renderUpcoming(); renderTodoBadge(); }
 
 /* ================================================================
    빠른 추가
    ================================================================ */
-/* ================================================================
-   🏋 운동 체크 (이 폰에만 저장 · 백업 파일에 포함)
-   ================================================================ */
-function toggleGym(ds) {
-  if (S.gym[ds]) delete S.gym[ds]; else S.gym[ds] = 1;
-  save(); renderGym(); renderCalendar(); renderDay();
-  if (S.gym[ds]) toast(ds === todayStr() ? '🏋 오늘 운동 체크! 수고했어요' : `🏋 ${korDate(ds)} 운동 체크`);
-}
-function renderGym() {
-  const t = todayStr(), now = new Date(), done = !!S.gym[t];
-  const ym = t.slice(0, 7);
-  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const pym = `${prev.getFullYear()}-${pad(prev.getMonth() + 1)}`;
-  const keys = Object.keys(S.gym).sort();
-  const mCnt = keys.filter(k => k.startsWith(ym)).length, pCnt = keys.filter(k => k.startsWith(pym)).length;
-  const btn = document.getElementById('gymBtn');
-  btn.className = 'gym-btn' + (done ? ' on' : '');
-  btn.innerText = done ? '🏋 오늘 완료 ✓' : '🏋 오늘 운동';
-  // 마지막 운동 이후 며칠 지났는지 (빼먹지 않게)
-  const last = keys.filter(k => k <= t).pop();
-  const gap = last ? daysBetween(last, t) : null;
-  let tail;
-  if (done) tail = '';
-  else if (gap === null) tail = '아직 기록 없음';
-  else tail = gap === 1 ? '어제 운동함' : `${gap}일째 쉬는 중`;
-  document.getElementById('gymL1').innerHTML = `${now.getMonth() + 1}월 <b>${mCnt}회</b><small>${tail || '지난달 ' + pCnt + '회'}</small>`;
-  // 이번 주 월~일
-  const mon = addDays(s2d(t), -((s2d(t).getDay() + 6) % 7));
-  document.getElementById('gymWeek').innerHTML = [0, 1, 2, 3, 4, 5, 6].map(i => {
-    const ds = d2s(addDays(mon, i));
-    return `<span class="${S.gym[ds] ? 'on' : ''} ${ds === t ? 'td' : ''}">${WD[(i + 1) % 7]}</span>`;
-  }).join('');
-  // 저녁 6시 이후인데 오늘 체크 안 했고 2일 이상 쉬었으면 테두리로 살짝 알림
-  document.getElementById('gymBar').classList.toggle('nudge', !done && now.getHours() >= 18 && (gap === null || gap >= 2));
-}
-
+/* 🏋 운동 체크는 홈(m.html) 오늘 줄에서만 · 여기서는 달력 칸에 🏋 표시만 (S.gym) */
 function quickAdd() {
   const inp = document.getElementById('quickInput');
   const raw = inp.value.trim();
