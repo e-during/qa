@@ -211,6 +211,17 @@
   .ts-cell.on svg { stroke: #e0b060; }
   .ts-next:active, .ts-cell:active { background: rgba(255,255,255,.04); }
   @media (max-width: 380px) { body:has(.today-strip.on) .tile { min-height: 92px; } body:has(.today-strip.on) .sec-label { margin-top: 12px; } body:has(.today-strip.on) .credit { margin-top: 10px; } body:has(.today-strip.on) .hero { min-height: 128px; max-height: 136px; } .ts-cell { width: 46px; } .ts-next { padding: 8px 10px 8px 12px; } .today-strip { margin-bottom: 8px; } body:has(.today-strip.on) .values-line { margin-top: 6px; } }
+  /* ---------- 2026-10-01 세로 압축: 날짜·가치 줄 제거 · 대시보드 카드 낮춤 ---------- */
+  .hero-text { padding-top: 12px; }
+  .hero-team { margin-top: 0; }
+  .content { padding-top: 12px; }
+  .dash-btn { padding: 12px 14px; border-radius: 16px; }
+  .dash-btn .icon { width: 40px; height: 40px; border-radius: 12px; }
+  .dash-btn .icon svg { width: 20px; height: 20px; }
+  .dash-btn .live { margin-bottom: 1px; }
+  .dash-btn .label { font-size: 15.5px; }
+  .dash-btn .desc { margin-top: 2px; }
+  .sec-label { margin-top: 14px; }
 </style>
 </head>
 <body>
@@ -220,14 +231,8 @@
   </div>
 
   <div class="hero-text">
-    <div class="hero-date" id="today">SMART QUALITY PLATFORM</div>
     <div class="hero-team">품질경영팀 PORTAL</div>
-    <div class="values-line">
-      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L20 6 V12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 V6 Z"/></svg>신뢰</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>품질</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 L4 14 h6 l-1 8 9-12 h-6 Z"/></svg>효율</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 2.5-5 6-5s6 2 6 5"/><path d="M10 20c0-3 2.5-5 6-5s6 2 6 5"/></svg>함께</span>
-    </div>
+</div>
   </div>
 
   <div class="content">
@@ -284,12 +289,6 @@
   </div>
 
 <script>
-  // 오늘 날짜 (예: 2026. 10. 01 (목))
-  (function () {
-    var d = new Date(), w = '일월화수목금토'.charAt(d.getDay());
-    var p = function (n) { return (n < 10 ? '0' : '') + n; };
-    document.getElementById('today').textContent = d.getFullYear() + '. ' + p(d.getMonth() + 1) + '. ' + p(d.getDate()) + ' (' + w + ')';
-  })();
   // 툴박스 한 번 들어가면 NEW 표시 사라짐 (이 폰 기준)
   function tbSeen() { try { localStorage.setItem('m_tb_seen_v1', '1'); } catch (e) {} }
   (function () { var seen = false; try { seen = localStorage.getItem('m_tb_seen_v1') === '1'; } catch (e) {}
