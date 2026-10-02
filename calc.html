@@ -397,6 +397,39 @@
   .histo { display: block; width: 100%; height: auto; margin-top: 10px; }
   .sec-t { font-size: 12.5px; font-weight: 900; color: #0b1636; margin: 2px 2px -4px; }
   #sub-conv.active { margin-top: 12px; }
+  /* ---------- ⑤ AQL 샘플링 (KS Q ISO 2859-1 · 보통 검사 1회) ---------- */
+  .aq-lot { display: flex; align-items: center; gap: 8px; }
+  .aq-lot input { flex: 1; min-width: 0; text-align: right; font-size: 22px !important; font-weight: 900 !important; padding: 10px 13px !important; }
+  .aq-lot span { font-size: 12.5px; font-weight: 800; color: #64748B; }
+  .aq-chips { display: flex; gap: 6px; margin-top: 8px; }
+  .aq-chips button { flex: 1; height: 30px; border-radius: 999px; border: 1px solid #E2E8F0; background: #F8FAFC; color: #475569; font-size: 11.5px; font-weight: 800; font-family: inherit; padding: 0; }
+  .aq-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+  .aq-row .k { flex: none; width: 52px; font-size: 11.5px; font-weight: 800; color: #64748B; }
+  .aq-row .seg { flex: 1; }
+  .seg.g4 { grid-template-columns: repeat(4, 1fr); }
+  .seg.aq button { padding: 9px 2px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .aq-more { margin: 6px 0 0 60px; font-size: 11px; font-weight: 800; color: #b8863c; background: none; border: none; font-family: inherit; padding: 2px 0; }
+  #aqSpecial { display: none; margin: 6px 0 0 60px; }
+  .aq-res { border-radius: 18px; padding: 14px; background: linear-gradient(135deg, #1b3577 0%, #12234f 55%, #0e1b3e 100%); color: #fff; text-align: center; box-shadow: 0 10px 22px rgba(10,30,90,.25); }
+  .aq-res .top { font-size: 11px; font-weight: 800; color: rgba(255,255,255,.55); }
+  .aq-res .top b { color: #e0b060; }
+  .aq-res .g { display: grid; grid-template-columns: 1.2fr 1fr 1fr; margin-top: 8px; }
+  .aq-res .g > div + div { border-left: 1px solid rgba(255,255,255,.12); }
+  .aq-res .k { font-size: 11px; font-weight: 800; color: rgba(255,255,255,.55); }
+  .aq-res .v { font-size: 30px; font-weight: 900; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .aq-res .v.ac { color: #6ee7b7; } .aq-res .v.re { color: #fca5a5; }
+  .aq-res .u { font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.4); }
+  .aq-res .say { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.12); font-size: 12.5px; font-weight: 700; line-height: 1.5; }
+  .aq-res .say b { color: #e0b060; }
+  .aq-res .note { margin-top: 6px; font-size: 11px; font-weight: 700; color: #fcd34d; line-height: 1.45; }
+  .aq-res .full { margin-top: 8px; font-size: 24px; font-weight: 900; color: #e0b060; }
+  .aq-judge { display: flex; align-items: center; gap: 8px; }
+  .aq-judge input { width: 96px !important; text-align: center; font-size: 18px !important; font-weight: 900 !important; padding: 10px !important; }
+  .aq-judge .jr { flex: 1; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; background: #F1F5F9; color: #94A3B8; }
+  .aq-judge .jr.ok { background: #D1FAE5; color: #065F46; }
+  .aq-judge .jr.ng { background: #FEE2E2; color: #991B1B; }
+  .tabbar .tbtn .tl { white-space: nowrap; }
+  @media (max-width: 380px) { .tabbar { gap: 2px; padding-left: 6px; padding-right: 6px; } .tabbar .tbtn .tl { font-size: 10.5px; letter-spacing: -.3px; } }
 </style>
 </head>
 <body>
@@ -689,6 +722,27 @@
       </div>
     </div>
 
+    <!-- ============ 5. AQL 샘플링 검사표 ============ -->
+    <div id="panel-aql" class="panel">
+      <div class="card">
+        <div class="field" style="margin-bottom:0;"><label>로트 크기 (입고·출하 수량)</label>
+          <div class="aq-lot"><input type="text" readonly id="aq-lot" placeholder="0" data-label="로트 크기 (EA)" onclick="openKeypad(this)" oninput="aqLotInput()"><span>EA</span></div>
+        </div>
+        <div class="aq-chips" id="aqChips"></div>
+        <div class="aq-row"><span class="k">검사수준</span><div class="seg g3 aq" id="aqLv"></div></div>
+        <button type="button" class="aq-more" id="aqMore" onclick="aqToggleSpecial()">특별 검사수준 S-1~S-4 ▾</button>
+        <div class="seg g4 aq" id="aqSpecial"></div>
+        <div class="aq-row" style="align-items:flex-start;"><span class="k" style="padding-top:9px;">AQL %</span><div class="seg g4 aq" id="aqAql"></div></div>
+      </div>
+      <div class="aq-res" id="aqRes"></div>
+      <div class="card">
+        <div class="aq-judge">
+          <input type="text" readonly id="aq-def" placeholder="불량 수" data-label="시료 중 불량 개수" onclick="openKeypad(this)" oninput="aqJudge()">
+          <div class="jr" id="aqJudge">시료 검사 후 불량 수 입력</div>
+        </div>
+        <div class="hint">보통 검사 · 1회 샘플링 (KS Q ISO 2859-1 표 Ⅰ·Ⅱ-A) · 까다로운·수월한 검사 미포함 · 사내 검사기준서가 우선</div>
+      </div>
+    </div>
   </main>
 
   <nav class="tabbar">
@@ -707,6 +761,10 @@
     <button class="tbtn" data-tab="cpk" onclick="switchTab('cpk')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
       <span class="tl">Cpk·불량</span>
+    </button>
+    <button class="tbtn" data-tab="aql" onclick="switchTab('aql')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"></path><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg>
+      <span class="tl">AQL</span>
     </button>
   </nav>
 
@@ -784,7 +842,7 @@
 
   // -------- 탭 전환 --------
   function switchTab(name){
-    ['quick','conv','position','cpk'].forEach(t => id('panel-' + t).classList.toggle('active', t === name));
+    ['quick','conv','position','cpk','aql'].forEach(t => id('panel-' + t).classList.toggle('active', t === name));
     document.querySelectorAll('.tabbar .tbtn').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
     ST.tab = name; saveState();
     window.scrollTo(0, 0);
@@ -1731,6 +1789,80 @@
   }
 
   // -------- 시작 --------
+  /* ==========================================================
+     ⑤ AQL 샘플링 — KS Q ISO 2859-1 표 Ⅰ(시료문자) + 표 Ⅱ-A(보통 검사 1회)
+     표 Ⅱ-A는 (시료문자 순번 + AQL 순번) 대각선마다 Ac/Re가 같고, 사이 칸은 화살표 → 규칙으로 계산
+     ========================================================== */
+  const AQ_T1 = [[8,'AAAAAAB'],[15,'AAAAABC'],[25,'AABBBCD'],[50,'ABBCCDE'],[90,'BBCCCEF'],[150,'BBCDDFG'],[280,'BCDEEGH'],[500,'BCDEFHJ'],
+    [1200,'CCEFGJK'],[3200,'CDEGHKL'],[10000,'CDFGJLM'],[35000,'CDFHKMN'],[150000,'DEGJLNP'],[500000,'DEGJMPQ'],[Infinity,'DEHKNQR']];
+  const AQ_LV = ['S-1','S-2','S-3','S-4','I','II','III'];
+  const AQ_LET = 'ABCDEFGHJKLMNPQR';
+  const AQ_N = [2,3,5,8,13,20,32,50,80,125,200,315,500,800,1250,2000];
+  const AQ_AQLS = ['0.010','0.015','0.025','0.040','0.065','0.10','0.15','0.25','0.40','0.65','1.0','1.5','2.5','4.0','6.5'];
+  const AQ_SHOW = ['0.065','0.10','0.15','0.25','0.40','0.65','1.0','1.5','2.5','4.0','6.5'];
+  const AQ_DIAG = { 14:[0,1], 17:[1,2], 18:[2,3], 19:[3,4], 20:[5,6], 21:[7,8], 22:[10,11], 23:[14,15], 24:[21,22] };
+  function aqCell(i, j){ const s = i + j; if (AQ_DIAG[s]) return AQ_DIAG[s]; return (s < 14 || s === 16) ? 'down' : 'up'; }
+  function aqPlan(li, ai){
+    let i = li;
+    for (let g = 0; g < 20; g++){
+      const c = aqCell(i, ai);
+      if (Array.isArray(c)) return { i, ac: c[0], re: c[1] };
+      i += c === 'down' ? 1 : -1;
+      if (i < 0 || i >= AQ_N.length) return null;
+    }
+    return null;
+  }
+  const aqFmt = n => Number(n).toLocaleString('en-US');
+  function aqState(){ ST.aq = Object.assign({ lot: '', lv: 'II', aql: '1.0' }, ST.aq || {}); return ST.aq; }
+  function aqInit(){
+    const a = aqState();
+    id('aqChips').innerHTML = [500, 1000, 3000, 5000, 10000].map(v => `<button type="button" onclick="aqSetLot(${v})">${aqFmt(v)}</button>`).join('');
+    if (a.lot) id('aq-lot').value = aqFmt(a.lot);
+    if (a.lv.startsWith('S')) id('aqSpecial').style.display = 'grid';
+    aqRender();
+  }
+  function aqToggleSpecial(){ const r = id('aqSpecial'); r.style.display = r.style.display === 'grid' ? 'none' : 'grid'; }
+  function aqSetLot(v){ aqState().lot = String(v); id('aq-lot').value = aqFmt(v); saveState(); aqRender(); }
+  function aqLotInput(){ const raw = id('aq-lot').value.replace(/[^0-9]/g, '').slice(0, 7); aqState().lot = raw; saveState(); aqRender(); }
+  function aqSet(k, v){ aqState()[k] = v; saveState(); aqRender(); }
+  function aqRender(){
+    const a = aqState();
+    const lvName = { I: 'Ⅰ', II: 'Ⅱ', III: 'Ⅲ' };
+    id('aqLv').innerHTML = ['I','II','III'].map(v => `<button type="button" class="${a.lv === v ? 'on' : ''}" onclick="aqSet('lv','${v}')">${lvName[v]} ${v === 'II' ? '일반' : v === 'I' ? '완화' : '강화'}</button>`).join('');
+    id('aqSpecial').innerHTML = ['S-1','S-2','S-3','S-4'].map(v => `<button type="button" class="${a.lv === v ? 'on' : ''}" onclick="aqSet('lv','${v}')">${v}</button>`).join('');
+    id('aqAql').innerHTML = AQ_SHOW.map(v => `<button type="button" class="${a.aql === v ? 'on' : ''}" onclick="aqSet('aql','${v}')">${v}</button>`).join('');
+    const box = id('aqRes');
+    const lot = parseInt(a.lot, 10);
+    const empty = `<div class="g"><div><div class="k">시료수 n</div><div class="v">–</div></div><div><div class="k">합격 Ac</div><div class="v ac">–</div></div><div><div class="k">불합격 Re</div><div class="v re">–</div></div></div>`;
+    box.dataset.ac = '';
+    if (!(lot >= 2)) { box.innerHTML = `<div class="top">로트 크기를 넣으면 시료수와 합격 기준이 나옵니다</div>${empty}`; aqJudge(); return; }
+    const letter = AQ_T1.find(r => lot <= r[0])[1][AQ_LV.indexOf(a.lv)];
+    const li = AQ_LET.indexOf(letter), p = aqPlan(li, AQ_AQLS.indexOf(a.aql));
+    const top = `<div class="top">로트 ${aqFmt(lot)} · ${a.lv.startsWith('S') ? a.lv : '수준 ' + lvName[a.lv]} · AQL ${a.aql} → 시료문자 <b>${letter}</b></div>`;
+    if (!p) { box.innerHTML = top + empty + '<div class="note">표에서 계획을 찾지 못했습니다 · 기준서 확인</div>'; aqJudge(); return; }
+    box.dataset.ac = p.ac;
+    const n = AQ_N[p.i];
+    const okTxt = p.ac === 0 ? '불량이 <b>하나도 없어야</b> 합격, <b>1개라도</b> 나오면 불합격' : `불량 <b>${p.ac}개 이하</b>면 합격, <b>${p.re}개 이상</b>이면 불합격`;
+    if (n >= lot) {
+      box.innerHTML = top + `<div class="full">전수검사 (${aqFmt(lot)}개)</div><div class="say">표의 시료수 ${aqFmt(n)}개가 로트보다 많아 <b>전수검사</b> · ${okTxt}</div>`;
+      aqJudge(); return;
+    }
+    const moved = p.i !== li ? `<div class="note">⚠ 표의 화살표 칸 → ${p.i > li ? '아래' : '위'} 계획(${AQ_LET[p.i]}) 적용 · 시료수 ${AQ_N[li]} → ${n}개</div>` : '';
+    box.innerHTML = top + `<div class="g">
+        <div><div class="k">시료수 n</div><div class="v">${aqFmt(n)}</div><div class="u">개 뽑기</div></div>
+        <div><div class="k">합격 Ac</div><div class="v ac">${p.ac}</div><div class="u">개 이하</div></div>
+        <div><div class="k">불합격 Re</div><div class="v re">${p.re}</div><div class="u">개 이상</div></div></div>
+      <div class="say"><b>${aqFmt(n)}개</b> 뽑아서 ${okTxt}</div>${moved}`;
+    aqJudge();
+  }
+  function aqJudge(){
+    const el = id('aqJudge'), ac = id('aqRes').dataset.ac, d = id('aq-def').value.replace(/[^0-9]/g, '');
+    if (ac === '' || ac === undefined || d === '') { el.className = 'jr'; el.textContent = '시료 검사 후 불량 수 입력'; return; }
+    const ok = Number(d) <= Number(ac);
+    el.className = 'jr ' + (ok ? 'ok' : 'ng');
+    el.textContent = ok ? '✓ 합격 (로트 인수)' : '✕ 불합격 (로트 보류)';
+  }
+
   loadState();
   try { hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]') || []; } catch (e) { hist = []; }
   renderHist(); cRender();
@@ -1749,7 +1881,8 @@
   renderSymGrid(); showSym(ST.gd.sym);
   READY = true;
   setFit('feat', ST.gd.fit.feat); renderP3(); setGdSub(ST.gd.sub);
-  switchTab(['quick','conv','position','cpk'].includes(ST.tab) ? ST.tab : 'quick');
+  aqInit();
+  switchTab(['quick','conv','position','cpk','aql'].includes(ST.tab) ? ST.tab : 'quick');
 </script>
 </body>
 </html>
