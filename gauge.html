@@ -43,28 +43,66 @@
 
   /* ① 상태 */
   .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
-  .kpi { border: 1px solid var(--line); border-radius: 12px; padding: 9px 2px; text-align: center; cursor: pointer; min-width: 0; }
+  .kpi { position: relative; overflow: hidden; background: #F8FAFC; border: 1px solid #EDF1F5; border-radius: 12px; padding: 10px 2px 9px; text-align: center; cursor: pointer; min-width: 0; }
+  .kpi::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--navy); }
+  .kpi.red::before { background: var(--red); } .kpi.amber::before { background: var(--amber); } .kpi.green::before { background: var(--green); }
+  .kpi:active { background: var(--gold-bg); }
   .kpi .k { font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .kpi .k i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; }
   .kpi.red .k i { background: var(--red); } .kpi.amber .k i { background: var(--amber); } .kpi.green .k i { background: var(--green); }
   .kpi .v { font-size: 20px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
   .kpi.red .v { color: var(--red); } .kpi.amber .v { color: var(--amber); } .kpi.green .v { color: var(--green); }
-  .stack { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; }
+  .rate { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .rate b { font-size: 12px; font-weight: 800; color: var(--muted); }
+  .rate b em { font-style: normal; font-size: 20px; font-weight: 900; color: var(--green); margin-left: 4px; font-variant-numeric: tabular-nums; letter-spacing: -.3px; }
+  .rate span { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+  .rate span i { font-style: normal; font-weight: 900; }
+  .stack { display: flex; height: 10px; border-radius: 7px; overflow: hidden; gap: 2px; }
   .stack i { display: block; height: 100%; cursor: pointer; min-width: 4px; }
 
-  /* ② 월별 */
-  .cols, .labs { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 2px; }
-  .cols { align-items: end; height: 140px; border-bottom: 1px solid var(--line); }
-  .col { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; min-width: 0; }
-  .col .n { font-size: 10px; font-weight: 800; color: var(--body); margin-bottom: 2px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .col .b { width: 72%; max-width: 28px; border-radius: 4px 4px 0 0; background: var(--bar); }
+  /* ② 월별 — 2026-10-02 개편: 큰 달은 막대 끊김(≈) · 3개월 내 강조 띠 · 연도 구분선 */
+  .cols, .labs { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); }
+  .cols { align-items: end; height: 150px; border-bottom: 1.5px solid #CBD5E1; position: relative; }
+  .col { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; min-width: 0; }
+  .col .n { font-size: 10.5px; font-weight: 900; color: var(--body); margin-bottom: 3px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .col .b { position: relative; width: 62%; max-width: 24px; border-radius: 5px 5px 0 0; background: #A7B3C4; }
+  .col.near { background: rgba(217,119,6,.07); }
+  .col.near .b { background: var(--amber); } .col.near .n { color: #B45309; }
   .col.over .b { background: var(--red); } .col.over .n { color: var(--red); }
-  .col.peak .b { background: var(--navy); }
-  .labs { margin-top: 4px; }
+  .col.after .b { background: #CBD5E1; }
+  .col.zero .n { color: #CBD5E1; }
+  .col.zero .b { width: 6px; height: 6px !important; border-radius: 50%; background: #CBD5E1 !important; margin-bottom: -3px; }
+  .col.peak .b { background: linear-gradient(180deg, #1c2d5c, var(--navy)); }
+  .col.peak .n { color: var(--navy); font-size: 12px; }
+  .col.peak .n::after { content: ""; display: block; width: 14px; height: 2px; margin: 2px auto 0; background: var(--gold); border-radius: 2px; }
+  .col.brk .b::after { content: ""; position: absolute; left: -4px; right: -4px; top: 34%; height: 9px; background: #fff; transform: skewY(-20deg);
+    box-shadow: inset 0 1.5px 0 #fff, inset 0 -1.5px 0 #fff; }
+  .col.ys::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 0; border-left: 1.5px dashed #CBD5E1; }
+  .col.ys::after { content: attr(data-y); position: absolute; left: 3px; top: 0; font-size: 9.5px; font-weight: 900; color: var(--muted); letter-spacing: .3px; }
+  .col.nearL { border-radius: 8px 0 0 0; } .col.nearR { border-radius: 0 8px 0 0; }
+  .labs { margin-top: 5px; }
   .labs span { font-size: 9.5px; font-weight: 700; color: var(--muted); text-align: center; white-space: nowrap; overflow: hidden; min-width: 0; line-height: 1.25; }
   .labs span.y { color: var(--ink); font-weight: 900; }
   .labs span.r { color: var(--red); font-weight: 900; }
-  .labs small { display: block; font-size: 9px; color: var(--muted); }
+  .labs span.nr { color: #B45309; font-weight: 900; }
+  .mlg { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; font-size: 10.5px; font-weight: 700; color: var(--muted); }
+  .mlg i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: 0; }
+  .mlg .bk { margin-left: auto; }
+  .msum { display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 12px; }
+  .pk { display: flex; align-items: center; gap: 10px; text-align: left; border: none; border-radius: 12px; padding: 11px 12px; cursor: pointer; min-width: 0;
+    background: linear-gradient(135deg, #14244f, var(--navy)); color: #fff; box-shadow: 0 6px 14px rgba(11,22,54,.18); }
+  .pk .pk1 { min-width: 0; flex: 1; }
+  .pk .pk1 small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .6px; color: var(--gold); }
+  .pk .pk1 b { display: block; margin-top: 2px; font-size: 15px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pk .pk1 b i { font-style: normal; color: var(--gold); }
+  .pk .pk1 b em { font-style: normal; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.6); margin-left: 4px; }
+  .pk .pkd { flex: none; font-size: 11.5px; font-weight: 900; color: var(--navy); background: var(--gold); border-radius: 999px; padding: 4px 9px; font-variant-numeric: tabular-nums; }
+  .mch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .mch button { display: flex; align-items: center; justify-content: space-between; border-radius: 10px; border: 1px solid; font-size: 12px; font-weight: 800; padding: 9px 12px; cursor: pointer; }
+  .mch button b { font-size: 15px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .mch button b::after { content: ' ›'; font-weight: 700; opacity: .5; }
+  .mch .c-near { background: #FFF7ED; border-color: #FED7AA; color: #9A3412; }
+  .mch .c-over { background: #FEF2F2; border-color: #FECACA; color: #991B1B; }
 
   /* ③④ 가로 막대 (공통) */
   .hbar { display: grid; grid-template-columns: minmax(0, 118px) minmax(0, 1fr) 46px; align-items: center; gap: 8px; padding: 6px 4px; border-radius: 8px; cursor: pointer; }
@@ -149,6 +187,7 @@
     <section class="card">
       <h2>① 교정 상태 <small id="asofCap">누르면 목록</small></h2>
       <div class="kpis" id="kpis"></div>
+      <div class="rate" id="rate"></div>
       <div class="stack" id="stack"></div>
     </section>
 
@@ -156,7 +195,8 @@
       <h2>② 월별 교정 도래 <small>누르면 목록</small></h2>
       <div class="cols" id="cols"></div>
       <div class="labs" id="labs"></div>
-      <div class="hint" id="monHint"></div>
+      <div class="mlg" id="mlg"></div>
+      <div class="msum" id="msum"></div>
     </section>
 
     <section class="card">
@@ -211,25 +251,51 @@ function renderStatus() {
   const c = { all: DATA.length, over: 0, soon: 0, ok: 0 };
   DATA.forEach(g => { if (c[g._s] != null) c[g._s]++; });
   $('kpis').innerHTML = ST.map(([k, t, cls]) => `<div class="kpi ${cls}" onclick="openList({type:'status',key:'${k}'})"><div class="k">${cls ? '<i></i>' : ''}${t}</div><div class="v">${c[k].toLocaleString()}</div></div>`).join('');
+  const pct = c.all ? (c.ok / c.all * 100) : 0;
+  $('rate').innerHTML = `<b>유효율<em>${pct.toFixed(1)}%</em></b><span>조치 필요 <i style="color:var(--red)">${c.over}</i> · 임박 <i style="color:var(--amber)">${c.soon}</i></span>`;
   $('stack').innerHTML = [['over', 'var(--red)'], ['soon', 'var(--amber)'], ['ok', 'var(--green)']].filter(([k]) => c[k])
     .map(([k, col]) => `<i style="flex:${c[k]};background:${col}" title="${c[k]}대" onclick="openList({type:'status',key:'${k}'})"></i>`).join('');
 }
 
 /* ---------- ② 월별 (지남 + 이번 달부터 12개월 + 이후) ---------- */
 function monthKeys() { const o = []; for (let i = 0; i < 12; i++) { const d = new Date(now.getFullYear(), now.getMonth() + i, 1); o.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}`); } return o; }
+const NEAR_N = 3;   // 이번 달 포함 3개월 = 임박 구간
 function renderMonths() {
   const ms = monthKeys(), last = ms[ms.length - 1], cnt = { over: 0, after: 0 };
   ms.forEach(m => cnt[m] = 0);
   DATA.forEach(g => { if (!g.n) return; if (g.n < TODAY) cnt.over++; else { const m = g.n.slice(0, 7); if (m in cnt) cnt[m]++; else if (m > last) cnt.after++; } });
   const cols = [['over', cnt.over], ...ms.map(m => [m, cnt[m]]), ['after', cnt.after]];
-  const max = Math.max(1, ...cols.map(c => c[1]));
   const peak = ms.reduce((a, m) => cnt[m] > cnt[a] ? m : a, ms[0]);
+  // 한 달이 2위보다 3배 넘게 크면 그 막대만 끊어서 표시 → 나머지 달 차이가 보이게
+  const vals = cols.map(c => c[1]).sort((a, b) => b - a);
+  const top = vals[0] || 0, second = vals[1] || 0;
+  const broken = top >= 20 && top > second * 3;
+  const H = 112, scaleMax = Math.max(1, broken ? second / 0.72 : top);
+  const hOf = v => !v ? 0 : broken && v === top ? H : Math.max(8, Math.round(v / scaleMax * H));
+  const near = ms.slice(0, NEAR_N);
   $('cols').style.setProperty('--n', cols.length); $('labs').style.setProperty('--n', cols.length);
-  $('cols').innerHTML = cols.map(([k, v]) => `<div class="col${k === 'over' ? ' over' : ''}${k === peak && v ? ' peak' : ''}" onclick="openList({type:'month',key:'${k}'})"><div class="n">${v || ''}</div><div class="b" style="height:${v ? Math.max(10, Math.round(v / max * 112)) : 0}px"></div></div>`).join('');
+  $('cols').innerHTML = cols.map(([k, v]) => {
+    const cl = ['col', k === 'over' ? 'over' : k === 'after' ? 'after' : near.includes(k) ? 'near' : ''];
+    if (k === near[0]) cl.push('nearL'); if (k === near[near.length - 1]) cl.push('nearR');
+    if (!v) cl.push('zero');
+    if (k === peak && v && !near.includes(k)) cl.push('peak');
+    if (broken && v === top) cl.push('brk');
+    const ys = /^\d{4}-01$/.test(k);
+    if (ys) cl.push('ys');
+    return `<div class="${cl.join(' ')}"${ys ? ` data-y="${k.slice(0, 4)}"` : ''} onclick="openList({type:'month',key:'${k}'})"><div class="n">${v ? v.toLocaleString() : '0'}</div><div class="b" style="height:${hOf(v)}px"></div></div>`;
+  }).join('');
   $('labs').innerHTML = cols.map(([k]) => k === 'over' ? '<span class="r">지남</span>' : k === 'after' ? '<span>이후</span>'
-    : `<span class="${k.endsWith('-01') ? 'y' : ''}">${+k.slice(5)}월${k.endsWith('-01') ? `<small>'${k.slice(2, 4)}</small>` : ''}</span>`).join('');
+    : `<span class="${near.includes(k) ? 'nr' : k === peak ? 'y' : ''}">${+k.slice(5)}월</span>`).join('');
+  $('mlg').innerHTML = `<span><i style="background:var(--red)"></i>지남</span><span><i style="background:var(--amber)"></i>3개월 내</span><span><i style="background:#A7B3C4"></i>이후</span>`
+    + (broken ? `<span class="bk">≈ 큰 막대는 줄여서 표시</span>` : '');
+  const nearN = near.reduce((a, m) => a + cnt[m], 0);
   const share = DATA.length ? Math.round(cnt[peak] / DATA.length * 100) : 0;
-  $('monHint').innerHTML = cnt[peak] ? `가장 많은 달 <b>${peak.slice(0, 4)}년 ${+peak.slice(5)}월 ${cnt[peak].toLocaleString()}대</b> (전체의 ${share}%)` : '';
+  const dd = dday(peak + '-01');
+  $('msum').innerHTML = (cnt[peak] ? `<button type="button" class="pk" onclick="openList({type:'month',key:'${peak}'})">
+      <span class="pk1"><small>최다 도래 월</small><b>${peak.slice(0, 4)}년 ${+peak.slice(5)}월 · <i>${cnt[peak].toLocaleString()}대</i><em>전체의 ${share}%</em></b></span>
+      <span class="pkd">${dd > 0 ? 'D-' + dd : '이번 달'}</span></button>` : '<div></div>')
+    + `<div class="mch"><button type="button" class="c-near" onclick="openList({type:'near'})">3개월 내<b>${nearN}대</b></button>`
+    + `<button type="button" class="c-over" onclick="openList({type:'month',key:'over'})">지남<b>${cnt.over}대</b></button></div>`;
 }
 
 /* ---------- 가로 막대 공통 ---------- */
@@ -275,6 +341,7 @@ function query(sel) {
   if (sel.type === 'search') { const q = sel.key.toLowerCase(); return DATA.filter(g => [g.id, g.nm, g.dv, g.ow, g.lc, g.dp].join(' ').toLowerCase().includes(q)); }
   if (sel.type === 'status') return sel.key === 'all' ? DATA : DATA.filter(g => g._s === sel.key);
   if (sel.type === 'month') return DATA.filter(g => sel.key === 'over' ? g._s === 'over' : sel.key === 'after' ? g.n && g.n.slice(0, 7) > ms[ms.length - 1] : g.n && g.n >= TODAY && g.n.startsWith(sel.key));
+  if (sel.type === 'near') return DATA.filter(g => g.n && g.n >= TODAY && g.n.slice(0, 7) <= ms[NEAR_N - 1]);
   if (sel.type === 'dept') return DATA.filter(g => deptOf(g) === sel.key);
   if (sel.type === 'loc') return DATA.filter(g => locOf(g) === sel.key && (!sel.dept || deptOf(g) === sel.dept));
   return [];
@@ -283,6 +350,7 @@ function titleOf(sel) {
   if (sel.type === 'search') return `🔍 "${sel.key}"`;
   if (sel.type === 'status') return ({ all: '전체 계측기', over: '🔴 교정 지남', soon: '🟡 30일 내 도래', ok: '🟢 유효' })[sel.key];
   if (sel.type === 'month') return sel.key === 'over' ? '🔴 교정 지남' : sel.key === 'after' ? '12개월 이후 도래' : `${sel.key.slice(0, 4)}년 ${+sel.key.slice(5)}월 교정 도래`;
+  if (sel.type === 'near') return '🟠 3개월 내 도래';
   if (sel.type === 'dept') return short(sel.key);
   return (sel.key || '설치장소 미기재') + (sel.dept ? ` · ${short(sel.dept)}` : '');
 }
