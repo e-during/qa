@@ -277,6 +277,8 @@
         .pe-chip.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
         .pe-port-item { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 8px 10px; font-size: 0.72rem; color: #475569; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
         .pe-port-item.on { background: #EFF6FF; border-color: #93C5FD; color: #1E3A8A; font-weight: 700; }
+        .pe-port-item > span:last-child { text-align: right; }
+        .pe-warn { display: block; margin-top: 2px; font-style: normal; font-size: 0.64rem; font-weight: 800; color: #b45309; }
         .pe-angle-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
         .pe-angle-grid button { background: #F1F5F9; border: 1px solid #E2E8F0; color: #334155; font-size: 0.64rem; font-weight: 700; padding: 8px 2px; border-radius: 8px; }
         .pe-angle-grid button.zero { grid-column: 1 / -1; background: #EFF6FF; border-color: #93C5FD; color: #1E3A8A; font-weight: 800; }
@@ -765,6 +767,22 @@
         .c-mini { margin-top: 6px; padding: 8px 10px; font-size: 0.8rem; text-align: left; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; }
         .c-mini b { display: inline; font-size: 1.2rem; margin-left: auto; }
         .c-mini.idle { display: block; text-align: center; }
+        /* [2026-10-07] 시간 계산 시인성 개선 */
+        .c-lab label { display: block; min-width: 0; }
+        .c-lab label > span { display: block; height: 18px; line-height: 18px; margin: 0 0 5px 2px; font-size: 0.76rem; font-weight: 900; color: #475569; letter-spacing: -.2px; white-space: nowrap; }
+        .c-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 12px; background: #EEF2F7; margin-bottom: 10px; }
+        .c-seg button { height: 40px; border: none; border-radius: 9px; background: none; font-size: 0.9rem; font-weight: 900; color: #64748B; font-family: inherit; }
+        .c-seg button.on { background: #fff; color: #0F172A; box-shadow: 0 1px 3px rgba(15,23,42,.12); }
+        .c-box2 { display: flex; align-items: flex-end; gap: 6px; }
+        .c-box2 label { flex: 1; }
+        .c-box2 .x { flex: none; padding-bottom: 16px; font-weight: 900; color: #94A3B8; }
+        .c-eta { margin-top: 12px; border-radius: 16px; padding: 14px 14px 12px; background: linear-gradient(160deg, #FFF8E8 0%, #FDF0D2 100%); border: 1px solid rgba(224,176,96,.55); }
+        .c-eta.idle { padding: 14px; background: #F8FAFC; border-color: #E2E8F0; color: #94A3B8; font-size: 0.84rem; font-weight: 800; text-align: center; }
+        .c-eta .k { font-size: 0.78rem; font-weight: 900; color: #9a6b1f; letter-spacing: .3px; }
+        .c-eta .v { margin-top: 2px; font-size: 2.1rem; font-weight: 900; color: #0F172A; line-height: 1.15; font-variant-numeric: tabular-nums; }
+        .c-eta .end { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 9px 12px; border-radius: 12px; background: #0b1636; color: #fff; font-size: 0.86rem; font-weight: 800; }
+        .c-eta .end b { margin-left: auto; font-size: 1.25rem; font-weight: 900; color: #e0b060; font-variant-numeric: tabular-nums; }
+        .c-eta .s { margin-top: 8px; font-size: 0.8rem; font-weight: 800; color: #6b5427; line-height: 1.45; }
 
         /* 품질 기록 · 소요시간 예측: 스크롤 양 줄이기 */
         .qm-seg3 button { padding: 7px 4px; font-size: 0.84rem; line-height: 1.25; }
@@ -1219,34 +1237,34 @@
                     </div>
                 </div>
 
-                <!-- 탭 2: 시간 계산 (한눈에 보기: 카드 1장) -->
+                <!-- 탭 2: 시간 계산 ([2026-10-07] 시인성 개선: 상시 라벨 · 계산 방식 선택 · 결과 1장 + 종료 시각) -->
                 <div id="stPanelCalc" style="display:none;">
                     <div class="tb-card">
-                        <div class="tb-step"><span class="n">1</span>작업 수량 · 걸린 시간</div>
-                        <div class="c-tc3">
-                            <div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="tcQty" placeholder="수량" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">개</span></div>
-                            <div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="tcMin" placeholder="0" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">분</span></div>
-                            <div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="decimal" id="tcSec" placeholder="0" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">초</span></div>
+                        <div class="tb-step"><span class="n">1</span>지금까지 한 작업</div>
+                        <div class="c-tc3 c-lab">
+                            <label><span>작업 수량</span><div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="tcQty" placeholder="예: 50" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">개</span></div></label>
+                            <label><span>걸린 시간</span><div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="tcMin" placeholder="0" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">분</span></div></label>
+                            <label><span>&nbsp;</span><div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="decimal" id="tcSec" placeholder="0" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">초</span></div></label>
                         </div>
                         <div class="tb-result idle c-result" id="tcResult">
                             <div class="k">1개당 시간</div>
-                            <div class="v">①, ②를 채우면 바로 계산됩니다</div>
+                            <div class="v">수량과 걸린 시간을 넣으면 바로 계산됩니다</div>
                         </div>
 
-                        <div class="tb-step" style="margin-top:14px;"><span class="n">2</span>앞으로 걸릴 시간</div>
-                        <div class="c-tcrow">
-                            <span class="k">총 수량</span>
-                            <div class="tb-input-wrap" style="flex:1;"><input class="tb-input" type="text" inputmode="numeric" id="tcTarget" placeholder="예: 300" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">개</span></div>
+                        <div class="tb-step" style="margin-top:16px;"><span class="n">2</span>앞으로 할 양</div>
+                        <div class="c-seg" id="tcSeg">
+                            <button type="button" class="on" data-m="qty" onclick="tcMode('qty')">총 수량으로</button>
+                            <button type="button" data-m="box" onclick="tcMode('box')">박스 단위로</button>
                         </div>
-                        <div class="tb-mini-result idle c-mini" id="tcTargetResult">총 수량을 넣으면 예상 시간이 나옵니다</div>
-                        <div class="c-tcrow" style="margin-top:8px;">
-                            <span class="k">박스</span>
-                            <div class="tb-input-wrap" style="flex:1;"><input class="tb-input" type="text" inputmode="numeric" id="tcBoxes" placeholder="박스 수" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">박스</span></div>
+                        <div id="tcQtyRow" class="c-lab">
+                            <label><span>남은(목표) 수량</span><div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="tcTarget" placeholder="예: 300" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">개</span></div></label>
+                        </div>
+                        <div id="tcBoxRow" class="c-lab c-box2" style="display:none;">
+                            <label><span>박스 수</span><div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="tcBoxes" placeholder="예: 4" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">박스</span></div></label>
                             <span class="x">×</span>
-                            <div class="tb-input-wrap" style="flex:1;"><input class="tb-input" type="text" inputmode="numeric" id="tcBoxQty" placeholder="박스당" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">개</span></div>
+                            <label><span>박스당 수량</span><div class="tb-input-wrap"><input class="tb-input" type="text" inputmode="numeric" id="tcBoxQty" placeholder="박스당" autocomplete="off" oninput="tcCalc()"><span class="tb-unit">개</span></div></label>
                         </div>
-                        <div class="tb-hint" id="tcBoxQtyHint" style="display:none;"></div>
-                        <div class="tb-mini-result idle c-mini" id="tcBoxResult">박스 수를 넣으면 예상 시간이 나옵니다</div>
+                        <div class="c-eta idle" id="tcEta">1번을 먼저 채워주세요</div>
                     </div>
                     <button type="button" class="tb-ghost-btn gray" onclick="tcClear()">↺ 입력값 모두 지우기</button>
                 </div>
@@ -1395,8 +1413,8 @@
                     <div class="pe-card">
                         <h2>측정기 / 포트 선택</h2>
                         <div class="pe-chip-row">
-                            <button id="peMachineBtn1" class="pe-chip on" onclick="peSelectMachine(1)">측정기 1번</button>
-                            <button id="peMachineBtn2" class="pe-chip" onclick="peSelectMachine(2)">측정기 2번</button>
+                            <button id="peMachineBtn1" class="pe-chip on" onclick="peSelectMachine(1)">측정기(신규)</button>
+                            <button id="peMachineBtn2" class="pe-chip" onclick="peSelectMachine(2)">측정기(구형)</button>
                         </div>
                         <div id="pePortList"></div>
                     </div>
@@ -2440,16 +2458,13 @@
             const totalSec = min * 60 + sec;
 
             const res = $('tcResult');
-            const tRes = $('tcTargetResult');
-            const bRes = $('tcBoxResult');
             const boxQtyIn = stPosInt($('tcBoxQty').value);
             $('tcBoxQty').placeholder = qty ? String(qty) : '박스당';
 
             if (!qty || totalSec <= 0) {
                 res.className = 'tb-result c-result idle';
                 res.innerHTML = `<div class="k">1개당 시간</div><div class="v">${!qty ? '수량을 넣어주세요' : '걸린 시간(분·초)을 넣어주세요'}</div>`;
-                tRes.className = 'tb-mini-result c-mini idle'; tRes.innerHTML = '위 1번을 먼저 채워주세요';
-                bRes.className = 'tb-mini-result c-mini idle'; bRes.innerHTML = '위 1번을 먼저 채워주세요';
+                tcRenderEta(0);
                 return;
             }
 
@@ -2459,23 +2474,46 @@
             res.innerHTML = `<div class="k">1개당 시간</div><div class="v">${stHuman(per)}</div>
                 <div class="s">${qty.toLocaleString()}개에 ${stHuman(totalSec)} · 1시간이면 약 ${perHour.toLocaleString()}개</div>`;
 
-            const target = stPosInt($('tcTarget').value);
-            if (target) {
-                tRes.className = 'tb-mini-result c-mini';
-                tRes.innerHTML = `${target.toLocaleString()}개 하려면<b>${stHuman(per * target)}</b>`;
+            tcRenderEta(per);
+        }
+        // [2026-10-07] 2번: 계산 방식(총 수량 / 박스) 하나만 보여주고, 결과는 1장 + 지금 시작 시 종료 시각
+        let tcModeV = 'qty';
+        function tcMode(m) {
+            tcModeV = m;
+            document.querySelectorAll('#tcSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+            document.getElementById('tcQtyRow').style.display = m === 'qty' ? '' : 'none';
+            document.getElementById('tcBoxRow').style.display = m === 'box' ? '' : 'none';
+            tcCalc();
+        }
+        function tcEndText(sec) {
+            const now = new Date(), end = new Date(now.getTime() + sec * 1000);
+            const p2 = n => String(n).padStart(2, '0');
+            const hm = d => `${p2(d.getHours())}:${p2(d.getMinutes())}`;
+            const days = Math.round((new Date(end.getFullYear(), end.getMonth(), end.getDate()) - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+            const day = days === 0 ? '' : days === 1 ? '내일 ' : `${end.getMonth() + 1}/${end.getDate()} `;
+            return { start: hm(now), end: day + hm(end) };
+        }
+        function tcRenderEta(per) {
+            const eta = document.getElementById('tcEta');
+            const idle = msg => { eta.className = 'c-eta idle'; eta.innerHTML = msg; };
+            if (!per) { idle('1번을 먼저 채워주세요'); return; }
+            let pcs = 0, sub = '';
+            if (tcModeV === 'qty') {
+                pcs = stPosInt(document.getElementById('tcTarget').value);
+                if (!pcs) { idle('남은(목표) 수량을 넣으면 예상 시간이 나옵니다'); return; }
+                sub = `${pcs.toLocaleString()}개 기준 · 1시간에 약 ${Math.floor(3600 / per).toLocaleString()}개`;
             } else {
-                tRes.className = 'tb-mini-result c-mini idle'; tRes.innerHTML = '총 수량을 넣으면 예상 시간이 나옵니다';
+                const boxes = stPosInt(document.getElementById('tcBoxes').value);
+                const boxQty = stPosInt(document.getElementById('tcBoxQty').value) || stPosInt(document.getElementById('tcQty').value);
+                if (!boxes) { idle('박스 수를 넣으면 예상 시간이 나옵니다'); return; }
+                pcs = boxes * boxQty;
+                sub = `${boxes.toLocaleString()}박스 × ${boxQty.toLocaleString()}개 = 총 ${pcs.toLocaleString()}개 · 1박스당 ${stHuman(per * boxQty)}`;
             }
-
-            const boxes = stPosInt($('tcBoxes').value);
-            const boxQty = boxQtyIn || qty;
-            if (boxes) {
-                const pcs = boxes * boxQty;
-                bRes.className = 'tb-mini-result c-mini';
-                bRes.innerHTML = `${boxes.toLocaleString()}박스 × ${boxQty.toLocaleString()}개 = 총 ${pcs.toLocaleString()}개<b>${stHuman(per * pcs)}</b>1박스당 ${stHuman(per * boxQty)}`;
-            } else {
-                bRes.className = 'tb-mini-result c-mini idle'; bRes.innerHTML = '박스 수를 넣으면 예상 시간이 나옵니다';
-            }
+            const sec = per * pcs, t = tcEndText(sec);
+            eta.className = 'c-eta';
+            eta.innerHTML = `<div class="k">예상 소요시간</div><div class="v">${stHuman(sec)}</div>
+                <div class="end">지금(${t.start}) 시작하면<b>${t.end} 종료</b></div>
+                <div class="s">${sub}</div>`;
         }
         function tcClear() {
             ['tcQty', 'tcMin', 'tcSec', 'tcTarget', 'tcBoxes', 'tcBoxQty'].forEach(id => document.getElementById(id).value = '');
@@ -3242,19 +3280,21 @@
 
         // ==================== 🦾 CMM 프로브 교육 시뮬레이터 (pe- 접두사) ====================
         const peProbeData = {
+            // [2026-10-07] 실제 장착 프로브로 수정 · 1 = 측정기(신규), 2 = 측정기(구형)
             1: [
-                { id: 2, name: "포트 2번", spec: "ø2_ (40mm)" },
-                { id: 3, name: "포트 3번", spec: "ø0.7 (20mm + se20mm)" },
-                { id: 5, name: "포트 5번", spec: "ø0.5 (10mm + 30mm)" },
-                { id: 16, name: "포트 16번", spec: "ø1 (27.5mm + se30mm)" }
+                { id: 2, name: "포트 2번", spec: "Ø2_40mm" },
+                { id: 4, name: "포트 4번", spec: "Ø0.5_10mm+se30mm" },
+                { id: 5, name: "포트 5번", spec: "Ø0.7_20mm+se30mm" },
+                { id: 6, name: "포트 6번", spec: "Ø1_27.5mm+se30mm" }
             ],
             2: [
-                { id: 2, name: "포트 2번", spec: "ø2_ (40mm)" },
-                { id: 3, name: "포트 3번", spec: "ø0.5_ (1.0mm + se 30mm)" },
-                { id: 5, name: "포트 5번", spec: "ø0.11_ (2.0mm + se 30mm)" },
-                { id: 6, name: "포트 6번", spec: "ø1_ (27.5mm + se 30mm)" }
+                { id: 2, name: "포트 2번", spec: "Ø2_40mm" },
+                { id: 3, name: "포트 3번", spec: "Ø0.7_20mm+se20mm" },
+                { id: 5, name: "포트 5번", spec: "Ø5.21+20mm+35mm", warn: "가끔 변동 · 장착 확인" },
+                { id: 6, name: "포트 6번", spec: "Ø1_27.5mm+se30mm" }
             ]
         };
+        const PE_MACHINE_NAME = { 1: '측정기(신규)', 2: '측정기(구형)' };
         const peAnglePresets = [
             { a: 0, b: 0, zero: true },
             { a: 90, b: 0 }, { a: 90, b: 90 }, { a: 90, b: 180 }, { a: 90, b: -90 },
@@ -3325,7 +3365,7 @@
             const wrap = document.getElementById('pePortList');
             wrap.innerHTML = peProbeData[peCurrentMachine].map((port, idx) => `
                 <div class="pe-port-item ${idx === peSelectedPortIndex ? 'on' : ''}" onclick="peSelectPort(${idx})">
-                    <span>${port.name}</span><span>${port.spec}</span>
+                    <span>${port.name}</span><span>${port.spec}${port.warn ? `<em class="pe-warn">⚠ ${port.warn}</em>` : ''}</span>
                 </div>`).join('');
         }
         function peSelectPort(idx) {
@@ -3554,7 +3594,7 @@
             const port = peProbeData[peCurrentMachine][peSelectedPortIndex];
             const A = peCurrentAngleA, B = peCurrentAngleB;
             document.getElementById('peLegend').innerText =
-                `측정기 ${peCurrentMachine}번 · ${port.name} (${port.spec})\n${peGetProbeDirectionLabel(A, B).replace('→ ', '')}`;
+                `${PE_MACHINE_NAME[peCurrentMachine]} · ${port.name} (${port.spec})\n${peGetProbeDirectionLabel(A, B).replace('→ ', '')}`;
             const w = peCanvas.clientWidth, h = peCanvas.clientHeight;
             const aR = A * Math.PI / 180, bR = B * Math.PI / 180;
             const side = Math.sin(aR) * Math.sin(bR);      // + 우측
@@ -3659,7 +3699,7 @@
         function peSetZoom(z) { peDscZoom = z; document.getElementById('pe-zoom-on').classList.toggle('on', z); document.getElementById('pe-zoom-off').classList.toggle('on', !z); peDrawSimulation(); }
         function peBallDia() {
             const port = peProbeData[peCurrentMachine][peSelectedPortIndex];
-            const m = String(port.spec).match(/ø\s*([\d.]+)/);
+            const m = String(port.spec).match(/[øØ]\s*([\d.]+)/);
             return { dia: m ? parseFloat(m[1]) : 1, port };
         }
         function peDscGeom() {
@@ -3678,7 +3718,7 @@
             document.getElementById('peDscInfo').innerHTML =
                 `${full ? '전체원 360°' : `호 ${Math.abs(sweep).toFixed(1)}° (${sweep > 0 ? '반시계' : '시계'})`} · 호 길이 <b>${arcLen.toFixed(2)} mm</b><br>`
                 + `점 간격 <b>${gap.toFixed(2)} mm</b> (${Math.abs(step).toFixed(2)}°) · ${peDscVal.c}점<br>`
-                + `볼 ø${g.dia} (측정기 ${peCurrentMachine}번 ${g.port.name}) · ${peDscFeat === 'hole' ? '구멍 안쪽' : '축 바깥쪽'} 접촉${warn}`;
+                + `볼 ø${g.dia} (${PE_MACHINE_NAME[peCurrentMachine]} ${g.port.name}) · ${peDscFeat === 'hole' ? '구멍 안쪽' : '축 바깥쪽'} 접촉${warn}`;
         }
         function peDrawDSC(cx0, cy0, minDim) {
             const { sweep, full, step, angles } = peDscPoints();

@@ -90,6 +90,36 @@
   /* 결과 화면 */
   .result { flex: 1; min-height: 0; overflow-y: auto; padding: 14px; max-width: 560px; width: 100%; margin: 0 auto; }
   .result textarea { width: 100%; min-height: 46vh; padding: 12px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; font-size: 13.5px; line-height: 1.6; font-weight: 600; color: var(--ink); font-family: inherit; resize: vertical; }
+  /* [2026-10-07] 사진 썸네일 마킹 버튼 */
+  .photos .ph .mk { top: auto; bottom: 2px; right: auto; left: 2px; width: auto; height: 22px; padding: 0 6px; border-radius: 999px; background: rgba(11,22,54,.82); color: var(--gold); font-size: 11px; font-weight: 900; }
+  /* [2026-10-07] 사진 이어서 공유 띠 (FLOW 등은 글+사진 동시 공유 시 글을 버림 → 글 먼저, 사진은 2단계) */
+  .ps-bar { position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 12px); z-index: 60; display: none; align-items: center; gap: 8px; padding: 10px 10px 10px 14px; border-radius: 16px; background: var(--navy); box-shadow: 0 12px 30px -10px rgba(11,22,54,.6); }
+  .ps-bar.show { display: flex; }
+  .ps-bar .m { flex: 1; min-width: 0; color: rgba(255,255,255,.8); font-size: 12.5px; font-weight: 700; line-height: 1.35; }
+  .ps-bar .m b { display: block; color: #fff; font-size: 14px; font-weight: 900; }
+  .ps-bar .go { flex: none; height: 44px; padding: 0 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #f1cf8a, #e0b060); color: #0b1636; font-size: 14px; font-weight: 900; }
+  .ps-bar .no { flex: none; width: 34px; height: 44px; border: none; background: none; color: rgba(255,255,255,.5); font-size: 18px; }
+  /* [2026-10-07] 사진 마킹 편집기 */
+  .mk-ov { position: fixed; inset: 0; z-index: 80; display: none; flex-direction: column; background: #070e22; }
+  .mk-ov.show { display: flex; }
+  .mk-top { flex: none; display: flex; align-items: center; gap: 8px; padding: calc(env(safe-area-inset-top) + 10px) 12px 10px; }
+  .mk-top .t { flex: 1; color: #fff; font-size: 15px; font-weight: 900; }
+  .mk-top button { height: 36px; padding: 0 14px; border-radius: 999px; font-size: 13.5px; font-weight: 900; border: 1px solid rgba(255,255,255,.22); background: none; color: rgba(255,255,255,.8); }
+  .mk-top .ok { border: none; background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff; }
+  .mk-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0 10px; }
+  .mk-wrap { position: relative; overflow: hidden; border-radius: 12px; line-height: 0; max-width: 100%; max-height: 100%; }
+  .mk-wrap canvas { display: block; touch-action: none; transform-origin: 0 0; max-width: 100%; }
+  .mk-fit { position: absolute; right: 8px; top: 8px; display: none; height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); background: rgba(11,22,54,.82); color: #fff; font-size: 12px; font-weight: 900; line-height: 1; }
+  .mk-fit.show { display: block; }
+  .mk-bot { flex: none; padding: 10px 12px calc(env(safe-area-inset-bottom) + 12px); }
+  .mk-tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .mk-tools button, .mk-row button { height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.14); background: #0f1a38; color: rgba(255,255,255,.7); font-size: 13px; font-weight: 800; }
+  .mk-tools button.on { border-color: var(--gold); background: rgba(224,176,96,.16); color: var(--gold); }
+  .mk-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .mk-row .cl { width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); padding: 0; }
+  .mk-row .cl.on { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.35); }
+  .mk-row .sp { flex: 1; text-align: center; color: rgba(255,255,255,.4); font-size: 11px; font-weight: 700; }
+  .mk-row .ud { padding: 0 14px; }
   .rbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
   .rbtns button { height: 50px; border-radius: 14px; border: 1px solid var(--line); background: #fff; font-size: 14.5px; font-weight: 800; color: var(--body); }
   .rbtns .pri { background: var(--navy); border-color: var(--navy); color: var(--gold); }
@@ -270,6 +300,40 @@
 </section>
 
 <div class="toast" id="toast"></div>
+
+<!-- [2026-10-07] 2단계 공유: 글 다음 사진 -->
+<div class="ps-bar" id="psBar">
+  <div class="m"><b id="psTitle">글 공유 완료</b>이어서 사진을 같은 대화방에 보내세요</div>
+  <button type="button" class="go" onclick="sharePending()">🖼 사진 공유</button>
+  <button type="button" class="no" onclick="hidePsBar()" aria-label="닫기">✕</button>
+</div>
+
+<!-- [2026-10-07] 사진 마킹 편집기 -->
+<div class="mk-ov" id="mkOv">
+  <div class="mk-top">
+    <button type="button" onclick="mkClose(false)" id="mkSkip">건너뛰기</button>
+    <div class="t">사진 마킹</div>
+    <button type="button" class="ok" onclick="mkClose(true)">✓ 완료</button>
+  </div>
+  <div class="mk-stage" id="mkStage">
+    <div class="mk-wrap" id="mkWrap"><canvas id="mkCv"></canvas><button type="button" class="mk-fit" id="mkFit" onclick="mkResetZoom()">↺ 맞춤</button></div>
+  </div>
+  <div class="mk-bot">
+    <div class="mk-tools">
+      <button type="button" data-t="arrow" class="on" onclick="mkTool('arrow')">↗ 화살표</button>
+      <button type="button" data-t="circle" onclick="mkTool('circle')">◯ 원</button>
+      <button type="button" data-t="box" onclick="mkTool('box')">▢ 박스</button>
+      <button type="button" data-t="text" onclick="mkTool('text')">T 글자</button>
+    </div>
+    <div class="mk-row">
+      <button type="button" class="cl on" data-c="#ff2d2d" style="background:#ff2d2d" onclick="mkColor('#ff2d2d')" aria-label="빨강"></button>
+      <button type="button" class="cl" data-c="#ffd400" style="background:#ffd400" onclick="mkColor('#ffd400')" aria-label="노랑"></button>
+      <button type="button" class="cl" data-c="#2dd4ff" style="background:#2dd4ff" onclick="mkColor('#2dd4ff')" aria-label="하늘"></button>
+      <div class="sp" id="mkHint">끌어서 그리기 · 두 손가락 확대</div>
+      <button type="button" class="ud" onclick="mkUndo()">↶ 취소</button>
+    </div>
+  </div>
+</div>
 <div class="undo-bar" id="undoBar"><span id="undoTxt">선택했습니다</span><button type="button" onclick="doUndo()">↩ 취소</button></div>
 
 <script>
@@ -576,13 +640,17 @@ function resizeImage(file) {
   });
 }
 async function addPhotos(inp, target) {
+  const fromCam = inp.hasAttribute('capture');
   const files = [...(inp.files || [])]; inp.value = '';
-  for (const f of files) { if (photos.length >= 6) { toast('사진은 최대 6장까지'); break; } const r = await resizeImage(f); photos.push({ file: r, url: URL.createObjectURL(r) }); }
+  let added = 0;
+  for (const f of files) { if (photos.length >= 6) { toast('사진은 최대 6장까지'); break; } const r = await resizeImage(f); photos.push({ file: r, url: URL.createObjectURL(r) }); added++; }
   renderPhotos(target);
   if (target === 'resPhotos') refreshReport();
+  // 촬영 직후엔 바로 마킹 화면 (건너뛰기 가능) · 갤러리 사진은 썸네일의 '마킹' 버튼으로
+  if (fromCam && added) mkOpen(photos.length - 1, target, true);
 }
 function removePhoto(i, target) { URL.revokeObjectURL(photos[i].url); photos.splice(i, 1); renderPhotos(target); if (target === 'resPhotos') refreshReport(); }
-function renderPhotos(target) { const el = $(target); if (el) el.innerHTML = photos.map((p, i) => `<div class="ph"><img src="${p.url}" alt=""><button type="button" onclick="removePhoto(${i}, '${target}')">×</button></div>`).join(''); }
+function renderPhotos(target) { const el = $(target); if (el) el.innerHTML = photos.map((p, i) => `<div class="ph"><img src="${p.url}" alt=""><button type="button" onclick="removePhoto(${i}, '${target}')">×</button><button type="button" class="mk" onclick="mkOpen(${i}, '${target}', false)">✎ 마킹</button></div>`).join(''); }
 function clearPhotos() { photos.forEach(p => URL.revokeObjectURL(p.url)); photos = []; }
 
 /* ---------- 공유 ---------- */
@@ -592,22 +660,32 @@ async function copyText(text) {
   document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); return ok;
 }
 // 카톡은 사진과 함께 보낼 때 글이 빠질 수 있어 글을 먼저 복사해 둔다
+// [2026-10-07] FLOW·카톡 등은 글+사진을 한 번에 받으면 글을 버림 → 글만 먼저 공유하고, 사진은 하단 띠 버튼으로 2단계 공유
+let pendingFiles = [];
+function showPsBar(files) {
+  pendingFiles = files.slice();
+  $('psTitle').textContent = `글 공유 완료 · 사진 ${files.length}장 남음`;
+  $('psBar').classList.add('show');
+}
+function hidePsBar() { $('psBar').classList.remove('show'); pendingFiles = []; }
+async function sharePending() {
+  const files = pendingFiles; if (!files.length) { hidePsBar(); return; }
+  if (navigator.share && navigator.canShare && navigator.canShare({ files })) {
+    try { await navigator.share({ files }); hidePsBar(); } catch (e) { if (!(e && e.name === 'AbortError')) toast('사진 공유에 실패했습니다 · 갤러리에서 직접 보내주세요', 3500); }
+  } else { toast('이 브라우저는 사진 공유를 지원하지 않습니다 · 갤러리에서 직접 보내주세요', 3500); hidePsBar(); }
+}
 async function shareText(text, withPhotos) {
   const files = withPhotos ? photos.map(p => p.file) : [];
   await copyText(text);
   if (navigator.share) {
     try {
-      if (files.length && navigator.canShare && navigator.canShare({ files })) {
-        await navigator.share({ files, text, title: text.split('\n')[0] });
-        toast('글은 복사해 두었습니다 · 글이 빠졌으면 대화창에 붙여넣기 하세요', 3500);
-      } else {
-        await navigator.share({ text, title: text.split('\n')[0] });
-        if (files.length) toast('이 폰은 사진 동시 공유가 안 됩니다 · 사진은 따로 보내주세요', 3500);
-      }
+      await navigator.share({ text, title: text.split('\n')[0] });
+      if (files.length) showPsBar(files);
       return true;
     } catch (e) { if (e && e.name === 'AbortError') return false; }
   }
   toast('공유 창을 열 수 없어 글을 복사했습니다 · 붙여넣기 하세요', 3000);
+  if (files.length) showPsBar(files);
   return true;
 }
 async function sharePhotosOnly() {
@@ -659,17 +737,29 @@ function readQuick() {
   if (Q.defect === '기타' && !Q.defectEtc) { toast('불량 이름을 입력하세요'); $('qDefEtc').focus(); return false; }
   return true;
 }
+// [2026-10-07] 시인성 개선: 항목별 한 줄 · 구분선 · 이모지 없음(FLOW 호환)
 function quickText() {
   const defect = Q.defect === '기타' ? Q.defectEtc : Q.defect;
-  const L = [`[불량 발생 보고] ${Q.part} · ${defect}`];
-  L.push(`- 일시: ${nowStr()}${Q.process ? ' · ' + Q.process : ''}`);
-  if (Q.customer) L.push(`- 고객사: ${Q.customer}`);
-  if (Q.ng || Q.qty) { const r = rateTxt(Q.ng, Q.qty); L.push(`- 수량: 불량 ${Q.ng ? fmtN(Q.ng) + 'ea' : '-'}${Q.qty ? ` / 검사 ${fmtN(Q.qty)}ea` : ''}${r ? ` (${r})` : ''}`); }
-  if (Q.memo) L.push(`- 현상: ${Q.memo}`);
-  L.push(`- 즉시 조치: ${Q.acts.length ? Q.acts.join(', ') : '확인 중'}`);
-  if (photos.length) L.push(`- 사진 ${photos.length}장 첨부`);
-  L.push('- 원인(5Why)은 분석 후 별도 공유 예정');
-  if (Q.author) L.push(`작성: ${Q.author}`);
+  const HR = '━━━━━━━━━━━━━━';
+  const name = [Q.product, Q.ptype].map(x => (x || '').trim()).filter(Boolean).join(' ');
+  const L = ['[불량 발생 보고]', HR];
+  L.push(`■ 품목 : ${name || Q.part}`);
+  if (Q.pno) L.push(`■ 품번 : ${Q.pno}`);
+  L.push(`■ 불량 : ${defect}`);
+  L.push(`■ 일시 : ${nowStr()}`);
+  if (Q.process) L.push(`■ 공정 : ${Q.process}`);
+  if (Q.customer) L.push(`■ 고객 : ${Q.customer}`);
+  L.push(HR);
+  if (Q.ng || Q.qty) {
+    L.push(`▶ 불량 ${Q.ng ? fmtN(Q.ng) + 'ea' : '-'}${Q.qty ? ` / 검사 ${fmtN(Q.qty)}ea` : ''}`);
+    const r = rateTxt(Q.ng, Q.qty); if (r) L.push(`▶ 불량률 ${r}`);
+  }
+  if (Q.memo) L.push(`▶ 현상 : ${Q.memo}`);
+  L.push(`▶ 즉시조치 : ${Q.acts.length ? Q.acts.join(', ') : '확인 중'}`);
+  L.push(HR);
+  if (photos.length) L.push(`※ 사진 ${photos.length}장 별도 첨부`);
+  L.push('※ 원인(5Why)은 분석 후 별도 공유');
+  if (Q.author) L.push(`작성 : ${Q.author}`);
   return L.join('\n');
 }
 function quickSave(goBack) {
@@ -1163,6 +1253,116 @@ function copyAsNew(i) {
 
 window.addEventListener('pagehide', () => { if (A) saveDraft(); });
 renderHome();
+
+/* ============================================================
+   [2026-10-07] 사진 마킹 편집기 (화살표 · 원 · 박스 · 글자 · 두 손가락 확대)
+   좌표는 원본 사진 픽셀 기준으로 저장 → 완료 시 원본 해상도로 합성해 첨부 사진을 교체
+   ============================================================ */
+const MK = { idx: -1, target: '', img: null, marks: [], tool: 'arrow', color: '#ff2d2d', drag: null, s: 1, x: 0, y: 0, ptrs: new Map(), pinch: null, lock: false };
+const mkCv = $('mkCv'), mkCtx = mkCv.getContext('2d');
+function mkLW() { return Math.max(4, mkCv.width * 0.007); }
+function mkFont() { return Math.round(Math.max(26, mkCv.width * 0.05)); }
+function mkOpen(i, target, fromCam) {
+  const p = photos[i]; if (!p) return;
+  const img = new Image();
+  img.onload = () => {
+    Object.assign(MK, { idx: i, target, img, marks: [], drag: null, ptrs: new Map(), pinch: null, lock: false });
+    mkCv.width = img.naturalWidth; mkCv.height = img.naturalHeight;
+    $('mkSkip').textContent = fromCam ? '건너뛰기' : '취소';
+    $('mkOv').classList.add('show'); document.body.style.overflow = 'hidden';
+    mkLayout(); mkResetZoom(); mkDraw();
+  };
+  img.src = p.url;
+}
+function mkLayout() {
+  // 화면에 맞게 캔버스 표시 크기 결정 (가로·세로 모두 들어오게)
+  const st = $('mkStage'), W = st.clientWidth - 20, H = st.clientHeight - 4;
+  const r = Math.min(W / mkCv.width, H / mkCv.height);
+  mkCv.style.width = Math.floor(mkCv.width * r) + 'px'; mkCv.style.height = Math.floor(mkCv.height * r) + 'px';
+}
+function mkDrawMark(c, m) {
+  c.save(); c.strokeStyle = m.c; c.fillStyle = m.c; c.lineWidth = mkLW(); c.lineCap = 'round'; c.lineJoin = 'round';
+  c.shadowColor = 'rgba(0,0,0,.45)'; c.shadowBlur = mkLW() * 1.2;
+  if (m.t === 'arrow') {
+    const a = Math.atan2(m.y2 - m.y1, m.x2 - m.x1), h = mkLW() * 4.5;
+    c.beginPath(); c.moveTo(m.x1, m.y1); c.lineTo(m.x2 - Math.cos(a) * h * .6, m.y2 - Math.sin(a) * h * .6); c.stroke();
+    c.beginPath(); c.moveTo(m.x2, m.y2);
+    c.lineTo(m.x2 - h * Math.cos(a - .45), m.y2 - h * Math.sin(a - .45));
+    c.lineTo(m.x2 - h * Math.cos(a + .45), m.y2 - h * Math.sin(a + .45)); c.closePath(); c.fill();
+  } else if (m.t === 'box') {
+    c.strokeRect(Math.min(m.x1, m.x2), Math.min(m.y1, m.y2), Math.abs(m.x2 - m.x1), Math.abs(m.y2 - m.y1));
+  } else if (m.t === 'circle') {
+    c.beginPath(); c.ellipse((m.x1 + m.x2) / 2, (m.y1 + m.y2) / 2, Math.abs(m.x2 - m.x1) / 2, Math.abs(m.y2 - m.y1) / 2, 0, 0, Math.PI * 2); c.stroke();
+  } else if (m.t === 'text') {
+    c.font = `900 ${mkFont()}px -apple-system, "Pretendard", sans-serif`; c.textBaseline = 'middle';
+    c.shadowBlur = 0; c.lineWidth = mkFont() * .18; c.strokeStyle = 'rgba(0,0,0,.75)'; c.strokeText(m.s, m.x, m.y); c.fillText(m.s, m.x, m.y);
+  }
+  c.restore();
+}
+function mkDraw() {
+  mkCtx.clearRect(0, 0, mkCv.width, mkCv.height);
+  if (MK.img) mkCtx.drawImage(MK.img, 0, 0);
+  MK.marks.forEach(m => mkDrawMark(mkCtx, m));
+  if (MK.drag && MK.drag.x2 !== undefined) mkDrawMark(mkCtx, MK.drag);
+}
+function mkTool(t) { MK.tool = t; document.querySelectorAll('.mk-tools button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); $('mkHint').textContent = t === 'text' ? '글자 넣을 곳을 누르세요' : '끌어서 그리기 · 두 손가락 확대'; }
+function mkColor(c) { MK.color = c; document.querySelectorAll('.mk-row .cl').forEach(b => b.classList.toggle('on', b.dataset.c === c)); }
+function mkUndo() { MK.marks.pop(); mkDraw(); }
+function mkApplyZoom() {
+  const W = mkCv.clientWidth, H = mkCv.clientHeight;
+  MK.s = Math.min(4, Math.max(1, MK.s));
+  MK.x = Math.min(0, Math.max(W - W * MK.s, MK.x)); MK.y = Math.min(0, Math.max(H - H * MK.s, MK.y));
+  mkCv.style.transform = MK.s > 1.001 ? `translate(${MK.x}px, ${MK.y}px) scale(${MK.s})` : '';
+  $('mkFit').classList.toggle('show', MK.s > 1.01);
+}
+function mkResetZoom() { MK.s = 1; MK.x = 0; MK.y = 0; mkApplyZoom(); }
+function mkPt(e) { const r = mkCv.getBoundingClientRect(); return { x: (e.clientX - r.left) * mkCv.width / r.width, y: (e.clientY - r.top) * mkCv.height / r.height }; }
+function mkMid() { const [a, b] = [...MK.ptrs.values()], r = $('mkWrap').getBoundingClientRect(); return { mx: (a.x + b.x) / 2 - r.left, my: (a.y + b.y) / 2 - r.top, d: Math.hypot(a.x - b.x, a.y - b.y) || 1 }; }
+mkCv.addEventListener('pointerdown', e => {
+  e.preventDefault(); try { mkCv.setPointerCapture(e.pointerId); } catch (_) {}
+  MK.ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (MK.ptrs.size >= 2) { MK.drag = null; MK.lock = true; const m = mkMid(); MK.pinch = { d0: m.d, s0: MK.s, qx: (m.mx - MK.x) / MK.s, qy: (m.my - MK.y) / MK.s }; mkDraw(); return; }
+  if (MK.lock) return;
+  const p = mkPt(e); MK.drag = { t: MK.tool, c: MK.color, x1: p.x, y1: p.y, cx: e.clientX, cy: e.clientY };
+});
+mkCv.addEventListener('pointermove', e => {
+  if (MK.ptrs.has(e.pointerId)) MK.ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (MK.pinch && MK.ptrs.size >= 2) { const m = mkMid(); MK.s = MK.pinch.s0 * m.d / MK.pinch.d0; MK.x = m.mx - Math.min(4, Math.max(1, MK.s)) * MK.pinch.qx; MK.y = m.my - Math.min(4, Math.max(1, MK.s)) * MK.pinch.qy; mkApplyZoom(); return; }
+  if (MK.lock || !MK.drag || MK.drag.t === 'text') return;
+  const p = mkPt(e); MK.drag.x2 = p.x; MK.drag.y2 = p.y; mkDraw();
+});
+function mkEnd(e, cancel) {
+  const wasLock = MK.lock;
+  MK.ptrs.delete(e.pointerId); if (MK.ptrs.size < 2) MK.pinch = null; if (!MK.ptrs.size) MK.lock = false;
+  const d = MK.drag; MK.drag = null;
+  if (cancel || wasLock || !d) { mkDraw(); return; }
+  if (d.t === 'text') {
+    if (Math.hypot(e.clientX - d.cx, e.clientY - d.cy) < 12) {
+      const s = (prompt('넣을 글자 (예: 미성형, 2번 캐비티)') || '').trim();
+      if (s) MK.marks.push({ t: 'text', c: d.c, s, x: d.x1, y: d.y1 });
+    }
+  } else if (d.x2 !== undefined && Math.hypot(d.x2 - d.x1, d.y2 - d.y1) > mkCv.width * 0.015) MK.marks.push(d);
+  mkDraw();
+}
+mkCv.addEventListener('pointerup', e => mkEnd(e, false));
+mkCv.addEventListener('pointercancel', e => mkEnd(e, true));
+mkCv.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+window.addEventListener('resize', () => { if ($('mkOv').classList.contains('show')) { mkLayout(); mkResetZoom(); } });
+function mkClose(apply) {
+  const done = () => { $('mkOv').classList.remove('show'); document.body.style.overflow = ''; MK.img = null; mkResetZoom(); };
+  if (!apply || !MK.marks.length) { done(); return; }
+  MK.drag = null; mkDraw();
+  mkCv.toBlob(b => {
+    if (b && photos[MK.idx]) {
+      URL.revokeObjectURL(photos[MK.idx].url);
+      const f = new File([b], `defect_mark_${Date.now()}.jpg`, { type: 'image/jpeg' });
+      photos[MK.idx] = { file: f, url: URL.createObjectURL(f) };
+      renderPhotos(MK.target); if (MK.target === 'resPhotos') refreshReport();
+      toast('마킹한 사진으로 바꿨습니다');
+    }
+    done();
+  }, 'image/jpeg', 0.88);
+}
 </script>
 </body>
 </html>

@@ -111,6 +111,16 @@
   .work-box .h { font-size: 0.78rem; font-weight: 900; color: #7c5a1c; margin-bottom: 4px; }
   .work-box .b { font-size: 0.86rem; color: var(--body); white-space: pre-wrap; line-height: 1.5; }
   .work-box .b + .h { margin-top: 8px; }
+  /* [2026-10-07] 목록에서 바로 삭제(✕) + 되돌리기 */
+  .ev-row .ev-x { flex: none; width: 34px; height: 34px; margin: -6px -4px -6px 0; border: none; border-radius: 10px; background: none; color: #94A3B8; font-size: 1.05rem; font-weight: 900; line-height: 1; }
+  .ev-row .ev-x:active { background: #FEE2E2; color: var(--red); }
+  .work-box { position: relative; padding-right: 40px; }
+  .work-box .wb-x { position: absolute; top: 6px; right: 6px; width: 32px; height: 32px; border: none; border-radius: 10px; background: none; color: #b08a45; font-size: 1rem; font-weight: 900; line-height: 1; }
+  .work-box .wb-x:active { background: #FEE2E2; color: var(--red); }
+  .undo-bar { position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 18px); z-index: 101; display: none; align-items: center; gap: 10px; padding: 8px 8px 8px 16px; border-radius: 14px; background: rgba(15,23,42,.94); color: #fff; font-size: 0.88rem; font-weight: 700; }
+  .undo-bar.show { display: flex; }
+  .undo-bar span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .undo-bar button { flex: none; height: 38px; padding: 0 14px; border: none; border-radius: 10px; background: #e0b060; color: #0b1636; font-size: 0.88rem; font-weight: 900; }
 
   /* ---------- 할 일 ---------- */
   .todo-add { display: flex; gap: 8px; }
@@ -514,6 +524,7 @@
   <button type="button" onclick="document.getElementById('alarmBox').classList.remove('show')">확인</button>
 </div>
 <div class="toast" id="toast"></div>
+<div class="undo-bar" id="undoBar"><span id="undoMsg"></span><button type="button" onclick="undoDelete()">되돌리기</button></div>
 
 <script>
 /* ================================================================
@@ -723,6 +734,7 @@ function evRowHtml(ev, ds, showDday) {
     <span class="bar" style="background:${COLORS[ev.color] || COLORS['파랑']}"></span>
     <span class="tm">${ev.time ? ev.time + (ev.end ? `<small>~${ev.end}</small>` : '') : '<small style="font-size:.78rem;color:#64748B;">종일</small>'}</span>
     <span class="tt"><b>${esc(ev.title)}</b>${sub ? `<span>${sub}</span>` : ''}</span>${dd}
+    <button type="button" class="ev-x" onclick="event.stopPropagation(); quickDeleteEvent('${ev.id}','${ds}')" aria-label="일정 삭제">✕</button>
   </div>`;
 }
 function renderDay() {
@@ -741,6 +753,7 @@ function renderDay() {
   const box = document.getElementById('dayWork');
   if (w && (w.learn || w.measure || w.todo)) {
     box.innerHTML = `<div class="work-box" onclick="openWork()">
+      <button type="button" class="wb-x" onclick="event.stopPropagation(); quickDeleteWork()" aria-label="업무 기록 삭제">✕</button>
       ${w.learn ? `<div class="h">📚 업무 내용</div><div class="b">${esc(w.learn)}</div>` : ''}
       ${w.measure ? `<div class="h">📊 측정 데이터</div><div class="b">${esc(w.measure)}</div>` : ''}
       ${w.todo ? `<div class="h">📅 차기 계획</div><div class="b">${esc(w.todo)}</div>` : ''}
@@ -888,13 +901,46 @@ function askDeleteEvent() {
     deleteEvent('all');
   }
 }
+/* [2026-10-07] 목록 ✕ 바로 삭제: 일반 일정은 즉시 삭제 + 되돌리기 / 반복 일정은 '이 날짜만·전체' 선택 */
+let undoSnap = null, undoT = null;
+function showUndo(msg, snap) {
+  undoSnap = snap; document.getElementById('undoMsg').innerText = msg;
+  document.getElementById('undoBar').classList.add('show');
+  clearTimeout(undoT); undoT = setTimeout(() => { document.getElementById('undoBar').classList.remove('show'); undoSnap = null; }, 4500);
+}
+function undoDelete() {
+  if (!undoSnap) return;
+  const snap = undoSnap; undoSnap = null;
+  S.events = snap.events; S.work = snap.work;
+  save(); renderAll();
+  document.getElementById('undoBar').classList.remove('show'); clearTimeout(undoT);
+  toast('되돌렸습니다');
+}
+function snapshot() { return { events: JSON.parse(JSON.stringify(S.events)), work: JSON.parse(JSON.stringify(S.work)) }; }
+function quickDeleteEvent(id, ds) {
+  const ev = S.events.find(e => e.id === id); if (!ev) return;
+  if (ev.repeat && ev.repeat !== 'none') { editId = id; editOcc = ds; askDeleteEvent(); return; }
+  const snap = snapshot();
+  S.events = S.events.filter(e => e.id !== id);
+  save(); renderAll();
+  showUndo(`"${ev.title}" 삭제됨`, snap);
+}
+function quickDeleteWork() {
+  if (!S.work[selDate]) return;
+  if (!confirm(`${korDate(selDate)} 업무 기록을 삭제할까요?`)) return;
+  const snap = snapshot();
+  delete S.work[selDate];
+  save(); renderAll();
+  showUndo(`${korDate(selDate)} 업무 기록 삭제됨`, snap);
+}
 function deleteEvent(mode) {
   const ev = S.events.find(e => e.id === editId);
   if (!ev) return;
+  const snap = snapshot();
   if (mode === 'one') { ev.ex = [...new Set([...(ev.ex || []), editOcc])]; }
   else S.events = S.events.filter(e => e.id !== editId);
   save(); closeSheets(); renderAll();
-  toast(mode === 'one' ? `${korDate(editOcc)} 하루만 삭제했습니다` : '일정을 삭제했습니다');
+  showUndo(mode === 'one' ? `${korDate(editOcc)} 하루만 삭제됨` : `"${ev.title}" 삭제됨`, snap);
 }
 
 /* ================================================================
