@@ -37,9 +37,13 @@
   .head-title { flex: 1; text-align: center; min-width: 0; }
   .head-title .s { font-size: 9px; font-weight: 800; letter-spacing: 1.2px; color: #d1a250; }
   .head-title .m { font-size: 15px; font-weight: 900; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .live { font-size: 10px; font-weight: 900; color: #ff6b6a; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-  .live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse 1.2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { transform: scale(.85); opacity: .75; } 50% { transform: scale(1.15); opacity: 1; } }
+  /* [2026-10-16] LIVE → 마지막 업로드 시각 (누르면 새 데이터 확인) */
+  .upd { flex: none; min-width: 64px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding: 5px 0 5px 8px; border: none; background: none; color: #fff; font-family: inherit; text-align: right; }
+  .upd .ul { font-size: 9.5px; font-weight: 800; color: #d1a250; letter-spacing: .3px; display: inline-flex; align-items: center; gap: 3px; }
+  .upd .ul i { font-style: normal; display: inline-block; font-size: 11px; line-height: 1; }
+  .upd .uv { font-size: 12px; font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .upd.busy .ul i { animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   .seg { display: flex; margin-top: 12px; background: #2a2a2c; border-radius: 12px; padding: 3px; }
   .seg button { flex: 1; min-height: 40px; border: none; background: transparent; color: #aaa; font-size: 14px; font-weight: 800; border-radius: 10px; }
@@ -49,17 +53,8 @@
 
   .wrap { padding: 14px 14px 0; }
 
-  .sync { font-size: 11px; color: #888; font-weight: 600; line-height: 1.7; margin-bottom: 12px; }
-  .sync .warn { color: var(--red); font-weight: 800; display: block; }
-
-
-  /* TODAY SUMMARY */
-  .summary { background: #fff; border: 1px solid #1a1a1a; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
-  .summary-head { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; font-weight: 800; color: var(--sub); letter-spacing: .5px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
-  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; text-align: center; }
-  .summary-grid .l { font-size: 11px; font-weight: 700; color: var(--sub); }
-  .summary-grid .v { margin-top: 3px; font-size: 20px; font-weight: 900; }
-  .summary-grid .acc .l, .summary-grid .acc .v { color: var(--red); }
+  .sync { font-size: 11px; color: var(--red); font-weight: 800; line-height: 1.5; margin-bottom: 8px; }
+  .sync:empty { display: none; }
 
   /* KPI */
   .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -128,50 +123,57 @@
   .perf-line b { font-weight: 900; }
   .perf-line:empty { display: none; }
 
-  /* 필터 */
-  .filters { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 4px; margin-bottom: 14px; }
-  .f-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .f-label { flex: 0 0 52px; font-size: 12px; font-weight: 800; color: var(--sub); }
-  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip { min-height: 36px; padding: 0 14px; border: none; background: #ebebeb; color: #444; font-size: 13px; font-weight: 800; border-radius: 18px; }
-  .chip.active { background: #222; color: #fff; }
-
-  /* 탭 */
-  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab { flex: 0 0 auto; min-height: 40px; padding: 0 14px; border: 1px solid #ddd; background: #fff; color: #555; font-size: 13px; font-weight: 800; border-radius: 20px; white-space: nowrap; }
-  .tab .badge { margin-left: 5px; background: #e0e0e0; color: #333; font-size: 11px; padding: 2px 7px; border-radius: 10px; }
+  /* [2026-10-16] 탭: 4칸 고정(가로 스크롤 없음) · 할 일 먼저 */
+  .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 8px; }
+  .tab { min-height: 52px; padding: 6px 4px; border: 1px solid #ddd; background: #fff; color: #555; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-family: inherit; }
+  .tab .tl { font-size: 11.5px; font-weight: 800; line-height: 1.25; word-break: keep-all; text-align: center; }
+  .tab .badge { font-size: 15px; font-weight: 900; color: #111; font-variant-numeric: tabular-nums; }
+  .tab .badge.hot { color: var(--red); }
   .tab.active { background: #111; color: #fff; border-color: #111; }
-  .tab.active .badge { background: #fff; color: #111; }
+  .tab.active .badge { color: #fff; }
+  .tab.active .badge.hot { color: #ff8a89; }
 
-  /* 업무 카드 */
-  .list { display: flex; flex-direction: column; gap: 8px; }
-  .item { background: #fff; border: 1px solid #ececec; border-radius: 12px; padding: 12px 14px; }
-  .item.urgent { border-left: 4px solid var(--red); }
-  .item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .badge-st { display: inline-block; padding: 4px 9px; font-size: 11px; font-weight: 800; border-radius: 5px; white-space: nowrap; }
+  /* [2026-10-16] 필터: 우선순위 한 줄만 (상태는 탭이 대신함) */
+  .filters { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 2px; }
+  .f-label { font-size: 11.5px; font-weight: 800; color: var(--sub); margin-right: 2px; }
+  .chips { display: flex; gap: 5px; }
+  .chip { min-height: 32px; padding: 0 12px; border: 1px solid #e0e0e0; background: #fff; color: #555; font-size: 12.5px; font-weight: 800; border-radius: 16px; font-family: inherit; }
+  .chip.active { background: #222; border-color: #222; color: #fff; }
+  .chip[data-prio="urgent"].active { background: var(--red); border-color: var(--red); }
+
+  /* [2026-10-16] 업무 카드: 2줄 압축 (품명 / 고객사·담당 + 날짜) */
+  .list { display: flex; flex-direction: column; gap: 6px; }
+  .item { background: #fff; border: 1px solid #ececec; border-radius: 10px; padding: 10px 12px; }
+  .item.urgent { border-left: 4px solid var(--red); padding-left: 10px; }
+  .i1 { display: flex; align-items: flex-start; gap: 7px; }
+  .badge-st { flex: none; display: inline-block; margin-top: 1px; padding: 2px 6px; font-size: 10.5px; font-weight: 800; border-radius: 4px; white-space: nowrap; }
   .badge-st.urgent { background: #ffebeb; color: var(--red); }
   .badge-st.ing { background: #e8f4ff; color: #0066cc; }
-  .badge-st.hold { background: #fff4e5; color: #ff9800; }
+  .badge-st.hold { background: #fff4e5; color: #d97a00; }
   .badge-st.done { background: #e7f9ee; color: #1a9247; }
-  .prio { font-size: 11.5px; font-weight: 800; color: #666; }
-  .prio.hi { color: var(--red); }
-  .item-name { margin-top: 8px; font-size: 14.5px; font-weight: 800; line-height: 1.4; word-break: break-all; }
-  .item-meta { margin-top: 3px; font-size: 12px; color: var(--sub); font-weight: 500; word-break: break-all; }
-  .item-foot { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #555; }
+  .item-name { flex: 1; min-width: 0; font-size: 14px; font-weight: 800; line-height: 1.35; word-break: break-all; }
+  .i2 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 4px; font-size: 12px; color: var(--sub); font-weight: 600; }
+  .i2 .im { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .i2 .id { flex: none; font-weight: 800; color: #444; font-variant-numeric: tabular-nums; }
+  .i2 .id.late { color: var(--red); }
   .empty { text-align: center; padding: 34px 0; color: var(--sub); font-weight: 700; font-size: 13px; background: #fff; border-radius: 12px; border: 1px solid #ececec; }
   .more-note { text-align: center; font-size: 11.5px; color: #999; font-weight: 600; margin-top: 10px; }
 
 
-  /* 챗봇 (바텀시트) */
+  /* 챗봇 (바텀시트) · [2026-10-16] 버튼을 작은 원형으로 (탭·목록 가림 최소화) */
   .chat-fab {
-    position: fixed; right: 16px; bottom: calc(16px + var(--safe-b)); z-index: 90;
-    height: 54px; padding: 0 20px 0 16px; border-radius: 28px; border: none;
-    background: #111; color: #fff; font-size: 14px; font-weight: 800;
-    display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.3);
+    position: fixed; right: 14px; bottom: calc(14px + var(--safe-b)); z-index: 90;
+    width: 52px; height: 52px; padding: 0; border-radius: 50%; border: none;
+    background: #111; color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+    box-shadow: 0 6px 16px rgba(0,0,0,.28);
   }
-  .chat-fab .ic { font-size: 20px; }
+  .chat-fab { transition: transform .2s ease, opacity .2s ease; }
+  .chat-fab.away { transform: translateY(90px); opacity: 0; pointer-events: none; }  /* 스크롤 중엔 숨김 → 카드 날짜 가림 방지 */
+  .chat-fab .ic { font-size: 19px; line-height: 1; }
+  .chat-fab .tx { font-size: 9.5px; font-weight: 800; margin-top: 2px; }
+  .toast { position: fixed; left: 50%; bottom: calc(80px + var(--safe-b)); transform: translateX(-50%); z-index: 120; background: rgba(17,17,17,.92); color: #fff; font-size: 12.5px; font-weight: 700; padding: 9px 14px; border-radius: 10px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .toast.show { opacity: 1; }
   .chat-dim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 95; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
   .chat-dim.open { opacity: 1; pointer-events: auto; }
   .chat-panel {
@@ -218,8 +220,6 @@
   .cw-opt-btn:active { background: #dcdcdc; }
   .cw-opt-btn.primary { background: #111; color: #fff; }
   /* ---- [2026-09-30] 한 화면 압축: 요약 상자 숨김(KPI와 중복) · KPI 3열 · 막대 낮춤 → 그래프까지 첫 화면 ---- */
-  .summary { display: none; }
-  .sync { margin-bottom: 8px; font-size: 10.5px; line-height: 1.5; }
   .kpi-cap { display: flex; justify-content: space-between; align-items: baseline; margin: 0 2px 7px; }
   .kpi-cap b { font-size: 13px; font-weight: 900; }
   .kpi-cap span { display: none; }
@@ -233,6 +233,10 @@
   .kpi-sub { margin: 1px 0 0; font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .perf { padding: 11px 12px; margin-bottom: 12px; }
   .perf-bars { height: 80px; margin-top: 6px; }
+
+  /* [2026-10-16] 월별 막대: 모든 달 건수 표시 (이번 달·선택 달만 진하게) */
+  .perf-bars .n { color: #999; font-weight: 700; }
+  .perf-bars .col.cur .n, .perf-bars .col.sel .n { color: #222; font-weight: 900; }
 
   /* [2026-10-02] 실적 패널 줄 정리 */
   .perf-line .pl { display: flex; align-items: flex-start; gap: 8px; padding: 2px 0; cursor: pointer; }
@@ -308,7 +312,7 @@
       <div class="s">QUALITY MANAGEMENT TEAM</div>
       <div class="m">품질경영팀 업무 현황</div>
     </div>
-    <span class="live">LIVE</span>
+    <button type="button" class="upd" id="updBtn" title="눌러서 새 데이터 확인"><span class="ul"><i>↻</i>업로드</span><span class="uv" id="updTime">--/-- --:--</span></button>
   </div>
   <div class="seg" id="deptGroup">
     <button data-dept="precision" class="active">정밀 측정</button>
@@ -320,16 +324,7 @@
   <div class="sync" id="syncInfo"></div>
 
 
-  <div class="kpi-cap"><b id="kpiCap"></b><span>누르면 아래 목록</span></div>
-  <section class="summary">
-    <div class="summary-head"><span id="sumHead">TODAY SUMMARY</span></div>
-    <div class="summary-grid">
-      <div><div class="l" id="sumLabel1">오늘예정</div><div class="v" id="sumVal1">-</div></div>
-      <div><div class="l" id="sumLabel2">진행중</div><div class="v" id="sumVal2">-</div></div>
-      <div class="acc" id="sumBox3"><div class="l" id="sumLabel3">긴급 대응</div><div class="v" id="sumVal3">-</div></div>
-    </div>
-  </section>
-
+  <div class="kpi-cap"><b id="kpiCap"></b></div>
   <section class="kpi-grid" id="kpiGrid"></section>
 
   <section class="perf" id="pcPerf" style="display:none;">
@@ -339,31 +334,21 @@
     <div class="perf-line" id="perfNext"></div>
   </section>
 
+  <nav class="tabs" id="tabHeader">
+    <button type="button" class="tab active" data-tab="t1"><span class="tl"></span><span class="badge" id="badge-t1">0</span></button>
+    <button type="button" class="tab" data-tab="t2"><span class="tl"></span><span class="badge" id="badge-t2">0</span></button>
+    <button type="button" class="tab" data-tab="t3"><span class="tl"></span><span class="badge" id="badge-t3">0</span></button>
+    <button type="button" class="tab" data-tab="t4"><span class="tl"></span><span class="badge" id="badge-t4">0</span></button>
+  </nav>
+
   <section class="filters">
-    <div class="f-row">
-      <div class="f-label">상태</div>
-      <div class="chips" id="statusGroup">
-        <button class="chip active" data-status="all">전체</button>
-        <button class="chip" data-status="pending">진행중</button>
-        <button class="chip" data-status="done">완료</button>
-      </div>
-    </div>
-    <div class="f-row">
-      <div class="f-label">우선순위</div>
-      <div class="chips" id="prioGroup">
-        <button class="chip active" data-prio="all">전체</button>
-        <button class="chip" data-prio="urgent">긴급</button>
-        <button class="chip" data-prio="normal">보통</button>
-      </div>
+    <span class="f-label">우선순위</span>
+    <div class="chips" id="prioGroup">
+      <button type="button" class="chip active" data-prio="all">전체</button>
+      <button type="button" class="chip" data-prio="urgent">긴급</button>
+      <button type="button" class="chip" data-prio="normal">보통</button>
     </div>
   </section>
-
-  <nav class="tabs" id="tabHeader">
-    <button class="tab active" data-tab="todo"><span class="tl">오늘 해야할 업무</span><span class="badge" id="badge-todo">0</span></button>
-    <button class="tab" data-tab="overdue"><span class="tl">장기미완</span><span class="badge" id="badge-overdue">0</span></button>
-    <button class="tab" data-tab="done"><span class="tl">최근완료</span><span class="badge" id="badge-done">0</span></button>
-    <button class="tab" data-tab="history"><span class="tl">전체 이력</span><span class="badge" id="badge-history">0</span></button>
-  </nav>
 
   <section class="list" id="list"></section>
 
@@ -385,7 +370,8 @@
   <div class="chat-body" id="chatBody"></div>
   <div class="chat-options" id="optionsWrap"></div>
 </div>
-<button class="chat-fab" id="chatFab" onclick="toggleChat(true)"><span class="ic">💬</span>챗봇</button>
+<button class="chat-fab" id="chatFab" onclick="toggleChat(true)" aria-label="업무 챗봇 열기"><span class="ic">💬</span><span class="tx">챗봇</span></button>
+<div class="toast" id="toast"></div>
 
 <script>
   // chatbot-core.js에 대시보드 위젯과 동일한 CSS 클래스명을 알려준다 (스타일만 모바일용으로 재정의)
@@ -397,6 +383,18 @@
 </script>
 <script src="js/github-config.js"></script>
 <script src="js/github-sync.js"></script>
+<script>
+  // [2026-10-16] 같은 파일을 한 페이지에서 두 번 받지 않도록 (챗봇 + 대시보드가 같은 파일을 읽음)
+  // GitHub 비로그인 조회는 IP당 시간당 60회 제한 → 페이지 1회 열 때 조회 4회 → 2회로 줄임
+  (function () {
+    var G = window.GitHubSync; if (!G || !G.pullJSONSync) return;
+    var orig = G.pullJSONSync, memo = {};
+    G.pullJSONSync = function (name, fallback) {
+      if (!Object.prototype.hasOwnProperty.call(memo, name)) memo[name] = orig(name, null);
+      return memo[name] == null ? fallback : memo[name];
+    };
+  })();
+</script>
 <script src="js/chatbot-core.js"></script>
 
 <script>
@@ -442,9 +440,12 @@
     return `${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
   }
 
-  document.getElementById('syncInfo').innerHTML =
-    `📊 정밀 엑셀 ${fmtDateTime(GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.updatedAt)} · 📋 수입 엑셀 ${fmtDateTime(GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.updatedAt)}`
-    + (GITLAB_SYNC_OK ? '' : '<span class="warn">⚠ 서버 연결 실패 (이 기기의 로컬 캐시 표시 중)</span>');
+  // [2026-10-16] 업로드 시각은 헤더 오른쪽(부서별)으로 이동 · 이 줄은 연결 실패 때만 표시
+  document.getElementById('syncInfo').textContent = GITLAB_SYNC_OK ? '' : '⚠ 서버 연결 실패 · 이 기기의 이전 데이터 표시 중 (잠시 후 오른쪽 위 ↻)';
+  function renderUpd(){
+    const d = currentDept === 'precision' ? GITLAB_MEASURE_DATA : GITLAB_INSPECTION_DATA;
+    document.getElementById('updTime').textContent = fmtDateTime(d && d.updatedAt).replace('.', '/');
+  }
 
   // ============================================================
   //  정밀측정 데이터
@@ -570,7 +571,7 @@
     const max = Math.max(1, ...qiMonths.map(x => x.n));
     document.getElementById('perfBars').innerHTML = qiMonths.map((x,i) =>
       `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 검사 ${x.n}건 · 불합격 ${x.ng}건">`
-      + `<div class="n">${(i===5||i===perfSel) ? x.n : ''}${x.ng ? `<i class="ngdot">●${x.ng}</i>` : ''}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
+      + `<div class="n">${x.n}${x.ng ? `<i class="ngdot">●${x.ng}</i>` : ''}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
     const mon = document.getElementById('perfMon');
     if (mon) mon.innerHTML = qiMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
     const sel = qiMonths[perfSel];
@@ -591,9 +592,8 @@
   //  상태 / 렌더링
   // ============================================================
   let currentDept = 'precision'; // [2026-09-30] 원래 순서(정밀측정 먼저)로 복귀
-  let currentTab = 'todo';
-  let statusFilter = 'all';
-  let prioFilter = 'all';
+  let currentTab = 't1';         // [2026-10-16] 탭은 t1~t4 (부서별 내용은 TAB_DEFS) · t1 = 할 일
+  let prioFilter = 'all';        // [2026-10-16] 상태 필터 삭제 (탭이 상태를 나눔)
 
   function scaledBar(v,max){ return Math.max(4, Math.min(100, Math.round((v/max)*100))); }
   function kpiCard(tone,value,unit,label,pct,sub){
@@ -611,7 +611,7 @@
         kpiCard('n', pcDoneMonth,'건','이번 달 완료',scaledBar(pcDoneMonth,30), `지난달 ${pcDonePrev}`),
         kpiCard('n', pcDoneYear,'건','올해 누적',scaledBar(pcDoneYear,300), `${now.getFullYear()}년`),
         kpiCard('n', pcIncomplete.length,'건','진행 중',scaledBar(pcIncomplete.length,30), pcRegistered ? `가등록 ${pcRegistered} 포함` : ''),
-        kpiCard(pcLate.length ? 'accent' : 'n', pcLate.length,'건','예정일 지남',scaledBar(pcLate.length,10)),
+        kpiCard(pcLate.length ? 'accent' : 'n', pcLate.length,'건','예정일 지남',scaledBar(pcLate.length,10), pcIncomplete.length ? `진행 중 ${pcIncomplete.length}건 중` : ''),
         kpiCard(pcUrgent.length ? 'accent' : 'n', pcUrgent.length,'건','긴급',scaledBar(pcUrgent.length,10))
       ].join('');
     } else {
@@ -637,7 +637,7 @@
     if (!mon0) { mon0 = document.createElement('div'); mon0.id = 'perfMon'; mon0.className = 'perf-mon'; document.getElementById('perfBars').after(mon0); }
     if (currentDept !== 'precision') { renderPerfInsp(); return; }
     const max = Math.max(1, ...pcMonths.map(x => x.n));
-    document.getElementById('perfBars').innerHTML = pcMonths.map((x,i) => `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 ${x.n}건"><div class="n">${i===5||i===perfSel ? x.n : ''}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
+    document.getElementById('perfBars').innerHTML = pcMonths.map((x,i) => `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 ${x.n}건"><div class="n">${x.n}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
     let mon = document.getElementById('perfMon');
     if (!mon) { mon = document.createElement('div'); mon.id = 'perfMon'; mon.className = 'perf-mon'; document.getElementById('perfBars').after(mon); }
     mon.innerHTML = pcMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
@@ -674,122 +674,120 @@
   }
   function perfPick(i){ perfSel = perfSel === i ? 5 : i; renderPerf(); }
 
-  function renderSummary(){
-    const set = (i,l,v) => { document.getElementById('sumLabel'+i).textContent = l; document.getElementById('sumVal'+i).textContent = v + '건'; };
-    const pc = currentDept === 'precision';
-    document.getElementById('sumHead').textContent = `${now.getMonth()+1}월 ${pc ? '측정' : '검사'} 실적`;
-    document.getElementById('kpiCap').textContent = `${now.getMonth()+1}월 ${pc ? '측정' : '검사'} 실적`;
-    document.getElementById('sumBox3').classList.toggle('acc', !pc && qiUrgent.length > 0);
-    if (pc){ set(1,'이번 달 완료',pcDoneMonth); set(2,'올해 누적',pcDoneYear); set(3,'진행 중',pcIncomplete.length); }
-    else { set(1,'이번 달 완료',qiDoneMonth); set(2,'올해 누적',qiDoneYear); set(3,'미완료',qiMonthPending.length); }
+  function renderCap(){
+    document.getElementById('kpiCap').textContent = `${now.getMonth()+1}월 ${currentDept === 'precision' ? '측정' : '검사'} 실적`;
   }
 
-  function buildRows(){
+  // ============================================================
+  //  [2026-10-16] 탭 정의 — 할 일(진행·미완료)을 앞에, 완료·이력을 뒤에
+  //  · rows: 카드 목록 · dl: 카드 날짜 앞 글자 · hot: 숫자를 빨간색으로 강조할지
+  // ============================================================
+  function shortDate(v){ const n = nd(v); return n ? n.slice(5).replace('-', '/') : (v || '-'); }
+  function row(o){ return Object.assign({ urgent:false, completed:false, late:false }, o); }
+  function buildTabs(){
     if (currentDept === 'precision'){
       return {
-        todo: pcRecentDone.map(r => ({
-          statusClass:'done', statusLabel:'완료', name: r.item||'(품명없음)', meta: r.customer||'-',
-          assignee: r.assignee||'-', date: r.completeDate||'-', dl:'완료일', urgent:false, completed:true })),
-        overdue: pcOpenSorted.map(r => ({
-          statusClass: r.urgent?'urgent':(r.dueDate && r.dueDate<today?'hold':'ing'), statusLabel: r.urgent?'긴급':(r.dueDate===today?'오늘예정':(r.dueDate && r.dueDate<today?'예정일 지남':'진행 중')),
-          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent: !!r.urgent, completed:false })),
-        done: pcLate.map(r => ({
-          statusClass:'hold', statusLabel:'예정일 지남', name: r.item||'(품명없음)',
-          meta: `${r.customer||'-'} · ${daysBetween(r.dueDate,today)}일 경과`, assignee: r.assignee||'-', date: r.dueDate||'-', urgent: !!r.urgent, completed:false })),
-        history: [...pcAll].sort((a,b)=>(b.dueDate||'').localeCompare(a.dueDate||'')).map(r => ({
-          statusClass: r.completeDate?'done':'hold', statusLabel: r.completeDate?'완료':'미완료',
-          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent:!!r.urgent, completed:!!r.completeDate }))
+        t1: { label:'진행 중', dl:'요청', empty:'진행 중인 측정이 없습니다 · 모두 완료',
+          rows: pcOpenSorted.map(r => row({
+            statusClass: r.urgent ? 'urgent' : (r.dueDate && r.dueDate < today ? 'hold' : 'ing'),
+            statusLabel: r.urgent ? '긴급' : (r.dueDate === today ? '오늘' : (r.dueDate && r.dueDate < today ? '지남' : '진행')),
+            name: r.item, meta: r.customer, assignee: r.assignee, date: r.dueDate, urgent: !!r.urgent, late: !!(r.dueDate && r.dueDate < today) })) },
+        t2: { label:'예정일 지남', dl:'요청', hot:true, empty:'예정일이 지난 건이 없습니다',
+          rows: pcLate.map(r => row({
+            statusClass:'hold', statusLabel: `${daysBetween(r.dueDate, today)}일`,
+            name: r.item, meta: r.customer, assignee: r.assignee, date: r.dueDate, urgent: !!r.urgent, late:true })) },
+        t3: { label:'최근 완료', dl:'완료', empty:'완료 기록이 없습니다',
+          rows: pcRecentDone.map(r => row({
+            statusClass:'done', statusLabel:'완료', name: r.item, meta: r.customer, assignee: r.assignee, date: r.completeDate, completed:true })) },
+        t4: { label:'전체 이력', dl:'요청', empty:'표시할 데이터가 없습니다',
+          rows: [...pcAll].sort((a,b)=>(b.dueDate||'').localeCompare(a.dueDate||'')).map(r => row({
+            statusClass: r.completeDate ? 'done' : 'hold', statusLabel: r.completeDate ? '완료' : '미완',
+            name: r.item, meta: r.customer, assignee: r.assignee, date: r.dueDate, urgent: !!r.urgent, completed: !!r.completeDate })) }
       };
     }
-    const vm = r => [r.customer, r.vendor].filter(Boolean).join(' · ') || '-';
+    const vm = r => [r.customer, r.vendor].filter(Boolean).join(' · ');
     return {
-      todo: qiTodayIn.map(r => ({
-        statusClass: qiComplete(r)?'done':'ing', statusLabel: qiComplete(r)?'완료':'미완료', name: r.item||'(품명없음)', meta: vm(r),
-        assignee: r.assignee||'-', date: r.receiveDate||'-', urgent: qiUrgent.includes(r), completed: qiComplete(r) })),
-      overdue: qiMonthPending.map(r => ({
-        statusClass:'hold', statusLabel:'미완료', name: r.item||'(품명없음)', meta: vm(r),
-        assignee: r.assignee||'-', date: r.receiveDate||'-', urgent: qiUrgent.includes(r), completed:false })),
-      done: qiWeekDone.map(r => ({
-        statusClass:'done', statusLabel:'완료', name: r.item||'(품명없음)', meta: vm(r),
-        assignee: r.assignee||'-', date: qiCompletedAt(r)||'-', urgent:false, completed:true })),
-      history: [...qiQms].sort((a,b)=>(b.receiveDate||'').localeCompare(a.receiveDate||'')).map(r => ({
-        statusClass: qiComplete(r)?'done':'hold', statusLabel: qiComplete(r)?'완료':'미완료', name: r.item||'(품명없음)',
-        meta: [r.partNo, r.customer, r.vendor].filter(Boolean).join(' · ') || '-', assignee: r.assignee||'-', date: r.receiveDate||'-',
-        urgent: qiMonthPending.includes(r) && qiUrgent.includes(r), completed: qiComplete(r) }))
+      t1: { label:'이번달 미완료', dl:'입고', hot: qiUrgent.length > 0, empty:'미완료 건이 없습니다',
+        rows: [...qiMonthPending].sort((a,b)=>(a.receiveDate||'').localeCompare(b.receiveDate||'')).map(r => row({
+          statusClass: qiUrgent.includes(r) ? 'urgent' : 'hold', statusLabel: qiUrgent.includes(r) ? `${daysBetween(r.receiveDate, today)}일` : '미완',
+          name: r.item, meta: vm(r), assignee: r.assignee, date: r.receiveDate, urgent: qiUrgent.includes(r), late: qiUrgent.includes(r) })) },
+      t2: { label:'오늘 입고', dl:'입고', empty:'오늘 입고된 건이 없습니다',
+        rows: qiTodayIn.map(r => row({
+          statusClass: qiComplete(r) ? 'done' : 'ing', statusLabel: qiComplete(r) ? '완료' : '대기',
+          name: r.item, meta: vm(r), assignee: r.assignee, date: r.receiveDate, urgent: qiUrgent.includes(r), completed: qiComplete(r) })) },
+      t3: { label:'이번주 완료', dl:'완료', empty:'이번 주 완료 건이 없습니다',
+        rows: qiWeekDone.map(r => row({
+          statusClass: qiIsNg(r) ? 'urgent' : 'done', statusLabel: qiIsNg(r) ? 'NG' : '완료',
+          name: r.item, meta: vm(r), assignee: r.assignee, date: qiCompletedAt(r), completed:true })) },
+      t4: { label:'최근 2개월', dl:'입고', empty:'표시할 데이터가 없습니다',
+        note:'수입검사는 최근 2개월(이번 달·지난달)만 보관합니다 · 이전 이력은 PC 수입검사 보고서에서 확인',
+        rows: [...qiQms].sort((a,b)=>(b.receiveDate||'').localeCompare(a.receiveDate||'')).map(r => row({
+          statusClass: qiComplete(r) ? (qiIsNg(r) ? 'urgent' : 'done') : 'hold', statusLabel: qiComplete(r) ? (qiIsNg(r) ? 'NG' : '완료') : '미완',
+          name: r.item, meta: [r.partNo, r.customer, r.vendor].filter(Boolean).join(' · '), assignee: r.assignee, date: r.receiveDate,
+          urgent: qiMonthPending.includes(r) && qiUrgent.includes(r), completed: qiComplete(r) })) }
     };
   }
 
-  function updateTabs(rowsByTab){
-    const labels = currentDept === 'precision'
-      ? { todo:'최근 완료', overdue:'진행 중', done:'예정일 지남', history:'전체 이력' }
-      : { todo:'오늘 입고', overdue:'이번달 미완료', done:'이번주 완료', history:'최근 2개월' };
+  function updateTabs(tabs){
     document.querySelectorAll('#tabHeader .tab').forEach(btn => {
-      const k = btn.dataset.tab;
-      btn.querySelector('.tl').textContent = labels[k];
-      document.getElementById('badge-'+k).textContent = rowsByTab[k].length;
+      const t = tabs[btn.dataset.tab];
+      btn.querySelector('.tl').textContent = t.label;
+      const b = document.getElementById('badge-' + btn.dataset.tab);
+      b.textContent = t.rows.length;
+      b.classList.toggle('hot', !!t.hot && t.rows.length > 0);
+      btn.classList.toggle('active', btn.dataset.tab === currentTab);
     });
   }
 
   function applyFilters(rows){
-    return rows.filter(r => {
-      if (statusFilter === 'pending' && r.completed) return false;
-      if (statusFilter === 'done' && !r.completed) return false;
-      if (prioFilter === 'urgent' && !r.urgent) return false;
-      if (prioFilter === 'normal' && r.urgent) return false;
-      return true;
-    });
+    if (prioFilter === 'urgent') return rows.filter(r => r.urgent);
+    if (prioFilter === 'normal') return rows.filter(r => !r.urgent);
+    return rows;
   }
 
   const MAX_ROWS = 40;
   function renderList(){
-    const rowsByTab = buildRows();
-    updateTabs(rowsByTab);
-    const all = applyFilters(rowsByTab[currentTab]);
+    const tabs = buildTabs();
+    updateTabs(tabs);
+    const tab = tabs[currentTab];
+    const all = applyFilters(tab.rows);
     const rows = all.slice(0, MAX_ROWS);
     const list = document.getElementById('list');
+    const note = tab.note ? `<div class="more-note">${esc(tab.note)}</div>` : '';
     if (!rows.length){
-      const msg = currentDept === 'precision' ? ({ todo:'완료 기록이 없습니다', overdue:'진행 중인 측정이 없습니다 · 모두 완료', done:'예정일이 지난 건이 없습니다', history:'표시할 데이터가 없습니다' })[currentTab] : '표시할 데이터가 없습니다.';
-      list.innerHTML = `<div class="empty">${msg}</div>`; return;
+      list.innerHTML = `<div class="empty">${prioFilter === 'all' ? tab.empty : '조건에 맞는 건이 없습니다'}</div>` + note; return;
     }
-    const dateLabel = currentDept === 'precision' ? (currentTab === 'todo' ? '완료일' : '완료요청일') : (currentTab === 'done' ? '완료일' : '입고일');
-    list.innerHTML = rows.map(r => `
-      <div class="item ${r.urgent?'urgent':''}">
-        <div class="item-top">
-          <span class="badge-st ${r.statusClass}">${esc(r.statusLabel)}</span>
-          <span class="prio ${r.urgent?'hi':''}">${r.urgent?'우선순위 높음':'우선순위 보통'}</span>
-        </div>
-        <div class="item-name">${esc(r.name)}</div>
-        <div class="item-meta">${esc(r.meta)}</div>
-        <div class="item-foot"><span>👤 ${esc(r.assignee)}</span><span>${dateLabel} ${esc(r.date)}</span></div>
-      </div>`).join('')
+    list.innerHTML = rows.map(r => {
+      const meta = [r.meta, r.assignee ? `👤 ${r.assignee}` : ''].filter(Boolean).join(' · ') || '-';
+      return `<div class="item ${r.urgent ? 'urgent' : ''}">
+        <div class="i1"><span class="badge-st ${r.statusClass}">${esc(r.statusLabel)}</span><span class="item-name">${esc(r.name || '(품명없음)')}</span></div>
+        <div class="i2"><span class="im">${esc(meta)}</span><span class="id ${r.late && !r.completed ? 'late' : ''}">${tab.dl} ${esc(shortDate(r.date))}</span></div>
+      </div>`;
+    }).join('')
       + (all.length > MAX_ROWS ? `<div class="more-note">최근 ${MAX_ROWS}건만 표시 (전체 ${all.length}건)</div>` : '')
-      + (currentDept !== 'precision' && currentTab === 'history' ? `<div class="more-note">수입검사는 최근 2개월(이번 달·지난달)만 보관합니다 · 이전 이력은 PC 수입검사 보고서에서 확인</div>` : '');
+      + note;
   }
 
-  function renderAll(){ renderKpi(); renderSummary(); renderPerf(); renderList(); }
-
+  function renderAll(){ renderUpd(); renderCap(); renderKpi(); renderPerf(); renderList(); }
 
 
   // ============================================================
   //  이벤트
   // ============================================================
-  function bindGroup(id, sel, onPick){
-    document.querySelectorAll(`#${id} ${sel}`).forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll(`#${id} ${sel}`).forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        onPick(btn);
-      });
-    });
+  function setActive(id, sel, attr, val){
+    document.querySelectorAll(`#${id} ${sel}`).forEach(b => b.classList.toggle('active', b.dataset[attr] === val));
   }
-  bindGroup('deptGroup','button', b => {
-    currentDept = b.dataset.dept; currentTab = 'todo'; perfSel = 5;
-    document.querySelectorAll('#tabHeader .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'todo'));
+  document.querySelectorAll('#deptGroup button').forEach(b => b.addEventListener('click', () => {
+    currentDept = b.dataset.dept; currentTab = 't1'; perfSel = 5;
+    setActive('deptGroup', 'button', 'dept', currentDept);
     renderAll();
-  });
-  bindGroup('statusGroup','.chip', b => { statusFilter = b.dataset.status; renderList(); });
-  bindGroup('prioGroup','.chip', b => { prioFilter = b.dataset.prio; renderList(); });
-  bindGroup('tabHeader','.tab', b => { currentTab = b.dataset.tab; renderList(); });
+  }));
+  document.querySelectorAll('#prioGroup .chip').forEach(b => b.addEventListener('click', () => {
+    prioFilter = b.dataset.prio; setActive('prioGroup', '.chip', 'prio', prioFilter); renderList();
+  }));
+  document.querySelectorAll('#tabHeader .tab').forEach(b => b.addEventListener('click', () => {
+    currentTab = b.dataset.tab; renderList();
+  }));
 
   // 챗봇 열기/닫기 (대화 로직은 chatbot-core.js, 처음 열 때 restartChat() 1회 호출)
   let chatInited = false;
@@ -803,21 +801,81 @@
     if (open && !chatInited){ chatInited = true; restartChat(); }
   }
 
-  renderAll();
+  // [2026-10-16] 스크롤하는 동안 챗봇 버튼을 내렸다가, 멈추면 다시 표시
+  let fabT = null;
+  window.addEventListener('scroll', () => {
+    const f = document.getElementById('chatFab'); f.classList.add('away');
+    clearTimeout(fabT); fabT = setTimeout(() => f.classList.remove('away'), 700);
+  }, { passive: true });
+
+  let toastT = null;
+  function toast(msg){
+    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200);
+  }
 
   // ============================================================
-  //  자동 새로고침 (60초) — 챗봇이 열려 있거나 화면이 백그라운드일 땐 건너뜀
+  //  [2026-10-16] 화면 상태 유지 — 새 데이터로 다시 열 때 부서·탭·필터·스크롤 위치 복원
   // ============================================================
-  const REFRESH_INTERVAL_MS = 60000;
-  window.__loadedAt = Date.now();
-  function refreshIfIdle(){
-    if (document.hidden) return;
-    if (document.getElementById('chatPanel').classList.contains('open')) return;
-    location.reload();
+  const STATE_KEY = 'mdash_state_v1';
+  function saveState(){
+    try { sessionStorage.setItem(STATE_KEY, JSON.stringify({ dept: currentDept, tab: currentTab, prio: prioFilter, y: window.scrollY, at: Date.now() })); } catch (e) {}
   }
-  setInterval(refreshIfIdle, REFRESH_INTERVAL_MS);
+  (function restoreState(){
+    let s = null;
+    // 바로 지우지 않음: 새 데이터를 풀 때 github-sync.js가 한 번 더 새로고침할 수 있어서 2분 동안 유지
+    try { s = JSON.parse(sessionStorage.getItem(STATE_KEY) || 'null'); } catch (e) {}
+    if (s && Date.now() - (s.at || 0) < 2 * 60 * 1000) {
+      if (s.dept === 'precision' || s.dept === 'inspection') currentDept = s.dept;
+      if (/^t[1-4]$/.test(s.tab)) currentTab = s.tab;
+      if (['all','urgent','normal'].includes(s.prio)) prioFilter = s.prio;
+      setActive('deptGroup', 'button', 'dept', currentDept);
+      setActive('prioGroup', '.chip', 'prio', prioFilter);
+    }
+    renderAll();
+    if (s && s.y) requestAnimationFrame(() => window.scrollTo(0, s.y));
+  })();
+
+  // ============================================================
+  //  [2026-10-16] 새 데이터 확인 (예전: 60초마다 무조건 새로고침)
+  //  · 데이터는 PC에서 엑셀을 올릴 때만 바뀜 → 10분마다(화면이 보일 때만) 파일 목록 1회 조회
+  //  · 파일이 바뀌었을 때만 화면 상태를 저장하고 다시 열기 · 오른쪽 위 ↻ 를 누르면 바로 확인
+  //  · GitHub 비로그인 조회 한도(IP당 시간당 60회)를 넘지 않게 하기 위함
+  // ============================================================
+  const CHECK_EVERY_MS = 10 * 60 * 1000;
+  let baseSig = null, lastCheck = Date.now(), checking = false;
+  async function dataSig(){
+    const c = window.GITHUB_CONFIG || {};
+    const url = `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${c.dataDir || 'data'}?ref=${encodeURIComponent(c.branch || 'main')}`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/vnd.github+json' }, cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const list = await res.json();
+    return list.filter(f => /^(measure|inspection)\.json$/.test(f.name)).map(f => f.name + ':' + f.sha).sort().join('|');
+  }
+  async function checkUpdate(manual){
+    if (checking) return;
+    if (!manual && (document.hidden || document.getElementById('chatPanel').classList.contains('open'))) return;
+    checking = true; lastCheck = Date.now();
+    const btn = document.getElementById('updBtn'); btn.classList.add('busy');
+    try {
+      const sig = await dataSig();
+      if (baseSig && sig !== baseSig) { saveState(); location.reload(); return; }
+      // 서버 연결 실패로 이전 데이터를 보던 중이면 → 연결이 되돌아왔으니 다시 열어 최신 반영
+      if (manual && !GITLAB_SYNC_OK) { saveState(); location.reload(); return; }
+      baseSig = sig;
+      if (manual) toast('최신 데이터입니다');
+    } catch (e) {
+      if (manual) toast('지금은 확인할 수 없습니다 · 잠시 후 다시 눌러주세요');
+    } finally {
+      checking = false; btn.classList.remove('busy');
+    }
+  }
+  document.getElementById('updBtn').addEventListener('click', () => checkUpdate(true));
+  // 처음 열 때 기준값 1회 저장 (화면 표시가 끝난 뒤)
+  if (GITLAB_SYNC_OK) setTimeout(() => checkUpdate(false), 1500);
+  setInterval(() => { if (Date.now() - lastCheck >= CHECK_EVERY_MS) checkUpdate(false); }, 60000);
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && Date.now() - window.__loadedAt > REFRESH_INTERVAL_MS) refreshIfIdle();
+    if (!document.hidden && Date.now() - lastCheck >= CHECK_EVERY_MS) checkUpdate(false);
   });
 </script>
 </body>
