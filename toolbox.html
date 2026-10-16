@@ -30,7 +30,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
         body { height: 100%; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; overflow: hidden; }
-
         header {
             position: relative; display: flex; align-items: center;
             background: linear-gradient(180deg, #0d1836 0%, #0b1636 100%);
@@ -47,55 +46,21 @@
         header .title { flex: 1; text-align: center; }
         header .title .t1 { font-size: 15.5px; font-weight: 900; color: #fff; }
         header .title .t2 { margin-top: 1px; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--gold); }
-
         .container { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .view { display: none; flex: 1; flex-direction: column; height: 100%; position: absolute; width: 100%; top: 0; left: 0; background: var(--bg-color); }
         .view.active { display: flex; }
         #home-view { overflow-y: auto; }
-
         .hub-wrap { max-width: 480px; margin: 0 auto; }
-
         .disclaimer-banner {
             margin: clamp(8px,2.5vw,12px) clamp(16px,5vw,24px) 0; padding: 6px 12px; border-radius: 10px;
             background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E;
             font-size: clamp(9.5px, 2.6vw, 11px); font-weight: 600; text-align: center;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .hub-grid { padding: clamp(10px,3vw,14px) clamp(16px,5vw,24px) 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(8px,2.5vw,10px); }
-        .hub-grid-wide { padding: 0 clamp(16px,5vw,24px); margin-top: 8px; }
-        .hub-section-label { padding: 10px clamp(16px,5vw,24px) 2px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.4px; color: #64748B; }
-        .hub-note { padding: 6px clamp(16px,5vw,24px) 8px; font-size: 11px; color: #94A3B8; font-weight: 600; text-align: center; }
-        .hub-card {
-            background: var(--card-bg); padding: 11px 14px; border-radius: 14px;
-            display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.1s; border: 1px solid #E2E8F0;
-        }
-        .hub-card:active { transform: scale(0.97); }
-        .hub-card .icon {
-            flex: none; width: 34px; height: 34px; border-radius: 10px;
-            background: linear-gradient(135deg, #0d1836, #17284f);
-            border: 1px solid rgba(224,176,96,.35);
-            display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
-        }
-        .hub-card h3 { font-size: 0.85rem; color: #1E293B; line-height: 1.2; }
-        .hub-card-wide {
-            padding: 12px 16px; display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center;
-            border: 1px solid rgba(224,176,96,.5);
-            background: linear-gradient(135deg, #fffdf7, #ffffff);
-            position: relative; overflow: hidden;
-        }
-        .hub-card-wide::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--gold), #f3dca8);
-        }
-        .hub-card-wide .icon { width: 34px; height: 34px; font-size: 1.1rem; }
-        .hub-card-wide h3 { font-size: 0.9rem; color: #1E293B; }
         .hub-banner { padding: 2px clamp(16px,5vw,24px) 16px; }
         .hub-banner img { width: 100%; display: block; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-
         .sub-header { display: flex; align-items: center; padding: 12px 16px; background: white; border-bottom: 1px solid #E2E8F0; z-index: 10; flex-shrink: 0; }
         .back-btn { background: none; border: none; font-size: 1rem; font-weight: bold; color: #3B82F6; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-
         /* 자 모드 */
         .ruler-container { flex: 1; display: flex; background: white; position: relative; overflow: hidden; user-select: none; }
         .ruler-edge { width: 50px; height: 100%; background: #FEF3C7; border-right: 2px solid #D97706; position: relative; flex-shrink: 0; }
@@ -112,7 +77,6 @@
         .cal-box { background: #F1F5F9; padding: 12px; border-radius: 8px; width: 100%; max-width: 260px; margin-bottom: 12px; }
         .cal-box label { font-size: 0.75rem; font-weight: bold; }
         .cal-box input { width: 100%; margin-top: 8px; }
-
         .calib-toggle-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
         .mini-btn { flex: 1 1 auto; min-width: 84px; background: white; border: 1px solid #CBD5E1; color: #334155; font-size: 0.68rem; font-weight: bold; padding: 7px 6px; border-radius: 6px; cursor: pointer; }
         .mini-btn.ghost { flex: 0 0 auto; padding: 7px 10px; color: #94A3B8; }
@@ -125,10 +89,8 @@
         .direct-calib-field { display: flex; flex-direction: column; gap: 2px; }
         .direct-calib-field label { font-size: 0.68rem; color: #64748B; }
         .direct-calib-field input { width: 100%; padding: 6px 8px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: white; }
-
         .calib-ref-line { position: absolute; right: 0; width: 26px; border-top: 3px solid #EF4444; z-index: 5; }
         .calib-ref-line span { position: absolute; right: 30px; top: -9px; font-size: 9px; font-weight: bold; color: #EF4444; white-space: nowrap; }
-
         /* 판정(Go/No-Go) 패널 - 공통 */
         .verdict-panel { background: #F1F5F9; border-radius: 8px; padding: 12px; width: 100%; max-width: 260px; margin-bottom: 12px; text-align: left; }
         .verdict-panel h4 { font-size: 0.8rem; font-weight: bold; color: #1E293B; margin-bottom: 8px; }
@@ -136,51 +98,20 @@
         .verdict-field { display: flex; flex-direction: column; gap: 2px; }
         .verdict-field label { font-size: 0.68rem; color: #64748B; }
         .verdict-field input { width: 100%; padding: 6px 8px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: white; }
-        .verdict-range { font-size: 0.7rem; color: #64748B; margin-bottom: 6px; min-height: 14px; }
-        .verdict-result { padding: 10px; border-radius: 8px; text-align: center; font-weight: 800; font-size: 0.95rem; background: #E2E8F0; color: #64748B; transition: background .15s, color .15s; }
-        .verdict-result.pass { background: #D1FAE5; color: #065F46; }
-        .verdict-result.fail { background: #FEE2E2; color: #991B1B; }
-
-        .level-container .verdict-panel { background: #1E293B; }
-        .level-container .verdict-panel h4 { color: #E2E8F0; }
-        .level-container .verdict-field label { color: #94A3B8; }
-        .level-container .verdict-field input { background: #0F172A; border-color: #334155; color: white; }
-
         /* 메모 입력 */
-        .memo-box { width: 100%; max-width: 260px; margin-bottom: 12px; }
-        .memo-box label { font-size: 0.7rem; color: #64748B; display: block; margin-bottom: 4px; text-align: left; }
-        .memo-box input { width: 100%; padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: white; }
-        .level-container .memo-box label { color: #94A3B8; }
-        .level-container .memo-box input { background: #1E293B; border-color: #334155; color: white; }
-
         /* 캡처 버튼 */
         .capture-btn { position: absolute; right: 16px; bottom: max(16px, env(safe-area-inset-bottom, 16px)); width: 52px; height: 52px; border-radius: 50%; border: none; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; z-index: 20; }
         .capture-btn.light { background: var(--primary-color); color: white; }
-        .capture-btn.dark { background: #F8FAFC; color: var(--primary-color); }
         .capture-btn:active { transform: scale(0.93); }
         .capture-btn[disabled] { opacity: 0.6; cursor: default; }
-
         .toast { position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom, 24px)); transform: translate(-50%, 12px); background: rgba(15,23,42,0.92); color: white; padding: 10px 18px; border-radius: 20px; font-size: 0.85rem; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 100; }
         .toast.show { opacity: 1; transform: translate(-50%, 0); }
-
         /* 각도기/수평계 */
-        .level-container { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 20px; background: #0F172A; color: white; transition: background 0.3s; position: relative; overflow-y: auto; }
-        .level-container.passed { background: #065F46; }
         .angle-display { font-size: 3.2rem; font-weight: 800; margin-top: 12px; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
         .angle-status { font-size: 1.05rem; margin-bottom: 20px; color: #94A3B8; }
         .level-btn { background: #3B82F6; color: white; border: none; padding: 14px 32px; border-radius: 30px; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); margin-bottom: 16px; }
         .level-btn:active { transform: scale(0.95); }
-
         /* 어두운 컨테이너(각도기/조도계) 안의 보정 박스·버튼 다크 스타일 */
-        .level-container .cal-box { background: #1E293B; }
-        .level-container .cal-box label { color: #E2E8F0; }
-        .level-container .direct-calib-field label { color: #94A3B8; }
-        .level-container .direct-calib-field input,
-        .level-container .cal-box input[type="number"] { background: #0F172A; border-color: #334155; color: white; }
-        .level-container .mini-btn { background: #0F172A; border-color: #334155; color: #E2E8F0; }
-        .level-container .mini-btn.ghost { color: #94A3B8; }
-        .level-container .mini-btn.done { background: var(--accent-color); border-color: var(--accent-color); color: white; }
-
         /* 📐 측정기 화면 내 각도기 레이어(스마트자는 항상 유지, 각도기는 추가 레이어) */
         .angle-card { display: none; width: 100%; max-width: 260px; background: #0F172A; border-radius: 14px; padding: 16px; margin-bottom: 12px; color: white; text-align: center; transition: background .3s; }
         .angle-card.show { display: block; }
@@ -191,20 +122,7 @@
         .angle-card .verdict-panel h4 { color: #E2E8F0; }
         .angle-card .verdict-field label { color: #94A3B8; }
         .angle-card .verdict-field input { background: #0F172A; border-color: #334155; color: white; }
-
         /* ⏱️ 사이클타임 스톱워치 */
-        .timer-display { font-size: 2.6rem; font-weight: 900; font-variant-numeric: tabular-nums; color: #0F172A; margin: 8px 0 14px; }
-        .timer-btn-row { display: flex; gap: 6px; width: 100%; max-width: 260px; margin-bottom: 12px; }
-        .timer-btn-row .mini-btn { padding: 12px 6px; font-size: 0.78rem; }
-        .lap-summary { width: 100%; max-width: 260px; font-size: 0.72rem; color: #64748B; margin-bottom: 6px; text-align: left; min-height: 14px; }
-        .lap-list { width: 100%; max-width: 260px; max-height: 180px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 12px; }
-        .lap-item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 10px; font-size: 0.78rem; border-bottom: 1px solid #F1F5F9; }
-        .lap-item:last-child { border-bottom: none; }
-        .lap-item .lap-row1 { display: flex; justify-content: space-between; width: 100%; font-weight: 700; color: #334155; }
-        .lap-item .lap-memo { font-size: 0.7rem; color: #64748B; text-align: left; }
-        .lap-item.pass .lap-row1 { color: #065F46; }
-        .lap-item.fail .lap-row1 { color: #991B1B; }
-
         /* 구간 기록 메모 시트 */
         .lap-sheet-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 49; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
         .lap-sheet-backdrop.show { opacity: 1; pointer-events: auto; }
@@ -216,61 +134,19 @@
         }
         .lap-sheet.show { transform: translateY(0); }
         .lap-sheet-title { font-size: 0.95rem; font-weight: 800; color: var(--primary-color); margin-bottom: 4px; }
-        .lap-sheet-time { font-size: 0.78rem; color: #64748B; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
-        .lap-sheet-field { margin-bottom: 16px; }
-        .lap-sheet-field label { font-size: 0.72rem; color: #64748B; display: block; margin-bottom: 6px; }
-        .lap-sheet-field input { width: 100%; padding: 11px 12px; border: 1px solid #CBD5E1; border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
-        .lap-sheet-field input:focus { outline: none; border-color: var(--gold); }
-        .lap-sheet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .lap-sheet-actions .mini-btn { width: 100%; padding: 12px 6px; font-size: 0.82rem; margin-top: 0; }
-
         /* 📝 품질 메모장 (.qm- 접두사, localStorage 저장) */
         .qm-scroll { flex: 1; overflow-y: auto; background: #F1F5F9; padding: 12px 12px calc(70px + env(safe-area-inset-bottom,0px)); }
         .qm-wrap { max-width: 480px; margin: 0 auto; }
-        .qm-input-card { background: white; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
-        .qm-cat-row { display: flex; gap: 6px; margin-bottom: 12px; }
-        .qm-cat { flex: 1; background: #F1F5F9; border: 1px solid #E2E8F0; color: #334155; font-size: 0.72rem; font-weight: 700; padding: 9px 4px; border-radius: 10px; text-align: center; }
-        .qm-cat.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
-        .qm-field { margin-bottom: 10px; }
-        .qm-field label { display: block; font-size: 0.7rem; color: #64748B; margin-bottom: 4px; }
-        .qm-field input, .qm-field textarea, .qm-field select { width: 100%; padding: 9px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical; background: white; }
-        .qm-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.85rem; }
-        .qm-btn.primary { background: var(--accent-color); color: white; }
-
-        .qm-list-head { margin-bottom: 10px; }
-        .qm-list-head input { width: 100%; padding: 9px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; margin-bottom: 8px; background: white; }
-        .qm-filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
-        .qm-chip { background: white; border: 1px solid #E2E8F0; color: #64748B; font-size: 0.7rem; font-weight: 700; padding: 6px 12px; border-radius: 20px; }
-        .qm-chip.on { background: var(--gold); border-color: var(--gold); color: #1a1206; }
-
-        .qm-item { background: white; border: 1px solid #E2E8F0; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-        .qm-item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
-        .qm-badge { font-size: 0.64rem; font-weight: 800; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
-        .qm-badge.defect { background: #FEE2E2; color: #991B1B; }
-        .qm-badge.cmm { background: #DBEAFE; color: #1E40AF; }
-        .qm-badge.etc { background: #F1F5F9; color: #475569; }
-        .qm-item-time { font-size: 0.66rem; color: #94A3B8; margin-left: auto; }
-        .qm-item-part { font-size: 0.76rem; font-weight: 700; color: #1E293B; margin-bottom: 4px; }
-        .qm-item-content { font-size: 0.8rem; color: #334155; line-height: 1.5; white-space: pre-wrap; margin-bottom: 8px; }
-        .qm-item-del { background: none; border: none; color: #EF4444; font-size: 0.7rem; font-weight: 700; padding: 0; }
-        .qm-empty { text-align: center; color: #94A3B8; font-size: 0.8rem; padding: 30px 0; }
-
         /* 🦾 CMM 프로브 교육 시뮬레이터 (.pe- 접두사로 스코프 처리) */
-        .hub-grid-wide-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(8px,2.5vw,10px); }
-        .hub-grid-wide-2 .hub-card-wide { flex-direction: column; gap: 6px; padding: 12px 8px; }
-        .hub-grid-wide-2 .hub-card-wide h3 { font-size: 0.76rem; line-height: 1.25; }
-
         .pe-scroll { flex: 1; overflow-y: auto; background: #F1F5F9; padding: 12px 12px calc(20px + env(safe-area-inset-bottom,0px)); }
         .pe-wrap { max-width: 480px; margin: 0 auto; }
         .pe-tabbar { display: flex; gap: 6px; margin: 2px 0 12px; }
         .pe-tbtn { flex: 1; background: white; border: 1px solid #E2E8F0; color: #64748B; font-size: 0.72rem; font-weight: 700; padding: 9px 4px; border-radius: 10px; text-align: center; }
         .pe-tbtn.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
-
         .pe-canvas-card { background: #0b1636; border-radius: 16px; padding: 10px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.15); }
         .pe-viewport-head { color: #93c5fd; font-size: 0.74rem; font-weight: 700; text-align: center; margin-bottom: 6px; }
         .pe-canvas-card canvas { width: 100%; height: 260px; display: block; border-radius: 10px; background: #0f172a; }
         .pe-legend { margin-top: 8px; font-size: 0.72rem; color: #CBD5E1; line-height: 1.5; font-family: monospace; white-space: pre-line; }
-
         .pe-card { background: white; border-radius: 14px; padding: 14px; margin-bottom: 12px; border: 1px solid #E2E8F0; }
         .pe-card h2 { font-size: 0.82rem; color: #1E293B; margin-bottom: 10px; }
         .pe-chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -285,7 +161,6 @@
         .pe-angle-grid button.zero { grid-column: 1 / -1; background: #EFF6FF; border-color: #93C5FD; color: #1E3A8A; font-weight: 800; }
         .pe-angle-grid button.on { background: var(--gold); border-color: var(--gold); color: #1a1206; }
         .pe-angle-grid button.zero.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
-
         .pe-slider-row { display: flex; justify-content: space-between; font-size: 0.76rem; font-weight: 700; color: #334155; margin-bottom: 4px; }
         .pe-slider-row .v { font-family: monospace; background: #F1F5F9; padding: 2px 8px; border-radius: 6px; }
         .pe-field { margin-bottom: 14px; }
@@ -295,16 +170,12 @@
         .pe-badge.ok { background: #D1FAE5; color: #065F46; }
         .pe-badge.warn { background: #FEF3C7; color: #92400E; }
         .pe-mapbox { background: #F1F5F9; border-radius: 10px; padding: 8px 10px; font-size: 0.72rem; color: #1E3A8A; font-family: monospace; }
-
         .pe-fold { width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; padding: 0; font-size: 0.82rem; font-weight: 800; color: #1E293B; font-family: inherit; }
         .pe-fold b { margin-left: 6px; color: #9a6b1f; font-weight: 900; }
         .pe-fold span:last-child { font-size: 0.72rem; font-weight: 800; color: #64748B; background: #F1F5F9; border-radius: 8px; padding: 6px 10px; }
         .pe-legend-row { display: flex; align-items: center; gap: 8px; }
         .pe-legend-row .pe-legend { flex: 1; min-width: 0; font-size: 0.66rem; letter-spacing: -0.02em; }
         .pe-lcopy { flex: none; margin-top: 8px; border: none; border-radius: 9px; background: #e0b060; color: #1a1206; font-size: 0.9rem; padding: 6px 10px; }
-        .pe-ijk-out { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #0b1636; border-radius: 12px; padding: 10px 10px 10px 14px; }
-        .pe-ijk-out span { font-family: monospace; font-size: 1.02rem; font-weight: 800; color: #facc15; letter-spacing: .3px; }
-        .pe-ijk-out button { flex: none; border: none; border-radius: 9px; background: #e0b060; color: #1a1206; font-weight: 900; font-size: 0.74rem; padding: 8px 10px; }
         .pe-ijk-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; align-items: start; }
         .pe-ijk-sl .pe-field { margin-bottom: 10px; }
         .pe-ijk-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -335,26 +206,14 @@
         .pe-num-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .pe-num-field label { display: block; font-size: 0.7rem; color: #64748B; margin-bottom: 4px; }
         .pe-num-field input { width: 100%; padding: 9px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; }
-
         .pe-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.82rem; }
         .pe-btn.primary { background: var(--accent-color); color: white; }
         .pe-btn.outline { background: white; border: 1px solid #CBD5E1; color: #334155; margin-top: 8px; }
         .pe-btn-row { display: flex; gap: 8px; }
         .pe-btn-row .pe-btn { flex: 1; }
         .pe-btn[disabled] { opacity: 0.45; cursor: default; }
-
         /* 🧮 간이 측정 기록 */
-        #qrTable { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-bottom: 12px; }
-        #qrTable th { background: var(--primary-color); color: var(--gold); padding: 8px 4px; font-weight: 700; font-size: 0.72rem; }
-        #qrTable td { border: 1px solid #eef1f4; padding: 4px; text-align: center; background: white; }
-        #qrTable td input { width: 100%; padding: 6px 4px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.8rem; text-align: center; }
-        .qr-verdict.ok { color: #065F46; font-weight: 800; }
-        .qr-verdict.ng { color: #991B1B; font-weight: 800; }
-        .qr-del { background: none; border: none; color: #EF4444; font-weight: 800; font-size: 0.85rem; }
-
         /* 🔮 CMM 측정 납기 예측기 (기존 데스크톱 도구 이식, .cmm-view로 스코프 처리) */
-        .cmm-scroll { flex: 1; overflow-y: auto; background: #e9ecef; padding: 14px 10px calc(24px + env(safe-area-inset-bottom, 0px)); }
-        .cmm-wrap { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); overflow: hidden; padding: 18px 16px; }
         .cmm-view h1 { font-size: 1.3rem; font-weight: 700; color: #1e2a3e; margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .cmm-view h1 small { font-size: 0.72rem; font-weight: normal; background: #f1f3f5; padding: 5px 10px; border-radius: 40px; color: #2c3e66; }
         .cmm-view h3 { font-size: 0.92rem; margin: 0 0 14px 0; padding-left: 8px; border-left: 4px solid var(--gold); color: #1f3a4b; }
@@ -372,9 +231,6 @@
         .cmm-view .cmm-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
         .cmm-view .cmm-field:last-child { margin-bottom: 0; }
         .cmm-view .cmm-field label { font-size: 0.78rem; font-weight: 700; color: #64748b; }
-        .cmm-view .cmm-field-row { display: flex; gap: 8px; }
-        .cmm-view .cmm-field-row input { flex: 1; min-width: 0; }
-        .cmm-view .cmm-field-row button { flex: none; white-space: nowrap; }
         .cmm-view .cmm-field-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
         .cmm-view .cmm-field-row2:last-child { margin-bottom: 0; }
         .cmm-view .cmm-field-row2 .cmm-field { margin-bottom: 0; }
@@ -387,36 +243,17 @@
         .cmm-view .cmm-advanced[open] summary::after { content: '▴'; }
         .cmm-view .cmm-advanced-hint { font-size: 0.66rem; font-weight: 500; color: #94a3b8; }
         .cmm-view .cmm-advanced-body { padding: 2px 16px 16px; border-top: 1px solid #f1f3f5; padding-top: 14px; }
-        .cmm-view .item-table-wrapper { overflow-x: auto; margin: 14px 0 10px; -webkit-overflow-scrolling: touch; }
         .cmm-view table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 480px; }
         .cmm-view th { background: var(--primary-color); color: var(--gold); padding: 9px 6px; font-weight: 700; }
         .cmm-view td { border: 1px solid #eef1f4; padding: 6px 4px; vertical-align: middle; background: white; }
         .cmm-view input[type="text"], .cmm-view input[type="number"] { width: 100%; min-width: 56px; padding: 8px 8px; }
-        .cmm-view .action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; justify-content: space-between; align-items: center; }
-        .cmm-view .calc-btn { background: var(--accent-color); font-size: 0.95rem; padding: 13px 24px; border-radius: 14px; width: 100%; }
-        .cmm-view .calc-btn:active { background: #0d9868; }
-        .cmm-view .result-area { margin-top: 18px; background: #f8fafc; border-radius: 18px; padding: 14px; border: 1px solid #cbd5e1; }
-        .cmm-view .result-card { background: white; border-radius: 16px; padding: 14px 16px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .cmm-view .highlight-date { font-size: 1.15rem; font-weight: 800; color: var(--primary-color); background: #FBF3E4; display: inline-block; padding: 8px 16px; border-radius: 14px; margin: 6px 0; border: 1px solid rgba(224,176,96,.4); }
-        .cmm-view .stat-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
-        .cmm-view .stat-item { background: #f1f5f9; border-radius: 14px; padding: 10px 14px; flex: 1; min-width: 130px; font-size: 0.83rem; line-height: 1.6; }
-        .cmm-view .per-item-table th { background: var(--accent-color); color: white; }
         .cmm-view hr { margin: 16px 0; border-color: #e2e8f0; }
-        .cmm-view .machine-badge { background: #eff6ff; border-radius: 10px; padding: 3px 9px; font-size: 0.74rem; font-weight: 700; color: #1e40af; display: inline-block; }
-        .cmm-view .machine-badge-both { background: #fef3c7; border-radius: 10px; padding: 3px 9px; font-size: 0.74rem; font-weight: 700; color: #92400e; display: inline-block; }
         .cmm-view .overtime-group { margin-top: 8px; padding: 10px 10px; background: #f9f9fc; border-radius: 12px; }
         .cmm-view .overtime-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .cmm-view .overtime-item label { width: auto; min-width: 80px; font-size: 0.82rem; }
         .cmm-view .overtime-item input { width: 80px; }
-        .cmm-view .deadline-ok { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 12px; padding: 8px 16px; font-size: 0.95rem; font-weight: 800; margin-top: 6px; }
-        .cmm-view .deadline-warn { display: inline-block; background: #fee2e2; color: #991b1b; border-radius: 12px; padding: 8px 16px; font-size: 0.95rem; font-weight: 800; margin-top: 6px; animation: cmm-blink-warn 1.2s ease-in-out infinite; }
         @keyframes cmm-blink-warn { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        .cmm-view .workday-badge { display: inline-block; background: #ede9fe; color: #4c1d95; border-radius: 10px; padding: 6px 14px; font-size: 0.86rem; font-weight: 700; margin-top: 4px; }
-        .cmm-view .parallel-ok-badge { display: inline-block; background: #d1fae5; color: #065f46; border-radius: 10px; padding: 6px 14px; font-size: 0.8rem; font-weight: 700; }
         .cmm-view .section-label { font-size: 0.74rem; color: #64748b; margin-top: 4px; font-weight: 400; }
-        .cmm-view .split-option-box { margin-top: 10px; padding: 10px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; font-size: 0.82rem; color: #1e40af; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .cmm-view .split-option-box input[type="checkbox"] { width: auto; min-width: auto; padding: 0; accent-color: #2563eb; }
-
         /* ==========================================================
            📊 치수 판정 · ⏱️ 측정/선별 시간 (2026-09 개편, .tb- 접두사)
            - 누구나 바로 쓸 수 있게: 번호 순서, 큰 입력칸, 단위 표시, 즉시 결과
@@ -474,7 +311,6 @@
         .tb-item.ng { border-color: #FCA5A5; background: #FFF5F5; }
         .tb-item.ng .badge { background: #DC2626; color: #fff; }
         .tb-del { flex: none; border: none; background: none; color: #CBD5E1; font-size: 1.15rem; font-weight: 900; padding: 4px 6px; font-family: inherit; }
-        .tb-sum-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
         .tb-sum { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 4px; text-align: center; }
         .tb-sum .k { font-size: 0.72rem; font-weight: 800; color: #64748B; }
         .tb-sum .v { font-size: 1.2rem; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; }
@@ -490,7 +326,6 @@
         .tb-bar .tb-tick.top { top: -6px; color: #3B82F6; }
         .tb-ghost-btn { width: 100%; padding: 13px; border-radius: 12px; border: 1px solid #FCA5A5; background: #fff; color: #DC2626; font-weight: 800; font-size: 0.88rem; font-family: inherit; }
         .tb-ghost-btn.gray { border-color: #CBD5E1; color: #64748B; }
-
         /* ⏱️ 측정/선별 시간 */
         .tb-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #E2E8F0; padding: 4px; border-radius: 14px; margin-bottom: 12px; }
         .tb-tabs button { border: none; background: transparent; padding: 13px 4px; border-radius: 11px; font-size: 1rem; font-weight: 900; color: #64748B; font-family: inherit; }
@@ -519,14 +354,8 @@
         .tb-result.idle { background: #F1F5F9; }
         .tb-result.idle .k { color: #94A3B8; }
         .tb-result.idle .v { font-size: 0.95rem; color: #94A3B8; font-weight: 700; margin-top: 6px; }
-        .tb-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .tb-mini-result { margin-top: 10px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 12px; text-align: center; font-size: 0.84rem; color: #065F46; font-weight: 800; line-height: 1.45; }
-        .tb-mini-result b { display: block; font-size: 1.6rem; font-weight: 900; color: #047857; font-variant-numeric: tabular-nums; }
-        .tb-mini-result.idle { background: #F8FAFC; border-color: #E2E8F0; color: #94A3B8; }
         .tb-link-btn { width: 100%; margin-top: 12px; padding: 14px; border-radius: 12px; background: #FBF3E4; color: #7c5a1c; font-weight: 900; font-size: 0.92rem; border: 1px solid rgba(224,176,96,.6); font-family: inherit; }
-        .tb-sub { font-size: 0.86rem; font-weight: 900; color: #0F172A; margin: 16px 0 10px; padding-top: 14px; border-top: 1px dashed #E2E8F0; }
         .tb-rec-sum { margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-
         /* 📐 측정 소요시간 예측 (2026-09 개편, .cm- 접두사) */
         .tb-input.cm-sm { height: 52px; font-size: 1.05rem; padding: 0 12px; }
         .cm-now { flex: none; height: 52px; padding: 0 16px; border-radius: 12px; border: 2px solid var(--primary-color); background: #fff; color: var(--primary-color); font-weight: 900; font-size: 0.95rem; font-family: inherit; }
@@ -565,48 +394,10 @@
         .cm-res-item .n span { font-size: 0.76rem; font-weight: 700; color: #64748B; margin-left: 4px; }
         .cm-res-item .m { font-size: 0.76rem; color: #64748B; font-weight: 700; margin-top: 2px; }
         .cm-res-item .f { font-size: 1rem; font-weight: 900; color: #B91C1C; margin-top: 4px; font-variant-numeric: tabular-nums; }
-
         /* 📝 품질 기록 (2026-09 개편) */
-        .qm-seg3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #F1F5F9; padding: 4px; border-radius: 14px; margin-bottom: 8px; }
-        .qm-seg3 button { border: none; background: transparent; padding: 10px 4px; border-radius: 10px; font-size: 0.9rem; font-weight: 900; color: #64748B; line-height: 1.35; font-family: inherit; }
-        .qm-seg3 button.on { background: var(--primary-color); color: var(--gold); box-shadow: 0 2px 6px rgba(0,0,0,.15); }
-        .qm-goto-dim { width: 100%; margin-bottom: 14px; padding: 10px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #F8FAFC; color: #64748B; font-size: 0.8rem; font-weight: 700; font-family: inherit; }
-        .qm-goto-dim b { color: var(--primary-color); }
-        .qm-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 14px; }
-        .qm-type { padding: 12px 4px; border-radius: 10px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 0.84rem; font-weight: 800; color: #475569; font-family: inherit; }
-        .qm-type.on { background: #DC2626; border-color: #DC2626; color: #fff; }
-        .qm-ta { width: 100%; padding: 12px; border: 2px solid #CBD5E1; border-radius: 12px; font-size: 1rem; font-family: inherit; resize: vertical; margin-bottom: 12px; line-height: 1.5; }
-        .qm-ta:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
-        .qm-rate { color: #B91C1C !important; font-size: 0.86rem !important; }
-        .qm-rate b { font-size: 1.05rem; }
-        .qm-rate.warn { color: #92400E !important; }
-        #qmFormCard.editing { border: 2px solid var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.2); }
-        .qm-item.editing { border-color: var(--gold); }
-        .qm-item-types { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
-        .qm-item-types span { font-size: 0.72rem; font-weight: 800; background: #FEE2E2; color: #991B1B; padding: 3px 8px; border-radius: 999px; }
-        .qm-item-rate { font-size: 0.72rem; font-weight: 900; color: #B91C1C; background: #FEF2F2; border: 1px solid #FECACA; padding: 2px 8px; border-radius: 999px; }
-        .qm-item-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; border-top: 1px solid #F1F5F9; padding-top: 8px; }
-        .qm-item-actions button { padding: 9px 4px; border-radius: 9px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 0.78rem; font-weight: 800; color: #334155; font-family: inherit; }
-        .qm-item-actions button.del { color: #DC2626; border-color: #FECACA; background: #fff; }
         .qm-migrate { display: block; width: 100%; margin-top: 8px; padding: 9px; border-radius: 9px; border: 1px solid #F59E0B; background: #fff; color: #92400E; font-weight: 900; font-family: inherit; }
-        .qm-list-head input { height: 46px; font-size: 0.95rem; }
-        .qm-chip { font-size: 0.8rem; padding: 8px 12px; }
-
         /* 🏠 허브 (2026-09 개편, .hb- 접두사) */
         .hb { padding: 0 clamp(14px,4.5vw,20px); }
-        .hb-notice { margin: 10px 0 0; padding: 7px 10px; border-radius: 10px; background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E; font-size: 11px; font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hb-sched { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 12px 14px 12px 12px; border-radius: 16px; background: #fff; border: 1px solid #E2E8F0; box-shadow: 0 4px 10px -4px rgba(15,23,42,.12); text-decoration: none; transition: transform .1s; }
-        .hb-sched:active { transform: scale(.98); }
-        .hb-date { flex: none; width: 48px; border-radius: 12px; overflow: hidden; background: var(--primary-color); text-align: center; box-shadow: inset 0 0 0 1px rgba(224,176,96,.35); }
-        .hb-date .m { font-size: 9.5px; font-weight: 800; color: var(--gold); padding-top: 5px; }
-        .hb-date .d { font-size: 20px; font-weight: 900; color: #fff; line-height: 1.05; }
-        .hb-date .w { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,.6); padding-bottom: 5px; }
-        .hb-sched-txt { flex: 1; min-width: 0; }
-        .hb-sched-txt .t { font-size: 0.95rem; font-weight: 900; color: #0F172A; display: flex; align-items: center; gap: 6px; }
-        .hb-sched-txt .cnt { font-size: 10px; font-weight: 800; color: var(--primary-color); background: #FBF3E4; border: 1px solid rgba(224,176,96,.55); border-radius: 999px; padding: 1px 7px; }
-        .hb-sched-txt .s { margin-top: 3px; font-size: 0.76rem; font-weight: 600; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hb-sched-txt .s b { color: #0F172A; font-weight: 800; }
-        .hb-sched .chev { flex: none; width: 18px; height: 18px; color: #94A3B8; }
         .hb-sec { margin: 16px 2px 7px; font-size: 0.72rem; font-weight: 800; letter-spacing: .5px; color: #64748B; display: flex; align-items: center; gap: 8px; }
         .hb-sec::after { content: ''; flex: 1; height: 1px; background: #E2E8F0; }
         .hb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -617,18 +408,8 @@
         .hb-card .tx { min-width: 0; }
         .hb-card .t { font-size: 0.86rem; font-weight: 900; color: #0F172A; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .hb-card .s { margin-top: 2px; font-size: 0.68rem; font-weight: 600; color: #64748B; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hb .hub-note { padding: 16px 0 8px; }
         .hb .hub-banner { padding: 2px 0 16px; }
-
         /* 🔍 5Why 버튼 (스케줄러 옆 · 2026-09-29) */
-        .hb-top { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; margin-top: 10px; }
-        .hb-top .hb-sched { margin-top: 0; min-width: 0; }
-        .hb-why { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 5px 4px; border-radius: 14px; background: #fff; border: 1px solid #E2E8F0; box-shadow: 0 4px 10px -4px rgba(15,23,42,.12); text-decoration: none; transition: transform .1s; }
-        .hb-why:active { transform: scale(.97); }
-        .hb-why .ic { width: 26px; height: 26px; border-radius: 8px; background: var(--primary-color); display: grid; place-items: center; box-shadow: inset 0 0 0 1px rgba(224,176,96,.3); }
-        .hb-why .ic svg { width: 15px; height: 15px; stroke: var(--gold); }
-        .hb-why .t { font-size: 0.78rem; font-weight: 900; color: #0F172A; white-space: nowrap; margin-top: 1px; line-height: 1.2; }
-        .hb-why .s { font-size: 0.62rem; font-weight: 700; color: #64748B; white-space: nowrap; line-height: 1.2; }
         /* 맨 윗줄 2개 (스케줄러 · 불량 보고) — 일반 카드와 같은 모양 */
         .hb-top2 { margin-top: 10px; }
         .hb .hb-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -639,20 +420,12 @@
         .hb-cal .d { font-size: 15px; font-weight: 900; color: #fff; line-height: 1; }
         .hb-cal .w { font-size: 9px; font-weight: 800; color: var(--gold); line-height: 1; }
         /* 📏 허브 압축 (2026-09-28) — 배너 2장까지 한 화면에 */
-        .hb-sched { margin-top: 10px; padding: 8px 12px 8px 9px; gap: 10px; border-radius: 14px; }
-        .hb-date { width: 42px; border-radius: 10px; }
-        .hb-date .m { font-size: 8.5px; padding-top: 3px; }
-        .hb-date .d { font-size: 17px; line-height: 1.1; }
-        .hb-date .w { font-size: 8.5px; padding-bottom: 3px; }
-        .hb-sched-txt .t { font-size: 0.92rem; }
-        .hb-sched-txt .s { margin-top: 2px; font-size: 0.74rem; }
         .hb-sec { margin: 10px 2px 6px; }
         .hb-card { min-height: 54px; padding: 8px 10px; gap: 9px; border-radius: 13px; }
         .hb-card .ic { width: 34px; height: 34px; border-radius: 10px; }
         .hb-card .ic svg { width: 17px; height: 17px; }
         .hb .hub-banner { padding: 12px 0 14px; }
         .hb .hub-banner img + img { margin-top: 8px !important; }
-
         /* ==========================================================
            📐 한눈에 보기 조정 (2026-09) — 기능은 그대로, 배치·크기만 압축
            기준: 390×844 화면에서 치수 판정 · 시간 재기 · 시간 계산은 스크롤 없이 보이게
@@ -689,7 +462,6 @@
         .tb-sum { padding: 6px 2px; border-radius: 10px; }
         .tb-sum .k { font-size: 0.66rem; }
         .tb-sum .v { font-size: 1rem; }
-
         /* 치수 판정 */
         .c-seg button { line-height: 1.2; }
         .c-inline { flex: 1; display: flex; gap: 6px; min-width: 0; }
@@ -716,7 +488,6 @@
         .c-list .tb-item .val { font-size: 1rem; }
         .c-list .tb-item .badge { padding: 4px 8px; font-size: 0.74rem; }
         .c-list:empty { display: none; }
-
         /* 📋 측정 기록지 (2026-09-29) — 여유·공차 사용률·한계 근접·공유·Cpk 연동 */
         .dm-meta { display: grid; grid-template-columns: 1fr 1.2fr; gap: 6px; margin-bottom: 8px; }
         .dm-meta input { width: 100%; min-width: 0; height: 38px; padding: 0 10px; border-radius: 10px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 0.84rem; font-weight: 700; color: #0F172A; font-family: inherit; }
@@ -736,7 +507,6 @@
         .dm-actions button { height: 44px; border-radius: 12px; border: 1px solid #E2E8F0; background: #fff; font-size: 0.86rem; font-weight: 800; color: #334155; font-family: inherit; }
         .dm-actions button.pri { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
         .dm-actions button:active { transform: scale(.97); }
-
         /* 시간 재기 */
         .c-timer { padding-top: 10px; }
         .c-qty { display: flex; align-items: center; gap: 8px; }
@@ -753,21 +523,10 @@
         .c-list .tb-rec-head .t { font-size: 1.15rem; }
         .c-list .tb-rec input { padding: 8px 10px; font-size: 0.88rem; }
         .c-reset { margin-left: 8px; border: 1px solid #FCA5A5; background: #fff; color: #DC2626; font-size: 0.74rem; font-weight: 800; padding: 5px 10px; border-radius: 999px; font-family: inherit; }
-        .c-btn2 { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-top: 8px; }
-        .c-btn2 .tb-ghost-btn { width: auto; padding: 11px 14px; }
-        .c-btn2 .tb-link-btn[style*="display: none"] + .tb-ghost-btn,
-        .c-btn2 .tb-link-btn[style*="display:none"] + .tb-ghost-btn { grid-column: 1 / -1; }
-
         /* 시간 계산 */
         .c-tc3 { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 6px; }
         .c-result .v { font-size: 1.7rem; }
         .c-result.idle .v { font-size: 0.86rem; margin-top: 2px; }
-        .c-tcrow { display: flex; align-items: center; gap: 6px; }
-        .c-tcrow .k { flex: none; width: 50px; font-size: 0.8rem; font-weight: 900; color: #475569; }
-        .c-tcrow .x { flex: none; font-weight: 900; color: #94A3B8; }
-        .c-mini { margin-top: 6px; padding: 8px 10px; font-size: 0.8rem; text-align: left; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; }
-        .c-mini b { display: inline; font-size: 1.2rem; margin-left: auto; }
-        .c-mini.idle { display: block; text-align: center; }
         /* [2026-10-07] 시간 계산 시인성 개선 */
         .c-lab label { display: block; min-width: 0; }
         .c-lab label > span { display: block; height: 18px; line-height: 18px; margin: 0 0 5px 2px; font-size: 0.76rem; font-weight: 900; color: #475569; letter-spacing: -.2px; white-space: nowrap; }
@@ -784,13 +543,7 @@
         .c-eta .end { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 9px 12px; border-radius: 12px; background: #0b1636; color: #fff; font-size: 0.86rem; font-weight: 800; }
         .c-eta .end b { margin-left: auto; font-size: 1.25rem; font-weight: 900; color: #e0b060; font-variant-numeric: tabular-nums; }
         .c-eta .s { margin-top: 8px; font-size: 0.8rem; font-weight: 800; color: #6b5427; line-height: 1.45; }
-
         /* 품질 기록 · 소요시간 예측: 스크롤 양 줄이기 */
-        .qm-seg3 button { padding: 7px 4px; font-size: 0.84rem; line-height: 1.25; }
-        .qm-goto-dim { margin-bottom: 10px; padding: 8px; }
-        .qm-types { gap: 5px; margin-bottom: 10px; }
-        .qm-type { padding: 9px 4px; font-size: 0.8rem; }
-        .qm-ta { padding: 9px 10px; font-size: 0.95rem; margin-bottom: 8px; }
         #qm-save-btn { height: 52px !important; font-size: 1.1rem !important; }
         .cm-item { padding: 10px; margin-bottom: 8px; }
         .cm-item .tb-label { margin-top: 8px !important; }
@@ -810,11 +563,9 @@
         .qx-tabs button.on .qx-cnt { background: var(--gold); color: #1a1206; }
         #memo-view .qx-scroll { padding: 12px 12px 24px; }
         #memo-view.qx-listmode .qx-scroll { padding-bottom: calc(84px + env(safe-area-inset-bottom,0px)); }
-
         .qx-editbar { display: none; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 10px 12px; border-radius: 12px; background: #FEF3C7; border: 1.5px solid var(--gold); color: #78350F; font-size: 0.9rem; font-weight: 900; }
         .qx-editbar button { border: none; background: #fff; color: #78350F; font-weight: 900; font-size: 0.82rem; padding: 6px 12px; border-radius: 8px; font-family: inherit; }
         #memo-view.qx-editing .qx-editbar { display: flex; }
-
         .qx-cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
         .qx-cats button { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 4px; border-radius: 12px; border: 1.5px solid #E2E8F0; background: #fff; color: #475569; font-size: 0.9rem; font-weight: 900; font-family: inherit; white-space: nowrap; }
         .qx-cats button svg { width: 18px; height: 18px; flex: none; }
@@ -823,7 +574,6 @@
         .qx-cats button.c-etc svg { color: var(--qx-etc); }
         .qx-cats button.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); box-shadow: 0 4px 10px -4px rgba(11,22,54,.55); }
         .qx-cats button.on svg { color: var(--gold); }
-
         .qx-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; box-shadow: 0 2px 8px -4px rgba(15,23,42,.1); }
         #memo-view.qx-editing .qx-card { border: 2px solid var(--gold); }
         .qx-l { display: flex; align-items: center; gap: 6px; margin: 14px 0 6px; font-size: 0.9rem; font-weight: 900; color: var(--qx-ink); }
@@ -836,11 +586,9 @@
         .qx-ta { padding: 11px 13px; line-height: 1.5; resize: vertical; font-weight: 600; display: block; }
         .qx-in::placeholder, .qx-ta::placeholder, .qx-qbox input::placeholder, .qx-search input::placeholder { color: #8391A7; font-weight: 600; opacity: 1; }
         .qx-in:focus, .qx-ta:focus, .qx-search input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
-
         .qx-types { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; }
         .qx-type { min-height: 44px; padding: 4px 2px; border-radius: 10px; border: 1.5px solid #D5DCE6; background: #fff; color: #1E293B; font-size: 0.8rem; font-weight: 800; line-height: 1.2; font-family: inherit; word-break: keep-all; }
         .qx-type.on { background: var(--qx-def); border-color: var(--qx-def); color: #fff; box-shadow: 0 3px 8px -3px rgba(220,38,38,.6); }
-
         .qx-qty { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) 92px; align-items: center; gap: 6px; }
         .qx-qbox { display: flex; align-items: center; height: 48px; border: 1.5px solid var(--qx-line); border-radius: 12px; padding: 0 10px; background: #fff; gap: 6px; }
         .qx-qbox:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
@@ -854,19 +602,16 @@
         .qx-ratebox.on b { color: var(--qx-def); }
         .qx-ratebox.warn { background: #FFFBEB; box-shadow: inset 0 0 0 1.5px #FDE68A; }
         .qx-ratebox.warn b { color: #B45309; font-size: 0.74rem; }
-
         .qx-del { display: none; width: 100%; margin-top: 10px; padding: 11px; border-radius: 12px; border: 1px solid #FECACA; background: #fff; color: #DC2626; font-weight: 900; font-size: 0.88rem; font-family: inherit; }
         #memo-view.qx-editing .qx-del { display: block; }
         .qx-dimlink { display: block; width: 100%; margin-top: 12px; padding: 6px; border: none; background: none; color: #64748B; font-size: 0.8rem; font-weight: 700; font-family: inherit; }
         .qx-dimlink b { color: var(--primary-color); }
-
         .qx-savebar { flex-shrink: 0; display: flex; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom,0px)); background: #fff; border-top: 1px solid #E2E8F0; box-shadow: 0 -6px 16px -10px rgba(15,23,42,.35); }
         #memo-view.qx-listmode .qx-savebar { display: none; }
         .qx-save { flex: 1; height: 54px; border: none; border-radius: 14px; background: linear-gradient(135deg, #FF7A2F, #FF5A0A); color: #fff; font-size: 1.12rem; font-weight: 900; font-family: inherit; box-shadow: 0 6px 14px -6px rgba(255,90,10,.7); }
         .qx-save:active, .qx-cats button:active, .qx-type:active, .qx-tabs button:active { transform: scale(.97); }
         .qx-cancel { display: none; flex: none; width: 88px; height: 54px; border: none; border-radius: 14px; background: #E2E8F0; color: #334155; font-size: 0.95rem; font-weight: 900; font-family: inherit; }
         #memo-view.qx-editing .qx-cancel { display: block; }
-
         .qx-search input { width: 100%; height: 46px; padding: 0 14px 0 40px; border: 1.5px solid var(--qx-line); border-radius: 12px; font-size: 0.95rem; font-weight: 700; color: var(--qx-ink); font-family: inherit; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.5' y2='16.5'/%3E%3C/svg%3E") no-repeat 13px center / 18px; }
         .qx-filters { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; margin: 8px 0 4px; }
         .qx-filters button { display: flex; align-items: center; justify-content: center; gap: 5px; height: 38px; border-radius: 10px; border: 1.5px solid #E2E8F0; background: #fff; color: #334155; font-size: 0.84rem; font-weight: 900; font-family: inherit; white-space: nowrap; }
@@ -874,7 +619,6 @@
         .qx-filters button em { font-style: normal; font-size: 0.74rem; color: #64748B; }
         .qx-filters button.on { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
         .qx-filters button.on em { color: var(--gold); }
-
         .qx-day { display: flex; align-items: center; gap: 8px; margin: 16px 2px 8px; font-size: 0.82rem; font-weight: 900; color: var(--qx-ink); }
         .qx-day small { font-size: 0.72rem; font-weight: 700; color: #64748B; }
         .qx-day::after { content: ''; flex: 1; height: 1px; background: #D5DCE6; }
@@ -968,7 +712,6 @@
         .cm-dock-calc { flex: none; height: 46px; padding: 0 14px; border: none; border-radius: 12px; background: var(--primary-color); color: var(--gold); font-weight: 900; font-size: 0.92rem; font-family: inherit; }
         #cmm-view .capture-btn.cm-dock-cap { position: static; flex: none; width: 46px; height: 46px; box-shadow: none; font-size: 1.15rem; }
         #cmm-view .qm-scroll { padding-bottom: 16px; }
-
         /* ==========================================================
            📷 측정 데이터 (2026-10 개편, .md- 접두사)
            측정기 화면 → 탭 3개: 데이터 읽기 | 화면 자 | 각도기
@@ -978,12 +721,8 @@
         .md-tabs button.on { background: var(--primary-color); color: var(--gold); }
         .md-pane { display: none; flex: 1; min-height: 0; flex-direction: column; position: relative; }
         .md-pane.on { display: flex; }
-        .md-seg3 { grid-template-columns: repeat(3, 1fr); }
-        .md-howto { font-size: 0.74rem; color: #64748B; font-weight: 600; line-height: 1.5; margin-bottom: 8px; }
-        .md-howto b { color: #0F172A; }
         .md-ta { width: 100%; min-height: 84px; border: 2px solid #CBD5E1; border-radius: 12px; padding: 10px 12px; font-size: 0.8rem; font-family: ui-monospace, Menlo, Consolas, monospace; resize: vertical; background: #fff; color: #0F172A; line-height: 1.45; }
         .md-ta:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,176,96,.25); }
-        .md-btnrow { display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; margin-top: 8px; }
         .md-btn { height: 44px; border-radius: 11px; border: 1px solid #CBD5E1; background: #fff; font-size: 0.86rem; font-weight: 900; color: #334155; font-family: inherit; cursor: pointer; }
         .md-btn.primary { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
         .md-btn.accent { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
@@ -994,26 +733,9 @@
         .md-chunk { display: inline-flex; align-items: center; gap: 6px; padding: 4px 4px 4px 10px; border-radius: 999px; background: #F1F5F9; border: 1px solid #E2E8F0; font-size: 0.74rem; font-weight: 800; color: #334155; }
         .md-chunk.zero { background: #FEF3C7; border-color: #FDE68A; color: #92400E; }
         .md-chunk button { border: none; background: rgba(15,23,42,.08); width: 22px; height: 22px; border-radius: 50%; font-size: 0.7rem; color: #64748B; font-family: inherit; }
-        .md-photos { display: flex; gap: 6px; align-items: center; margin-top: 10px; overflow-x: auto; padding-bottom: 2px; }
         .md-photo-btn { flex: none; display: inline-flex; align-items: center; gap: 4px; height: 44px; padding: 0 10px; border-radius: 10px; border: 1px dashed #CBD5E1; background: #F8FAFC; font-size: 0.76rem; font-weight: 800; color: #475569; cursor: pointer; }
         .md-photo-btn input { display: none; }
         .md-thumb { flex: none; width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid #E2E8F0; cursor: pointer; }
-        .md-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .md-cols label { font-size: 0.7rem; font-weight: 800; color: #64748B; display: block; margin-bottom: 3px; }
-        .md-cols select { width: 100%; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; background: #fff; font-size: 0.84rem; font-weight: 700; font-family: inherit; padding: 0 6px; color: #0F172A; }
-        .md-tol { display: flex; align-items: center; gap: 6px; }
-        .md-tol .k { flex: none; font-size: 0.8rem; font-weight: 900; color: #475569; margin-right: 2px; }
-        .md-tol .sg { flex: none; font-weight: 900; color: #64748B; font-size: 1rem; }
-        .md-tol input { flex: 1; min-width: 0; height: 40px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 10px; font-size: 0.92rem; font-weight: 800; font-family: inherit; font-variant-numeric: tabular-nums; background: #fff; color: #0F172A; }
-        .md-tol input:focus { outline: none; border-color: var(--gold); }
-        .md-subhint { font-size: 0.7rem; color: #94A3B8; font-weight: 600; margin: 5px 0 12px; line-height: 1.45; }
-        .md-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
-        .md-stat { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 6px 8px; min-width: 0; }
-        .md-stat .k { font-size: 0.64rem; font-weight: 800; color: #64748B; }
-        .md-stat .v { font-size: 0.96rem; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .md-dev-max { font-size: 0.74rem; font-weight: 700; color: #475569; margin-bottom: 10px; }
-        .md-dev-max:empty { display: none; }
-        .md-dev-max b { color: #0F172A; font-variant-numeric: tabular-nums; }
         .md-alerts { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
         .md-alerts:empty { display: none; }
         .md-alert { border-radius: 10px; padding: 8px 10px; font-size: 0.76rem; font-weight: 700; line-height: 1.45; }
@@ -1021,50 +743,28 @@
         .md-alert.warn { background: #FEF3C7; color: #92400E; }
         .md-alert.ng { background: #FEE2E2; color: #991B1B; }
         .md-alert.ok { background: #ECFDF5; color: #065F46; }
-        .md-filter { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
-        .md-filter button { border: 1px solid #E2E8F0; background: #fff; border-radius: 999px; padding: 5px 12px; font-size: 0.74rem; font-weight: 800; color: #64748B; font-family: inherit; }
-        .md-filter button.on { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
-        .md-filter .tip { margin-left: auto; font-size: 0.68rem; color: #94A3B8; font-weight: 600; }
         .md-table { border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; background: #fff; }
         .md-tr { display: grid; grid-template-columns: 34px minmax(0, 1fr) 76px 40px; align-items: center; gap: 4px; padding: 8px; border-top: 1px solid #F1F5F9; font-size: 0.78rem; font-variant-numeric: tabular-nums; }
         .md-tr:first-child { border-top: none; }
-        .md-tr.hd { background: #F8FAFC; font-size: 0.64rem; font-weight: 900; color: #64748B; padding: 6px 8px; }
-        .md-tr.hd span:nth-child(3) { text-align: right; }
-        .md-tr.hd span:last-child { text-align: center; }
         .md-tr .no { font-weight: 900; color: #0F172A; }
         .md-tr .it { color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; font-size: 0.74rem; }
         .md-tr .nm { text-align: right; font-weight: 800; color: #0F172A; }
         .md-tr .nm.dim { color: #94A3B8; font-weight: 700; }
         .md-tr .nm.bad { color: #B45309; background: #FDE68A; border-radius: 4px; padding: 0 2px; }
-        .md-tr .vd { text-align: center; font-size: 0.64rem; font-weight: 900; border-radius: 6px; padding: 2px 0; }
-        .md-tr .vd.ok { color: #065F46; background: #D1FAE5; }
-        .md-tr .vd.ng { color: #991B1B; background: #FEE2E2; }
-        .md-tr .vd.q { color: #92400E; background: #FEF3C7; }
-        .md-tr.ngrow { background: #FEF2F2; }
         .md-tr.qrow { background: #FFFBEB; }
         .md-tr.ed .no::after { content: '·'; color: var(--gold); margin-left: 1px; font-size: 1rem; }
         .md-tr[data-k] { cursor: pointer; }
         .md-tr[data-k]:active { background: #F1F5F9; }
-        .md-empty { padding: 22px 12px; text-align: center; color: #94A3B8; font-weight: 800; font-size: 0.82rem; line-height: 1.55; }
-        .md-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-        .md-copy .wide { grid-column: 1 / -1; }
         .md-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 0.7rem; color: #94A3B8; font-weight: 600; }
         .md-foot button { border: none; background: none; font-weight: 800; font-size: 0.74rem; font-family: inherit; padding: 4px 0; }
         .md-foot .reset { color: #EF4444; }
         .md-foot .restore { color: #3B82F6; }
-        .md-angle-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
-        .md-angle-wrap .angle-card { max-width: 320px; }
-        .md-angle-wrap .angle-card .angle-display { font-size: 2.8rem; }
-        .md-angle-hint { max-width: 320px; font-size: 0.74rem; color: #64748B; font-weight: 600; text-align: center; line-height: 1.5; }
         .md-sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
         .md-sheet-grid label { font-size: 0.68rem; font-weight: 800; color: #64748B; display: block; margin-bottom: 3px; }
         .md-sheet-grid input { width: 100%; height: 42px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 10px; font-size: 0.95rem; font-weight: 800; font-family: inherit; font-variant-numeric: tabular-nums; color: #0F172A; }
         .md-sheet-grid input:focus { outline: none; border-color: var(--gold); }
         .md-sheet-grid .full { grid-column: 1 / -1; }
-        .md-sheet-grid.gen .tool-only { display: none; }
         .md-sheet-note { font-size: 0.72rem; color: #92400E; background: #FEF3C7; border-radius: 8px; padding: 6px 9px; margin-bottom: 10px; font-weight: 700; display: none; }
-        .md-sheet-act { display: grid; grid-template-columns: auto 1fr 1fr; gap: 8px; }
-        .md-sheet-act .del { color: #DC2626; border-color: #FECACA; padding: 0 12px; }
         .md-viewer { position: fixed; inset: 0; background: #0B1220; z-index: 60; display: none; flex-direction: column; }
         .md-viewer.show { display: flex; }
         .md-viewer .bar { display: flex; align-items: center; gap: 6px; padding: calc(env(safe-area-inset-top) + 10px) 12px 10px; color: #fff; font-size: 0.82rem; font-weight: 800; }
@@ -1075,20 +775,10 @@
         .md-viewer.zoom img { width: 250%; max-width: none; }
         .md-viewer .foot { padding: 8px 12px calc(env(safe-area-inset-bottom) + 10px); color: #94A3B8; font-size: 0.72rem; text-align: center; font-weight: 600; }
         .md-tr .nm { font-size: 0.86rem; }
-        .md-calc { background: #F1F5F9; border-radius: 10px; padding: 9px 10px; margin-bottom: 12px; font-size: 0.76rem; color: #475569; font-weight: 700; line-height: 1.5; display: none; }
-        .md-calc b { color: #0F172A; font-variant-numeric: tabular-nums; }
-        .md-calc button { margin-top: 6px; width: 100%; height: 36px; border-radius: 9px; border: 1px solid var(--gold); background: #fffdf7; color: #7c5a17; font-weight: 900; font-size: 0.8rem; font-family: inherit; }
-
         /* 📏 실척 게이지 (.mg- 접두사) — 화면 자 보정값으로 실제 크기 표시 */
-        .mg-ws { padding: 10px 10px 24px; }
-        .mg-chips { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; width: 100%; background: #F1F5F9; padding: 3px; border-radius: 12px; margin-bottom: 12px; position: sticky; top: 0; z-index: 3; }
-        .mg-chips button { border: none; background: transparent; padding: 8px 0; border-radius: 9px; font-size: 0.76rem; font-weight: 900; color: #64748B; font-family: inherit; white-space: nowrap; }
-        .mg-chips button.on { background: var(--primary-color); color: var(--gold); }
         .mg-sec { display: none; width: 100%; flex-direction: column; align-items: center; }
         .mg-sec.on { display: flex; }
         .mg-sec .cal-box, .mg-sec .angle-card { max-width: 100%; }
-        .mg-lead { font-size: 0.76rem; color: #64748B; font-weight: 600; line-height: 1.5; margin-bottom: 10px; text-align: center; }
-        .mg-lead b { color: #0F172A; }
         .mg-row { display: flex; gap: 6px; align-items: center; width: 100%; margin-bottom: 8px; }
         .mg-row .k { flex: none; font-size: 0.74rem; font-weight: 900; color: #475569; }
         .mg-in { flex: 1; min-width: 0; height: 38px; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0 10px; font-size: 0.95rem; font-weight: 800; font-family: inherit; font-variant-numeric: tabular-nums; color: #0F172A; background: #fff; text-align: center; }
@@ -1115,21 +805,16 @@
         .mg-line span { flex: none; width: 54px; text-align: right; }
         .mg-line .l { background: #0F172A; flex: none; }
         .mg-board.inv .mg-line .l { background: #F8FAFC; }
-        .mg-line .tick-l { position: relative; height: 10px; flex: none; border-left: 1.5px solid #0F172A; border-right: 1.5px solid #0F172A; }
-        .mg-line .tick-l::after { content: ''; position: absolute; left: 0; right: 0; top: 4px; border-top: 1.5px solid #0F172A; }
-        .mg-board.inv .mg-line .tick-l, .mg-board.inv .mg-line .tick-l::after { border-color: #F8FAFC; }
         .mg-stage { position: relative; width: 100%; height: 250px; border-radius: 12px; border: 1px solid #E2E8F0; background: #fff; overflow: hidden; margin-bottom: 10px; }
         .mg-stage .cx, .mg-stage .cy { position: absolute; background: rgba(59,130,246,.35); }
         .mg-stage .cx { left: 0; right: 0; top: 50%; height: 1px; }
         .mg-stage .cy { top: 0; bottom: 0; left: 50%; width: 1px; }
         .mg-circle { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 1.5px solid #DC2626; background: rgba(220,38,38,.06); box-sizing: border-box; }
         .mg-circle.fill { background: #0F172A; border-color: #0F172A; }
-        .mg-big { font-size: 1.25rem; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; margin-bottom: 2px; }
         .mg-sub { font-size: 0.72rem; color: #64748B; font-weight: 700; margin-bottom: 10px; min-height: 1em; }
         .mg-sub.warn { color: #B45309; }
         .mg-presets { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 8px; }
         .mg-presets button { border: 1px solid #E2E8F0; background: #fff; border-radius: 999px; padding: 5px 10px; font-size: 0.74rem; font-weight: 800; color: #475569; font-family: inherit; }
-        .mg-range { width: 100%; margin-bottom: 10px; }
         .mg-cls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; width: 100%; background: #F1F5F9; padding: 3px; border-radius: 12px; margin-bottom: 8px; }
         .mg-cls button { border: none; background: transparent; padding: 6px 0 5px; border-radius: 9px; font-size: 0.9rem; font-weight: 900; color: #64748B; font-family: inherit; line-height: 1.15; }
         .mg-cls button small { display: block; font-size: 0.6rem; font-weight: 700; }
@@ -1138,13 +823,6 @@
         .mg-tolres .v { font-size: 1.3rem; font-weight: 900; color: #1E3A8A; font-variant-numeric: tabular-nums; }
         .mg-tolres .r { font-size: 0.78rem; font-weight: 800; color: #3B82F6; margin-top: 2px; font-variant-numeric: tabular-nums; }
         .mg-tolres.idle .v { color: #93C5FD; }
-        .mg-band { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .mg-band span { flex: none; width: 64px; text-align: right; font-size: 0.66rem; font-weight: 800; color: #475569; }
-        .mg-band .b { height: 26px; background: rgba(16,185,129,.25); border-left: 1.5px solid #059669; border-right: 1.5px solid #059669; flex: none; box-sizing: content-box; }
-        .mg-tbl { width: 100%; border-collapse: collapse; font-size: 0.74rem; font-variant-numeric: tabular-nums; margin-bottom: 8px; }
-        .mg-tbl td { padding: 5px 6px; border-top: 1px solid #F1F5F9; color: #334155; font-weight: 700; }
-        .mg-tbl td:last-child { text-align: right; font-weight: 900; color: #0F172A; }
-        .mg-tbl tr.on td { background: #FEF3C7; }
         .mg-note { width: 100%; font-size: 0.68rem; color: #94A3B8; font-weight: 600; line-height: 1.5; text-align: center; margin-top: 4px; }
         .mg-sec .angle-card .angle-display { font-size: 2.4rem; }
         /* 데이터 읽기 단순화 (2026-10) */
@@ -1153,8 +831,6 @@
         .md-paste { width: 100%; height: 64px; border: none; border-radius: 16px; background: var(--primary-color); color: var(--gold); font-size: 1.12rem; font-weight: 900; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 6px 16px -6px rgba(11,22,54,.45); cursor: pointer; }
         .md-paste svg { width: 24px; height: 24px; }
         .md-paste:active { transform: scale(.98); }
-        .md-go { display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px; }
-        .md-shoot input { display: none; }
         .mc-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 12px; }
         .mc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
         .mc-head b { font-size: 0.95rem; font-weight: 900; color: #0F172A; }
@@ -1259,7 +935,8 @@
         .st-sort-entry .ic { flex: none; width: 42px; height: 42px; border-radius: 12px; background: rgba(224,176,96,.16); display: grid; place-items: center; color: var(--gold); font-size: 1.05rem; font-weight: 900; letter-spacing: -1px; }
         .st-sort-entry .tx { flex: 1; min-width: 0; }
         .st-sort-entry .t, .st-sort-entry .s { display: block; }
-        body.sr-on .toast { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+        /* 선별 중엔 알림을 위쪽에 (아래 작은 칸을 가리지 않게) */
+        body.sr-on .toast { bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 112px); }
         .st-sort-entry .t { font-size: 1rem; font-weight: 900; color: var(--gold); }
         .st-sort-entry .s { margin-top: 2px; font-size: 0.76rem; font-weight: 600; color: #CBD5E1; }
         .st-sort-entry .go { flex: none; font-size: 1.2rem; color: var(--gold); }
@@ -1284,7 +961,6 @@
         .sr-bar { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 12px calc(env(safe-area-inset-bottom, 0px) + 10px); background: rgba(248,250,252,.96); border-top: 1px solid #E2E8F0; }
         .sr-start { width: 100%; height: 58px; border: none; border-radius: 16px; background: #10B981; color: #fff; font-size: 1.15rem; font-weight: 900; font-family: inherit; }
         .sr-start:active { transform: scale(.98); }
-
         #srRun { background: #0B1220; }
         .sr-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px 6px; color: #fff; }
         .sr-head .l { flex: 1; min-width: 0; }
@@ -1298,7 +974,9 @@
         .sr-last.hit { background: #1E3A5F; color: #fff; }
         .sr-last.hit b { color: var(--gold); font-size: 1.05rem; }
         .sr-last.undo { background: #3F2A12; color: #FDE68A; }
-        .sr-grid { flex: 1; min-height: 0; display: grid; gap: 8px; padding: 8px 12px; }
+        .sr-grid { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; padding: 8px 12px; }
+        .sr-main { flex: 4; min-height: 0; display: grid; gap: 8px; }
+        .sr-aux { flex: 1; min-height: 0; display: grid; gap: 8px; }
         .sr-btn { position: relative; overflow: hidden; border: none; border-radius: 18px; background: #16223A; color: #fff; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
         .sr-btn .fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--c); opacity: .28; transition: height .2s; pointer-events: none; }
         .sr-btn .edge { position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--c); pointer-events: none; }
@@ -1307,7 +985,14 @@
         .sr-btn .pc { position: relative; font-size: 0.74rem; font-weight: 800; color: #94A3B8; min-height: 1em; }
         .sr-btn.flash { animation: srFlash .35s ease-out; }
         @keyframes srFlash { 0% { box-shadow: inset 0 0 0 4px var(--c); transform: scale(.97); } 100% { box-shadow: inset 0 0 0 0 var(--c); transform: scale(1); } }
-        .sr-grid.c1 .sr-btn .ct { font-size: 3.4rem; }
+        .sr-grid.c1 .sr-main .sr-btn .ct { font-size: 3.4rem; }
+        /* 보조 줄: 선별 중 추가한 드문 불량 (작게) */
+        .sr-aux .sr-btn { border-radius: 14px; gap: 0; }
+        .sr-aux .sr-btn .nm { font-size: 0.8rem; max-width: 100%; padding: 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sr-aux .sr-btn .ct { font-size: 1.6rem; }
+        .sr-aux .sr-btn .pc { display: none; }
+        .sr-aux .sr-btn .edge { width: 4px; }
+        .sr-aux .sr-btn.isnew::after { top: 4px; right: 4px; padding: 1px 6px; font-size: 0.6rem; }
         .sr-foot { display: grid; grid-template-columns: 1fr 1.6fr 0.7fr 0.9fr; gap: 8px; padding: 4px 12px calc(env(safe-area-inset-bottom, 0px) + 10px); }
         .sr-foot > * { height: 56px; border-radius: 14px; border: 1px solid #334155; background: #111A2E; color: #E2E8F0; font-size: 0.9rem; font-weight: 900; font-family: inherit; display: flex; align-items: center; justify-content: center; }
         .sr-foot .box { background: #10B981; border-color: #10B981; color: #fff; }
@@ -1320,7 +1005,6 @@
         .sr-paused.show { display: flex; }
         .sr-paused b { font-size: 1.6rem; font-weight: 900; color: var(--gold); }
         .sr-paused span { font-size: 0.9rem; color: #CBD5E1; font-weight: 700; }
-
         .sr-qty .tb-step { margin-bottom: 8px; }
         .sr-sum { background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px; margin-bottom: 10px; }
         .sr-sum .big { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -1341,6 +1025,15 @@
         .sr-acts .pri { background: var(--primary-color); border-color: var(--primary-color); color: var(--gold); }
         .sr-acts .wide { grid-column: 1 / -1; }
         .sr-acts button.done { background: #D1FAE5; border-color: #A7F3D0; color: #065F46; }
+        /* 선별 중 '+ 다른 불량' (2026-10-16) */
+        .sr-lastrow { display: flex; gap: 8px; margin: 0 12px; }
+        .sr-lastrow .sr-last { flex: 1; min-width: 0; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sr-more { flex: none; padding: 0 12px; border-radius: 12px; border: 1px dashed #475569; background: transparent; color: var(--gold); font-size: 0.82rem; font-weight: 900; font-family: inherit; white-space: nowrap; }
+        .sr-more:active { transform: scale(.96); }
+        .sr-btn.isnew { box-shadow: inset 0 0 0 3px var(--gold); }
+        .sr-btn.isnew::after { content: '새 칸'; position: absolute; top: 8px; right: 10px; padding: 2px 8px; border-radius: 999px; background: var(--gold); color: #1a1206; font-size: 0.66rem; font-weight: 900; }
+        .sr-addlist { max-height: 34vh; overflow-y: auto; }
+        .sr-addclose { width: 100%; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -1738,17 +1431,6 @@
                 </div>
             </div>
 
-            <!-- 촬영 직후: 사진 크게 → 길게 눌러 글자 복사 → 돌아오면 자동 추가 -->
-            <div class="md-shotv" id="mdShotV">
-                <div class="tip" id="mdShotTip"><b>사진을 길게 누르기</b> → 텍스트 추출(또는 Google 렌즈) → <b>모두 선택 · 복사</b><br>복사하고 돌아오면 자동으로 정리됩니다</div>
-                <div class="stage"><img id="mdShotImg" alt="찍은 측정 화면"></div>
-                <div class="act">
-                    <label class="md-btn">다시 찍기<input type="file" accept="image/*" capture="environment" onchange="mdShot(this)"></label>
-                    <button type="button" class="md-btn accent" onclick="mdShotPaste()">복사했어요 · 붙여넣기</button>
-                    <button type="button" class="md-btn" onclick="mdShotClose()">닫기</button>
-                </div>
-            </div>
-
             <div class="md-viewer" id="mdViewer">
                 <div class="bar">
                     <button type="button" onclick="mdViewerMove(-1)">‹</button>
@@ -1894,7 +1576,10 @@
                         <button type="button" class="pz" id="srPauseBtn" onclick="srPause()">일시정지</button>
                     </div>
                 </div>
-                <div class="sr-last" id="srLast">불량이 나오면 해당 칸을 누르세요</div>
+                <div class="sr-lastrow">
+                    <div class="sr-last" id="srLast">불량이 나오면 해당 칸을 누르세요</div>
+                    <button type="button" class="sr-more" onclick="srOpenAdd()">＋ 다른 불량</button>
+                </div>
                 <div class="sr-grid" id="srGrid"></div>
                 <div class="sr-foot">
                     <button type="button" class="undo" onclick="srUndo()">↶ 취소</button>
@@ -1903,6 +1588,19 @@
                     <button type="button" class="end" onclick="srEnd()">끝</button>
                 </div>
                 <div class="sr-paused" id="srPaused" onclick="srPause()"><b>일시정지</b><span>누르면 다시 시작</span></div>
+
+                <!-- 선별 중 예상 못 한 불량 추가 -->
+                <div class="lap-sheet-backdrop" id="srAddBack" onclick="srCloseAdd()"></div>
+                <div class="lap-sheet" id="srAddSheet" role="dialog" aria-modal="true">
+                    <div class="lap-sheet-title">다른 불량 추가</div>
+                    <div class="sr-hint" id="srAddHint"></div>
+                    <div class="sr-types sr-addlist" id="srAddTypes"></div>
+                    <div class="sr-add">
+                        <input type="text" id="srAddIn" placeholder="목록에 없으면 직접 입력" autocomplete="off" onkeydown="if(event.key==='Enter'){srAddRunFromInput();}">
+                        <button type="button" onclick="srAddRunFromInput()">추가</button>
+                    </div>
+                    <button type="button" class="md-btn sr-addclose" onclick="srCloseAdd()">닫기</button>
+                </div>
             </div>
 
             <!-- ③ 결과 -->
@@ -2020,8 +1718,6 @@
                         </div>
                     </details>
                 </div>
-
-                <button type="button" id="calculateBtn" class="tb-big-btn" style="display:none;">📅 계산하기</button>
 
                 <div class="cmm-view">
                     <div id="resultArea"></div>
@@ -3101,25 +2797,10 @@
         }
 
         // ── 찍기 → 사진 크게 → 길게 눌러 글자 복사 → 앱으로 돌아오면 자동 추가 ──
-        let mdShotUrl = '', mdShotWaiting = false, mdLastClip = '';
-        function mdShot(input) {
-            const f = input.files && input.files[0];
-            input.value = '';
-            if (!f) return;
-            const url = URL.createObjectURL(f);
-            mdPhotos.push(url);            // 더보기 > 원본 사진에서 다시 볼 수 있게 (저장 안 함)
-            mdRenderPhotos();
-            mdShotUrl = url;
-            document.getElementById('mdShotImg').src = url;
-            const tip = document.getElementById('mdShotTip');
-            tip.classList.remove('ok');
-            tip.innerHTML = '<b>사진을 길게 누르기</b> → 텍스트 추출(또는 Google 렌즈) → <b>모두 선택 · 복사</b><br>복사하고 돌아오면 자동으로 정리됩니다';
-            document.getElementById('mdShotV').classList.add('show');
-            mdShotWaiting = true;
-        }
+        // ── AI 답 기다리는 중: 앱으로 돌아오면 클립보드 자동 확인 ──
+        let mdShotWaiting = false, mdLastClip = '';
         function mdShotClose() {
             mdShotWaiting = false;
-            document.getElementById('mdShotV').classList.remove('show');
             const w = document.getElementById('mdWait'); if (w) w.style.display = 'none';
         }
         // 클립보드에 측정 데이터처럼 보이는 새 글이 있으면 추가 (같은 글은 두 번 안 넣음)
@@ -3306,7 +2987,6 @@
             document.getElementById('mdSheet').classList.remove('show');
             document.getElementById('mdMoreSheet').classList.remove('show');
         }
-        function mdCloseSheet() { mdCloseSheets(); }
 
         // ── 줄 수정: 측정값 하나만, 계산값 있으면 큰 버튼으로 바로 교체 ──
         function mdOpenSheet(key) {
@@ -3857,7 +3537,6 @@
             const totalSec = min * 60 + sec;
 
             const res = $('tcResult');
-            const boxQtyIn = stPosInt($('tcBoxQty').value);
             $('tcBoxQty').placeholder = qty ? String(qty) : '박스당';
 
             if (!qty || totalSec <= 0) {
@@ -4000,7 +3679,6 @@
         const excludeSatCheck       = document.getElementById('excludeSat');
         const excludeSunCheck       = document.getElementById('excludeSun');
         const targetDeadlineInput   = document.getElementById('targetDeadline');
-        const calculateBtn          = document.getElementById('calculateBtn');
         const resultArea            = document.getElementById('resultArea');
         const nowBtn                = document.getElementById('nowBtn');
         const saveBtn               = document.getElementById('saveDataBtn');
@@ -4061,10 +3739,6 @@
             const min = Math.floor(m % 60);
             if (h === 0) return `${min}분`;
             return min ? `${h}시간 ${min}분` : `${h}시간`;
-        }
-        function formatDateTime(date) {
-            if (!date) return '오류';
-            return date.toLocaleString('ko-KR', { hour12: false });
         }
         function escapeHtml(str) {
             if (!str) return '';
@@ -4292,34 +3966,8 @@
             const perItemDetails  = scheduleResult.perItemResults;
             const splitMode       = scheduleResult.splitMode;
 
-            const dailyInfos = perMachineOvertimeHours.map(ot => {
-                const cap = getDailyAvailableMinutes(workStartMin, workEndMin, lunchStartMin, lunchEndMin, ot * 60);
-                return `${cap}분 (잔업 ${ot}h)`;
-            });
             const dailyCapMinutes = getDailyAvailableMinutes(workStartMin, workEndMin, lunchStartMin, lunchEndMin, (perMachineOvertimeHours[0] || 0) * 60);
             const estimatedDays   = dailyCapMinutes > 0 ? (totalRequiredSum / machineCount / dailyCapMinutes) : 0;
-
-            let deadlineHtml = '';
-            if (targetDeadlineStr) {
-                const deadlineDate = new Date(targetDeadlineStr);
-                deadlineDate.setHours(23,59,59,999);
-                const diffMs     = deadlineDate - finalFinishDate;
-                const absDiffMin = Math.abs(diffMs / 60000);
-                const dD = Math.floor(absDiffMin / (60*24));
-                const dH = Math.floor((absDiffMin % (60*24)) / 60);
-                const dM = Math.floor(absDiffMin % 60);
-                if (diffMs >= 0) {
-                    deadlineHtml = `<div style="margin-top:10px;">
-                        <div style="font-size:0.9rem;color:#374151;margin-bottom:4px;">🎯 목표 납기일 : <strong>${new Date(targetDeadlineStr).toLocaleDateString('ko-KR')}</strong></div>
-                        <span class="deadline-ok">✅ 납기 여유 : +${dD}일 ${dH}시간 ${dM}분</span>
-                    </div>`;
-                } else {
-                    deadlineHtml = `<div style="margin-top:10px;">
-                        <div style="font-size:0.9rem;color:#374151;margin-bottom:4px;">🎯 목표 납기일 : <strong>${new Date(targetDeadlineStr).toLocaleDateString('ko-KR')}</strong></div>
-                        <span class="deadline-warn">⚠️ 납기 초과 예상 : -${dD}일 ${dH}시간 ${dM}분</span>
-                    </div>`;
-                }
-            }
 
             // ── 결과 (2026-09 개편: 완료 예정일·납기 여부를 맨 위에 크게) ──
             const pad2 = n => String(n).padStart(2, '0');
@@ -4647,10 +4295,6 @@
             } catch (e) { alert('불러오기 오류: ' + e.message); }
         });
 
-        calculateBtn.addEventListener('click', () => {
-            performCalculation();
-        });
-
         let cmInitialized = false;
         let cmStartTouched = false;
         startDateTimeInput.addEventListener('input', () => { cmStartTouched = true; cmStartLabel(); cmDockLive(); });
@@ -4800,16 +4444,6 @@
         }
         function peStepA(d) { peCurrentAngleA = Math.max(0, Math.min(105, peCurrentAngleA + d * 7.5)); peSyncAB(); }
         function peStepB(d) { let b = peCurrentAngleB + d * 7.5; if (b > 180) b -= 360; if (b < -180) b += 360; if (b === -180) b = 180; peCurrentAngleB = b; peSyncAB(); }
-        function peResetProbeView() {
-            peCurrentAngleA = 0; peCurrentAngleB = 0; peSyncAB();
-        }
-
-        function peLerpHexColor(hex1, hex2, t) {
-            const h1 = parseInt(hex1.slice(1), 16), h2 = parseInt(hex2.slice(1), 16);
-            const r1 = (h1 >> 16) & 255, g1 = (h1 >> 8) & 255, b1 = h1 & 255;
-            const r2 = (h2 >> 16) & 255, g2 = (h2 >> 8) & 255, b2 = h2 & 255;
-            return `rgb(${Math.round(r1 + (r2 - r1) * t)}, ${Math.round(g1 + (g2 - g1) * t)}, ${Math.round(b1 + (b2 - b1) * t)})`;
-        }
         function peGetProbeDirectionLabel(aDeg, bDeg) {
             if (Math.abs(aDeg) < 1) return '→ 정반 방향으로 일자(수직) 상태';
             // 실기 기준: B=0 → 전방, B=90 → 우측(전방에서 시계방향 90°)
@@ -5638,16 +5272,24 @@
         const SR_KEY = 'tb_sort_v1', SR_HIST_KEY = 'tb_sort_hist_v1';
         const SR_COLORS = ['#F87171', '#60A5FA', '#FBBF24', '#34D399', '#A78BFA', '#F472B6', '#22D3EE', '#FB923C'];
         const SR_MAX = 8;
+        const SR_AUX = 3;   // 선별 중 추가 칸(보조 줄) 최대 개수 · 넘으면 '기타'로 모음
+        const SR_ETC = '기타', SR_ETC_C = '#94A3B8';
+        const srColor = (t, i) => t === SR_ETC ? SR_ETC_C : SR_COLORS[i % SR_COLORS.length];
+        // '기타' 칸에 모아 센 불량은 이름까지 붙여서 표시 → 기타(크랙 2, 변색 1)
+        function srLabel(t) {
+            const e = Object.entries(S.etc || {}).filter(([, n]) => n > 0);
+            return t === SR_ETC && e.length ? `${SR_ETC}(${e.map(([k, n]) => `${k} ${n}`).join(', ')})` : t;
+        }
         let S = null;
         let srPhotos = [];
         let srTick = null, srWakeLock = null, srLastT = null;
 
         function srBlank(keep) {
             return { stage: 'setup', part: keep ? keep.part : '', types: keep ? keep.types.slice() : [], custom: keep ? (keep.custom || []).slice() : [],
-                     box: keep ? keep.box : '', prodName: keep ? (keep.prodName || '') : '', counts: [], log: [], boxes: 0, startTs: 0, pausedMs: 0, pauseAt: 0, endTs: 0, total: '', qmId: null };
+                     box: keep ? keep.box : '', prodName: keep ? (keep.prodName || '') : '', counts: [], log: [], boxes: 0, startTs: 0, pausedMs: 0, pauseAt: 0, endTs: 0, total: '', qmId: null, etc: {}, added: [], mainN: 0 };
         }
         function srLoad() {
-            try { const s = JSON.parse(localStorage.getItem(SR_KEY) || 'null'); if (s && s.stage) return Object.assign(srBlank(), s); } catch (e) {}
+            try { const s = JSON.parse(localStorage.getItem(SR_KEY) || 'null'); if (s && s.stage) { const o = Object.assign(srBlank(), s); if (!s.mainN) o.mainN = Math.max(1, o.types.length - (o.added || []).length); return o; } } catch (e) {}
             return srBlank();
         }
         function srSave() { try { localStorage.setItem(SR_KEY, JSON.stringify(S)); } catch (e) {} }
@@ -5808,7 +5450,7 @@
             if (!S.types.length) { showToast('셀 불량 유형을 1개 이상 고르세요'); return; }
             S.stage = 'run';
             S.counts = S.types.map(() => 0);
-            S.log = []; S.boxes = 0; S.total = ''; S.qmId = null;
+            S.log = []; S.boxes = 0; S.total = ''; S.qmId = null; S.etc = {}; S.added = []; S.mainN = S.types.length;
             S.startTs = Date.now(); S.pausedMs = 0; S.pauseAt = 0; S.endTs = 0;
             srPhotos.forEach(p => URL.revokeObjectURL(p.url)); srPhotos = [];
             if (S.part) {
@@ -5822,15 +5464,19 @@
 
         // ── ② 선별 중 ──
         function srRenderRun(rebuild) {
-            const n = S.types.length;
+            const n = S.types.length, mainN = Math.min(n, S.mainN || n);
             const grid = document.getElementById('srGrid');
-            if (rebuild || grid.children.length !== n) {
-                const cols = n <= 2 ? 1 : 2, rows = Math.ceil(n / cols);
-                grid.className = 'sr-grid' + (n === 1 ? ' c1' : '');
-                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-                grid.innerHTML = S.types.map((t, i) =>
-                    `<button type="button" class="sr-btn" id="srB${i}" style="--c:${SR_COLORS[i % SR_COLORS.length]};${n % 2 === 1 && n > 2 && i === n - 1 ? 'grid-column: 1 / -1;' : ''}" onpointerdown="srHit(${i}, event)"><span class="fill"></span><span class="edge"></span><span class="nm">${qmEscapeHtml(t)}</span><span class="ct">0</span><span class="pc"></span></button>`).join('');
+            if (rebuild || grid.querySelectorAll('.sr-btn').length !== n) {
+                const btn = (t, i, extra) => `<button type="button" class="sr-btn" id="srB${i}" style="--c:${srColor(t, i)};${extra || ''}" onpointerdown="srHit(${i}, event)"><span class="fill"></span><span class="edge"></span><span class="nm">${qmEscapeHtml(t)}</span><span class="ct">0</span><span class="pc"></span></button>`;
+                // 주 영역(시작할 때 고른 유형, 약 80%) — 칸 위치는 추가해도 그대로
+                const cols = mainN <= 2 ? 1 : 2, rows = Math.ceil(mainN / cols);
+                let html = `<div class="sr-main" style="grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr);">`
+                    + S.types.slice(0, mainN).map((t, i) => btn(t, i, mainN % 2 === 1 && mainN > 2 && i === mainN - 1 ? 'grid-column: 1 / -1;' : '')).join('') + '</div>';
+                // 보조 줄(선별 중 추가한 유형, 약 20%)
+                const aux = S.types.slice(mainN);
+                if (aux.length) html += `<div class="sr-aux" style="grid-template-columns: repeat(${aux.length}, 1fr);">` + aux.map((t, k) => btn(t, mainN + k)).join('') + '</div>';
+                grid.className = 'sr-grid' + (mainN === 1 ? ' c1' : '');
+                grid.innerHTML = html;
                 document.getElementById('srRunPart').innerText = S.part || '품번 미입력';
             }
             const ng = srNg(), mx = Math.max(1, ...S.counts);
@@ -5880,9 +5526,73 @@
         function srUndo() {
             const last = S.log.pop();
             if (!last) { showToast('취소할 기록이 없습니다'); return; }
-            if (last.k === 'd') { S.counts[last.i] = Math.max(0, S.counts[last.i] - 1); srLast(`${qmEscapeHtml(S.types[last.i])} 1개 취소 → ${S.counts[last.i]}`, 'undo'); }
+            if (last.k === 'd') {
+                S.counts[last.i] = Math.max(0, S.counts[last.i] - 1);
+                if (last.x && S.etc && S.etc[last.x]) { S.etc[last.x]--; if (!S.etc[last.x]) delete S.etc[last.x]; }
+                srLast(`${qmEscapeHtml(last.x ? `${SR_ETC}(${last.x})` : S.types[last.i])} 1개 취소 → ${S.counts[last.i]}`, 'undo');
+            }
             else if (last.k === 'b') { S.boxes = Math.max(0, S.boxes - 1); srLast(`박스 1개 취소 → ${S.boxes}박스`, 'undo'); }
             srSave(); srBuzz([20, 60, 20]); srRenderRun(false);
+        }
+        // ── 선별 중 예상 못 한 불량: 칸 추가 + 바로 1개 (2026-10-16) ──
+        //  시작 때 고른 유형 = 주 영역(약 80%) · 선별 중 추가 = 아래 보조 줄(약 20%, 최대 3칸)
+        //  보조 3칸이 다 찼으면 → '기타' 칸(없으면 보조 줄 4번째로 만듦)에 모아 세고, 이름은 S.etc에 따로 남김
+        function srOpenAdd() {
+            if (S.pauseAt) { showToast('일시정지 중입니다 · 다시 시작 후 추가하세요'); return; }
+            const full = S.types.length - (S.mainN || S.types.length) >= SR_AUX;
+            const list = srTypeCatalog().all.filter(t => !S.types.includes(t) && t !== SR_ETC);
+            document.getElementById('srAddHint').innerText = full
+                ? `추가 칸 ${SR_AUX}개가 다 차서 '${SR_ETC}' 칸에 모아 셉니다 · 보고서엔 불량 이름까지 남습니다`
+                : '고르면 아래쪽에 작은 칸이 생기고 바로 1개가 세어집니다';
+            document.getElementById('srAddTypes').innerHTML = list.map(t =>
+                `<button type="button" data-t="${qmEscapeHtml(t)}" onclick="srAddRun(this.dataset.t)">${qmEscapeHtml(t)}</button>`).join('');
+            document.getElementById('srAddIn').value = '';
+            document.getElementById('srAddBack').classList.add('show');
+            document.getElementById('srAddSheet').classList.add('show');
+        }
+        function srCloseAdd() {
+            document.getElementById('srAddBack').classList.remove('show');
+            document.getElementById('srAddSheet').classList.remove('show');
+            const inp = document.getElementById('srAddIn'); if (inp) inp.blur();
+        }
+        function srAddRunFromInput() {
+            const t = document.getElementById('srAddIn').value.replace(/\s+/g, ' ').trim();
+            if (!t) { showToast('불량 이름을 입력하세요'); return; }
+            srAddRun(t);
+        }
+        function srAddRun(t) {
+            t = String(t || '').trim();
+            if (!t) return;
+            srCloseAdd();
+            let i = S.types.indexOf(t);
+            if (i >= 0) { srHit(i); return; }          // 이미 있는 칸이면 그 칸에 +1
+            if (!QM_DEFECT_TYPES.includes(t) && !S.custom.includes(t)) S.custom.push(t);
+            S.etc = S.etc || {}; S.added = S.added || [];
+            let x = null;
+            if (!S.mainN) S.mainN = S.types.length;
+            if (S.types.length - S.mainN < SR_AUX) {
+                S.types.push(t); S.counts.push(0); i = S.types.length - 1;
+                S.added.push(t);
+            } else {
+                i = S.types.indexOf(SR_ETC);
+                if (i < 0) { S.types.push(SR_ETC); S.counts.push(0); i = S.types.length - 1; }
+                x = t;
+                S.etc[t] = (S.etc[t] || 0) + 1;
+            }
+            S.counts[i]++;
+            S.log.push({ k: 'd', i, x, ts: Date.now() });
+            srSave();
+            srBuzz([30, 50, 30]);
+            srRenderRun(true);
+            const b = document.getElementById('srB' + i);
+            if (b) { b.classList.add('isnew'); setTimeout(() => b.classList.remove('isnew'), 2500); }
+            if (x) {
+                srLast(`${SR_ETC}(${qmEscapeHtml(x)}) <b>+1 → ${S.counts[i]}</b>`, 'hit');
+                showToast(`추가 칸이 다 차서 '${SR_ETC}'에 모아 셉니다 · ${x}`);
+            } else {
+                srLast(`새 칸 ${qmEscapeHtml(t)} <b>+1</b>`, 'hit');
+                showToast(`'${t}' 칸을 아래에 추가했습니다`);
+            }
         }
         function srAddBox() {
             if (S.pauseAt) return;
@@ -5933,7 +5643,7 @@
 
         // ── ③ 결과 ──
         function srRanked() {
-            return S.types.map((t, i) => ({ t, n: S.counts[i] || 0, c: SR_COLORS[i % SR_COLORS.length] })).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
+            return S.types.map((t, i) => ({ t, n: S.counts[i] || 0, c: srColor(t, i) })).filter(x => x.n > 0).sort((a, b) => b.n - a.n);
         }
         function srTimeRange() {
             const a = new Date(S.startTs), b = new Date(S.endTs || Date.now());
@@ -5942,12 +5652,12 @@
         }
         function srReportText() {
             const ng = srNg(), insp = srInspected(), ms = srElapsed(), HR = '━━━━━━━━━━━━━━';
-            const circ = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧'];
+            const circ = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨'];
             const L = [`[선별 결과] ${S.part || '품번 미입력'}`, `${srTimeRange()} (작업 ${srDur(ms, true)})`];
             L.push(insp ? `검사 ${srFmtN(insp)} / 불량 ${srFmtN(ng)} (${(ng / insp * 100).toFixed(2)}%)` : `불량 ${srFmtN(ng)} (검사 수량 미입력)`);
             L.push(HR);
             const r = srRanked();
-            if (r.length) r.forEach((x, k) => L.push(`${circ[k] || '·'} ${x.t} ${srFmtN(x.n)} (${Math.round(x.n / ng * 100)}%)`));
+            if (r.length) r.forEach((x, k) => L.push(`${circ[k] || '·'} ${srLabel(x.t)} ${srFmtN(x.n)} (${Math.round(x.n / ng * 100)}%)`));
             else L.push('불량 없음');
             L.push(HR);
             if (insp && ms > 0) {
@@ -5956,6 +5666,8 @@
             }
             const bx = parseInt(S.box, 10);
             if (bx > 0 && S.boxes) L.push(`박스 ${S.boxes}개 × ${srFmtN(bx)}`);
+            const addN = (S.added || []).filter(t => S.types.includes(t));
+            if (addN.length) L.push(`※ 선별 중 추가된 불량: ${addN.join(', ')}`);
             if (srPhotos.length) L.push(`※ 사진 ${srPhotos.length}장 첨부`);
             return L.join('\n');
         }
@@ -5968,7 +5680,8 @@
             document.getElementById('srSum').innerHTML =
                 `<div class="big"><b>${insp ? (ng / insp * 100).toFixed(2) + '%' : srFmtN(ng) + '개'}</b><span>${insp ? `불량 ${srFmtN(ng)} / 검사 ${srFmtN(insp)}` : '불량 수량'}</span></div>`
                 + `<div class="meta">${qmEscapeHtml(S.part || '품번 미입력')} · ${srTimeRange()} · 작업 ${srDur(ms, true)}</div>`
-                + `<div class="rows">${r.map(x => `<div class="row" style="--c:${x.c}"><span>${qmEscapeHtml(x.t)}</span><div class="bar"><i style="width:${x.n / r[0].n * 100}%"></i></div><span class="v">${srFmtN(x.n)} · ${Math.round(x.n / ng * 100)}%</span></div>`).join('')}</div>`;
+                + `<div class="rows">${r.map(x => `<div class="row" style="--c:${x.c}"><span>${qmEscapeHtml(x.t)}</span><div class="bar"><i style="width:${x.n / r[0].n * 100}%"></i></div><span class="v">${srFmtN(x.n)} · ${Math.round(x.n / ng * 100)}%</span></div>`).join('')}</div>`
+                + (Object.keys(S.etc || {}).length ? `<div class="meta">${qmEscapeHtml(srLabel(SR_ETC))}</div>` : '');
             document.getElementById('srPhotos').innerHTML = srPhotos.map(p => `<img src="${p.url}" alt="">`).join('');
             document.getElementById('srText').value = srReportText();
             const sb = document.getElementById('srSaveQmBtn');
@@ -6055,9 +5768,10 @@
             try { if (!qmInitialized) qmLoadMemos(); } catch (e) {}
             const ng = srNg(), insp = srInspected(), r = srRanked();
             const m = {
-                cat: 'defect', part: S.part, types: r.map(x => x.t),
+                cat: 'defect', part: S.part,
+                types: [...new Set(r.map(x => x.t).filter(t => !(t === SR_ETC && Object.keys(S.etc || {}).length)).concat(Object.keys(S.etc || {})))],
                 ng: String(ng), total: insp ? String(insp) : '',
-                detail: `선별 ${srDur(srElapsed(), true)} · ` + (r.length ? r.map(x => `${x.t} ${x.n}`).join(', ') : '불량 없음'),
+                detail: `선별 ${srDur(srElapsed(), true)} · ` + (r.length ? r.map(x => `${srLabel(x.t)} ${x.n}`).join(', ') : '불량 없음'),
                 action: '선별', src: 'sort'
             };
             m.content = [`[불량유형] ${m.types.join(', ')}`, `[불량내용] ${m.detail}`, '[조치사항] 선별'].join('\n');
