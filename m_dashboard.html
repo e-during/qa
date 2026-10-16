@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<script src="js/gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>품질경영팀 대시보드</title>
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="품질경영팀">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root {
+    --bg: #f2f3f5; --card: #fff; --line: #e6e6e6;
+    --text: #111; --sub: #777; --red: #e62e2d;
+    --precision: #6b4fd6; --inspection: #0091a8;
+    --safe-b: env(safe-area-inset-bottom);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--text); padding-bottom: calc(96px + var(--safe-b)); overflow-x: hidden; }
+
+  /* 상단 고정 헤더 */
+  .app-head {
+    position: sticky; top: 0; z-index: 50;
+    background: #111; color: #fff;
+    padding: calc(env(safe-area-inset-top) + 10px) 16px 12px;
+  }
+  .head-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .home-btn { color: #fff; text-decoration: none; font-size: 12px; font-weight: 800; padding: 8px 12px; border: 1px solid rgba(255,255,255,.3); border-radius: 18px; white-space: nowrap; }
+  .head-title { flex: 1; text-align: center; min-width: 0; }
+  .head-title .s { font-size: 9px; font-weight: 800; letter-spacing: 1.2px; color: #d1a250; }
+  .head-title .m { font-size: 15px; font-weight: 900; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .live { font-size: 10px; font-weight: 900; color: #ff6b6a; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(.85); opacity: .75; } 50% { transform: scale(1.15); opacity: 1; } }
+
+  .seg { display: flex; margin-top: 12px; background: #2a2a2c; border-radius: 12px; padding: 3px; }
+  .seg button { flex: 1; min-height: 40px; border: none; background: transparent; color: #aaa; font-size: 14px; font-weight: 800; border-radius: 10px; }
+  .seg button.active { color: #fff; }
+  .seg button[data-dept="precision"].active { background: var(--precision); }
+  .seg button[data-dept="inspection"].active { background: var(--inspection); }
+
+  .wrap { padding: 14px 14px 0; }
+
+  .sync { font-size: 11px; color: #888; font-weight: 600; line-height: 1.7; margin-bottom: 12px; }
+  .sync .warn { color: var(--red); font-weight: 800; display: block; }
+
+
+  /* TODAY SUMMARY */
+  .summary { background: #fff; border: 1px solid #1a1a1a; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+  .summary-head { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; font-weight: 800; color: var(--sub); letter-spacing: .5px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; text-align: center; }
+  .summary-grid .l { font-size: 11px; font-weight: 700; color: var(--sub); }
+  .summary-grid .v { margin-top: 3px; font-size: 20px; font-weight: 900; }
+  .summary-grid .acc .l, .summary-grid .acc .v { color: var(--red); }
+
+  /* KPI */
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 13px 14px; }
+  .kpi-title { font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+  .kpi-val { display: flex; align-items: baseline; gap: 2px; margin-bottom: 9px; }
+  .kpi-val b { font-size: 26px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+  .kpi-val span { font-size: 13px; font-weight: 800; }
+  .kpi-val.acc b, .kpi-val.acc span { color: var(--red); }
+  .bar { height: 5px; background: #ececec; border-radius: 3px; overflow: hidden; }
+
+  /* ---------- 접속 게이트 ---------- */
+  .gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #0b1636; display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .gate.hidden { display: none; }
+  .gate-box { width: 100%; max-width: 300px; text-align: center; }
+  .gate-title { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .gate-desc { font-size: 12px; color: rgba(255,255,255,.5); margin-bottom: 20px; }
+  .gate-box input {
+    width: 100%; padding: 14px 16px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06);
+    color: #fff; font-size: 15px; text-align: center; margin-bottom: 10px; font-family: inherit;
+  }
+  .gate-box input:focus { outline: none; border-color: #e0b060; }
+  .gate-box button {
+    width: 100%; padding: 14px; border-radius: 12px; border: none;
+    background: #e0b060; color: #1a1200; font-weight: 900; font-size: 14px;
+  }
+  .gate-err { margin-top: 10px; font-size: 11px; color: #ff6b6a; display: none; }
+  .gate-err.show { display: block; }
+  .gate-back {
+    position: absolute; top: max(16px, env(safe-area-inset-top, 16px)); left: 16px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center;
+    text-decoration: none; color: #fff; font-size: 16px;
+  }
+  .gate-back:active { background: rgba(255,255,255,.16); }
+  .bar i { display: block; height: 100%; border-radius: 3px; background: #111; }
+  .bar i.acc { background: linear-gradient(90deg, #ff5a58, var(--red)); }
+
+  /* 정밀측정 실적 */
+  .kpi-sub { margin-top: -4px; margin-bottom: 8px; font-size: 11px; font-weight: 700; color: var(--sub); }
+  .kpi-sub .up { color: #1a9247; } .kpi-sub .down { color: var(--red); }
+  .perf-since { white-space: nowrap; margin-left: 8px; font-size: 11px; font-weight: 700; color: #999; }
+  .ngdot { display: inline-block; margin-left: 3px; font-style: normal; font-size: 10.5px; font-weight: 900; color: var(--red); }
+  .ngc { font-size: 10.5px; font-weight: 900; color: #fff; background: var(--red); border-radius: 4px; padding: 0 4px; margin-left: 2px; }
+  .perf.insp .perf-bars .b { background: #b7e3ea; }
+  .perf.insp .perf-bars .col.cur .b { background: var(--inspection); }
+  .perf.insp .perf-mon .cur { color: var(--inspection); }
+  .perf-line .k { display: inline-block; min-width: 62px; font-size: 11px; font-weight: 800; color: var(--sub); }
+  .perf { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 13px 14px; margin-bottom: 14px; }
+  .perf-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; font-weight: 800; }
+  .perf-cap { font-size: 11px; font-weight: 700; color: var(--sub); }
+  .perf-bars { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; align-items: end; height: 96px; margin-top: 10px; border-bottom: 1px solid #e6e6e6; }
+  .perf-bars .col { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: pointer; }
+  .perf-bars .n { font-size: 11px; font-weight: 800; color: #333; margin-bottom: 3px; min-height: 13px; }
+  .perf-bars .b { width: 60%; max-width: 26px; border-radius: 4px 4px 0 0; background: #c9bdf2; min-height: 2px; }
+  .perf-bars .col.cur .b { background: var(--precision); }
+  .perf-bars .col.sel .b { outline: 2px solid #111; outline-offset: 1px; }
+  .perf-mon { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 5px; text-align: center; font-size: 11px; font-weight: 700; color: var(--sub); }
+  .perf-mon .cur { color: var(--precision); font-weight: 900; }
+  .perf-line { margin-top: 10px; padding-top: 9px; border-top: 1px dashed #eee; font-size: 12.5px; font-weight: 700; color: #333; line-height: 1.5; word-break: keep-all; }
+  .perf-line b { font-weight: 900; }
+  .perf-line:empty { display: none; }
+
+  /* 필터 */
+  .filters { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 12px 4px; margin-bottom: 14px; }
+  .f-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .f-label { flex: 0 0 52px; font-size: 12px; font-weight: 800; color: var(--sub); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { min-height: 36px; padding: 0 14px; border: none; background: #ebebeb; color: #444; font-size: 13px; font-weight: 800; border-radius: 18px; }
+  .chip.active { background: #222; color: #fff; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; min-height: 40px; padding: 0 14px; border: 1px solid #ddd; background: #fff; color: #555; font-size: 13px; font-weight: 800; border-radius: 20px; white-space: nowrap; }
+  .tab .badge { margin-left: 5px; background: #e0e0e0; color: #333; font-size: 11px; padding: 2px 7px; border-radius: 10px; }
+  .tab.active { background: #111; color: #fff; border-color: #111; }
+  .tab.active .badge { background: #fff; color: #111; }
+
+  /* 업무 카드 */
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .item { background: #fff; border: 1px solid #ececec; border-radius: 12px; padding: 12px 14px; }
+  .item.urgent { border-left: 4px solid var(--red); }
+  .item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .badge-st { display: inline-block; padding: 4px 9px; font-size: 11px; font-weight: 800; border-radius: 5px; white-space: nowrap; }
+  .badge-st.urgent { background: #ffebeb; color: var(--red); }
+  .badge-st.ing { background: #e8f4ff; color: #0066cc; }
+  .badge-st.hold { background: #fff4e5; color: #ff9800; }
+  .badge-st.done { background: #e7f9ee; color: #1a9247; }
+  .prio { font-size: 11.5px; font-weight: 800; color: #666; }
+  .prio.hi { color: var(--red); }
+  .item-name { margin-top: 8px; font-size: 14.5px; font-weight: 800; line-height: 1.4; word-break: break-all; }
+  .item-meta { margin-top: 3px; font-size: 12px; color: var(--sub); font-weight: 500; word-break: break-all; }
+  .item-foot { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: #555; }
+  .empty { text-align: center; padding: 34px 0; color: var(--sub); font-weight: 700; font-size: 13px; background: #fff; border-radius: 12px; border: 1px solid #ececec; }
+  .more-note { text-align: center; font-size: 11.5px; color: #999; font-weight: 600; margin-top: 10px; }
+
+
+  /* 챗봇 (바텀시트) */
+  .chat-fab {
+    position: fixed; right: 16px; bottom: calc(16px + var(--safe-b)); z-index: 90;
+    height: 54px; padding: 0 20px 0 16px; border-radius: 28px; border: none;
+    background: #111; color: #fff; font-size: 14px; font-weight: 800;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.3);
+  }
+  .chat-fab .ic { font-size: 20px; }
+  .chat-dim { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 95; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+  .chat-dim.open { opacity: 1; pointer-events: auto; }
+  .chat-panel {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    height: 82vh; height: 82dvh; background: #fff;
+    border-radius: 18px 18px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.2);
+    display: flex; flex-direction: column; overflow: hidden;
+    transform: translateY(105%); transition: transform .25s ease;
+  }
+  .chat-panel.open { transform: translateY(0); }
+  .chat-head { padding: 14px 16px; border-bottom: 2px solid #000; display: flex; justify-content: space-between; align-items: center; }
+  .chat-sub { font-size: 9.5px; font-weight: 800; color: #888; letter-spacing: .5px; margin-bottom: 3px; }
+  .chat-main { font-size: 15px; font-weight: 800; }
+  .chat-actions { display: flex; gap: 8px; }
+  .chat-icon-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid #ccc; background: #fff; font-size: 15px; color: #333; }
+  .chat-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #fafafa; }
+  .chat-options { padding: 12px 14px calc(12px + var(--safe-b)); border-top: 1px solid #e0e0e0; background: #fff; display: flex; gap: 8px; flex-wrap: wrap; max-height: 34vh; overflow-y: auto; }
+
+  .cw-msg-row { display: flex; }
+  .cw-msg-row.bot { justify-content: flex-start; }
+  .cw-msg-row.user { justify-content: flex-end; }
+  .cw-bubble { max-width: 90%; padding: 11px 14px; font-size: 14px; line-height: 1.55; font-weight: 600; word-break: break-all; }
+  .cw-bubble.bot { background: #f0f0f0; color: #111; border-radius: 4px 14px 14px 14px; }
+  .cw-bubble.user { background: #111; color: #fff; border-radius: 14px 4px 14px 14px; }
+  .cw-bubble b { font-weight: 900; }
+  .cw-bubble b.accent { color: var(--red); }
+  .cw-stat-list, .cw-rank-list { list-style: none; margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .cw-stat-list li { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 9px 11px; font-size: 13px; font-weight: 700; }
+  .cw-stat-sub { display: block; font-size: 11.5px; color: var(--sub); font-weight: 500; margin-top: 2px; }
+  .cw-stat-more { margin-top: 6px; font-size: 12px; color: var(--sub); font-weight: 600; }
+  .cw-chart-box { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 6px 4px 2px; margin-top: 10px; overflow-x: auto; max-width: 100%; }
+  .cw-chart-box svg, .cw-chart-box canvas, .cw-chart-box img { max-width: 100%; height: auto; }
+  .cw-rank-list li { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 9px 11px; font-size: 13px; font-weight: 800; }
+  .cw-rank-list .medal { font-size: 15px; width: 20px; text-align: center; }
+  .cw-rank-list .rname { flex: 1; }
+  .cw-rank-list .rcount { color: var(--red); font-weight: 900; }
+  .cw-empty-note { margin-top: 8px; font-size: 12px; color: var(--sub); font-weight: 600; background: #fff8f2; border: 1px dashed #e0c9b8; border-radius: 8px; padding: 8px 10px; }
+  .cw-typing-dots { display: inline-flex; gap: 4px; align-items: center; padding: 4px 2px; }
+  .cw-typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #999; animation: blink 1.2s infinite ease-in-out; }
+  .cw-typing-dots span:nth-child(2) { animation-delay: .2s; }
+  .cw-typing-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100% { opacity: .25; } 40% { opacity: 1; } }
+  .cw-opt-btn { min-height: 42px; background: #ebebeb; border: none; color: #333; padding: 0 16px; font-size: 13.5px; font-weight: 700; border-radius: 21px; }
+  .cw-opt-btn:active { background: #dcdcdc; }
+  .cw-opt-btn.primary { background: #111; color: #fff; }
+  /* ---- [2026-09-30] 한 화면 압축: 요약 상자 숨김(KPI와 중복) · KPI 3열 · 막대 낮춤 → 그래프까지 첫 화면 ---- */
+  .summary { display: none; }
+  .sync { margin-bottom: 8px; font-size: 10.5px; line-height: 1.5; }
+  .kpi-cap { display: flex; justify-content: space-between; align-items: baseline; margin: 0 2px 7px; }
+  .kpi-cap b { font-size: 13px; font-weight: 900; }
+  .kpi-cap span { display: none; }
+  .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
+  .kpi-card { padding: 9px 9px 8px; border-radius: 10px; min-width: 0; }
+  .kpi-title { font-size: 11px; margin-bottom: 4px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-val { margin-bottom: 2px; }
+  .kpi-val b { font-size: 21px; }
+  .kpi-val span { font-size: 11px; }
+  .kpi-card .bar { display: none; }
+  .kpi-sub { margin: 1px 0 0; font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .perf { padding: 11px 12px; margin-bottom: 12px; }
+  .perf-bars { height: 80px; margin-top: 6px; }
+
+  /* [2026-10-02] 실적 패널 줄 정리 */
+  .perf-line .pl { display: flex; align-items: flex-start; gap: 8px; padding: 2px 0; cursor: pointer; }
+  .perf-line .pl + .pl { margin-top: 4px; }
+  .perf-line .pl .k { flex: none; width: 70px; min-width: 0; padding-top: 1px; }
+  .perf-line .pl .v { flex: 1; min-width: 0; }
+  .perf-line .pl .m, .perf-line .pl .s { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .perf-line .pl .s { font-size: 11px; font-weight: 700; color: #888; margin-top: 1px; }
+  .perf-line .pl.open .m, .perf-line .pl.open .s { white-space: normal; overflow: visible; }
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <a class="gate-back" href="m.html">←</a>
+  <div class="gate-box">
+    <div class="gate-title">품질경영팀 대시보드</div>
+    <div class="gate-desc" id="gateDesc">팀 데이터 비밀번호를 입력하세요 · 처음 한 번만</div>
+    <input type="password" id="gatePw" placeholder="비밀번호" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button id="gateBtn" type="button">입장</button>
+    <div id="gateErr" class="gate-err">비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+<script>
+// [입장 = 데이터 비밀번호] 2026-09-29
+// - 예전 고정 입장 비밀번호(코드에 적혀 있던 값)는 삭제했습니다.
+// - 이제 GitHub 데이터(암호화)를 여는 팀 비밀번호가 곧 입장 비밀번호입니다.
+//   비밀번호는 코드 어디에도 없고, 맞는지는 실제로 데이터를 풀어 봐야만 확인됩니다.
+// - 한 번 맞으면 이 폰에 기억되어 다음부터는 이 화면이 뜨지 않습니다.
+(function(){
+  var gate = document.getElementById('gate');
+  var pwInput = document.getElementById('gatePw');
+  var btn = document.getElementById('gateBtn');
+  var err = document.getElementById('gateErr');
+  var waiting = null;
+  try { localStorage.removeItem('qms_gate_ok'); } catch (e) {}
+  var remembered = false;
+  try { remembered = !!localStorage.getItem('ghs_data_pw_v1'); } catch (e) {}
+  if (remembered) gate.classList.add('hidden');
+
+  // github-sync.js가 비밀번호가 필요할 때 이 화면을 띄워 입력을 받습니다
+  window.GHS_ASK = function (opts) {
+    window.__ghsAsking = true;
+    gate.classList.remove('hidden');
+    document.getElementById('gateDesc').textContent = '팀 데이터 비밀번호를 입력하세요 · 처음 한 번만';
+    if (opts && opts.error) { err.textContent = opts.error; err.classList.add('show'); } else err.classList.remove('show');
+    pwInput.value = ''; setTimeout(function(){ pwInput.focus(); }, 50);
+    return new Promise(function (resolve) { waiting = resolve; });
+  };
+  function submit(){
+    var v = pwInput.value;
+    if (!v) { err.textContent = '비밀번호를 입력하세요'; err.classList.add('show'); pwInput.focus(); return; }
+    if (!waiting) return;
+    var r = waiting; waiting = null;
+    err.classList.remove('show');
+    document.getElementById('gateDesc').textContent = '확인 중…';
+    r(v);
+  }
+  btn.addEventListener('click', submit);
+  pwInput.addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); });
+
+  // 비밀번호를 물어볼 일이 없으면(이미 기억됨 · 데이터가 아직 암호화 전) 입장 화면을 닫음
+  window.addEventListener('load', function(){
+    setTimeout(function(){ if (!window.__ghsAsking) gate.classList.add('hidden'); }, 150);
+  });
+})();
+</script>
+
+<header class="app-head">
+  <div class="head-row">
+    <a class="home-btn" href="m.html">← 홈</a>
+    <div class="head-title">
+      <div class="s">QUALITY MANAGEMENT TEAM</div>
+      <div class="m">품질경영팀 업무 현황</div>
+    </div>
+    <span class="live">LIVE</span>
+  </div>
+  <div class="seg" id="deptGroup">
+    <button data-dept="precision" class="active">정밀 측정</button>
+    <button data-dept="inspection">수입검사</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="sync" id="syncInfo"></div>
+
+
+  <div class="kpi-cap"><b id="kpiCap"></b><span>누르면 아래 목록</span></div>
+  <section class="summary">
+    <div class="summary-head"><span id="sumHead">TODAY SUMMARY</span></div>
+    <div class="summary-grid">
+      <div><div class="l" id="sumLabel1">오늘예정</div><div class="v" id="sumVal1">-</div></div>
+      <div><div class="l" id="sumLabel2">진행중</div><div class="v" id="sumVal2">-</div></div>
+      <div class="acc" id="sumBox3"><div class="l" id="sumLabel3">긴급 대응</div><div class="v" id="sumVal3">-</div></div>
+    </div>
+  </section>
+
+  <section class="kpi-grid" id="kpiGrid"></section>
+
+  <section class="perf" id="pcPerf" style="display:none;">
+    <div class="perf-head"><span id="perfTitle">월별 측정 완료</span><span class="perf-cap" id="perfCap">막대를 누르면 건수</span></div>
+    <div class="perf-bars" id="perfBars"></div>
+    <div class="perf-line" id="perfCust"></div>
+    <div class="perf-line" id="perfNext"></div>
+  </section>
+
+  <section class="filters">
+    <div class="f-row">
+      <div class="f-label">상태</div>
+      <div class="chips" id="statusGroup">
+        <button class="chip active" data-status="all">전체</button>
+        <button class="chip" data-status="pending">진행중</button>
+        <button class="chip" data-status="done">완료</button>
+      </div>
+    </div>
+    <div class="f-row">
+      <div class="f-label">우선순위</div>
+      <div class="chips" id="prioGroup">
+        <button class="chip active" data-prio="all">전체</button>
+        <button class="chip" data-prio="urgent">긴급</button>
+        <button class="chip" data-prio="normal">보통</button>
+      </div>
+    </div>
+  </section>
+
+  <nav class="tabs" id="tabHeader">
+    <button class="tab active" data-tab="todo"><span class="tl">오늘 해야할 업무</span><span class="badge" id="badge-todo">0</span></button>
+    <button class="tab" data-tab="overdue"><span class="tl">장기미완</span><span class="badge" id="badge-overdue">0</span></button>
+    <button class="tab" data-tab="done"><span class="tl">최근완료</span><span class="badge" id="badge-done">0</span></button>
+    <button class="tab" data-tab="history"><span class="tl">전체 이력</span><span class="badge" id="badge-history">0</span></button>
+  </nav>
+
+  <section class="list" id="list"></section>
+
+</main>
+
+<!-- 챗봇 -->
+<div class="chat-dim" id="chatDim" onclick="toggleChat(false)"></div>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div>
+      <div class="chat-sub">QUALITY MANAGEMENT BOT</div>
+      <div class="chat-main">🤖 업무 챗봇</div>
+    </div>
+    <div class="chat-actions">
+      <button class="chat-icon-btn" onclick="restartChat()" title="처음부터">↺</button>
+      <button class="chat-icon-btn" onclick="toggleChat(false)" title="닫기">✕</button>
+    </div>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-options" id="optionsWrap"></div>
+</div>
+<button class="chat-fab" id="chatFab" onclick="toggleChat(true)"><span class="ic">💬</span>챗봇</button>
+
+<script>
+  // chatbot-core.js에 대시보드 위젯과 동일한 CSS 클래스명을 알려준다 (스타일만 모바일용으로 재정의)
+  window.QC_CHATBOT_UI = {
+    msgRow: 'cw-msg-row', bubble: 'cw-bubble', chartBox: 'cw-chart-box',
+    statList: 'cw-stat-list', statSub: 'cw-stat-sub', statMore: 'cw-stat-more',
+    rankList: 'cw-rank-list', emptyNote: 'cw-empty-note', typingDots: 'cw-typing-dots', optBtn: 'cw-opt-btn'
+  };
+</script>
+<script src="js/github-config.js"></script>
+<script src="js/github-sync.js"></script>
+<script src="js/chatbot-core.js"></script>
+
+<script>
+  // ============================================================
+  //  유틸 (dashboard.html과 동일 로직)
+  // ============================================================
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toYmd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function getMonday(d){ const x=new Date(d); x.setHours(0,0,0,0); const day=x.getDay(); x.setDate(x.getDate()+(day===0?-6:1-day)); return x; }
+  function addDays(d,n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
+  function daysBetween(a,b){ return Math.floor((new Date(b)-new Date(a))/86400000); }
+  function loadJsonLocal(key){ try{ return JSON.parse(localStorage.getItem(key))||[]; }catch(e){ return []; } }
+
+  // 모바일은 외부망 접속을 고려해 GitHub(외부용 저장소)를 먼저 조회하고,
+  // 응답이 없을 때만(사내망에 있을 때 등) 기존 GitLab을 대체로 조회합니다.
+  const GITLAB_MEASURE_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('measure.json', null)) || (typeof gitlabLoadLatestVersionedSync === 'function' ? gitlabLoadLatestVersionedSync('data/measure') : null);
+  const GITLAB_INSPECTION_DATA = (window.GitHubSync && GitHubSync.pullJSONSync('inspection.json', null)) || (typeof gitlabLoadLatestVersionedSync === 'function' ? gitlabLoadLatestVersionedSync('data/inspection') : null);
+  const GITLAB_SYNC_OK = !!(GITLAB_MEASURE_DATA || GITLAB_INSPECTION_DATA);
+
+  function loadJson(key){
+    switch(key){
+      case 'qc_qms_data_v1': return (GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.qms) || loadJsonLocal(key);
+      case 'qc_provisional_v1': return (GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.prov) || loadJsonLocal(key);
+      case 'qi_qms_data_v1': return (GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.qms) || loadJsonLocal(key);
+      default: return loadJsonLocal(key);
+    }
+  }
+
+  const now = new Date();
+  const today = toYmd(now);
+  const thisMonday = getMonday(now);
+  const weekStart = toYmd(thisMonday);
+  const weekEnd = toYmd(addDays(thisMonday,4));
+  const curMonthPrefix = today.slice(0,7);
+
+  function fmtTime(iso){
+    if(!iso) return ''; const d=new Date(iso); if(isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false});
+  }
+  function fmtDateTime(iso){
+    if(!iso) return '--.-- --:--'; const d=new Date(iso); if(isNaN(d.getTime())) return '--.-- --:--';
+    const p=n=>String(n).padStart(2,'0');
+    return `${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+
+  document.getElementById('syncInfo').innerHTML =
+    `📊 정밀 엑셀 ${fmtDateTime(GITLAB_MEASURE_DATA && GITLAB_MEASURE_DATA.updatedAt)} · 📋 수입 엑셀 ${fmtDateTime(GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.updatedAt)}`
+    + (GITLAB_SYNC_OK ? '' : '<span class="warn">⚠ 서버 연결 실패 (이 기기의 로컬 캐시 표시 중)</span>');
+
+  // ============================================================
+  //  정밀측정 데이터
+  // ============================================================
+  const qcQms = loadJson('qc_qms_data_v1');
+  const qcProv = loadJson('qc_provisional_v1');
+
+  // 날짜 형식이 달라도(2026.09.29 · 2026/9/29 · ISO 시각 포함) YYYY-MM-DD로 맞춤
+  function nd(v){ const m = String(v == null ? '' : v).match(/(\d{4})\D(\d{1,2})\D(\d{1,2})/); return m ? `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}` : ''; }
+  const pcAllRaw = [
+    ...qcQms.filter(r => !(r.item||'').includes('삭제')).map(r => ({customer:r.customer,item:r.item,dueDate:r.dueDate,completeDate:r.completeDate,assignee:r.assignee,urgent:false})),
+    ...qcProv.map(p => ({customer:p.customer,item:p.item,dueDate:p.dueDate||p.planDate,completeDate:p.completed?p.completedAt:'',assignee:p.assignee,urgent:!!p.urgent&&!p.completed}))
+  ];
+  const pcAll = pcAllRaw.map(r => Object.assign({}, r, { dueDate: nd(r.dueDate) || r.dueDate || '', completeDate: r.completeDate ? (nd(r.completeDate) || String(r.completeDate)) : '' }));
+  const pcIncomplete = pcAll.filter(r => !r.completeDate);
+  const pcComplete = pcAll.filter(r => !!r.completeDate);
+  const pcToday = pcIncomplete.filter(r => r.dueDate === today);
+  const pcProgress = pcIncomplete;
+  const pcRegistered = qcProv.filter(p => !p.completed).length;
+  const pcUrgent = pcIncomplete.filter(r => r.urgent);
+  const pcOverdue = pcIncomplete.filter(r => r.dueDate && daysBetween(r.dueDate, today) >= 30);
+  const pcDoneWeek = pcComplete.filter(r => r.completeDate >= weekStart && r.completeDate <= weekEnd).length;
+  const pcProgWeek = pcIncomplete.filter(r => r.dueDate >= weekStart && r.dueDate <= weekEnd).length;
+  const pcDelayWeek = pcIncomplete.filter(r => r.dueDate && r.dueDate < today).length;
+  const pcWeekTotal = pcDoneWeek + pcProgWeek + pcDelayWeek;
+  const pcWeekRate = pcWeekTotal > 0 ? Math.round((pcDoneWeek/pcWeekTotal)*100) : 0;
+  const pcRecentDone = [...pcComplete].sort((a,b)=>(b.completeDate||'').localeCompare(a.completeDate||''));
+
+  // ---- 정밀측정 실적 (완료 기준) ----
+  const ymOf = d => { const x = new Date(now.getFullYear(), now.getMonth() - d, 1); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`; };
+  const pcMonths = [5,4,3,2,1,0].map(d => { const ym = ymOf(d); return { ym, m: +ym.slice(5), n: pcComplete.filter(r => r.completeDate.startsWith(ym)).length }; });
+  const pcDoneMonth = pcMonths[5].n, pcDonePrev = pcMonths[4].n;
+  const pcDoneYear = pcComplete.filter(r => r.completeDate.startsWith(String(now.getFullYear()))).length;
+  const pcLate = pcIncomplete.filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r.dueDate) && r.dueDate < today).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+  const pcOpenSorted = [...pcIncomplete].sort((a,b) => (b.urgent - a.urgent) || (a.dueDate||'9999').localeCompare(b.dueDate||'9999'));
+  const pcNext = pcIncomplete.filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r.dueDate) && r.dueDate >= today).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0] || null;
+  function custLine(ym){
+    const c = {}; pcComplete.filter(r => r.completeDate.startsWith(ym)).forEach(r => { const k = r.customer || '기타'; c[k] = (c[k]||0) + 1; });
+    return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([k,v]) => `${esc(k)} <b>${v}</b>`).join(' · ');
+  }
+
+  const pcUrgentKeys = new Set(pcUrgent.map(r => r.customer+r.item));
+  const pcTodayOnly = pcToday.filter(r => !pcUrgentKeys.has(r.customer+r.item));
+  const pcShownKeys = new Set([...pcUrgent, ...pcTodayOnly].map(r => r.customer+r.item));
+  const pcProgOnly = pcProgress.filter(r => r.dueDate >= weekStart && r.dueDate <= weekEnd && !pcShownKeys.has(r.customer+r.item));
+  const pcTodoCombined = [
+    ...pcUrgent.map(r => ({...r, tag:'urgent'})),
+    ...pcTodayOnly.map(r => ({...r, tag:'today'})),
+    ...pcProgOnly.map(r => ({...r, tag:'prog'}))
+  ].slice(0,20);
+
+  // ============================================================
+  //  수입검사 데이터
+  // ============================================================
+  const qiQms = loadJson('qi_qms_data_v1');
+  let qiManual = (GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.manual) || null;
+  if (!qiManual) { try{ qiManual = JSON.parse(localStorage.getItem('qi_manual_complete_v1'))||{}; }catch(e){ qiManual = {}; } }
+  function qiRowKey(r){ return `${r.sheetName||''}|${r.no}|${r.partNo}|${r.lot}|${r.receiveDate}`; }
+  function qiComplete(r){ return !!r.inspectDate || !!qiManual[qiRowKey(r)]; }
+  function qiCompletedAt(r){ return r.inspectDate || (qiManual[qiRowKey(r)] ? qiManual[qiRowKey(r)].completedAt : ''); }
+
+  const qiMonthTarget = qiQms.filter(r => (r.receiveDate||'').startsWith(curMonthPrefix));
+  const qiMonthDone = qiMonthTarget.filter(r => qiComplete(r));
+  const qiMonthPending = qiMonthTarget.filter(r => !qiComplete(r));
+  const qiWeekDone = qiQms.filter(r => qiComplete(r) && qiCompletedAt(r) >= weekStart && qiCompletedAt(r) <= weekEnd)
+    .sort((a,b)=>qiCompletedAt(b).localeCompare(qiCompletedAt(a)));
+  const qiTodayIn = qiQms.filter(r => r.receiveDate === today);
+  const qiMonthRate = qiMonthTarget.length > 0 ? Math.round((qiMonthDone.length/qiMonthTarget.length)*100) : 0;
+  const qiUrgent = qiMonthPending.filter(r => r.receiveDate && daysBetween(r.receiveDate, today) >= 5);
+
+  // ---- [2026-09-30] 수입검사 실적 (정밀측정 패널과 같은 틀 · 검사 완료일 기준) ----
+  const QI_NG = /NG|불합격|부적합/i;
+  const qiIsNg = r => QI_NG.test(String(r.judgement || ''));
+  const qiDoneAll = qiQms.filter(r => qiComplete(r)).map(r => ({ r, d: nd(qiCompletedAt(r)) || String(qiCompletedAt(r) || '') }));
+  // [2026-10-01] 수입검사 콘솔은 이번 달·직전 달 시트만 보관 → 그 이전 달은 업로드 때 저장한 '통합데이터 월별 요약'으로 채움
+  const QI_YS = (() => { const m = (GITLAB_INSPECTION_DATA && GITLAB_INSPECTION_DATA.meta) || loadJsonLocal('qi_qms_meta_v1');
+    return (m && m.yearSummary && m.yearSummary.months) ? m.yearSummary : null; })();
+  const QI_LIVE_FROM = (() => { const x = new Date(now.getFullYear(), now.getMonth() - 1, 1); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`; })();
+  const qiUseYs = ym => !!(QI_YS && ym < QI_LIVE_FROM && QI_YS.months[ym]);
+  const qiMonths = [5,4,3,2,1,0].map(k => {
+    const x = new Date(now.getFullYear(), now.getMonth() - k, 1);
+    const ym = `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`;
+    if (qiUseYs(ym)) { const y = QI_YS.months[ym]; return { ym, m: x.getMonth() + 1, n: y.done || 0, ng: y.ng || 0, judged: y.judged || 0, ys: true }; }
+    const rows = qiDoneAll.filter(o => o.d.startsWith(ym));
+    return { ym, m: x.getMonth() + 1, n: rows.length, ng: rows.filter(o => qiIsNg(o.r)).length, judged: rows.filter(o => String(o.r.judgement || '').trim()).length };
+  });
+  const qiDoneMonth = qiMonths[5].n, qiDonePrev = qiMonths[4].n;
+  const qiYearStr = String(now.getFullYear());
+  // 올해 누적 = (직전 달 이전: 월별 요약) + (직전 달·이번 달: 실시간 데이터). 요약이 없으면 기존처럼 실시간 데이터만
+  const qiDoneYear = (QI_YS ? Object.keys(QI_YS.months).filter(ym => ym.startsWith(qiYearStr) && ym < QI_LIVE_FROM).reduce((s, ym) => s + (QI_YS.months[ym].done || 0), 0) : 0)
+    + qiDoneAll.filter(o => o.d.startsWith(qiYearStr) && (!QI_YS || o.d.slice(0, 7) >= QI_LIVE_FROM)).length;
+  const qiNgMonth = qiMonths[5].ng, qiJudgedMonth = qiMonths[5].judged;
+  const qiNgRate = qiJudgedMonth ? Math.round(qiNgMonth / qiJudgedMonth * 1000) / 10 : null;
+  const qiLastNg = qiDoneAll.filter(o => qiIsNg(o.r)).sort((a,b) => b.d.localeCompare(a.d))[0] || null;
+  const qiOldestPending = qiQms.filter(r => !qiComplete(r) && nd(r.receiveDate)).sort((a,b) => nd(a.receiveDate).localeCompare(nd(b.receiveDate)))[0] || null;
+
+  // [2026-10-02] 실적 패널 줄: 라벨 고정 칸 + 내용(1줄 굵게 · 2줄 업체/고객사) · 길면 … · 누르면 전체
+  function plWrap(h){
+    const m = String(h).match(/^<span class="k">([\s\S]*?)<\/span>([\s\S]*)$/);
+    if (!m) return `<div class="pl">${h}</div>`;
+    let body = m[2].trim(), sub = '';
+    const cut = body.lastIndexOf(' · ');
+    if (cut > 0 && /최근|예정|대기/.test(m[1]) && !/<span class="ngc">|<b>\d+<\/b>/.test(body.slice(cut))) { sub = body.slice(cut + 3); body = body.slice(0, cut); }
+    return `<div class="pl" onclick="this.classList.toggle('open')"><span class="k">${m[1]}</span><span class="v"><span class="m">${body}</span>${sub ? `<span class="s">${sub}</span>` : ''}</span></div>`;
+  }
+  function vendorLine(ym){
+    if (qiUseYs(ym)) {
+      const v = QI_YS.months[ym].v || {};
+      return Object.entries(v).sort((a,b) => (b[1][1] - a[1][1]) || (b[1][0] - a[1][0])).slice(0, 5)
+        .map(([k,x]) => `${esc(k)} <b>${x[0]}</b>${x[1] ? ` <span class="ngc">NG ${x[1]}</span>` : ''}`).join(' · ');
+    }
+    const c = {};
+    qiDoneAll.filter(o => o.d.startsWith(ym)).forEach(o => { const k = o.r.vendor || '기타'; c[k] = c[k] || { n: 0, ng: 0 }; c[k].n++; if (qiIsNg(o.r)) c[k].ng++; });
+    return Object.entries(c).sort((a,b) => (b[1].ng - a[1].ng) || (b[1].n - a[1].n)).slice(0, 5)
+      .map(([k,v]) => `${esc(k)} <b>${v.n}</b>${v.ng ? ` <span class="ngc">NG ${v.ng}</span>` : ''}`).join(' · ');
+  }
+  function ngVendorLine(ym){
+    const c = {};
+    qiDoneAll.filter(o => o.d.startsWith(ym) && qiIsNg(o.r)).forEach(o => { const k = o.r.vendor || '기타'; c[k] = (c[k] || 0) + 1; });
+    return Object.entries(c).sort((a,b) => b[1] - a[1]).slice(0, 3).map(([k,v]) => `${esc(k)} <b>${v}</b>`).join(' · ');
+  }
+  function renderPerfInsp(){
+    const max = Math.max(1, ...qiMonths.map(x => x.n));
+    document.getElementById('perfBars').innerHTML = qiMonths.map((x,i) =>
+      `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 검사 ${x.n}건 · 불합격 ${x.ng}건">`
+      + `<div class="n">${(i===5||i===perfSel) ? x.n : ''}${x.ng ? `<i class="ngdot">●${x.ng}</i>` : ''}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
+    const mon = document.getElementById('perfMon');
+    if (mon) mon.innerHTML = qiMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
+    const sel = qiMonths[perfSel];
+    document.getElementById('perfCap').textContent = perfSel === 5 ? '누르면 협력사별 · ●불합격' : `${sel.m}월 선택 · 다시 누르면 이번 달`;
+    const vl = vendorLine(sel.ym);
+    document.getElementById('perfCust').innerHTML = plWrap(`<span class="k">${sel.m}월 협력사</span>` + (vl || '검사 완료 기록 없음'));
+    const bits = [];
+    if (qiLastNg) bits.push(`<span class="k">최근 불합격</span><b>${esc(qiLastNg.d.slice(5).replace('-','/'))}</b> ${esc(qiLastNg.r.item || '')}${qiLastNg.r.vendor ? ' · ' + esc(qiLastNg.r.vendor) : ''}`);
+    else bits.push(`<span class="k">최근 불합격</span>${qiDoneAll.some(o => String(o.r.judgement || '').trim()) ? '없음' : '판정 데이터 없음'}`);
+    if (qiOldestPending) bits.push(`<span class="k">최장 대기</span><b>입고 ${Math.max(0, daysBetween(nd(qiOldestPending.receiveDate), today))}일</b> ${esc(qiOldestPending.item || '')}${qiOldestPending.vendor ? ' · ' + esc(qiOldestPending.vendor) : ''}`);
+    else bits.push(`<span class="k">최장 대기</span>대기 중인 건 없음`);
+    document.getElementById('perfNext').innerHTML = bits.map(plWrap).join('');
+    const liveMin = qiDoneAll.map(o => o.d).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0];
+    trimPerf(qiMonths, (QI_YS && QI_YS.from && (!liveMin || QI_YS.from < liveMin)) ? QI_YS.from : liveMin);
+  }
+
+  // ============================================================
+  //  상태 / 렌더링
+  // ============================================================
+  let currentDept = 'precision'; // [2026-09-30] 원래 순서(정밀측정 먼저)로 복귀
+  let currentTab = 'todo';
+  let statusFilter = 'all';
+  let prioFilter = 'all';
+
+  function scaledBar(v,max){ return Math.max(4, Math.min(100, Math.round((v/max)*100))); }
+  function kpiCard(tone,value,unit,label,pct,sub){
+    const acc = tone === 'accent';
+    return `<div class="kpi-card"><div class="kpi-title">${label}</div>
+      <div class="kpi-val ${acc?'acc':''}"><b>${value}</b><span>${unit}</span></div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
+      <div class="bar"><i class="${acc?'acc':''}" style="width:${pct}%"></i></div></div>`;
+  }
+
+  function renderKpi(){
+    const g = document.getElementById('kpiGrid');
+    if (currentDept === 'precision'){
+      g.innerHTML = [
+        kpiCard('n', pcDoneWeek,'건','이번 주 완료',scaledBar(pcDoneWeek,10)),
+        kpiCard('n', pcDoneMonth,'건','이번 달 완료',scaledBar(pcDoneMonth,30), `지난달 ${pcDonePrev}`),
+        kpiCard('n', pcDoneYear,'건','올해 누적',scaledBar(pcDoneYear,300), `${now.getFullYear()}년`),
+        kpiCard('n', pcIncomplete.length,'건','진행 중',scaledBar(pcIncomplete.length,30), pcRegistered ? `가등록 ${pcRegistered} 포함` : ''),
+        kpiCard(pcLate.length ? 'accent' : 'n', pcLate.length,'건','예정일 지남',scaledBar(pcLate.length,10)),
+        kpiCard(pcUrgent.length ? 'accent' : 'n', pcUrgent.length,'건','긴급',scaledBar(pcUrgent.length,10))
+      ].join('');
+    } else {
+      // [2026-09-30] 정밀측정과 같은 6칸 (실적 + 불합격)
+      g.innerHTML = [
+        kpiCard('n', qiWeekDone.length,'건','이번 주 완료',scaledBar(qiWeekDone.length,30)),
+        kpiCard('n', qiDoneMonth,'건','이번 달 완료',scaledBar(qiDoneMonth,120), `지난달 ${qiDonePrev}`),
+        kpiCard('n', qiDoneYear,'건','올해 누적',scaledBar(qiDoneYear,1200), `${now.getFullYear()}년`),
+        kpiCard(qiUrgent.length ? 'accent' : 'n', qiMonthPending.length,'건','미완료',scaledBar(qiMonthPending.length,30), qiUrgent.length ? `입고 5일↑ <span class="down">${qiUrgent.length}건</span>` : '5일↑ 지연 없음'),
+        kpiCard('n', qiMonthRate,'%','완료율',qiMonthRate, `${qiMonthDone.length} / ${qiMonthTarget.length}건`),
+        kpiCard(qiNgMonth ? 'accent' : 'n', qiNgMonth,'건','이번 달 불합격',scaledBar(qiNgMonth,10), qiNgRate === null ? '판정 없음' : `불합격률 ${qiNgRate}%`)
+      ].join('');
+    }
+  }
+
+  let perfSel = 5;
+  function renderPerf(){
+    const box = document.getElementById('pcPerf');
+    box.style.display = '';
+    box.classList.toggle('insp', currentDept !== 'precision');
+    document.getElementById('perfTitle').textContent = currentDept === 'precision' ? '월별 측정 완료' : '월별 검사 완료';
+    let mon0 = document.getElementById('perfMon');
+    if (!mon0) { mon0 = document.createElement('div'); mon0.id = 'perfMon'; mon0.className = 'perf-mon'; document.getElementById('perfBars').after(mon0); }
+    if (currentDept !== 'precision') { renderPerfInsp(); return; }
+    const max = Math.max(1, ...pcMonths.map(x => x.n));
+    document.getElementById('perfBars').innerHTML = pcMonths.map((x,i) => `<div class="col${i===5?' cur':''}${i===perfSel&&perfSel!==5?' sel':''}" onclick="perfPick(${i})" title="${x.m}월 ${x.n}건"><div class="n">${i===5||i===perfSel ? x.n : ''}</div><div class="b" style="height:${Math.round(x.n/max*58)}px"></div></div>`).join('');
+    let mon = document.getElementById('perfMon');
+    if (!mon) { mon = document.createElement('div'); mon.id = 'perfMon'; mon.className = 'perf-mon'; document.getElementById('perfBars').after(mon); }
+    mon.innerHTML = pcMonths.map((x,i) => `<span class="${i===5?'cur':''}">${x.m}월</span>`).join('');
+    const sel = pcMonths[perfSel];
+    document.getElementById('perfCap').textContent = perfSel === 5 ? '누르면 고객사별' : `${sel.m}월 ${sel.n}건`;
+    const cl = custLine(sel.ym);
+    document.getElementById('perfCust').innerHTML = plWrap(`<span class="k">${sel.m}월 고객사</span>` + (cl || '완료 기록 없음'));
+    const last = pcRecentDone[0];
+    const bits = [];
+    if (last) bits.push(`<span class="k">최근 완료</span><b>${esc(last.completeDate.slice(5).replace('-','/'))}</b> ${esc(last.item||'')}`);
+    if (pcNext) bits.push(`<span class="k">다음 예정</span><b>${esc(pcNext.dueDate.slice(5).replace('-','/'))}</b> ${esc(pcNext.item||'')}${pcNext.customer ? ' · ' + esc(pcNext.customer) : ''}`);
+    document.getElementById('perfNext').innerHTML = bits.map(plWrap).join('');
+    trimPerf(pcMonths, pcComplete.map(r => r.completeDate).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0]);
+  }
+
+  // [2026-09-30] 데이터가 없는 앞쪽 달은 막대에서 빼고, 시작일을 제목 옆에 표시 ("그 달에 일을 안 했다" 오해 방지)
+  function trimPerf(months, minDate){
+    let st = months.findIndex(x => x.n > 0); if (st < 0) st = months.length - 1;
+    const cols = months.length - st;
+    ['perfBars', 'perfMon'].forEach(id => {
+      const el = document.getElementById(id); if (!el) return;
+      [...el.children].forEach((c, i) => { c.style.display = i < st ? 'none' : ''; });
+      el.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    });
+    const t = document.getElementById('perfTitle');
+    const winStart = months[0].ym + '-01';
+    if (st > 0) t.textContent = t.textContent.replace(/\s*\(최근 6개월\)/, '');
+    if (minDate && minDate > winStart){
+      const n = document.createElement('small');
+      n.className = 'perf-since';
+      n.textContent = `데이터 ${+minDate.slice(5, 7)}/${+minDate.slice(8, 10)}부터`;
+      t.appendChild(n);
+    }
+  }
+  function perfPick(i){ perfSel = perfSel === i ? 5 : i; renderPerf(); }
+
+  function renderSummary(){
+    const set = (i,l,v) => { document.getElementById('sumLabel'+i).textContent = l; document.getElementById('sumVal'+i).textContent = v + '건'; };
+    const pc = currentDept === 'precision';
+    document.getElementById('sumHead').textContent = `${now.getMonth()+1}월 ${pc ? '측정' : '검사'} 실적`;
+    document.getElementById('kpiCap').textContent = `${now.getMonth()+1}월 ${pc ? '측정' : '검사'} 실적`;
+    document.getElementById('sumBox3').classList.toggle('acc', !pc && qiUrgent.length > 0);
+    if (pc){ set(1,'이번 달 완료',pcDoneMonth); set(2,'올해 누적',pcDoneYear); set(3,'진행 중',pcIncomplete.length); }
+    else { set(1,'이번 달 완료',qiDoneMonth); set(2,'올해 누적',qiDoneYear); set(3,'미완료',qiMonthPending.length); }
+  }
+
+  function buildRows(){
+    if (currentDept === 'precision'){
+      return {
+        todo: pcRecentDone.map(r => ({
+          statusClass:'done', statusLabel:'완료', name: r.item||'(품명없음)', meta: r.customer||'-',
+          assignee: r.assignee||'-', date: r.completeDate||'-', dl:'완료일', urgent:false, completed:true })),
+        overdue: pcOpenSorted.map(r => ({
+          statusClass: r.urgent?'urgent':(r.dueDate && r.dueDate<today?'hold':'ing'), statusLabel: r.urgent?'긴급':(r.dueDate===today?'오늘예정':(r.dueDate && r.dueDate<today?'예정일 지남':'진행 중')),
+          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent: !!r.urgent, completed:false })),
+        done: pcLate.map(r => ({
+          statusClass:'hold', statusLabel:'예정일 지남', name: r.item||'(품명없음)',
+          meta: `${r.customer||'-'} · ${daysBetween(r.dueDate,today)}일 경과`, assignee: r.assignee||'-', date: r.dueDate||'-', urgent: !!r.urgent, completed:false })),
+        history: [...pcAll].sort((a,b)=>(b.dueDate||'').localeCompare(a.dueDate||'')).map(r => ({
+          statusClass: r.completeDate?'done':'hold', statusLabel: r.completeDate?'완료':'미완료',
+          name: r.item||'(품명없음)', meta: r.customer||'-', assignee: r.assignee||'-', date: r.dueDate||'-', urgent:!!r.urgent, completed:!!r.completeDate }))
+      };
+    }
+    const vm = r => [r.customer, r.vendor].filter(Boolean).join(' · ') || '-';
+    return {
+      todo: qiTodayIn.map(r => ({
+        statusClass: qiComplete(r)?'done':'ing', statusLabel: qiComplete(r)?'완료':'미완료', name: r.item||'(품명없음)', meta: vm(r),
+        assignee: r.assignee||'-', date: r.receiveDate||'-', urgent: qiUrgent.includes(r), completed: qiComplete(r) })),
+      overdue: qiMonthPending.map(r => ({
+        statusClass:'hold', statusLabel:'미완료', name: r.item||'(품명없음)', meta: vm(r),
+        assignee: r.assignee||'-', date: r.receiveDate||'-', urgent: qiUrgent.includes(r), completed:false })),
+      done: qiWeekDone.map(r => ({
+        statusClass:'done', statusLabel:'완료', name: r.item||'(품명없음)', meta: vm(r),
+        assignee: r.assignee||'-', date: qiCompletedAt(r)||'-', urgent:false, completed:true })),
+      history: [...qiQms].sort((a,b)=>(b.receiveDate||'').localeCompare(a.receiveDate||'')).map(r => ({
+        statusClass: qiComplete(r)?'done':'hold', statusLabel: qiComplete(r)?'완료':'미완료', name: r.item||'(품명없음)',
+        meta: [r.partNo, r.customer, r.vendor].filter(Boolean).join(' · ') || '-', assignee: r.assignee||'-', date: r.receiveDate||'-',
+        urgent: qiMonthPending.includes(r) && qiUrgent.includes(r), completed: qiComplete(r) }))
+    };
+  }
+
+  function updateTabs(rowsByTab){
+    const labels = currentDept === 'precision'
+      ? { todo:'최근 완료', overdue:'진행 중', done:'예정일 지남', history:'전체 이력' }
+      : { todo:'오늘 입고', overdue:'이번달 미완료', done:'이번주 완료', history:'최근 2개월' };
+    document.querySelectorAll('#tabHeader .tab').forEach(btn => {
+      const k = btn.dataset.tab;
+      btn.querySelector('.tl').textContent = labels[k];
+      document.getElementById('badge-'+k).textContent = rowsByTab[k].length;
+    });
+  }
+
+  function applyFilters(rows){
+    return rows.filter(r => {
+      if (statusFilter === 'pending' && r.completed) return false;
+      if (statusFilter === 'done' && !r.completed) return false;
+      if (prioFilter === 'urgent' && !r.urgent) return false;
+      if (prioFilter === 'normal' && r.urgent) return false;
+      return true;
+    });
+  }
+
+  const MAX_ROWS = 40;
+  function renderList(){
+    const rowsByTab = buildRows();
+    updateTabs(rowsByTab);
+    const all = applyFilters(rowsByTab[currentTab]);
+    const rows = all.slice(0, MAX_ROWS);
+    const list = document.getElementById('list');
+    if (!rows.length){
+      const msg = currentDept === 'precision' ? ({ todo:'완료 기록이 없습니다', overdue:'진행 중인 측정이 없습니다 · 모두 완료', done:'예정일이 지난 건이 없습니다', history:'표시할 데이터가 없습니다' })[currentTab] : '표시할 데이터가 없습니다.';
+      list.innerHTML = `<div class="empty">${msg}</div>`; return;
+    }
+    const dateLabel = currentDept === 'precision' ? (currentTab === 'todo' ? '완료일' : '완료요청일') : (currentTab === 'done' ? '완료일' : '입고일');
+    list.innerHTML = rows.map(r => `
+      <div class="item ${r.urgent?'urgent':''}">
+        <div class="item-top">
+          <span class="badge-st ${r.statusClass}">${esc(r.statusLabel)}</span>
+          <span class="prio ${r.urgent?'hi':''}">${r.urgent?'우선순위 높음':'우선순위 보통'}</span>
+        </div>
+        <div class="item-name">${esc(r.name)}</div>
+        <div class="item-meta">${esc(r.meta)}</div>
+        <div class="item-foot"><span>👤 ${esc(r.assignee)}</span><span>${dateLabel} ${esc(r.date)}</span></div>
+      </div>`).join('')
+      + (all.length > MAX_ROWS ? `<div class="more-note">최근 ${MAX_ROWS}건만 표시 (전체 ${all.length}건)</div>` : '')
+      + (currentDept !== 'precision' && currentTab === 'history' ? `<div class="more-note">수입검사는 최근 2개월(이번 달·지난달)만 보관합니다 · 이전 이력은 PC 수입검사 보고서에서 확인</div>` : '');
+  }
+
+  function renderAll(){ renderKpi(); renderSummary(); renderPerf(); renderList(); }
+
+
+
+  // ============================================================
+  //  이벤트
+  // ============================================================
+  function bindGroup(id, sel, onPick){
+    document.querySelectorAll(`#${id} ${sel}`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll(`#${id} ${sel}`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        onPick(btn);
+      });
+    });
+  }
+  bindGroup('deptGroup','button', b => {
+    currentDept = b.dataset.dept; currentTab = 'todo'; perfSel = 5;
+    document.querySelectorAll('#tabHeader .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'todo'));
+    renderAll();
+  });
+  bindGroup('statusGroup','.chip', b => { statusFilter = b.dataset.status; renderList(); });
+  bindGroup('prioGroup','.chip', b => { prioFilter = b.dataset.prio; renderList(); });
+  bindGroup('tabHeader','.tab', b => { currentTab = b.dataset.tab; renderList(); });
+
+  // 챗봇 열기/닫기 (대화 로직은 chatbot-core.js, 처음 열 때 restartChat() 1회 호출)
+  let chatInited = false;
+  function toggleChat(force){
+    const panel = document.getElementById('chatPanel');
+    const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+    panel.classList.toggle('open', open);
+    document.getElementById('chatDim').classList.toggle('open', open);
+    document.getElementById('chatFab').style.display = open ? 'none' : 'flex';
+    document.body.style.overflow = open ? 'hidden' : '';
+    if (open && !chatInited){ chatInited = true; restartChat(); }
+  }
+
+  renderAll();
+
+  // ============================================================
+  //  자동 새로고침 (60초) — 챗봇이 열려 있거나 화면이 백그라운드일 땐 건너뜀
+  // ============================================================
+  const REFRESH_INTERVAL_MS = 60000;
+  window.__loadedAt = Date.now();
+  function refreshIfIdle(){
+    if (document.hidden) return;
+    if (document.getElementById('chatPanel').classList.contains('open')) return;
+    location.reload();
+  }
+  setInterval(refreshIfIdle, REFRESH_INTERVAL_MS);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && Date.now() - window.__loadedAt > REFRESH_INTERVAL_MS) refreshIfIdle();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<script src="js/gate.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<title>측정 계산기</title>
+<meta name="theme-color" content="#0b1636">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico" sizes="any">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  html { height: 100%; background: #F8FAFC; }
+  body {
+    min-height: 100%; min-height: 100dvh;
+    background: #F8FAFC; color: #334155;
+    display: flex; flex-direction: column;
+    overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+
+  /* ---------- 헤더 (다크 네이비 유지 - 브랜드 톤/통일감) ---------- */
+  header {
+    position: relative;
+    padding: calc(env(safe-area-inset-top) + 14px) 18px 12px;
+    display: flex; align-items: center;
+    background: linear-gradient(180deg, #0d1836 0%, #0b1636 100%);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  header .back { position: absolute; left: 18px; top: calc(env(safe-area-inset-top) + 14px); width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center; text-decoration: none; color: #fff; font-size: 15px; z-index: 1; }
+  header .title { flex: 1; text-align: center; }
+  header .title .t1 { font-size: 15.5px; font-weight: 900; color: #fff; }
+  header .title .t2 { margin-top: 1px; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #e0b060; }
+
+  /* ---------- 본문 ---------- */
+  main { flex: 1; padding: 16px 16px calc(env(safe-area-inset-bottom) + 84px); max-width: 480px; width: 100%; margin: 0 auto; }
+  .panel { display: none; flex-direction: column; gap: 12px; }
+  .panel.active { display: flex; }
+
+  .card {
+    background: #FFFFFF; border: 1px solid #E2E8F0;
+    border-radius: 18px; padding: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+  }
+  .card h2 { font-size: 12px; font-weight: 800; letter-spacing: .3px; color: #b8863c; margin-bottom: 12px; text-transform: uppercase; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { font-size: 11.5px; font-weight: 700; color: #64748B; }
+  .field input[type=number], .field input[type=text] {
+    width: 100%; min-width: 0; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px;
+    padding: 12px 13px; font-size: 15px; font-weight: 700; color: #1E293B; font-family: inherit;
+    -moz-appearance: textfield;
+  }
+  .field input:focus { outline: none; border-color: #e0b060; }
+  .field input[readonly] { caret-color: transparent; cursor: pointer; }
+  .field input[readonly]:focus { border-color: #e0b060; }
+  .row2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; min-width: 0; }
+  .row2 .field { min-width: 0; }
+  .row2 .field label { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .seg { display: grid; gap: 8px; }
+  .seg.g2 { grid-template-columns: 1fr 1fr; }
+  .seg.g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .seg button {
+    padding: 10px 8px; border-radius: 12px; border: 1px solid #E2E8F0;
+    background: #F1F5F9; color: #334155; font-size: 12px; font-weight: 800;
+    font-family: inherit;
+  }
+  /* 선택된 상태는 금색 배경 + 진한 텍스트로 확실하게 대비를 줘서 한눈에 구분되게 한다 */
+  .seg button.on { background: #e0b060; border-color: #e0b060; color: #1a1206; font-weight: 900; }
+
+  .btn-primary {
+    width: 100%; padding: 14px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff;
+    font-size: 14.5px; font-weight: 800; font-family: inherit;
+    box-shadow: 0 10px 24px rgba(255,85,0,.25);
+  }
+  .btn-primary:active { transform: scale(.98); }
+  .btn-secondary {
+    width: 100%; padding: 12px; border-radius: 14px; border: 1px solid #CBD5E1;
+    background: #F1F5F9; color: #475569; font-size: 13px; font-weight: 800; font-family: inherit;
+  }
+  .btn-secondary:active { background: #E2E8F0; }
+
+  .result-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; border-bottom: 1px solid #F1F5F9; }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .rl { font-size: 11.5px; font-weight: 700; color: #64748B; }
+  .result-row .rv { font-size: 15px; font-weight: 800; color: #1E293B; font-variant-numeric: tabular-nums; }
+
+  /* ---------- 간이계산기 계산 기록(누적) ---------- */
+  .card-head-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .card-head-row h2 { margin-bottom: 0; }
+  .hist-clear-btn { font-size: 10.5px; font-weight: 700; color: #94A3B8; background: none; border: none; font-family: inherit; padding: 4px 6px; }
+  .hist-clear-btn:active { color: #EF4444; }
+  .calc-history { display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; }
+  .hist-empty { text-align: center; font-size: 11.5px; color: #94A3B8; padding: 14px 0; }
+  .hist-item { padding: 10px 2px; border-bottom: 1px solid #F1F5F9; }
+  .hist-item:last-child { border-bottom: none; }
+  .hist-item .he { font-size: 12px; color: #64748B; font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist-item .hr { margin-top: 2px; font-size: 16px; font-weight: 800; color: #b8863c; font-variant-numeric: tabular-nums; }
+  .verdict { text-align: center; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 900; letter-spacing: .5px; margin-top: 4px; }
+  .verdict.pass { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+  .verdict.warn { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+  .verdict:not(.pass):not(.warn):not(.fail) { background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; font-size: 13px; letter-spacing: 0; }
+  .verdict.fail { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+  .hint { font-size: 11.5px; color: #64748B; line-height: 1.6; margin-top: 10px; }
+
+  /* ---------- 시뮬레이터 ---------- */
+  .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .preset-grid button {
+    padding: 10px; border-radius: 12px; border: 1px solid #E2E8F0;
+    background: #F1F5F9; color: #334155; font-size: 11px; font-weight: 700; text-align: left; font-family: inherit;
+  }
+  .slider-row { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 700; color: #64748B; margin-bottom: 4px; }
+  .slider-row span { color: #b8863c; font-weight: 800; }
+  input[type=range] { width: 100%; accent-color: #e0b060; }
+  canvas { width: 100%; height: 220px; display: block; border-radius: 12px; background: #F1F5F9; touch-action: none; }
+
+  /* ---------- 커스텀 숫자 키패드 ---------- */
+  .keypad-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 49;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+  }
+  .keypad-backdrop.show { opacity: 1; pointer-events: auto; }
+  .keypad-overlay {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    max-width: 480px; margin: 0 auto;
+    background: #0b1636; border: 1px solid rgba(255,255,255,.1); border-bottom: none;
+    border-radius: 20px 20px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,.45);
+    padding: 14px 14px calc(env(safe-area-inset-bottom) + 14px);
+    transform: translateY(100%); transition: transform .22s ease;
+  }
+  .keypad-overlay.show { transform: translateY(0); }
+  .keypad-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 2px; }
+  .keypad-head .kl { font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.5); }
+  .keypad-head .kv { font-size: 18px; font-weight: 900; color: #e0b060; font-variant-numeric: tabular-nums; }
+  .keypad-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+  .keypad-grid button {
+    padding: 15px 0; border-radius: 12px; border: 1px solid rgba(255,255,255,.1);
+    background: #0c1730; color: #fff; font-size: 17px; font-weight: 800; font-family: inherit;
+  }
+  .keypad-grid button:active { background: #16233f; }
+  .keypad-grid button.op { color: #e0b060; }
+  /* [2026-10-16] 빠른 입력: 연타 확대·길게 누르기 메뉴 막기 + 누름 표시 */
+  .ck-grid button, .keypad-grid button { touch-action: manipulation; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+  .keypad-grid button.tap { background: #16233f; }
+  .keypad-grid button.opdark { background: #16233f; color: #e0b060; }
+  .keypad-grid button.opdark:active { background: #1e2f54; }
+  .keypad-grid button.eq { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+  .keypad-grid button.wide { grid-column: span 2; }
+  .keypad-grid button.done { background: linear-gradient(135deg, #ff7a2f, #ff5500); color: #fff; grid-column: span 2; }
+
+  /* ---------- 하단 탭바 ---------- */
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    padding: 8px 10px calc(env(safe-area-inset-bottom) + 8px);
+    background: rgba(11,22,54,.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex; gap: 4px; max-width: 480px; margin: 0 auto; width: 100%;
+  }
+  .tabbar .tbtn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 2px; border-radius: 12px; background: none; border: none; color: rgba(255,255,255,.62);
+    font-family: inherit;
+  }
+  .tabbar .tbtn.on { color: #e0b060; }
+  .tabbar .tbtn svg { width: 20px; height: 20px; }
+  .tabbar .tbtn .tl { font-size: 11px; font-weight: 800; }
+
+  /* ==========================================================
+     2026-09 개편: 한 화면 · 즉시 계산 (심사·출장·회의용)
+     ========================================================== */
+  main { padding-top: 12px; }
+  .panel { gap: 10px; }
+  .card { padding: 14px; border-radius: 16px; }
+  .card h2 { margin-bottom: 10px; }
+  .seg.g5 { grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .seg.g5 button { padding: 10px 2px; font-size: 12.5px; }
+  .seg.g6 { grid-template-columns: repeat(6, 1fr); gap: 5px; }
+  .seg.g6 button { padding: 10px 1px; font-size: 12px; letter-spacing: -0.3px; }
+  /* 불량률 환산 전용 */
+  .rt-sum { margin: 10px 0 10px; padding: 14px 16px; border-radius: 16px; background: linear-gradient(135deg,#0F1B3D,#1E2C55); color: #fff; }
+  .rt-sum .k { font-size: 11.5px; font-weight: 800; letter-spacing: .04em; color: #e0b060; }
+  .rt-sum .v { font-size: 26px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .rt-sum .v small { font-size: 15px; font-weight: 800; color: #CBD5E1; margin-left: 4px; }
+  .rt-sum .s { font-size: 12.5px; font-weight: 700; color: #CBD5E1; margin-top: 4px; }
+  .rt-pre { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
+  .rt-pre button { padding: 8px 0; border-radius: 10px; border: 1.5px solid #E2E8F0; background: #fff; font-size: 13px; font-weight: 800; color: #334155; font-family: inherit; cursor: pointer; }
+  .rt-pre button.on { border-color: #e0b060; background: #FFFBF2; color: #9a6b1f; }
+  .rt-pre-l { font-size: 11.5px; font-weight: 800; color: #64748B; margin: 0 2px 5px; }
+  .rt-lot { margin-top: 12px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 14px; border: 1.5px dashed #CBD5E1; background: #F8FAFC; cursor: pointer; }
+  .rt-lot .l { flex: none; font-size: 13px; font-weight: 900; color: #0F172A; }
+  .rt-lot .l small { display: block; font-size: 11px; font-weight: 700; color: #64748B; }
+  .rt-lot input { flex: 1; min-width: 0; border: none; background: none; outline: none; text-align: right; font-size: 20px; font-weight: 800; color: #1E293B; font-family: inherit; caret-color: transparent; cursor: pointer; }
+  .rt-lot-r { text-align: right; font-size: 13px; font-weight: 800; color: #9a6b1f; margin: 6px 4px 0; min-height: 18px; }
+  .cv-link { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin: 14px 0 0; padding: 11px 14px; border-radius: 12px; border: none; background: #EEF2F7; color: #334155; font-size: 13px; font-weight: 800; font-family: inherit; cursor: pointer; }
+  .cv-link svg { width: 16px; height: 16px; flex: none; }
+  .seg button { font-size: 12.5px; }
+  .field { margin-bottom: 10px; }
+  .field input[type=text] { padding: 10px 12px; }
+  .hint { margin-top: 8px; }
+
+  /* ---------- ① 계산기 ---------- */
+  #panel-quick { gap: 0; }
+  .calc-screen { background: linear-gradient(180deg, #0d1836 0%, #0b1636 100%); border-radius: 20px; padding: 10px 14px 8px; color: #fff; box-shadow: 0 10px 24px -10px rgba(11,22,54,.55); }
+  .cs-hist { height: 58px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px); mask-image: linear-gradient(to bottom, transparent 0, #000 16px); overflow-y: auto; display: flex; flex-direction: column-reverse; gap: 1px; scrollbar-width: none; }
+  .cs-hist::-webkit-scrollbar { display: none; }
+  .cs-hist .hi { text-align: right; font-size: 13px; color: rgba(255,255,255,.5); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 1px 0; cursor: pointer; font-variant-numeric: tabular-nums; flex: none; }
+  .cs-hist .hi b { color: #e0b060; font-weight: 800; }
+  .cs-hist .hi .mm { color: #fff; font-weight: 800; }
+  .hs-back { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 55; opacity: 0; pointer-events: none; transition: opacity .18s; }
+  .hs-back.show { opacity: 1; pointer-events: auto; }
+  .hs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 56; max-width: 480px; margin: 0 auto; background: #fff; border-radius: 20px 20px 0 0; padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px); transform: translateY(105%); transition: transform .2s ease; box-shadow: 0 -10px 30px rgba(0,0,0,.25); }
+  .hs.show { transform: translateY(0); }
+  .hs-line { font-size: 18px; font-weight: 800; color: #0F172A; text-align: right; font-variant-numeric: tabular-nums; word-break: break-all; }
+  .hs-line b { color: #b8863c; }
+  #hsMemo { width: 100%; margin-top: 12px; height: 46px; padding: 0 12px; border-radius: 12px; border: 1.5px solid #E2E8F0; background: #F8FAFC; font-size: 15px; font-weight: 700; color: #0F172A; font-family: inherit; }
+  #hsMemo:focus { outline: none; border-color: #e0b060; background: #fff; }
+  .hs-btns { display: grid; grid-template-columns: 1fr 0.9fr 1.3fr; gap: 8px; margin-top: 12px; }
+  .hs-btns button { height: 52px; border-radius: 14px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 14px; font-weight: 800; color: #334155; font-family: inherit; }
+  .hs-btns button.pri { background: #e0b060; border-color: #e0b060; color: #1a1206; font-size: 16px; font-weight: 900; }
+  .hs-btns button.soft { background: #fff; color: #64748B; font-size: 12.5px; font-weight: 700; }
+  .cs-hist .hi.empty { color: rgba(255,255,255,.28); cursor: default; }
+  .cs-expr { margin-top: 4px; text-align: right; font-size: 36px; line-height: 46px; min-height: 46px; font-weight: 800; letter-spacing: -.5px; word-break: break-all; font-variant-numeric: tabular-nums; }
+  .cs-expr.m { font-size: 28px; line-height: 36px; }
+  .cs-expr.s { font-size: 21px; line-height: 27px; }
+  .cs-expr.done { color: #e0b060; }
+  .cs-prev { text-align: right; font-size: 19px; min-height: 26px; line-height: 26px; font-weight: 700; color: rgba(255,255,255,.5); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cs-foot { display: flex; align-items: center; gap: 6px; margin-top: 6px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,.08); }
+  .cs-foot .sp { flex: 1; }
+  .cs-foot button { background: rgba(255,255,255,.06); border: none; color: rgba(255,255,255,.6); font-size: 11.5px; font-weight: 800; font-family: inherit; padding: 7px 10px; border-radius: 10px; }
+  .cs-foot button.bk { color: #e0b060; font-size: 17px; padding: 4px 14px; }
+  .cs-foot button:active { background: rgba(255,255,255,.14); }
+  .ck-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+  .ck-grid button { height: clamp(50px, 8.2dvh, 72px); outline: none; border-radius: 16px; border: 1px solid #E2E8F0; background: #fff; color: #0F172A; font-size: 25px; font-weight: 700; font-family: inherit; box-shadow: 0 2px 0 #E2E8F0; user-select: none; -webkit-user-select: none; }
+  .ck-grid button:active, .ck-grid button.tap { transform: translateY(2px); box-shadow: none; background: #F1F5F9; }
+  .ck-grid button.fn { background: #F8FAFC; color: #9a6b1f; font-size: 20px; font-weight: 800; }
+  .ck-grid button.fn.c { color: #DC2626; }
+  .ck-grid button.op { background: #FBF3E4; border-color: #F0DDB8; color: #9a6b1f; font-size: 27px; box-shadow: 0 2px 0 #F0DDB8; }
+  .ck-grid button.eq { background: #0b1636; border-color: #0b1636; color: #e0b060; font-size: 28px; box-shadow: 0 2px 0 #050b1d; }
+  .ck-grid button.eq:active { background: #16233f; }
+
+  /* ---------- ② 환산 ---------- */
+  .cv-list { display: flex; flex-direction: column; gap: 8px; }
+  .cv-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 14px; border: 1.5px solid #E2E8F0; background: #fff; cursor: pointer; transition: border-color .15s; }
+  .cv-row.src { border-color: #e0b060; background: #FFFBF2; box-shadow: 0 0 0 3px rgba(224,176,96,.16); }
+  .cv-u { flex: none; width: 84px; }
+  .cv-u .n { font-size: 16px; font-weight: 900; color: #0F172A; }
+  .cv-u .d { font-size: 11.5px; font-weight: 700; color: #64748B; margin-top: 1px; }
+  .cv-row input { flex: 1; min-width: 0; border: none; background: none; outline: none; text-align: right; font-size: 23px; font-weight: 800; color: #1E293B; font-family: inherit; font-variant-numeric: tabular-nums; caret-color: transparent; cursor: pointer; }
+  .cv-row.src input { color: #9a6b1f; }
+  .cv-dms { flex: 1; min-width: 0; display: flex; align-items: baseline; justify-content: flex-end; gap: 2px; }
+  .cv-dms input { flex: 0 1 54px; width: 54px; min-width: 0; font-size: 21px !important; padding: 2px 0; border-bottom: 1.5px dashed #CBD5E1 !important; }
+  .cv-dms input:first-child { flex-basis: 62px; width: 62px; }
+  .cv-dms span { font-size: 18px; font-weight: 900; color: #94A3B8; margin-right: 4px; }
+  .cv-tip { font-size: 12px; font-weight: 700; color: #64748B; text-align: center; margin-top: 2px; }
+
+  /* ---------- ④ Cpk · 불량률 ---------- */
+  .sub { display: none; flex-direction: column; gap: 10px; }
+  .sub.active { display: flex; }
+  .data-head { display: flex; align-items: center; gap: 6px; }
+  .data-head h2 { flex: 1; margin: 0; }
+  .mini-btn { padding: 8px 11px; border-radius: 10px; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 12px; font-weight: 800; color: #334155; font-family: inherit; white-space: nowrap; }
+  .mini-btn.pri { background: #0b1636; border-color: #0b1636; color: #e0b060; }
+  .mini-btn:active { transform: scale(.97); }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; max-height: 54px; overflow-y: auto; }
+  .chips span { font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 8px; background: #F1F5F9; color: #334155; font-variant-numeric: tabular-nums; cursor: pointer; }
+  .chips span.ng { background: #FEE2E2; color: #991B1B; }
+  .chips .none { font-size: 12px; font-weight: 700; color: #64748B; background: none; padding: 4px 0; cursor: default; }
+  .hero { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 14px; background: #F1F5F9; border: 1px solid #E2E8F0; }
+  .hero .k { font-size: 12px; font-weight: 800; color: #64748B; }
+  .hero .k small { display: block; font-size: 10.5px; font-weight: 700; margin-top: 2px; opacity: .85; }
+  .hero .v { font-size: 30px; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; line-height: 1.1; text-align: right; }
+  .hero .v small { display: block; font-size: 12.5px; font-weight: 800; margin-top: 2px; }
+  .hero.pass { background: #D1FAE5; border-color: #A7F3D0; } .hero.pass .v, .hero.pass .k { color: #065F46; }
+  .hero.good { background: #ECFDF5; border-color: #A7F3D0; } .hero.good .v, .hero.good .k { color: #047857; }
+  .hero.warn { background: #FEF3C7; border-color: #FDE68A; } .hero.warn .v, .hero.warn .k { color: #92400E; }
+  .hero.fail { background: #FEE2E2; border-color: #FECACA; } .hero.fail .v, .hero.fail .k { color: #991B1B; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .stat-grid > div { background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 10px; padding: 6px 4px; text-align: center; min-width: 0; }
+  .stat-grid .k { font-size: 11.5px; font-weight: 700; color: #64748B; }
+  .stat-grid .v { font-size: 14px; font-weight: 800; color: #1E293B; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dotplot { display: block; width: 100%; height: 46px; margin-top: 8px; }
+  .ref-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .ref-table th, .ref-table td { padding: 7px 6px; font-size: 13px; text-align: center; border-bottom: 1px solid #F1F5F9; }
+  .ref-table th { font-size: 12px; font-weight: 800; color: #64748B; }
+  .ref-table td { font-weight: 800; color: #1E293B; }
+  .ref-table tr.on td { background: #FBF3E4; color: #9a6b1f; }
+
+
+  /* ---------- ③ GD&T ---------- */
+  .seg.g4 { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .seg.g4 button { padding: 10px 2px; }
+  .seg.g5x { display: grid; grid-template-columns: 1fr 1fr 6px 1fr 1fr 1fr; gap: 6px; }
+  .seg.g5x button { padding: 9px 2px; font-size: 12px; }
+  .gd-res { display: flex; align-items: center; gap: 12px; padding: 12px; }
+  .gd-fig { flex: none; width: 112px; height: 112px; border-radius: 12px; background: #F8FAFC; }
+  .gd-res-r { flex: 1; min-width: 0; }
+  .gd-res-r .verdict { margin: 0 0 6px; padding: 9px 6px; font-size: 14.5px; }
+  .gd-kv { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; padding: 4px 2px; border-bottom: 1px solid #F1F5F9; font-size: 11.5px; font-weight: 700; color: #64748B; }
+  .gd-kv:last-child { border-bottom: none; }
+  .gd-kv b { font-size: 14px; font-weight: 800; color: #1E293B; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #gd-pos.no-mmc .mmc-only { visibility: hidden; }
+  #gd-pos.no-mmc .row2.mmc-only { display: none; }
+
+  .fit-ctl { display: grid; grid-template-columns: 104px 1fr; gap: 12px; align-items: end; margin-top: 10px; }
+  .fit-sl .slider-row { font-size: 11px; margin-bottom: 8px; }
+  .fit-card { display: flex; align-items: center; gap: 8px; padding: 10px; }
+  .fit-fig { flex: none; width: 146px; height: 146px; }
+  .fit-legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .fl { display: flex; align-items: center; gap: 7px; padding: 4px 7px; border-radius: 10px; border: 1px solid transparent; }
+  .fl.hi { background: #F0FDF4; border-color: #BBF7D0; }
+  .fl i { flex: none; width: 14px; height: 0; border-top: 3px solid; border-radius: 2px; }
+  .fl i.dash { border-top-style: dashed; }
+  .fl.two i { height: auto; border: none; font-style: normal; font-size: 13px; font-weight: 900; color: #0EA5E9; text-align: center; line-height: 1; }
+  .fl.two { border-top: 1px dashed #E2E8F0; border-radius: 0 0 10px 10px; }
+  .fl b.sm { font-size: 11.5px; line-height: 1.15; text-align: right; }
+  .fl .t { flex: 1; min-width: 0; font-size: 11px; word-break: keep-all; font-weight: 800; color: #334155; line-height: 1.25; }
+  .fl .t small { display: block; font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: #64748B; }
+  .fl b { font-size: 13px; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .fit-concl { background: #0b1636; color: #fff; border-radius: 14px; padding: 10px 13px; font-size: 12px; font-weight: 700; line-height: 1.5; }
+  .fit-concl b { color: #e0b060; }
+  .fit-concl .s { display: block; margin-top: 4px; font-size: 11.5px; color: rgba(255,255,255,.7); font-weight: 600; }
+
+  .p3-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 10px; }
+  .p3-grid .field { margin-bottom: 8px; }
+
+  .sym-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .sym-grid button { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 2px 7px; border-radius: 12px; border: 1px solid #E2E8F0; background: #fff; font-family: inherit; color: #0F172A; }
+  .sym-grid button svg { width: 24px; height: 24px; }
+  .sym-grid button span { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
+  .sym-grid button.on { background: #0b1636; border-color: #0b1636; color: #e0b060; }
+  .sym-grid button.on span { color: #fff; }
+  .sym-grid .grp { grid-column: 1 / -1; font-size: 10.5px; font-weight: 800; color: #b8863c; margin: 4px 2px -2px; }
+  .sym-card .sh { display: flex; align-items: center; gap: 12px; }
+  .sym-card .sh .ic { flex: none; width: 48px; height: 48px; border-radius: 12px; border: 2px solid #0b1636; display: grid; place-items: center; color: #0b1636; }
+  .sym-card .sh .ic svg { width: 30px; height: 30px; }
+  .sym-card .sh .nm { font-size: 17px; font-weight: 900; color: #0F172A; }
+  .sym-card .sh .en { font-size: 11.5px; font-weight: 700; color: #64748B; margin-top: 1px; }
+  .sym-card .zone { margin-top: 10px; font-size: 13px; font-weight: 700; color: #334155; line-height: 1.55; }
+  .sym-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .sym-tags span { font-size: 11.5px; font-weight: 800; padding: 5px 9px; border-radius: 999px; background: #F1F5F9; color: #334155; }
+  .sym-tags span.y { background: #DCFCE7; color: #166534; }
+  .sym-tags span.n { background: #F1F5F9; color: #94A3B8; }
+  .sym-card .tip { margin-top: 10px; padding-top: 8px; border-top: 1px dashed #E2E8F0; font-size: 11.5px; font-weight: 700; color: #64748B; line-height: 1.5; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 84px); transform: translateX(-50%) translateY(10px); background: rgba(11,22,54,.94); color: #fff; font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 12px; opacity: 0; pointer-events: none; transition: all .2s; z-index: 60; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.act.show { pointer-events: auto; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; }
+  .toast button { border: none; background: #e0b060; color: #1a1206; font-weight: 900; font-size: 12.5px; font-family: inherit; padding: 7px 12px; border-radius: 9px; }
+  /* ---------- [2026-09-30] GD&T · Cpk 개편 ---------- */
+  .gd-more { display: none; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gd-more.open { display: grid; }
+  .gd-more button { padding: 10px 8px; border-radius: 12px; border: 1px dashed #CBD5E1; background: #fff; color: #334155; font-size: 12.5px; font-weight: 900; font-family: inherit; text-align: left; line-height: 1.3; }
+  .gd-more button small { display: block; font-size: 10.5px; font-weight: 700; color: #94A3B8; margin-top: 2px; }
+  .gd-more button.on { background: #0b1636; border: 1px solid #0b1636; color: #e0b060; }
+  .gd-more button.on small { color: rgba(255,255,255,.65); }
+  .pos-hero { padding: 12px 12px 10px; }
+  .pos-fig { display: block; width: 100%; max-width: 230px; margin: 0 auto; aspect-ratio: 1; }
+  .pos-hero .verdict { margin: 6px 0 8px; font-size: 18px; padding: 12px; }
+  .pos-kv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .pos-kv > div { background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 10px; padding: 6px 4px; text-align: center; min-width: 0; }
+  .pos-kv span { display: block; font-size: 11px; font-weight: 700; color: #64748B; }
+  .pos-kv b { display: block; font-size: 14px; font-weight: 900; color: #0F172A; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pos-mode { margin-bottom: 12px; }
+  .xy-grid { display: grid; grid-template-columns: 34px 1fr 1fr; gap: 6px 8px; align-items: center; }
+  .xy-grid > b { text-align: center; font-size: 12px; font-weight: 900; color: #0b1636; }
+  .xy-grid > span { font-size: 12px; font-weight: 800; color: #64748B; }
+  .xy-grid .field { margin: 0; }
+  .xy-diff { margin-top: 8px; text-align: center; font-size: 12px; font-weight: 700; color: #64748B; font-variant-numeric: tabular-nums; }
+  .xy-diff b { color: #0F172A; }
+  #gd-pos .pos-d { display: none; }
+  #gd-pos.in-d .pos-d { display: grid; }
+  #gd-pos.in-d .pos-xy { display: none; }
+  .bonus-h { font-size: 13px; font-weight: 900; color: #0F172A; margin-bottom: 8px; }
+  .bonus-h small { font-size: 11px; font-weight: 700; color: #94A3B8; margin-left: 4px; }
+  #gd-pos.no-mmc .mmc-box { display: none; }
+  #gd-pos .mmc-box { visibility: visible !important; }
+  .sym-card .how { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #0b1636; color: #fff; font-size: 12.5px; font-weight: 700; line-height: 1.55; }
+  .sym-card .how b { display: block; color: #e0b060; font-size: 11.5px; margin-bottom: 2px; }
+  .cpk-res .hero { padding: 14px 16px; }
+  .cpk-res .hero .v { font-size: 36px; }
+  .cpk-band { margin: 10px 2px 0; }
+  .cpk-band .bd { position: relative; height: 10px; border-radius: 999px; overflow: hidden; background: #F1F5F9; }
+  .cpk-band .bd i { position: absolute; top: 0; bottom: 0; }
+  .cpk-band .bd b { position: absolute; top: -3px; width: 4px; height: 16px; margin-left: -2px; border-radius: 2px; background: #0b1636; box-shadow: 0 0 0 2px #fff; }
+  .cpk-band .bl { position: relative; height: 16px; margin-top: 3px; font-size: 10px; font-weight: 800; color: #64748B; }
+  .cpk-band .bl span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .cpk-why { margin-top: 8px; padding: 10px 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700; line-height: 1.55; color: #334155; background: #F8FAFC; }
+  .cpk-why:empty { display: none; }
+  .cpk-why.ok { background: #F0FDF4; color: #166534; }
+  .cpk-why.mid { background: #FFFBEB; color: #92400E; }
+  .cpk-why.bad { background: #FEF2F2; color: #991B1B; }
+  .histo { display: block; width: 100%; height: auto; margin-top: 10px; }
+  .sec-t { font-size: 12.5px; font-weight: 900; color: #0b1636; margin: 2px 2px -4px; }
+  #sub-conv.active { margin-top: 12px; }
+  /* ---------- ⑤ AQL 샘플링 (KS Q ISO 2859-1 · 보통 검사 1회) ---------- */
+  .aq-lot { display: flex; align-items: center; gap: 8px; }
+  .aq-lot input { flex: 1; min-width: 0; text-align: right; font-size: 22px !important; font-weight: 900 !important; padding: 10px 13px !important; }
+  .aq-lot span { font-size: 12.5px; font-weight: 800; color: #64748B; }
+  .aq-chips { display: flex; gap: 6px; margin-top: 8px; }
+  .aq-chips button { flex: 1; height: 30px; border-radius: 999px; border: 1px solid #E2E8F0; background: #F8FAFC; color: #475569; font-size: 11.5px; font-weight: 800; font-family: inherit; padding: 0; }
+  .aq-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+  .aq-row .k { flex: none; width: 52px; font-size: 11.5px; font-weight: 800; color: #64748B; }
+  .aq-row .seg { flex: 1; }
+  .seg.g4 { grid-template-columns: repeat(4, 1fr); }
+  .seg.aq button { padding: 9px 2px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .aq-more { margin: 6px 0 0 60px; font-size: 11px; font-weight: 800; color: #b8863c; background: none; border: none; font-family: inherit; padding: 2px 0; }
+  #aqSpecial { display: none; margin: 6px 0 0 60px; }
+  .aq-res { border-radius: 18px; padding: 14px; background: linear-gradient(135deg, #1b3577 0%, #12234f 55%, #0e1b3e 100%); color: #fff; text-align: center; box-shadow: 0 10px 22px rgba(10,30,90,.25); }
+  .aq-res .top { font-size: 11px; font-weight: 800; color: rgba(255,255,255,.55); }
+  .aq-res .top b { color: #e0b060; }
+  .aq-res .g { display: grid; grid-template-columns: 1.2fr 1fr 1fr; margin-top: 8px; }
+  .aq-res .g > div + div { border-left: 1px solid rgba(255,255,255,.12); }
+  .aq-res .k { font-size: 11px; font-weight: 800; color: rgba(255,255,255,.55); }
+  .aq-res .v { font-size: 30px; font-weight: 900; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .aq-res .v.ac { color: #6ee7b7; } .aq-res .v.re { color: #fca5a5; }
+  .aq-res .u { font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.4); }
+  .aq-res .say { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.12); font-size: 12.5px; font-weight: 700; line-height: 1.5; }
+  .aq-res .say b { color: #e0b060; }
+  .aq-res .note { margin-top: 6px; font-size: 11px; font-weight: 700; color: #fcd34d; line-height: 1.45; }
+  .aq-res .full { margin-top: 8px; font-size: 24px; font-weight: 900; color: #e0b060; }
+  .aq-judge { display: flex; align-items: center; gap: 8px; }
+  .aq-judge input { width: 96px !important; text-align: center; font-size: 18px !important; font-weight: 900 !important; padding: 10px !important; }
+  .aq-judge .jr { flex: 1; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; background: #F1F5F9; color: #94A3B8; }
+  .aq-judge .jr.ok { background: #D1FAE5; color: #065F46; }
+  .aq-judge .jr.ng { background: #FEE2E2; color: #991B1B; }
+  .tabbar .tbtn .tl { white-space: nowrap; }
+  @media (max-width: 380px) { .tabbar { gap: 2px; padding-left: 6px; padding-right: 6px; } .tabbar .tbtn .tl { font-size: 10.5px; letter-spacing: -.3px; } }
+</style>
+</head>
+<body>
+
+  <header>
+    <a class="back" href="m.html">←</a>
+    <div class="title">
+      <div class="t1">측정 계산기</div>
+      <div class="t2">MEASUREMENT TOOLKIT</div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ 1. 계산기 (휴대폰 계산기 배치) ============ -->
+    <div id="panel-quick" class="panel active">
+      <div class="calc-screen">
+        <div class="cs-hist" id="csHist"></div>
+        <div class="cs-expr" id="csExpr">0</div>
+        <div class="cs-prev" id="csPrev"></div>
+        <div class="cs-foot">
+          <button type="button" onclick="cCopyHist()">기록 복사</button>
+          <button type="button" onclick="cClearHist()">기록 지우기</button>
+          <span class="sp"></span>
+          <button type="button" onclick="cCopy()">📋 복사</button>
+          <button type="button" class="bk" onclick="cBack()" aria-label="지우기">⌫</button>
+        </div>
+      </div>
+      <div class="ck-grid">
+        <button type="button" class="fn c" onclick="cClear()">C</button>
+        <button type="button" class="fn" onclick="cParen()">( )</button>
+        <button type="button" class="fn" onclick="cPercent()">%</button>
+        <button type="button" class="op" onclick="cOp('/')">÷</button>
+        <button type="button" onclick="cDigit('7')">7</button>
+        <button type="button" onclick="cDigit('8')">8</button>
+        <button type="button" onclick="cDigit('9')">9</button>
+        <button type="button" class="op" onclick="cOp('*')">×</button>
+        <button type="button" onclick="cDigit('4')">4</button>
+        <button type="button" onclick="cDigit('5')">5</button>
+        <button type="button" onclick="cDigit('6')">6</button>
+        <button type="button" class="op" onclick="cOp('-')">−</button>
+        <button type="button" onclick="cDigit('1')">1</button>
+        <button type="button" onclick="cDigit('2')">2</button>
+        <button type="button" onclick="cDigit('3')">3</button>
+        <button type="button" class="op" onclick="cOp('+')">+</button>
+        <button type="button" class="fn" onclick="cSign()">+/−</button>
+        <button type="button" onclick="cDigit('0')">0</button>
+        <button type="button" onclick="cDot()">.</button>
+        <button type="button" class="eq" onclick="cEquals()">=</button>
+      </div>
+    </div>
+
+    <!-- ============ 2. 환산 (한 번 입력 → 모든 단위) ============ -->
+    <div id="panel-conv" class="panel">
+      <div class="seg g6" id="cvCats">
+        <button type="button" data-cat="length" onclick="setConvCat('length')">길이</button>
+        <button type="button" data-cat="torque" onclick="setConvCat('torque')">토크</button>
+        <button type="button" data-cat="force" onclick="setConvCat('force')">힘</button>
+        <button type="button" data-cat="pressure" onclick="setConvCat('pressure')">압력</button>
+        <button type="button" data-cat="angle" onclick="setConvCat('angle')">각도</button>
+        <button type="button" data-cat="ratio" onclick="setConvCat('ratio')">불량률</button>
+      </div>
+      <div id="rtTop" style="display:none;">
+        <div class="rt-sum" id="rtSum"><div class="k">불량률</div><div class="v">–</div><div class="s">값을 넣거나 아래 버튼을 누르세요</div></div>
+        <div class="rt-pre-l">자주 쓰는 값 (ppm)</div>
+        <div class="rt-pre" id="rtPre">
+          <button type="button" onclick="ratioPreset(10)">10</button><button type="button" onclick="ratioPreset(50)">50</button><button type="button" onclick="ratioPreset(100)">100</button><button type="button" onclick="ratioPreset(500)">500</button><button type="button" onclick="ratioPreset(1000)">1,000</button>
+        </div>
+      </div>
+      <div class="cv-list" id="cvList"></div>
+      <div id="rtBottom" style="display:none;">
+        <div class="rt-lot" onclick="openKeypad(this.querySelector('input'))">
+          <div class="l">LOT 수량<small>예상 불량 개수 계산</small></div>
+          <input type="text" readonly id="rtLot" data-label="LOT 수량 (개)" placeholder="예: 15,120" oninput="ratioLot(this.value)">
+        </div>
+        <div class="rt-lot-r" id="rtLotR"></div>
+      </div>
+      <div class="cv-tip">아무 칸이나 눌러 값을 넣으면 나머지가 바로 바뀝니다</div>
+      <div class="hint" id="cvHint" style="text-align:center;margin-top:0;"></div>
+      <button type="button" class="cv-link" id="cvRateLink" style="display:none;" onclick="switchTab('cpk'); setCpkSub('rate');"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>불량 수 ÷ 검사 수로 계산 (Cpk·불량 탭)<span style="color:#94A3B8;">›</span></button>
+    </div>
+
+    <!-- ============ 3. GD&T (위치도 · 원 맞춤 비교 · 3점 원 · 기호 사전) ============ -->
+    <div id="panel-position" class="panel">
+      <!-- [2026-09-30] GD&T 개편: 위치도 판정 중심 · 기호/측정법 · 나머지는 더 보기 -->
+      <div class="seg g3" id="gdSubs">
+        <button type="button" data-sub="pos" onclick="setGdSub('pos')">위치도 판정</button>
+        <button type="button" data-sub="sym" onclick="setGdSub('sym')">기호 · 측정법</button>
+        <button type="button" data-sub="more" onclick="toggleGdMore()">더 보기 ▾</button>
+      </div>
+      <div class="gd-more" id="gdMore">
+        <button type="button" data-sub="fit" onclick="setGdSub('fit')">⭕ 원 맞춤 비교<small>핀·링게이지 vs CMM</small></button>
+        <button type="button" data-sub="p3" onclick="setGdSub('p3')">📍 3점으로 원 구하기<small>현미경·하이트 좌표</small></button>
+      </div>
+
+      <!-- 3-1 위치도 판정 -->
+      <div class="sub" id="gd-pos">
+        <div class="card pos-hero">
+          <svg class="pos-fig" id="posFig" viewBox="0 0 240 240"></svg>
+          <div id="res-verdict" class="verdict">계산 대기 중</div>
+          <div class="pos-kv">
+            <div><span>위치도 오차</span><b id="res-error">–</b></div>
+            <div><span>허용 공차</span><b id="res-allow">–</b></div>
+            <div><span>보너스</span><b id="res-bonus">–</b></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="seg g2 pos-mode" id="posMode">
+            <button type="button" data-m="xy" onclick="setPosIn('xy')">좌표로 입력</button>
+            <button type="button" data-m="d" onclick="setPosIn('d')">편차로 입력</button>
+          </div>
+          <div class="pos-xy">
+            <div class="xy-grid">
+              <span></span><b>X</b><b>Y</b>
+              <span>도면</span>
+              <div class="field"><input type="text" readonly id="pos-nx" data-label="도면 X (이론 위치)" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <div class="field"><input type="text" readonly id="pos-ny" data-label="도면 Y (이론 위치)" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <span>실측</span>
+              <div class="field"><input type="text" readonly id="pos-mx" data-label="실측 X" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <div class="field"><input type="text" readonly id="pos-my" data-label="실측 Y" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+            </div>
+            <div class="xy-diff" id="posDiff">편차 ΔX – · ΔY –</div>
+          </div>
+          <div class="row2 pos-d">
+            <div class="field"><label>X 편차 ΔX (mm)</label><input type="text" readonly id="pos-dx" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+            <div class="field"><label>Y 편차 ΔY (mm)</label><input type="text" readonly id="pos-dy" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+          </div>
+          <div class="field" style="margin-top:10px;"><label>도면 위치도 공차 ⌖ Ø (mm)</label><input type="text" readonly id="pos-tol" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+        </div>
+
+        <div class="card">
+          <div class="bonus-h">보너스 공차 <small>도면 공차 뒤에 Ⓜ·Ⓛ가 있을 때만</small></div>
+          <div class="seg g3">
+            <button type="button" id="mmc-none" onclick="setMmcMode('none')">없음 (RFS)</button>
+            <button type="button" id="mmc-mmc" onclick="setMmcMode('mmc')">Ⓜ MMC</button>
+            <button type="button" id="mmc-lmc" onclick="setMmcMode('lmc')">Ⓛ LMC</button>
+          </div>
+          <div class="mmc-only mmc-box">
+            <div class="seg g2" style="margin-top:10px;">
+              <button type="button" id="ft-hole" onclick="setFeatureType('hole')">구멍 (내경)</button>
+              <button type="button" id="ft-shaft" onclick="setFeatureType('shaft')">축 (외경)</button>
+            </div>
+            <div class="field" style="margin-top:10px;"><label>실제 측정 치수</label><input type="text" readonly id="pos-actual" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+            <div class="row2">
+              <div class="field"><label id="lbl-size-max">최대 허용 치수</label><input type="text" readonly id="pos-size-max" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+              <div class="field"><label id="lbl-size-min">최소 허용 치수</label><input type="text" readonly id="pos-size-min" onclick="openKeypad(this)" oninput="calculatePosition()"></div>
+            </div>
+          </div>
+          <div class="hint">Ø 원형 공차역 기준 · 오차 = 2√(ΔX²+ΔY²) · 데이텀 Ⓜ에 의한 추가 여유(데이텀 이동)는 미포함</div>
+        </div>
+      </div>
+
+      <!-- 3-2 원 맞춤 방식 비교 -->
+      <div class="sub" id="gd-fit">
+        <div class="card">
+          <div class="seg g5x">
+            <button type="button" data-feat="hole" onclick="setFit('feat','hole')">구멍</button>
+            <button type="button" data-feat="shaft" onclick="setFit('feat','shaft')">축</button>
+            <span></span>
+            <button type="button" data-shape="2" onclick="setFit('shape',2)">타원</button>
+            <button type="button" data-shape="3" onclick="setFit('shape',3)">삼각</button>
+            <button type="button" data-shape="4" onclick="setFit('shape',4)">사각</button>
+          </div>
+          <div class="fit-ctl">
+            <div class="field" style="margin:0;"><label>공칭 Ø (mm)</label><input type="text" readonly id="fit-nom" onclick="openKeypad(this)" oninput="renderFit(); saveState();"></div>
+            <div class="fit-sl">
+              <div class="slider-row">찌그러짐 (형상 편차) <span id="fit-amp-v">0.040 mm</span></div>
+              <input type="range" id="fit-amp" min="0" max="0.2" step="0.005" oninput="ST.gd.fit.amp=parseFloat(this.value); renderFit(); saveState();">
+            </div>
+          </div>
+        </div>
+        <div class="card fit-card">
+          <svg class="fit-fig" id="fitFig" viewBox="0 0 200 200"></svg>
+          <div class="fit-legend" id="fitLegend"></div>
+        </div>
+        <div class="fit-concl" id="fitConcl"></div>
+      </div>
+
+      <!-- 3-3 3점으로 원 구하기 -->
+      <div class="sub" id="gd-p3">
+        <div class="card">
+          <div class="p3-grid">
+            <div class="field"><label>점1 X</label><input type="text" readonly id="p3-x1" onclick="openKeypad(this)" oninput="renderP3()"></div>
+            <div class="field"><label>점1 Y</label><input type="text" readonly id="p3-y1" onclick="openKeypad(this)" oninput="renderP3()"></div>
+            <div class="field"><label>점2 X</label><input type="text" readonly id="p3-x2" onclick="openKeypad(this)" oninput="renderP3()"></div>
+            <div class="field"><label>점2 Y</label><input type="text" readonly id="p3-y2" onclick="openKeypad(this)" oninput="renderP3()"></div>
+            <div class="field"><label>점3 X</label><input type="text" readonly id="p3-x3" onclick="openKeypad(this)" oninput="renderP3()"></div>
+            <div class="field"><label>점3 Y</label><input type="text" readonly id="p3-y3" onclick="openKeypad(this)" oninput="renderP3()"></div>
+          </div>
+          <div class="hint" style="margin-top:0;">측정 현미경·하이트게이지 등으로 원 둘레 위 3점 좌표를 잰 값 (서로 멀리 떨어진 점일수록 정확)</div>
+        </div>
+        <div class="card gd-res">
+          <svg class="gd-fig" id="p3Fig" viewBox="0 0 120 120"></svg>
+          <div class="gd-res-r">
+            <div class="verdict" id="p3Dia" style="background:#0b1636;color:#e0b060;border:none;">–</div>
+            <div class="gd-kv"><span>중심 X</span><b id="p3-cx">–</b></div>
+            <div class="gd-kv"><span>중심 Y</span><b id="p3-cy">–</b></div>
+            <div class="gd-kv"><span>원점 기준 위치도</span><b id="p3-pos">–</b></div>
+          </div>
+        </div>
+        <button type="button" class="btn-secondary" onclick="p3ToPos()">중심 좌표를 위치도 ΔX·ΔY로 보내기 →</button>
+      </div>
+
+      <!-- 3-4 기호 사전 -->
+      <div class="sub" id="gd-sym">
+        <div class="sym-grid" id="symGrid"></div>
+        <div class="card sym-card" id="symCard"></div>
+      </div>
+    </div>
+
+    <!-- ============ 4. Cpk · 불량률 ============ -->
+    <div id="panel-cpk" class="panel">
+      <!-- [2026-09-30] Cpk 개편: 공정능력 한눈에 / 불량 환산(불량률·PPM + Cpk↔PPM 통합) -->
+      <div class="seg g2" id="cpkSubs">
+        <button type="button" data-sub="data" onclick="setCpkSub('data')">공정능력 (Cpk)</button>
+        <button type="button" data-sub="rate" onclick="setCpkSub('rate')">불량 환산</button>
+      </div>
+
+      <!-- 4-1 측정값으로 바로 -->
+      <div class="sub" id="sub-data">
+        <div class="card">
+          <div class="row2">
+            <div class="field" style="margin-bottom:10px;"><label>규격 상한 USL</label><input type="text" readonly id="cpk-usl" placeholder="없으면 비움" onclick="openKeypad(this)" oninput="renderCpk(); saveState();"></div>
+            <div class="field" style="margin-bottom:10px;"><label>규격 하한 LSL</label><input type="text" readonly id="cpk-lsl" placeholder="없으면 비움" onclick="openKeypad(this)" oninput="renderCpk(); saveState();"></div>
+          </div>
+          <div class="data-head">
+            <h2 id="cpkN">측정값 0개</h2>
+            <button type="button" class="mini-btn" onclick="cpkClear()">지우기</button>
+            <button type="button" class="mini-btn" onclick="cpkPaste()">📋 붙여넣기</button>
+            <button type="button" class="mini-btn pri" onclick="openDataKeypad()">＋ 입력</button>
+          </div>
+          <div class="chips" id="cpkChips"></div>
+        </div>
+        <div class="card cpk-res">
+          <div class="hero" id="cpkHero"><div class="k">Cpk</div><div class="v">–</div></div>
+          <div class="cpk-band" id="cpkBand"></div>
+          <div class="cpk-why" id="cpkWhy"></div>
+          <div class="stat-grid">
+            <div><div class="k">평균</div><div class="v" id="st-mean">–</div></div>
+            <div><div class="k">표준편차 σ</div><div class="v" id="st-sd">–</div></div>
+            <div><div class="k">Cp</div><div class="v" id="st-cp">–</div></div>
+            <div><div class="k">최소</div><div class="v" id="st-min">–</div></div>
+            <div><div class="k">최대</div><div class="v" id="st-max">–</div></div>
+            <div><div class="k">예상 불량</div><div class="v" id="st-ppm">–</div></div>
+          </div>
+          <svg class="histo" id="cpkPlot" viewBox="0 0 320 132"></svg>
+          <div class="hint" id="cpkNote">σ = 측정값 전체 표준편차(n−1) → 엄밀히는 Ppk · 기준 예: AIAG PPAP 초기공정 1.67↑, 양산 1.33↑ (고객사 요구 우선)</div>
+        </div>
+      </div>
+
+      <!-- 4-2 불량률 · PPM -->
+      <div class="sub" id="sub-rate">
+        <div class="sec-t">① 검사 결과 → 불량률 · PPM</div>
+        <div class="card">
+          <div class="row2">
+            <div class="field"><label>검사 수 (ea)</label><input type="text" readonly id="dr-n" placeholder="예: 5000" onclick="openKeypad(this)" oninput="renderRate(); saveState();"></div>
+            <div class="field"><label>불량 수 (ea)</label><input type="text" readonly id="dr-d" placeholder="예: 3" onclick="openKeypad(this)" oninput="renderRate(); saveState();"></div>
+          </div>
+          <div class="field"><label>목표 PPM (선택)</label><input type="text" readonly id="dr-t" placeholder="예: 100 · 고객사 목표" onclick="openKeypad(this)" oninput="renderRate(); saveState();"></div>
+        </div>
+        <div class="card">
+          <div class="hero" id="drHero"><div class="k">불량률</div><div class="v">–</div></div>
+          <div class="stat-grid">
+            <div><div class="k">불량률 %</div><div class="v" id="dr-pct">–</div></div>
+            <div><div class="k">빈도</div><div class="v" id="dr-one">–</div></div>
+            <div><div class="k">목표 내 허용</div><div class="v" id="dr-allow">–</div></div>
+          </div>
+          <div class="hint">PPM = 불량 수 ÷ 검사 수 × 1,000,000 · 목표 내 허용 = 이 검사 수에서 목표 PPM을 넘지 않는 최대 불량 수</div>
+        </div>
+      </div>
+
+      <!-- 4-3 Cpk ↔ 예상 불량률 -->
+      <div class="sub" id="sub-conv">
+        <div class="sec-t">② Cpk ↔ 예상 불량 PPM</div>
+        <div class="card">
+          <div class="seg g2" id="cpSides" style="margin-bottom:12px;">
+            <button type="button" data-side="two" onclick="setCpSide('two')">양측 규격</button>
+            <button type="button" data-side="one" onclick="setCpSide('one')">편측 규격</button>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Cpk</label><input type="text" readonly id="cp-cpk" onclick="openKeypad(this)" oninput="cpFromCpk()"></div>
+            <div class="field"><label>예상 불량 PPM</label><input type="text" readonly id="cp-ppm" onclick="openKeypad(this)" oninput="cpFromPpm()"></div>
+          </div>
+        </div>
+        <div class="card">
+          <table class="ref-table" id="cpTable"></table>
+          <div class="hint">정규분포 · 공정 평균이 규격 중앙(양측)에 있다고 가정한 이론값입니다. 실제 불량률은 분포 형태·치우침에 따라 달라집니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 5. AQL 샘플링 검사표 ============ -->
+    <div id="panel-aql" class="panel">
+      <div class="card">
+        <div class="field" style="margin-bottom:0;"><label>로트 크기 (입고·출하 수량)</label>
+          <div class="aq-lot"><input type="text" readonly id="aq-lot" placeholder="0" data-label="로트 크기 (EA)" onclick="openKeypad(this)" oninput="aqLotInput()"><span>EA</span></div>
+        </div>
+        <div class="aq-chips" id="aqChips"></div>
+        <div class="aq-row"><span class="k">검사수준</span><div class="seg g3 aq" id="aqLv"></div></div>
+        <button type="button" class="aq-more" id="aqMore" onclick="aqToggleSpecial()">특별 검사수준 S-1~S-4 ▾</button>
+        <div class="seg g4 aq" id="aqSpecial"></div>
+        <div class="aq-row" style="align-items:flex-start;"><span class="k" style="padding-top:9px;">AQL %</span><div class="seg g4 aq" id="aqAql"></div></div>
+      </div>
+      <div class="aq-res" id="aqRes"></div>
+      <div class="card">
+        <div class="aq-judge">
+          <input type="text" readonly id="aq-def" placeholder="불량 수" data-label="시료 중 불량 개수" onclick="openKeypad(this)" oninput="aqJudge()">
+          <div class="jr" id="aqJudge">시료 검사 후 불량 수 입력</div>
+        </div>
+        <div class="hint">보통 검사 · 1회 샘플링 (KS Q ISO 2859-1 표 Ⅰ·Ⅱ-A) · 까다로운·수월한 검사 미포함 · 사내 검사기준서가 우선</div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tbtn on" data-tab="quick" onclick="switchTab('quick')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="12" x2="8" y2="12"></line><line x1="12" y1="12" x2="12" y2="12"></line><line x1="16" y1="12" x2="16" y2="12"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg>
+      <span class="tl">계산기</span>
+    </button>
+    <button class="tbtn" data-tab="conv" onclick="switchTab('conv')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+      <span class="tl">환산</span>
+    </button>
+    <button class="tbtn" data-tab="position" onclick="switchTab('position')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="3" x2="12" y2="7"></line><line x1="12" y1="17" x2="12" y2="21"></line><line x1="3" y1="12" x2="7" y2="12"></line><line x1="17" y1="12" x2="21" y2="12"></line></svg>
+      <span class="tl">GD&amp;T</span>
+    </button>
+    <button class="tbtn" data-tab="cpk" onclick="switchTab('cpk')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+      <span class="tl">Cpk·불량</span>
+    </button>
+    <button class="tbtn" data-tab="aql" onclick="switchTab('aql')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"></path><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg>
+      <span class="tl">AQL</span>
+    </button>
+  </nav>
+
+  <!-- ============ 숫자 키패드 (입력칸용) ============ -->
+  <div class="keypad-backdrop" id="keypadBackdrop" onclick="closeKeypad()"></div>
+  <div class="keypad-overlay" id="keypadOverlay">
+    <div class="keypad-head">
+      <span class="kl" id="keypadLabel">입력</span>
+      <span class="kv" id="keypadValue">0</span>
+    </div>
+    <div class="keypad-grid" id="keypadGrid"></div>
+  </div>
+  <input type="hidden" id="cpk-entry" value="">
+  <!-- 계산 기록 한 줄 누르면 뜨는 작은 선택창 -->
+  <div class="hs-back" id="hsBack" onclick="closeHistSheet()"></div>
+  <div class="hs" id="hs">
+    <div class="hs-line" id="hsLine"></div>
+    <input type="text" id="hsMemo" placeholder="✎ 메모 입력 (예: Ø10 내경)" autocomplete="off" enterkeyhint="done"
+           oninput="hsSaveMemo()" onkeydown="if (event.key === 'Enter') { event.preventDefault(); closeHistSheet(); }">
+    <div class="hs-btns">
+      <button type="button" class="soft" id="hsUse" onclick="hsUse()">이 값으로 계산</button>
+      <button type="button" onclick="hsCopy()">📋 복사</button>
+      <button type="button" class="pri" onclick="closeHistSheet()">완료</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script>
+  function id(x){ return document.getElementById(x); }
+  function parseNum(s){ const v = parseFloat(String(s == null ? '' : s).replace(/,/g, '')); return v; }
+  let toastTimer = null;
+  let toastAct = null;
+  function toast(msg, actLabel, actFn){
+    const t = id('toast'); toastAct = actFn || null;
+    t.innerHTML = ''; t.appendChild(document.createTextNode(msg));
+    if (actFn) { const b = document.createElement('button'); b.type = 'button'; b.textContent = actLabel; b.onclick = () => { const f = toastAct; toastAct = null; t.classList.remove('show'); if (f) f(); }; t.appendChild(b); }
+    t.classList.toggle('act', !!actFn); t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.classList.remove('show'); toastAct = null; }, actFn ? 4000 : 1800);
+  }
+  async function copyTextSafe(text){
+    try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) {}
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); return ok;
+  }
+
+  // -------- 저장 (마지막 입력값 유지) --------
+  const STATE_KEY = 'calc_state_v2', HIST_KEY = 'calc_hist_v2';
+  let ST = { tab: 'quick', convCat: 'length', conv: {}, cpkSub: 'data', usl: '', lsl: '', data: [], dr: { n: '', d: '', t: '' }, cpSide: 'two', cpk: '1.33' };
+  const GD0 = { sub: 'pos', sym: 9,
+    pos: { in: 'xy', ft: 'hole', mm: 'none', 'pos-nx': '25.000', 'pos-ny': '10.000', 'pos-mx': '25.030', 'pos-my': '10.020', 'pos-dx': '0.030', 'pos-dy': '0.020', 'pos-tol': '0.100', 'pos-actual': '10.02', 'pos-size-max': '10.05', 'pos-size-min': '9.95' },
+    fit: { feat: 'hole', shape: 2, amp: 0.04, nom: '10.00' },
+    p3: ['5.02', '0.01', '-2.49', '4.34', '-2.51', '-4.32'] };
+  let READY = false;
+  function loadState(){
+    try { const s = JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); if (s && typeof s === 'object') ST = Object.assign(ST, s); } catch (e) {}
+    const g = ST.gd || {};
+    ST.gd = Object.assign({}, GD0, g);
+    ST.gd.pos = Object.assign({}, GD0.pos, g.pos || {});
+    ST.gd.fit = Object.assign({}, GD0.fit, g.fit || {});
+    if (!Array.isArray(ST.gd.p3) || ST.gd.p3.length !== 6) ST.gd.p3 = GD0.p3.slice();
+    if (!(ST.gd.sym >= 0 && ST.gd.sym < 14)) ST.gd.sym = 9;
+    if (!Array.isArray(ST.data)) ST.data = [];
+    ST.data = ST.data.map(v => String(v)).filter(v => isFinite(Number(v)));
+    ST.dr = Object.assign({ n: '', d: '', t: '' }, ST.dr || {});
+    ST.conv = ST.conv || {};
+  }
+  function saveState(){
+    if (!READY) return;
+    ST.gd.fit.nom = id('fit-nom').value;
+    ST.usl = id('cpk-usl').value; ST.lsl = id('cpk-lsl').value;
+    ST.dr = { n: id('dr-n').value, d: id('dr-d').value, t: id('dr-t').value };
+    ST.cpk = id('cp-cpk').value;
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(ST)); } catch (e) {}
+  }
+
+  // -------- 탭 전환 --------
+  function switchTab(name){
+    ['quick','conv','position','cpk','aql'].forEach(t => id('panel-' + t).classList.toggle('active', t === name));
+    document.querySelectorAll('.tabbar .tbtn').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+    ST.tab = name; saveState();
+    window.scrollTo(0, 0);
+  }
+
+  // -------- 입력칸용 숫자 키패드 --------
+  let activeKeypadInput = null;
+  let keypadMode = 'num';   // num | data(측정값 연속 입력)
+  let freshEntry = true;
+
+  function openKeypad(inputEl, mode){
+    inputEl.blur();
+    activeKeypadInput = inputEl;
+    keypadMode = mode || 'num';
+    freshEntry = true;
+    const fieldWrap = inputEl.closest('.field');
+    const label = inputEl.dataset.label || (fieldWrap && fieldWrap.querySelector('label') ? fieldWrap.querySelector('label').innerText : '입력');
+    id('keypadLabel').innerText = label;
+    id('keypadValue').innerText = inputEl.value || '0';
+    id('keypadGrid').innerHTML = keypadMode === 'data' ? dataKeys() : numKeys();
+    id('keypadOverlay').classList.add('show');
+    id('keypadBackdrop').classList.add('show');
+  }
+  function closeKeypad(){
+    id('keypadOverlay').classList.remove('show');
+    id('keypadBackdrop').classList.remove('show');
+    activeKeypadInput = null;
+  }
+  function numKeys(){
+    return '<button onclick="kpPress(\'7\')">7</button><button onclick="kpPress(\'8\')">8</button><button onclick="kpPress(\'9\')">9</button><button class="op" onclick="kpBack()">⌫</button>'
+      + '<button onclick="kpPress(\'4\')">4</button><button onclick="kpPress(\'5\')">5</button><button onclick="kpPress(\'6\')">6</button><button class="op" onclick="kpSign()">±</button>'
+      + '<button onclick="kpPress(\'1\')">1</button><button onclick="kpPress(\'2\')">2</button><button onclick="kpPress(\'3\')">3</button><button class="op" onclick="kpPress(\'.\')">.</button>'
+      + '<button class="wide" onclick="kpPress(\'0\')">0</button><button class="done wide" onclick="closeKeypad()">완료</button>';
+  }
+  function dataKeys(){
+    return '<button onclick="kpPress(\'7\')">7</button><button onclick="kpPress(\'8\')">8</button><button onclick="kpPress(\'9\')">9</button><button class="op" onclick="kpBack()">⌫</button>'
+      + '<button onclick="kpPress(\'4\')">4</button><button onclick="kpPress(\'5\')">5</button><button onclick="kpPress(\'6\')">6</button><button class="op" onclick="kpSign()">±</button>'
+      + '<button onclick="kpPress(\'1\')">1</button><button onclick="kpPress(\'2\')">2</button><button onclick="kpPress(\'3\')">3</button><button class="op" onclick="kpPress(\'.\')">.</button>'
+      + '<button onclick="kpPress(\'0\')">0</button><button class="opdark" onclick="closeKeypad()">닫기</button><button class="done wide" onclick="kpAddData()">추가 ↵</button>';
+  }
+  function updateKp(v){
+    activeKeypadInput.value = v;
+    id('keypadValue').innerText = v || '0';
+    activeKeypadInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  function kpPress(ch){
+    if (!activeKeypadInput) return;
+    let v = activeKeypadInput.value.replace(/,/g, '');
+    if (freshEntry) { v = ''; freshEntry = false; }
+    if (ch === '.') { if (v.includes('.')) return; if (v === '' || v === '-') v = v + '0'; v = v + '.'; }
+    else if (v === '0') v = ch;
+    else if (v === '-0') v = '-' + ch;
+    else v = v + ch;
+    updateKp(v);
+  }
+  function kpBack(){
+    if (!activeKeypadInput) return;
+    freshEntry = false;
+    updateKp(activeKeypadInput.value.replace(/,/g, '').slice(0, -1));
+  }
+  function kpSign(){
+    if (!activeKeypadInput) return;
+    freshEntry = false;
+    let v = activeKeypadInput.value.replace(/,/g, '');
+    v = v.startsWith('-') ? v.slice(1) : ('-' + v);
+    updateKp(v);
+  }
+  document.addEventListener('keydown', e => {
+    if (!id('keypadOverlay').classList.contains('show')) return;
+    const k = e.key;
+    if (/^\d$/.test(k)) kpPress(k);
+    else if (k === '.') kpPress('.');
+    else if (k === '-') kpSign();
+    else if (k === 'Backspace') kpBack();
+    else if (k === 'Enter') { keypadMode === 'data' ? kpAddData() : closeKeypad(); }
+    else if (k === 'Escape') closeKeypad();
+    else return;
+    e.preventDefault(); e.stopImmediatePropagation();
+  }, true);
+
+  /* ==========================================================
+     ① 계산기 — 휴대폰 기본 계산기 배치 · 입력 중 결과 미리보기
+     ========================================================== */
+  const cx = { expr: '', done: false };
+  let hist = [];
+  function cLast(){ return cx.expr.slice(-1); }
+  function cDigit(d){
+    if (cx.done) { cx.expr = ''; cx.done = false; }
+    const tok = (cx.expr.match(/[\d.]*$/) || [''])[0];
+    if (tok === '0') cx.expr = cx.expr.slice(0, -1) + d;
+    else { if (cLast() === ')') cx.expr += '*'; cx.expr += d; }
+    cRender();
+  }
+  function cDot(){
+    if (cx.done) { cx.expr = ''; cx.done = false; }
+    const tok = (cx.expr.match(/[\d.]*$/) || [''])[0];
+    if (tok.includes('.')) return;
+    if (cLast() === ')') cx.expr += '*';
+    cx.expr += tok === '' ? '0.' : '.';
+    cRender();
+  }
+  function cOp(o){
+    cx.done = false;
+    const L = cLast();
+    if (cx.expr === '') { if (o === '-') cx.expr = '-'; cRender(); return; }
+    if (L === '(') { if (o === '-') cx.expr += '-'; cRender(); return; }
+    if ('+-*/'.includes(L)) {
+      const before = cx.expr.slice(0, -1);
+      if (before === '' || before.endsWith('(')) { cRender(); return; }
+      cx.expr = before + o;
+    } else if (L === '.') cx.expr += '0' + o;
+    else cx.expr += o;
+    cRender();
+  }
+  function cParen(){
+    cx.done = false;
+    const open = (cx.expr.match(/\(/g) || []).length, close = (cx.expr.match(/\)/g) || []).length;
+    const L = cLast();
+    if (open > close && /[\d.)]/.test(L)) cx.expr += ')';
+    else if (/[\d.)]/.test(L)) cx.expr += '*(';
+    else cx.expr += '(';
+    cRender();
+  }
+  // 200+10% → 200+20 (삼성 계산기 방식) · 50×10% → 50×0.1
+  function cPercent(){
+    const m = cx.expr.match(/(\d+\.?\d*)$/);
+    if (!m) return;
+    const num = parseFloat(m[1]);
+    const before = cx.expr.slice(0, cx.expr.length - m[1].length);
+    let val = num / 100;
+    const op = before.match(/[+\-]$/);
+    if (op && before.length > 1 && !before.endsWith('(-')) {
+      const base = cEval(before.slice(0, -1));
+      if (base !== null && !isNaN(base)) val = base * num / 100;
+    }
+    cx.expr = before + rawStr(val); cx.done = false;
+    cRender();
+  }
+  function cSign(){
+    cx.done = false;
+    const m = cx.expr.match(/(\d+\.?\d*)$/);
+    if (!m) { if (cx.expr === '' || /[+\-*/(]$/.test(cx.expr)) { cx.expr += '(-'; cRender(); } return; }
+    let before = cx.expr.slice(0, cx.expr.length - m[1].length);
+    if (before.endsWith('(-')) before = before.slice(0, -2); else before += '(-';
+    cx.expr = before + m[1];
+    cRender();
+  }
+  function cBack(){ if (cx.done) { cx.expr = ''; cx.done = false; } else cx.expr = cx.expr.slice(0, -1); cRender(); }
+  function cClear(){ cx.expr = ''; cx.done = false; cRender(); }
+  function cPrepare(e){
+    let s = e;
+    while (/[+\-*/(]$/.test(s)) s = s.slice(0, -1);
+    const open = (s.match(/\(/g) || []).length, close = (s.match(/\)/g) || []).length;
+    s += ')'.repeat(Math.max(0, open - close));
+    return s;
+  }
+  function cEval(e){
+    if (!e || !/^[0-9+\-*/().]+$/.test(e)) return null;
+    const s = cPrepare(e);
+    if (!s) return null;
+    try {
+      const r = Function(`'use strict'; return (${s})`)();
+      if (typeof r !== 'number' || isNaN(r)) return null;
+      return isFinite(r) ? r : NaN;
+    } catch (x) { return null; }
+  }
+  function round12(r){ return parseFloat(r.toPrecision(12)); }
+  function rawStr(r){ r = round12(r); let s = String(r); if (/e/.test(s)) s = r.toFixed(12).replace(/0+$/, '').replace(/\.$/, ''); return s; }
+  function fmtNum(r){ r = round12(r); const a = Math.abs(r); if (a !== 0 && (a >= 1e15 || a < 1e-9)) return r.toExponential(6); return r.toLocaleString('en-US', { maximumFractionDigits: 10 }); }
+  function fmtDisp(r){ return fmtNum(r).replace(/-/g, '−'); }
+  function prettyExpr(e){
+    return e.replace(/\d+(\.\d*)?/g, t => { const p = t.split('.'); return Number(p[0]).toLocaleString('en-US') + (t.includes('.') ? '.' + p[1] : ''); })
+            .replace(/\*/g, '×').replace(/\//g, '÷').replace(/-/g, '−');
+  }
+  function hasOp(e){ return /[+\-*/(]/.test(e.replace(/^-/, '')); }
+  function cRender(){
+    const ex = id('csExpr');
+    const txt = cx.expr ? prettyExpr(cx.expr) : '0';
+    ex.textContent = txt;
+    ex.className = 'cs-expr' + (txt.length > 18 ? ' s' : txt.length > 11 ? ' m' : '') + (cx.done ? ' done' : '');
+    let prev = '';
+    if (!cx.done && cx.expr && hasOp(cx.expr)) {
+      const r = cEval(cx.expr);
+      if (r !== null && !isNaN(r)) prev = '= ' + fmtDisp(r);
+    }
+    id('csPrev').textContent = prev;
+  }
+  function cEquals(){
+    if (!cx.expr || cx.done) return;
+    const r = cEval(cx.expr);
+    if (r === null) { toast('수식을 확인하세요'); return; }
+    if (isNaN(r)) { toast('0으로 나눌 수 없습니다'); return; }
+    if (!hasOp(cPrepare(cx.expr))) { cx.expr = rawStr(r); cx.done = true; cRender(); return; }
+    hist.unshift({ e: prettyExpr(cPrepare(cx.expr)), r: rawStr(r) });
+    if (hist.length > 30) hist.length = 30;
+    saveHist();
+    cx.expr = rawStr(r); cx.done = true;
+    cRender(); renderHist();
+  }
+  function renderHist(){
+    id('csHist').innerHTML = hist.length
+      ? hist.map((h, i) => `<div class="hi" onclick="openHistSheet(${i})">${h.m ? `<span class="mm">${escH(h.m)}</span> · ` : ''}${h.e} = <b>${fmtDisp(parseFloat(h.r))}</b></div>`).join('')
+      : '<div class="hi empty">계산 기록이 여기에 쌓입니다 · 누르면 메모·다시 쓰기</div>';
+  }
+  function cUseHist(i){
+    const r = hist[i].r;
+    if (cx.done) cx.expr = '';
+    if (cx.expr === '' || /[+\-*/(]$/.test(cx.expr)) cx.expr += (r.startsWith('-') && cx.expr !== '') ? '(' + r : r;
+    else cx.expr = r;
+    cx.done = false; cRender();
+  }
+  function escH(t){ return String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function saveHist(){ try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch (e) {} }
+  function histText(h){ return `${h.m ? h.m + ' : ' : ''}${h.e} = ${fmtDisp(parseFloat(h.r))}`; }
+  let hsIdx = -1;
+  function openHistSheet(i){
+    const h = hist[i]; if (!h) return;
+    hsIdx = i;
+    id('hsLine').innerHTML = `${escH(h.e)} = <b>${fmtDisp(parseFloat(h.r))}</b>`;
+    id('hsMemo').value = h.m || '';
+    id('hs').classList.add('show'); id('hsBack').classList.add('show');
+  }
+  function closeHistSheet(){ id('hsMemo').blur(); id('hs').classList.remove('show'); id('hsBack').classList.remove('show'); hsIdx = -1; }
+  function hsSaveMemo(){
+    const h = hist[hsIdx]; if (!h) return;
+    const m = id('hsMemo').value.trim().slice(0, 40);
+    if (m) h.m = m; else delete h.m;
+    saveHist(); renderHist();
+  }
+  function hsUse(){ const i = hsIdx; closeHistSheet(); if (i >= 0) cUseHist(i); }
+  function hsRe(){
+    const h = hist[hsIdx]; closeHistSheet(); if (!h) return;
+    cx.expr = h.e.replace(/,/g, '').replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+    cx.done = false; cRender();
+  }
+  async function hsCopy(){ const h = hist[hsIdx]; closeHistSheet(); if (!h) return; toast(await copyTextSafe(histText(h)) ? '복사했습니다' : '복사에 실패했습니다'); }
+  async function cCopyHist(){
+    if (!hist.length) { toast('복사할 기록이 없습니다'); return; }
+    const text = '[계산 기록]\n' + hist.slice().reverse().map(histText).join('\n');
+    toast(await copyTextSafe(text) ? `계산 기록 ${hist.length}개를 복사했습니다` : '복사에 실패했습니다');
+  }
+  function cClearHist(){ if (!hist.length) return; if (!confirm('계산 기록을 모두 지울까요?')) return; hist = []; try { localStorage.removeItem(HIST_KEY); } catch (e) {} renderHist(); }
+  async function cCopy(){
+    let v = '';
+    if (cx.done) v = cx.expr;
+    else if (cx.expr) { const r = cEval(cx.expr); v = (r !== null && !isNaN(r)) ? rawStr(r) : ''; }
+    if (!v) { toast('복사할 결과가 없습니다'); return; }
+    toast(await copyTextSafe(v) ? `${v} 복사했습니다` : '복사에 실패했습니다');
+  }
+  // PC 키보드
+  document.addEventListener('keydown', e => {
+    if (!id('panel-quick').classList.contains('active') || id('keypadOverlay').classList.contains('show') || id('hs').classList.contains('show')) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const k = e.key;
+    if (/^\d$/.test(k)) cDigit(k);
+    else if (k === '.') cDot();
+    else if ('+-*/'.includes(k) && k.length === 1) cOp(k);
+    else if (k === 'Enter' || k === '=') cEquals();
+    else if (k === 'Backspace') cBack();
+    else if (k === 'Escape' || k === 'Delete') cClear();
+    else if (k === '%') cPercent();
+    else if (k === '(' || k === ')') cParen();
+    else return;
+    e.preventDefault();
+  });
+
+  /* ==========================================================
+     ② 환산 — 한 칸 입력 → 같은 종류 모든 단위 동시 표시
+     ========================================================== */
+  const CONV = {
+    length:   { def: [0, '1'], hint: '1 inch = 25.4 mm · 1 mil = 0.001 inch = 25.4 μm',
+                units: [['mm', '밀리미터', 1], ['μm', '마이크로미터', 0.001], ['inch', '인치', 25.4], ['mil', '1/1000 inch', 0.0254]] },
+    torque:   { def: [0, '1'], hint: '1 kgf·cm = 0.0980665 N·m · 1 lbf·in ≈ 0.11298 N·m',
+                units: [['N·m', '뉴턴미터', 1], ['N·cm', '뉴턴센티미터', 0.01], ['kgf·cm', '킬로그램힘 cm', 0.0980665], ['kgf·m', '킬로그램힘 m', 9.80665], ['lbf·in', '파운드 인치', 0.1129848290276167], ['lbf·ft', '파운드 피트', 1.3558179483314004]] },
+    force:    { def: [0, '850'], hint: '1 kgf = 9.80665 N · 1 gf = 0.00980665 N · 1 lbf ≈ 4.44822 N',
+                units: [['N', '뉴턴', 1], ['kN', '킬로뉴턴', 1000], ['kgf', '킬로그램힘', 9.80665], ['gf', '그램힘', 0.00980665], ['lbf', '파운드힘', 4.4482216152605]] },
+    pressure: { def: [0, '1'], hint: '1 MPa = 10 bar ≈ 10.197 kgf/cm² ≈ 145.04 psi',
+                units: [['MPa', '메가파스칼', 1], ['kPa', '킬로파스칼', 0.001], ['Pa', '파스칼', 1e-6], ['bar', '바', 0.1], ['kgf/cm²', '킬로그램힘/cm²', 0.0980665], ['psi', 'lbf/in²', 0.006894757293168361]] },
+    ratio:    { def: [0, '100'], hint: '1% = 10,000 ppm · 1 ppm = 1,000 ppb · 100 ppm = 10,000개 중 1개',
+                units: [['ppm', '100만 개당', 1], ['%', '100개당', 10000], ['ppb', '10억 개당', 0.001], ['1/N', 'N개 중 1개꼴', 'inv']] },
+    angle:    { def: [0, '1'], hint: '',
+                units: [['°', '도 (십진)'], ['° ′ ″', '도·분·초'], ['rad', '라디안'], ['%', '기울기 (tan×100)']] }
+  };
+  const DMS_I = 1;
+  const D2R = Math.PI / 180;
+  function angToDeg(i, v){ return i === 0 ? v : i === 2 ? v / D2R : Math.atan(v / 100) / D2R; }
+  function angFromDeg(i, d){ return i === 0 ? d : i === 2 ? d * D2R : (Math.abs(d) >= 90 ? NaN : Math.tan(d * D2R) * 100); }
+  function degToDms(deg){
+    const sg = deg < 0 ? -1 : 1; let a = Math.abs(deg);
+    let D = Math.floor(a), M = Math.floor((a - D) * 60), S = Math.round(((a - D) * 60 - M) * 60 * 100) / 100;
+    if (S >= 60) { S -= 60; M++; } if (M >= 60) { M -= 60; D++; }
+    return [(sg < 0 ? '-' : '') + D, String(M), String(S)];
+  }
+  function dmsToDeg(d, m, s){
+    const neg = String(d).trim().startsWith('-');
+    const D = Math.abs(parseNum(d) || 0), M = parseNum(m) || 0, S = parseNum(s) || 0;
+    if ([d, m, s].every(x => String(x).trim() === '' || String(x).trim() === '-')) return NaN;
+    return (neg ? -1 : 1) * (D + M / 60 + S / 3600);
+  }
+  function fmtConv(x){
+    if (!isFinite(x)) return '';
+    const a = Math.abs(x);
+    if (a !== 0 && (a < 1e-6 || a >= 1e12)) return x.toExponential(4);
+    return x.toLocaleString('en-US', { maximumSignificantDigits: 7 });
+  }
+  function setConvCat(cat){
+    ST.convCat = cat; saveState();
+    document.querySelectorAll('#cvCats button').forEach(b => b.classList.toggle('on', b.dataset.cat === cat));
+    const C = CONV[cat];
+    let src = ST.conv[cat] || { i: C.def[0], v: C.def[1] };
+    if (!(src.i >= 0 && src.i < C.units.length)) src = { i: C.def[0], v: C.def[1] };
+    id('cvList').innerHTML = C.units.map((u, i) => (cat === 'angle' && i === DMS_I) ? `
+      <div class="cv-row${i === src.i ? ' src' : ''}" onclick="openKeypad(this.querySelector('input'))">
+        <div class="cv-u"><div class="n">${u[0]}</div><div class="d">${u[1]}</div></div>
+        <div class="cv-dms">
+          <input type="text" readonly data-p="d" data-label="도 (°)" onclick="event.stopPropagation(); openKeypad(this)" oninput="convDms()"><span>°</span>
+          <input type="text" readonly data-p="m" data-label="분 (′)" onclick="event.stopPropagation(); openKeypad(this)" oninput="convDms()"><span>′</span>
+          <input type="text" readonly data-p="s" data-label="초 (″)" onclick="event.stopPropagation(); openKeypad(this)" oninput="convDms()"><span>″</span>
+        </div>
+      </div>` : `
+      <div class="cv-row${i === src.i ? ' src' : ''}" onclick="openKeypad(this.querySelector('input'))">
+        <div class="cv-u"><div class="n">${u[0]}</div><div class="d">${u[1]}</div></div>
+        <input type="text" readonly data-i="${i}" data-label="${u[0]} (${u[1]})" oninput="convInput(${i}, this.value)">
+      </div>`).join('');
+    id('cvHint').innerText = C.hint;
+    const isR = cat === 'ratio';
+    id('cvRateLink').style.display = isR ? 'flex' : 'none';
+    id('rtTop').style.display = id('rtBottom').style.display = isR ? 'block' : 'none';
+    if (isR) id('rtLot').value = ST.ratioLot || '';
+    const rows = id('cvList').querySelectorAll('.cv-row');
+    if (cat === 'angle' && src.i === DMS_I) {
+      const p = String(src.v).split('|'); const ins = rows[DMS_I].querySelectorAll('input');
+      ins.forEach((el, k) => el.value = p[k] || '');
+    } else rows[src.i].querySelector('input').value = src.v;
+    convFill(src.i, src.v);
+  }
+  function convFill(si, sv){
+    const cat = ST.convCat, C = CONV[cat];
+    const rows = id('cvList').querySelectorAll('.cv-row');
+    if (cat === 'angle') {
+      const deg = si === DMS_I ? dmsToDeg(...String(sv).split('|').concat(['', '', '']).slice(0, 3)) : angToDeg(si, parseNum(sv));
+      rows.forEach((r, i) => {
+        if (i === si) return;
+        if (i === DMS_I) { const p = isFinite(deg) ? degToDms(deg) : ['', '', '']; r.querySelectorAll('input').forEach((el, k) => el.value = p[k]); }
+        else r.querySelector('input').value = isFinite(deg) ? fmtConv(angFromDeg(i, deg)) : '';
+      });
+      id('cvHint').innerText = isFinite(deg) && Math.abs(deg) < 90
+        ? `빼기구배 ${fmtConv(deg)}° → 깊이 10 mm당 편측 ${fmtConv(10 * Math.tan(deg * D2R))} mm · 1° = 60′ = 3600″`
+        : '1° = 60′ = 3600″ · 1 rad ≈ 57.29578°';
+      return;
+    }
+    const v = parseNum(sv);
+    // 기준 단위로 변환 ('inv' = 역수 단위: 불량률의 1/N → ppm = 1,000,000 / N)
+    const toBase = (i, x) => C.units[i][2] === 'inv' ? (x > 0 ? 1e6 / x : NaN) : x * C.units[i][2];
+    const fromBase = (i, b) => C.units[i][2] === 'inv' ? (b > 0 ? 1e6 / b : NaN) : b / C.units[i][2];
+    const base = isNaN(v) ? NaN : toBase(si, v);
+    rows.forEach((r, i) => {
+      if (i === si) return;
+      const out = isNaN(base) ? NaN : fromBase(i, base);
+      r.querySelector('input').value = isFinite(out) ? (C.units[i][2] === 'inv' ? Math.round(out).toLocaleString('en-US') : fmtConv(out)) : '';
+    });
+    if (cat === 'ratio') ratioUpdate(base);
+  }
+  function convMark(i){ id('cvList').querySelectorAll('.cv-row').forEach((r, k) => r.classList.toggle('src', k === i)); }
+  function convInput(i, val){
+    ST.conv[ST.convCat] = { i, v: val };
+    convMark(i); convFill(i, val); saveState();
+  }
+  /* 불량률 전용: 요약 카드 · 빠른 입력 · LOT 예상 불량 */
+  let RT_BASE = NaN;
+  function nice(x){ return x >= 100 ? Math.round(x).toLocaleString('en-US') : fmtConv(Math.round(x * 100) / 100); }
+  function ratioUpdate(base){
+    RT_BASE = base;
+    const ok = isFinite(base) && base > 0 && base <= 1e6;
+    // 읽기 쉬운 "N개 중 M개" 표현: M이 1 이상이 되는 가장 작은 10의 거듭제곱 기준
+    let sub = '값을 넣거나 아래 버튼을 누르세요';
+    if (ok) {
+      let per = 100; while (per < 1e9 && base * per / 1e6 < 1) per *= 10;
+      const cnt = base * per / 1e6;
+      const perTxt = per >= 1e8 ? (per / 1e8) + '억' : per >= 1e4 ? (per / 1e4).toLocaleString('en-US') + '만' : per.toLocaleString('en-US');
+      const inv = 1e6 / base;
+      sub = `${perTxt}${per >= 1e4 ? ' ' : ''}개 중 ${nice(cnt)}개` + (Math.abs(inv - per) / per < 1e-9 ? '' : ` · ${nice(inv)}개 중 1개꼴`);
+    } else if (isFinite(base) && base > 1e6) sub = '100%(1,000,000 ppm)를 넘을 수 없습니다';
+    id('rtSum').innerHTML = `<div class="k">불량률</div><div class="v">${ok ? nice(base) : '–'}<small>ppm</small>${ok ? `<small>= ${fmtConv(base / 1e4)}%</small>` : ''}</div><div class="s">${sub}</div>`;
+    id('rtPre').querySelectorAll('button').forEach(b => b.classList.toggle('on', ok && Number(b.innerText.replace(/,/g, '')) === base));
+    id('cvHint').innerText = '';
+    ratioLotCalc();
+  }
+  function ratioPreset(ppm){
+    const r0 = id('cvList').querySelectorAll('.cv-row')[0].querySelector('input');
+    r0.value = String(ppm); convInput(0, String(ppm));
+  }
+  function ratioLot(v){ ST.ratioLot = v; saveState(); ratioLotCalc(); }
+  function ratioLotCalc(){
+    const n = parseNum(ST.ratioLot || ''), out = id('rtLotR');
+    if (!(n > 0) || !(RT_BASE > 0) || RT_BASE > 1e6) { out.innerText = ''; return; }
+    const e = n * RT_BASE / 1e6;
+    const eTxt = e < 0.01 ? '0.01 미만' : e < 10 ? (Math.round(e * 10) / 10).toString() : nice(e);
+    out.innerText = `→ ${n.toLocaleString('en-US')}개 LOT에서 예상 불량 약 ${eTxt}개`;
+  }
+  function convDms(){
+    const ins = id('cvList').querySelectorAll('.cv-row')[DMS_I].querySelectorAll('input');
+    const v = [...ins].map(el => el.value.replace(/,/g, '')).join('|');
+    ST.conv.angle = { i: DMS_I, v };
+    convMark(DMS_I); convFill(DMS_I, v); saveState();
+  }
+
+  /* ==========================================================
+     ④ Cpk · 불량률
+     ========================================================== */
+  // 정규분포 상측 확률 Q(z) = P(Z > z) · erfc 근사(상대오차 < 1.2e-7, Numerical Recipes)
+  function erfc(x){
+    const z = Math.abs(x), t = 1 / (1 + 0.5 * z);
+    const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+    return x >= 0 ? r : 2 - r;
+  }
+  function Q(z){ return 0.5 * erfc(z / Math.SQRT2); }
+  function fmtPpm(p){
+    if (!isFinite(p)) return '–';
+    if (p === 0) return '0';
+    if (p < 0.01) return p.toExponential(1);
+    if (p < 10) return p.toFixed(2);
+    if (p < 1000) return p.toFixed(1);
+    return Math.round(p).toLocaleString('en-US');
+  }
+  function fmtV(x, d){ return isFinite(x) ? x.toFixed(d) : '–'; }
+  function decimalsOf(arr){ let d = 0; arr.forEach(v => { const s = String(v); const k = s.includes('.') ? s.split('.')[1].length : 0; if (k > d) d = k; }); return Math.min(Math.max(d, 2), 5); }
+
+  function setCpkSub(s){
+    if (s === 'conv') s = 'rate';   // 불량률·PPM + Cpk↔PPM 한 화면(불량 환산)
+    ST.cpkSub = s; saveState();
+    document.querySelectorAll('#cpkSubs button').forEach(b => b.classList.toggle('on', b.dataset.sub === s));
+    id('sub-data').classList.toggle('active', s === 'data');
+    id('sub-rate').classList.toggle('active', s === 'rate');
+    id('sub-conv').classList.toggle('active', s === 'rate');
+  }
+
+  // 4-1 측정값 → Cpk
+  function openDataKeypad(){
+    const e = id('cpk-entry'); e.value = '';
+    openKeypad(e, 'data');
+    id('keypadLabel').innerText = `측정값 입력 · 지금 ${ST.data.length}개`;
+    id('keypadValue').innerText = '0';
+  }
+  function kpAddData(){
+    const e = id('cpk-entry');
+    let raw = e.value.replace(/,/g, '').replace(/\.$/, '');
+    const v = Number(raw);
+    if (raw === '' || raw === '-' || !isFinite(v)) { toast('값을 입력하세요'); return; }
+    if (/^-?\./.test(raw)) raw = raw.replace('.', '0.');
+    ST.data.push(raw);
+    e.value = ''; freshEntry = true;
+    id('keypadValue').innerText = '0';
+    id('keypadLabel').innerText = `측정값 입력 · 지금 ${ST.data.length}개 (방금 ${raw})`;
+    renderCpk(); saveState();
+  }
+  async function cpkPaste(){
+    let txt = '';
+    try { if (navigator.clipboard && navigator.clipboard.readText && window.isSecureContext) txt = await navigator.clipboard.readText(); } catch (e) {}
+    if (!txt) txt = prompt('측정값을 붙여넣으세요 (엑셀 열 복사 · 쉼표 · 줄바꿈 모두 가능)') || '';
+    const vals = txt.split(/[\s,;\t]+/).map(s => s.trim().replace(/\.$/, '')).filter(s => s !== '' && isFinite(Number(s)));
+    if (!vals.length) { toast('숫자를 찾지 못했습니다'); return; }
+    ST.data.push(...vals);
+    renderCpk(); saveState();
+    toast(`${vals.length}개 추가 · 전체 ${ST.data.length}개`);
+  }
+  function cpkClear(){ if (!ST.data.length) return; if (!confirm(`측정값 ${ST.data.length}개를 모두 지울까요?`)) return; ST.data = []; renderCpk(); saveState(); }
+  function cpkRemove(i){
+    const v = ST.data.splice(i, 1)[0]; renderCpk(); saveState();
+    toast(`${v} 삭제`, '되돌리기', () => { ST.data.splice(Math.min(i, ST.data.length), 0, v); renderCpk(); saveState(); toast(`${v} 복구`); });
+  }
+
+  function renderCpk(){
+    const usl = parseNum(id('cpk-usl').value), lsl = parseNum(id('cpk-lsl').value);
+    const hasU = isFinite(usl), hasL = isFinite(lsl);
+    const raws = ST.data, data = raws.map(Number), n = data.length;
+    id('cpkN').innerText = `측정값 ${n}개`;
+    id('cpkChips').innerHTML = n
+      ? data.map((v, i) => `<span class="${(hasU && v > usl) || (hasL && v < lsl) ? 'ng' : ''}" onclick="cpkRemove(${i})" title="누르면 삭제">${raws[i]}</span>`).join('')
+      : '<span class="none">＋ 입력으로 하나씩 넣거나, 엑셀 열을 복사해 붙여넣기 하세요</span>';
+
+    const hero = id('cpkHero');
+    const set = (k, v) => id(k).innerText = v;
+    ['st-mean', 'st-sd', 'st-cp', 'st-min', 'st-max', 'st-ppm'].forEach(k => set(k, '–'));
+    id('cpkPlot').innerHTML = ''; id('cpkBand').innerHTML = ''; id('cpkWhy').innerHTML = ''; id('cpkWhy').className = 'cpk-why';
+    const heroMsg = (k, v, cls) => { hero.className = 'hero' + (cls ? ' ' + cls : ''); hero.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`; };
+
+    if (n === 0) { heroMsg('Cpk', '–'); return; }
+    const d = decimalsOf(raws);
+    const mean = data.reduce((a, b) => a + b, 0) / n;
+    const mn = Math.min(...data), mx = Math.max(...data);
+    set('st-mean', mean.toFixed(d + 1)); set('st-min', mn.toFixed(d)); set('st-max', mx.toFixed(d));
+    drawPlot(data, mean, hasU ? usl : null, hasL ? lsl : null);
+    if (n < 2) { heroMsg('Cpk', '<small>측정값 2개 이상</small>'); return; }
+    const sd = Math.sqrt(data.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
+    set('st-sd', sd.toFixed(d + 2));
+    if (!hasU && !hasL) { heroMsg('Cpk', '<small>USL 또는 LSL 입력</small>'); return; }
+    if (hasU && hasL && usl <= lsl) { heroMsg('Cpk', '<small>USL이 LSL보다 커야 합니다</small>', 'fail'); return; }
+    if (sd === 0) { heroMsg('Cpk', '<small>값이 모두 같아 σ = 0</small>', 'warn'); return; }
+
+    const cpu = hasU ? (usl - mean) / (3 * sd) : Infinity;
+    const cpl = hasL ? (mean - lsl) / (3 * sd) : Infinity;
+    const cpk = Math.min(cpu, cpl);
+    if (hasU && hasL) set('st-cp', ((usl - lsl) / (6 * sd)).toFixed(2)); else set('st-cp', '편측');
+    const ppm = ((hasU ? Q((usl - mean) / sd) : 0) + (hasL ? Q((mean - lsl) / sd) : 0)) * 1e6;
+    set('st-ppm', fmtPpm(ppm) + ' ppm');
+
+    let cls, word;
+    if (cpk >= 1.67) { cls = 'pass'; word = '초기·양산 기준 충족'; }
+    else if (cpk >= 1.33) { cls = 'good'; word = '양산 충족 · 초기공정 조건부'; }
+    else if (cpk >= 1.0) { cls = 'warn'; word = '1.33 미만 · 개선 필요'; }
+    else { cls = 'fail'; word = '1.00 미만 · 부족'; }
+    const side = !hasL ? ' · 상한 편측' : !hasU ? ' · 하한 편측' : '';
+    const ng = data.filter(v => (hasU && v > usl) || (hasL && v < lsl)).length;
+    heroMsg(`Cpk${side}<small>n=${n}${n < 25 ? ' · 25개 미만 참고용' : ''}${ng ? ` · 규격 밖 ${ng}개` : ''}</small>`, `${cpk.toFixed(2)}<small>${word}</small>`, cls);
+    drawBand(cpk);
+    // 왜 이 값인가 (치우침 vs 산포) — 한 줄 진단
+    const why = id('cpkWhy'); let msg = '', wcls = '';
+    const needSd = d2 => d2 / (3 * 1.33);
+    if (hasU && hasL) {
+      const cp = (usl - lsl) / (6 * sd), center = (usl + lsl) / 2, half = (usl - lsl) / 2;
+      const shift = (mean - center) / half * 100, dir = shift > 0 ? '상한' : '하한';
+      if (cpk >= 1.33 && Math.abs(shift) < 25) { msg = `✅ 중심·산포 모두 양호 · 치우침 ${Math.abs(shift).toFixed(0)}%`; wcls = 'ok'; }
+      else if (cp < 1.33) { msg = `📏 <b>산포가 큼</b> · 중앙에 맞춰도 Cp ${cp.toFixed(2)} → σ를 <b>${sd.toFixed(d + 2)} → ${needSd(half).toFixed(d + 2)}</b> 이하로 줄여야 1.33`; wcls = 'bad'; }
+      else { msg = `🎯 <b>평균이 ${dir} 쪽으로 ${Math.abs(shift).toFixed(0)}% 치우침</b> · 중앙(${center.toFixed(d)})으로 옮기면 Cpk <b>${cp.toFixed(2)}</b>`; wcls = 'mid'; }
+    } else {
+      const dist = hasU ? usl - mean : mean - lsl;
+      msg = cpk >= 1.33 ? `✅ 편측 규격 · ${hasU ? '상한' : '하한'}까지 여유 충분` : `📏 편측 규격 · ${hasU ? '상한' : '하한'}까지 거리 ${dist.toFixed(d)} → σ를 <b>${needSd(Math.abs(dist)).toFixed(d + 2)}</b> 이하로 줄이거나 평균을 멀리`;
+      wcls = cpk >= 1.33 ? 'ok' : 'bad';
+    }
+    why.className = 'cpk-why ' + wcls; why.innerHTML = msg;
+  }
+  // Cpk 기준 띠 (1.00 · 1.33 · 1.67) + 현재 위치
+  function drawBand(c){
+    const lo = 0.5, hi = 2.17, X = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+    const seg = (a, b, col) => `<i style="left:${X(a)}%;width:${X(b) - X(a)}%;background:${col}"></i>`;
+    id('cpkBand').innerHTML = `<div class="bd">${seg(lo, 1, '#FECACA')}${seg(1, 1.33, '#FDE68A')}${seg(1.33, 1.67, '#BBF7D0')}${seg(1.67, hi, '#86EFAC')}<b style="left:${X(c)}%"></b></div>
+      <div class="bl"><span style="left:${X(1)}%">1.00</span><span style="left:${X(1.33)}%">1.33 양산</span><span style="left:${X(1.67)}%">1.67 초기</span></div>`;
+  }
+  // 히스토그램 + 규격선 + 평균 + 정규 곡선 (분포가 규격 안 어디에 있는지)
+  function drawPlot(data, mean, usl, lsl){
+    const W = 320, H = 132, L = 14, R = 306, T = 18, B = 104;
+    const pts = data.concat(usl == null ? [] : [usl], lsl == null ? [] : [lsl]);
+    let lo = Math.min(...pts), hi = Math.max(...pts);
+    if (hi === lo) { hi += 1; lo -= 1; }
+    const span = hi - lo; lo -= span * 0.08; hi += span * 0.08;
+    const X = v => L + (v - lo) / (hi - lo) * (R - L);
+    const n = data.length, bins = Math.max(5, Math.min(14, Math.round(Math.sqrt(n) * 1.6)));
+    const dmin = Math.min(...data), dmax = Math.max(...data), bw = (dmax - dmin) / bins || (span || 1) / 10;
+    const cnt = new Array(bins).fill(0), ngc = new Array(bins).fill(0);
+    data.forEach(v => { let k = Math.floor((v - dmin) / bw); if (k >= bins) k = bins - 1; if (k < 0) k = 0; cnt[k]++; if ((usl != null && v > usl) || (lsl != null && v < lsl)) ngc[k]++; });
+    const cmax = Math.max(...cnt, 1);
+    let s = '';
+    if (lsl != null && usl != null) s += `<rect x="${X(lsl)}" y="${T}" width="${X(usl) - X(lsl)}" height="${B - T}" fill="#F0FDF4"/>`;
+    s += `<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="#CBD5E1" stroke-width="1"/>`;
+    for (let k = 0; k < bins; k++) {
+      if (!cnt[k]) continue;
+      const x0 = X(dmin + k * bw), x1 = X(dmin + (k + 1) * bw), h = cnt[k] / cmax * (B - T - 8);
+      s += `<rect x="${x0 + 0.8}" y="${B - h}" width="${Math.max(1, x1 - x0 - 1.6)}" height="${h}" rx="1.5" fill="${ngc[k] ? '#DC2626' : '#0b1636'}" fill-opacity="${ngc[k] ? .85 : .72}"/>`;
+    }
+    if (n >= 2) {
+      const sd = Math.sqrt(data.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1));
+      if (sd > 0) {
+        const pk = 1 / (sd * Math.sqrt(2 * Math.PI)), scale = cmax * bw * n / n;   // 막대 높이 기준으로 곡선 맞춤
+        let d = '';
+        for (let i = 0; i <= 80; i++) {
+          const v = lo + (hi - lo) * i / 80, f = Math.exp(-0.5 * ((v - mean) / sd) ** 2);
+          const y = B - f * (B - T - 8) * Math.min(1.15, (n * bw * pk) / cmax);
+          d += (i ? 'L' : 'M') + X(v).toFixed(1) + ' ' + y.toFixed(1);
+        }
+        s += `<path d="${d}" fill="none" stroke="#e0b060" stroke-width="1.6"/>`;
+      }
+    }
+    [['LSL', lsl], ['USL', usl]].forEach(([t, v]) => {
+      if (v == null) return;
+      s += `<line x1="${X(v)}" y1="${T - 4}" x2="${X(v)}" y2="${B}" stroke="#EF4444" stroke-width="1.6" stroke-dasharray="4 3"/><text x="${X(v)}" y="${T - 7}" font-size="9" font-weight="900" fill="#EF4444" text-anchor="middle">${t}</text><text x="${X(v)}" y="${B + 12}" font-size="8.5" font-weight="800" fill="#94A3B8" text-anchor="middle">${v}</text>`;
+    });
+    s += `<line x1="${X(mean)}" y1="${T}" x2="${X(mean)}" y2="${B}" stroke="#9a6b1f" stroke-width="1.6"/><text x="${X(mean)}" y="${B + 24}" font-size="9" font-weight="900" fill="#9a6b1f" text-anchor="middle">평균 ${mean.toFixed(decimalsOf(ST.data) + 1)}</text>`;
+    if (lsl != null && usl != null) s += `<line x1="${X((usl + lsl) / 2)}" y1="${T}" x2="${X((usl + lsl) / 2)}" y2="${B}" stroke="#16A34A" stroke-width="1" stroke-dasharray="2 3"/>`;
+    id('cpkPlot').innerHTML = s;
+  }
+
+  // 4-2 불량률 · PPM
+  function renderRate(){
+    const n = parseNum(id('dr-n').value), d = parseNum(id('dr-d').value), t = parseNum(id('dr-t').value);
+    const hero = id('drHero');
+    const set = (k, v) => id(k).innerText = v;
+    ['dr-pct', 'dr-one', 'dr-allow'].forEach(k => set(k, '–'));
+    if (!(n > 0) || !(d >= 0)) { hero.className = 'hero'; hero.innerHTML = '<div class="k">불량률</div><div class="v">–</div>'; return; }
+    if (d > n) { hero.className = 'hero fail'; hero.innerHTML = '<div class="k">불량률</div><div class="v"><small>불량 수가 검사 수보다 큽니다</small></div>'; return; }
+    const rate = d / n, ppm = rate * 1e6;
+    set('dr-pct', (rate * 100).toLocaleString('en-US', { maximumFractionDigits: 4 }) + ' %');
+    set('dr-one', d > 0 ? `${Math.round(n / d).toLocaleString('en-US')}개 중 1` : '불량 없음');
+    let cls = '', sub = '';
+    if (t > 0) {
+      const allow = Math.floor(n * t / 1e6 + 1e-9);
+      set('dr-allow', `${allow.toLocaleString('en-US')}개 이하`);
+      if (ppm <= t) { cls = 'pass'; sub = `목표 ${t.toLocaleString('en-US')} ppm 달성`; }
+      else { cls = 'fail'; sub = `목표 ${t.toLocaleString('en-US')} ppm의 ${(ppm / t).toFixed(1)}배`; }
+    } else set('dr-allow', '목표 미입력');
+    hero.className = 'hero' + (cls ? ' ' + cls : '');
+    hero.innerHTML = `<div class="k">불량률<small>${n.toLocaleString('en-US')}개 중 ${d.toLocaleString('en-US')}개</small></div><div class="v">${fmtPpm(ppm)} ppm${sub ? `<small>${sub}</small>` : ''}</div>`;
+  }
+
+  // 4-3 Cpk ↔ 예상 불량 PPM
+  function ppmFromCpk(c, side){ return Q(3 * c) * 1e6 * (side === 'two' ? 2 : 1); }
+  function cpkFromPpm(p, side){
+    const target = p / 1e6 / (side === 'two' ? 2 : 1);
+    if (!(target > 0) || target >= 0.5) return target >= 0.5 ? 0 : NaN;
+    let lo = 0, hi = 10;
+    for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; if (Q(3 * m) > target) lo = m; else hi = m; }
+    return (lo + hi) / 2;
+  }
+  function setCpSide(s){
+    ST.cpSide = s; saveState();
+    document.querySelectorAll('#cpSides button').forEach(b => b.classList.toggle('on', b.dataset.side === s));
+    cpFromCpk(); renderCpTable();
+  }
+  function cpFromCpk(){
+    const c = parseNum(id('cp-cpk').value);
+    id('cp-ppm').value = isFinite(c) && c >= 0 ? fmtPpm(ppmFromCpk(c, ST.cpSide)) : '';
+    renderCpTable(); saveState();
+  }
+  function cpFromPpm(){
+    const p = parseNum(id('cp-ppm').value);
+    const c = cpkFromPpm(p, ST.cpSide);
+    id('cp-cpk').value = isFinite(c) ? c.toFixed(2) : '';
+    renderCpTable(); saveState();
+  }
+  function renderCpTable(){
+    const cur = parseNum(id('cp-cpk').value);
+    const rows = [1.0, 1.33, 1.5, 1.67, 2.0];
+    id('cpTable').innerHTML = `<tr><th>Cpk</th><th>시그마 수준</th><th>예상 불량 PPM (${ST.cpSide === 'two' ? '양측' : '편측'})</th></tr>`
+      + rows.map(c => `<tr class="${Math.abs(c - cur) < 0.005 ? 'on' : ''}" onclick="id('cp-cpk').value='${c.toFixed(2)}'; cpFromCpk();"><td>${c.toFixed(2)}</td><td>${(3 * c).toFixed(1)}σ</td><td>${fmtPpm(ppmFromCpk(c, ST.cpSide))}</td></tr>`).join('');
+  }
+
+    /* ==========================================================
+     ③ GD&T — 위치도 · 원 맞춤 비교 · 3점 원 · 기호 사전
+     ========================================================== */
+  function setGdSub(s){
+    ST.gd.sub = s; saveState();
+    const more = s === 'fit' || s === 'p3';
+    document.querySelectorAll('#gdSubs button').forEach(b => b.classList.toggle('on', b.dataset.sub === s || (more && b.dataset.sub === 'more')));
+    document.querySelectorAll('#gdMore button').forEach(b => b.classList.toggle('on', b.dataset.sub === s));
+    id('gdMore').classList.toggle('open', more);
+    ['pos', 'fit', 'p3', 'sym'].forEach(k => id('gd-' + k).classList.toggle('active', k === s));
+    if (s === 'fit') renderFit();
+  }
+  function toggleGdMore(){
+    const m = id('gdMore'); m.classList.toggle('open');
+    id('gdSubs').querySelector('[data-sub="more"]').textContent = m.classList.contains('open') ? '더 보기 ▴' : '더 보기 ▾';
+  }
+  // 위치도 입력 방식: xy = 도면·실측 좌표 / d = 편차 직접
+  let posIn = 'xy';
+  function setPosIn(m){
+    posIn = m === 'd' ? 'd' : 'xy';
+    document.querySelectorAll('#posMode button').forEach(b => b.classList.toggle('on', b.dataset.m === posIn));
+    id('gd-pos').classList.toggle('in-d', posIn === 'd');
+    calculatePosition();
+  }
+  const f4 = v => isFinite(v) ? v.toFixed(3) : '–';
+
+  // ---- 3-1 위치도 ----
+  let featureType = 'hole'; // hole(내경) | shaft(외경)
+  let mmcMode = 'none';     // none | mmc | lmc
+  const POS_IDS = ['pos-nx', 'pos-ny', 'pos-mx', 'pos-my', 'pos-dx', 'pos-dy', 'pos-tol', 'pos-actual', 'pos-size-max', 'pos-size-min'];
+  function setFeatureType(t){
+    featureType = t;
+    id('ft-hole').classList.toggle('on', t === 'hole');
+    id('ft-shaft').classList.toggle('on', t === 'shaft');
+    id('lbl-size-max').innerText = t === 'hole' ? '최대 치수 (LMC)' : '최대 치수 (MMC)';
+    id('lbl-size-min').innerText = t === 'hole' ? '최소 치수 (MMC)' : '최소 치수 (LMC)';
+    calculatePosition();
+  }
+  function setMmcMode(mode){
+    mmcMode = mode;
+    ['none', 'mmc', 'lmc'].forEach(m => id('mmc-' + m).classList.toggle('on', m === mode));
+    id('gd-pos').classList.toggle('no-mmc', mode === 'none');
+    calculatePosition();
+  }
+  function calculatePosition(){
+    let xyWait = '';
+    if (posIn === 'xy') {
+      const nx = parseNum(id('pos-nx').value), ny = parseNum(id('pos-ny').value), mx = parseNum(id('pos-mx').value), my = parseNum(id('pos-my').value);
+      if ([nx, ny, mx, my].every(isFinite)) {
+        const ddx = mx - nx, ddy = my - ny;
+        id('pos-dx').value = ddx.toFixed(4).replace(/0+$/, '').replace(/\.$/, '.0');
+        id('pos-dy').value = ddy.toFixed(4).replace(/0+$/, '').replace(/\.$/, '.0');
+        id('posDiff').innerHTML = `편차 ΔX <b>${ddx >= 0 ? '+' : ''}${ddx.toFixed(3)}</b> · ΔY <b>${ddy >= 0 ? '+' : ''}${ddy.toFixed(3)}</b>`;
+      } else { xyWait = '도면·실측 X·Y를 입력하세요'; id('posDiff').innerHTML = '편차 ΔX – · ΔY –'; }
+    }
+    const dx = parseNum(id('pos-dx').value) || 0;
+    const dy = parseNum(id('pos-dy').value) || 0;
+    const tolRaw = parseNum(id('pos-tol').value);
+    const baseTol = tolRaw || 0;
+    const posError = 2 * Math.sqrt(dx * dx + dy * dy);
+    let bonus = 0, sizeNg = false, wait = '';
+    if (!(tolRaw > 0)) wait = '위치도 공차를 입력하세요';
+    if (!wait && xyWait) wait = xyWait;
+    if (mmcMode !== 'none') {
+      const sMaxR = parseNum(id('pos-size-max').value), sMinR = parseNum(id('pos-size-min').value), actR = parseNum(id('pos-actual').value);
+      if (!wait && !(isFinite(sMaxR) && isFinite(sMinR))) wait = '최대·최소 치수를 입력하세요';
+      else if (!wait && !isFinite(actR)) wait = '실측 치수를 입력하세요';
+      const sizeMax = sMaxR || 0;
+      const sizeMin = sMinR || 0;
+      const actual = isFinite(actR) ? actR : (featureType === 'hole' ? Math.min(sizeMax, sizeMin) : Math.max(sizeMax, sizeMin));
+      const sizeRange = Math.abs(sizeMax - sizeMin);
+      const mmcSize = featureType === 'hole' ? sizeMin : sizeMax;
+      const lmcSize = featureType === 'hole' ? sizeMax : sizeMin;
+      if (mmcMode === 'mmc') bonus = featureType === 'hole' ? (actual - mmcSize) : (mmcSize - actual);
+      else bonus = featureType === 'hole' ? (lmcSize - actual) : (actual - lmcSize);
+      sizeNg = actual > Math.max(sizeMax, sizeMin) + 1e-12 || actual < Math.min(sizeMax, sizeMin) - 1e-12;
+      bonus = Math.max(0, Math.min(bonus, sizeRange));
+    }
+    const allowable = baseTol + bonus;
+    id('res-error').innerText = 'Ø' + f4(posError);
+    id('res-bonus').innerText = mmcMode === 'none' ? '해당 없음' : '+' + f4(bonus);
+    id('res-allow').innerText = 'Ø' + f4(allowable);
+    const v = id('res-verdict');
+    const margin = allowable - posError;
+    if (wait) { v.className = 'verdict'; v.innerText = wait; }
+    else if (sizeNg) { v.className = 'verdict fail'; v.innerText = '치수 자체가 규격 밖'; }
+    else if (posError <= allowable + 1e-12) { v.className = 'verdict pass'; v.innerText = `OK · 여유 ${f4(margin)}`; }
+    else { v.className = 'verdict fail'; v.innerText = `NG · 초과 ${f4(-margin)}`; }
+    drawPosFig(dx, dy, baseTol, allowable, !wait && posError <= allowable + 1e-12 && !sizeNg);
+    ST.gd.pos = { in: posIn, ft: featureType, mm: mmcMode }; POS_IDS.forEach(k => ST.gd.pos[k] = id(k).value); saveState();
+  }
+  // 과녁 그림: 허용 공차원(초록/빨강) · 기본 공차(점선) · 측정점과 오차원
+  function drawPosFig(dx, dy, base, allow, ok){
+    const C = 120, rE = Math.hypot(dx, dy);
+    const rMax = Math.max(allow / 2, rE, base / 2, 1e-9) * 1.28, k = 100 / rMax;
+    let s = '';
+    for (let i = 1; i <= 4; i++) s += `<circle cx="${C}" cy="${C}" r="${i * 25}" fill="none" stroke="#EEF2F6" stroke-width="1"/>`;
+    s += `<line x1="12" y1="${C}" x2="228" y2="${C}" stroke="#CBD5E1" stroke-width="1"/><line x1="${C}" y1="12" x2="${C}" y2="228" stroke="#CBD5E1" stroke-width="1"/>`;
+    s += `<text x="226" y="${C - 4}" font-size="9" font-weight="800" fill="#94A3B8" text-anchor="end">+X</text><text x="${C + 4}" y="20" font-size="9" font-weight="800" fill="#94A3B8">+Y</text>`;
+    s += `<circle cx="${C}" cy="${C}" r="${allow / 2 * k}" fill="${ok ? '#DCFCE7' : '#FEE2E2'}" fill-opacity=".85" stroke="${ok ? '#16A34A' : '#DC2626'}" stroke-width="2"/>`;
+    if (allow - base > 1e-9) s += `<circle cx="${C}" cy="${C}" r="${base / 2 * k}" fill="none" stroke="#64748B" stroke-width="1.2" stroke-dasharray="4 3"/>`;
+    if (rE > 0) s += `<circle cx="${C}" cy="${C}" r="${rE * k}" fill="none" stroke="#0b1636" stroke-width="1" stroke-dasharray="2 3" opacity=".55"/>`;
+    const px = C + dx * k, py = C - dy * k;
+    s += `<line x1="${C}" y1="${C}" x2="${px}" y2="${py}" stroke="#0b1636" stroke-width="1.4"/>`;
+    s += `<circle cx="${C}" cy="${C}" r="3" fill="#e0b060"/>`;
+    s += `<circle cx="${px}" cy="${py}" r="7" fill="${ok ? '#0b1636' : '#DC2626'}" stroke="#fff" stroke-width="2"/>`;
+    s += `<text x="${C}" y="${C - allow / 2 * k - 6}" font-size="10" font-weight="900" fill="${ok ? '#15803D' : '#B91C1C'}" text-anchor="middle">허용 Ø${f4(allow)}</text>`;
+    s += `<text x="12" y="232" font-size="9" font-weight="700" fill="#94A3B8">● 측정 위치 · ○ 점선: ${allow - base > 1e-9 ? '기본 공차' : '오차 원'}</text>`;
+    id('posFig').innerHTML = s;
+  }
+
+  // ---- 3-2 원 맞춤 방식 비교 ----
+  function setFit(key, val){
+    ST.gd.fit[key] = val; saveState();
+    document.querySelectorAll('#gd-fit [data-feat]').forEach(b => b.classList.toggle('on', b.dataset.feat === ST.gd.fit.feat));
+    document.querySelectorAll('#gd-fit [data-shape]').forEach(b => b.classList.toggle('on', +b.dataset.shape === ST.gd.fit.shape));
+    renderFit();
+  }
+  function fitPoints(R, amp, k){
+    const N = 720, d = [], pts = [];
+    for (let i = 0; i < N; i++) { const t = i / N * 2 * Math.PI; d.push(Math.cos(k * t) + 0.3 * Math.cos((k + 1) * t + 1.1)); }
+    const sc = amp / (Math.max(...d) - Math.min(...d) || 1);
+    for (let i = 0; i < N; i++) { const t = i / N * 2 * Math.PI, r = R + d[i] * sc; pts.push([r * Math.cos(t), r * Math.sin(t)]); }
+    return pts;
+  }
+  function distStats(pts, c){ let mn = Infinity, mx = -Infinity; for (const p of pts) { const r = Math.hypot(p[0] - c[0], p[1] - c[1]); if (r < mn) mn = r; if (r > mx) mx = r; } return [mn, mx]; }
+  // 최소제곱원 (Kasa 대수 적합)
+  function fitLSC(pts){
+    let sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0, sz = 0, sxz = 0, syz = 0; const n = pts.length;
+    for (const [x, y] of pts) { const z = x * x + y * y; sx += x; sy += y; sxx += x * x; syy += y * y; sxy += x * y; sz += z; sxz += x * z; syz += y * z; }
+    const A = [[sxx, sxy, sx], [sxy, syy, sy], [sx, sy, n]], b = [-sxz, -syz, -sz];
+    const det = m => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    const D0 = det(A), sol = [0, 1, 2].map(j => det(A.map((r, i) => r.map((v, k) => k === j ? b[i] : v))) / D0);
+    const c = [-sol[0] / 2, -sol[1] / 2];
+    let r = 0; for (const p of pts) r += Math.hypot(p[0] - c[0], p[1] - c[1]); r /= n;
+    return { c, r };
+  }
+  // 중심 탐색 (8방향 패턴 서치)
+  function searchCenter(f, c0, s0){
+    let c = c0.slice(), best = f(c), s = s0;
+    const D = [[1, 0], [-1, 0], [0, 1], [0, -1], [.7071, .7071], [-.7071, .7071], [.7071, -.7071], [-.7071, -.7071]];
+    while (s > s0 * 1e-6) {
+      let moved = false;
+      for (const d of D) { const t = [c[0] + d[0] * s, c[1] + d[1] * s], v = f(t); if (v < best - 1e-14) { best = v; c = t; moved = true; break; } }
+      if (!moved) s /= 2;
+    }
+    return c;
+  }
+  function renderFit(){
+    const F = ST.gd.fit;
+    const nom = parseNum(id('fit-nom').value) || 10;
+    const amp = F.amp, R = nom / 2, hole = F.feat === 'hole';
+    id('fit-amp-v').innerText = amp.toFixed(3) + ' mm';
+    const pts = fitPoints(R, amp, F.shape);
+    const L = fitLSC(pts);
+    const s0 = Math.max(amp, 1e-4);
+    const cMIC = searchCenter(c => -distStats(pts, c)[0], L.c, s0);
+    const cMCC = searchCenter(c => distStats(pts, c)[1], L.c, s0);
+    const cMZC = searchCenter(c => { const [a, b] = distStats(pts, c); return b - a; }, L.c, s0);
+    const mic = distStats(pts, cMIC)[0], mcc = distStats(pts, cMCC)[1], mz = distStats(pts, cMZC);
+    const round = mz[1] - mz[0];
+    // 2점 측정 폭 (캘리퍼스·마이크로미터: 방향별 폭 = 투영 최대 − 최소)
+    let bMin = Infinity, bMax = -Infinity;
+    for (let j = 0; j < 180; j++) {
+      const t = j / 180 * Math.PI, ux = Math.cos(t), uy = Math.sin(t);
+      let lo = Infinity, hi = -Infinity;
+      for (const p of pts) { const v = p[0] * ux + p[1] * uy; if (v < lo) lo = v; if (v > hi) hi = v; }
+      const w = hi - lo; if (w < bMin) bMin = w; if (w > bMax) bMax = w;
+    }
+
+    // 그림: 반경 방향 편차만 과장 (중심 100,100 · 기준 반경 62px)
+    const Rd = 62, M = amp > 0 ? 26 / amp : 0;
+    const T = (x, y) => { const rho = Math.hypot(x, y), th = Math.atan2(y, x), rr = Rd + (rho - R) * M; return [100 + rr * Math.cos(th), 100 - rr * Math.sin(th)]; };
+    const path = arr => arr.map((p, i) => (i ? 'L' : 'M') + T(p[0], p[1]).map(v => v.toFixed(1)).join(' ')).join('') + 'Z';
+    const circ = (c, r) => { const a = []; for (let i = 0; i < 180; i++) { const t = i / 180 * 2 * Math.PI; a.push([c[0] + r * Math.cos(t), c[1] + r * Math.sin(t)]); } return path(a); };
+    const COL = { lsc: '#64748B', mic: '#16A34A', mcc: '#EA580C', mzc: '#7C3AED' };
+    const gauge = hole ? 'mic' : 'mcc';
+    let s = `<path d="${path(pts)}" fill="${hole ? '#fff' : '#E2E8F0'}" stroke="#0b1636" stroke-width="2.2"/>`;
+    s += `<path d="${circ(cMZC, mz[0])}" fill="none" stroke="${COL.mzc}" stroke-width="1" stroke-dasharray="2 2"/><path d="${circ(cMZC, mz[1])}" fill="none" stroke="${COL.mzc}" stroke-width="1" stroke-dasharray="2 2"/>`;
+    s += `<path d="${circ(L.c, L.r)}" fill="none" stroke="${COL.lsc}" stroke-width="1.4" stroke-dasharray="5 3"/>`;
+    s += `<path d="${circ(cMIC, mic)}" fill="none" stroke="${COL.mic}" stroke-width="${gauge === 'mic' ? 2.6 : 1.4}"/>`;
+    s += `<path d="${circ(cMCC, mcc)}" fill="none" stroke="${COL.mcc}" stroke-width="${gauge === 'mcc' ? 2.6 : 1.4}"/>`;
+    s += `<text x="100" y="104" font-size="10" font-weight="800" fill="#94A3B8" text-anchor="middle">${hole ? '구멍' : '축'}</text>`;
+    id('fitFig').innerHTML = s;
+
+    const row = (key, name, sub, val, dash) => `<div class="fl${gauge === key ? ' hi' : ''}"><i class="${dash ? 'dash' : ''}" style="border-color:${COL[key]}"></i><div class="t">${name}<small>${sub}</small></div><b>${val}</b></div>`;
+    id('fitLegend').innerHTML =
+        row('lsc', 'LSC 최소제곱', 'CMM 기본값', 'Ø' + f4(2 * L.r), true)
+      + row('mic', 'MIC 최대내접', '= 핀게이지', 'Ø' + f4(2 * mic))
+      + row('mcc', 'MCC 최소외접', '= 링게이지', 'Ø' + f4(2 * mcc))
+      + row('mzc', 'MZC 최소영역', '진원도 값', f4(round), true)
+      + `<div class="fl two"><i>↔</i><div class="t">2점 폭<small>캘리퍼스·마이크로</small></div><b class="sm">${bMin.toFixed(3)}<br>~${bMax.toFixed(3)}</b></div>`;
+
+    const g = hole ? 2 * mic : 2 * mcc, diff = Math.abs(2 * L.r - g);
+    id('fitConcl').innerHTML = amp === 0
+      ? '완전한 원이면 네 방식 모두 같은 값입니다. 찌그러짐을 올려 보세요.'
+      : (hole
+        ? `구멍: <b>핀게이지 = MIC Ø${f4(g)}</b> → CMM(LSC)보다 <b>${f4(diff)} 작게</b> 나옴<br>→ CMM 하한 OK인데 GO 핀이 안 들어가는 원인`
+        : `축: <b>링게이지 = MCC Ø${f4(g)}</b> → CMM(LSC)보다 <b>${f4(diff)} 크게</b> 나옴<br>→ CMM 상한 OK인데 GO 링이 안 들어가는 원인`)
+        + (amp > 0 && F.shape === 3 ? `<br>삼각: 2점 폭 차이 <b>${f4(bMax - bMin)}</b>뿐 → 캘리퍼스·마이크로로 안 잡힘 (진원도 ${f4(round)})` : '')
+        + `<span class="s">그림은 편차 과장 표시 · 맞춤 방식 지정이 없으면 고객사와 사전 합의 필요</span>`;
+  }
+
+  // ---- 3-3 3점 원 ----
+  const P3_IDS = ['p3-x1', 'p3-y1', 'p3-x2', 'p3-y2', 'p3-x3', 'p3-y3'];
+  let p3Center = null;
+  function renderP3(){
+    const v = P3_IDS.map(k => parseNum(id(k).value));
+    ST.gd.p3 = P3_IDS.map(k => id(k).value); saveState();
+    p3Center = null;
+    const clear = msg => { id('p3Dia').innerText = msg; ['p3-cx', 'p3-cy', 'p3-pos'].forEach(k => id(k).innerText = '–'); id('p3Fig').innerHTML = ''; };
+    if (v.some(x => !isFinite(x))) return clear('좌표 6개 입력');
+    const [x1, y1, x2, y2, x3, y3] = v;
+    const D = 2 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+    const span = Math.max(Math.hypot(x2 - x1, y2 - y1), Math.hypot(x3 - x1, y3 - y1), Math.hypot(x3 - x2, y3 - y2));
+    if (Math.abs(D) < 1e-9 * Math.max(1, span * span)) return clear('세 점이 한 직선 위');
+    const q1 = x1 * x1 + y1 * y1, q2 = x2 * x2 + y2 * y2, q3 = x3 * x3 + y3 * y3;
+    const cx = (q1 * (y2 - y3) + q2 * (y3 - y1) + q3 * (y1 - y2)) / D;
+    const cy = (q1 * (x3 - x2) + q2 * (x1 - x3) + q3 * (x2 - x1)) / D;
+    const r = Math.hypot(x1 - cx, y1 - cy);
+    p3Center = [cx, cy];
+    id('p3Dia').innerText = 'Ø ' + (2 * r).toFixed(4) + ' mm';
+    id('p3-cx').innerText = cx.toFixed(4); id('p3-cy').innerText = cy.toFixed(4);
+    id('p3-pos').innerText = 'Ø' + (2 * Math.hypot(cx, cy)).toFixed(4);
+    const k = 46 / r, C = 60;
+    let s = `<circle cx="${C}" cy="${C}" r="46" fill="#fff" stroke="#0b1636" stroke-width="1.6"/><circle cx="${C}" cy="${C}" r="2.5" fill="#e0b060"/>`;
+    [[x1, y1], [x2, y2], [x3, y3]].forEach(([x, y], i) => {
+      const px = C + (x - cx) * k, py = C - (y - cy) * k;
+      s += `<circle cx="${px}" cy="${py}" r="4.5" fill="#e0b060" stroke="#0b1636" stroke-width="1.2"/><text x="${C + (px - C) * 1.2}" y="${C + (py - C) * 1.2 + 3}" font-size="9" font-weight="900" fill="#0b1636" text-anchor="middle">${i + 1}</text>`;
+    });
+    id('p3Fig').innerHTML = s;
+  }
+  function p3ToPos(){
+    if (!p3Center) { toast('먼저 3점 좌표를 입력하세요'); return; }
+    id('pos-dx').value = p3Center[0].toFixed(4); id('pos-dy').value = p3Center[1].toFixed(4);
+    setGdSub('pos'); setPosIn('d');
+    toast('중심 좌표를 ΔX·ΔY로 넣었습니다 (원점 = 도면 중심일 때)');
+  }
+
+  // ---- 3-4 기호 사전 ----
+  const SYM_ICON = {
+    str: '<path d="M3 12H21"/>',
+    flat: '<path d="M8 7H21L16 17H3Z"/>',
+    circ: '<circle cx="12" cy="12" r="7"/>',
+    cyl: '<circle cx="12" cy="12" r="5.5"/><path d="M4 20L10 4M14 20L20 4"/>',
+    pline: '<path d="M4 17A8 8 0 0 1 20 17"/>',
+    psurf: '<path d="M4 17A8 8 0 0 1 20 17Z"/>',
+    par: '<path d="M9 4L6 20M18 4L15 20"/>',
+    perp: '<path d="M12 4V19M4 19H20"/>',
+    ang: '<path d="M4 19H20M4 19L17 6"/>',
+    pos: '<circle cx="12" cy="12" r="6"/><path d="M12 3V21M3 12H21"/>',
+    conc: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/>',
+    sym: '<path d="M3 12H21M7 7.5H17M7 16.5H17"/>',
+    cro: '<path d="M6 19L17 8M11 7H18V14"/>',
+    tro: '<path d="M3 20H13M3 20L11 9M7 8.5H12V13.5M9 20L17 9M13 8.5H18V13.5"/>'
+  };
+  const SYMS = [
+    ['모양', 'str', '진직도', 'Straightness', '두 평행선 사이 (표면 요소) · 공차 앞에 Ø가 붙으면 원통 안 (축선)', 'n', '가능 (치수형체의 축선일 때)', ''],
+    ['모양', 'flat', '평면도', 'Flatness', '두 평행 평면 사이', 'n', '원칙적으로 불가', '사출품 휨·변형 관리 대표 항목 · 정반 + 하이트게이지/다이얼 또는 CMM'],
+    ['모양', 'circ', '진원도', 'Circularity', '각 단면에서 동심 두 원 사이 (반경 차)', 'n', '불가', 'CMM은 원 맞춤 방식에 따라 값이 달라짐 → 「원 맞춤」 참고'],
+    ['모양', 'cyl', '원통도', 'Cylindricity', '동축 두 원통 사이 (진원도 + 진직도 + 테이퍼 통합)', 'n', '불가', ''],
+    ['윤곽', 'pline', '선의 윤곽도', 'Profile of a Line', '이론 윤곽을 따라가는 두 선 사이 (단면별)', 's', '불가', '데이텀이 없으면 모양만, 있으면 자세·위치까지 규제'],
+    ['윤곽', 'psurf', '면의 윤곽도', 'Profile of a Surface', '이론 곡면을 따라가는 두 면 사이', 's', '불가', '사출 외관·조립면에 많이 쓰임 · 데이텀 유무로 규제 범위가 달라짐'],
+    ['자세', 'par', '평행도', 'Parallelism', '데이텀에 평행한 두 평면(또는 Ø 원통) 사이', 'y', '가능 (치수형체일 때)', '자세 공차는 위치를 규제하지 않음'],
+    ['자세', 'perp', '직각도', 'Perpendicularity', '데이텀에 90°인 두 평면(또는 Ø 원통) 사이', 'y', '가능 (치수형체일 때)', ''],
+    ['자세', 'ang', '경사도', 'Angularity', '데이텀에 지정 각도(이론적으로 정확한 각)인 두 평면 사이', 'y', '가능 (치수형체일 때)', ''],
+    ['위치', 'pos', '위치도', 'Position', '이론적으로 정확한 위치를 중심으로 한 Ø 원통 (또는 두 평면) 안', 'y', 'Ⓜ · Ⓛ 가능', '보스·홀 위치 관리 대표 항목 · Ⓜ 적용 시 보너스 공차 → 「위치도」'],
+    ['위치', 'conc', '동심도 (동축도)', 'Concentricity / Coaxiality', '데이텀 축과 동축인 Ø 원통 안', 'y', '불가', 'ASME Y14.5-2018에서 동심도는 삭제 (ISO는 동축도로 유지) · 고객 도면 기준 확인'],
+    ['위치', 'sym', '대칭도', 'Symmetry', '데이텀 중심면에 대칭인 두 평면 사이', 'y', '불가', 'ASME Y14.5-2018에서 삭제 (ISO는 유지) · 고객 도면 기준 확인'],
+    ['흔들림', 'cro', '원주 흔들림', 'Circular Runout', '데이텀 축 기준 1회전 시 각 단면의 흔들림 (다이얼 최대−최소)', 'y', '불가', ''],
+    ['흔들림', 'tro', '온 흔들림', 'Total Runout', '데이텀 축 기준 회전 + 게이지를 면 전체로 이동하며 흔들림', 'y', '불가', '']
+  ];
+  // 현장 측정법 (SYMS 순서와 같음)
+  const SYM_HOW = [
+    '정반 위에서 하이트게이지·다이얼을 길이 방향으로 이동 · CMM 직선 요소',
+    '정반 + 다이얼/하이트게이지로 여러 점 측정 · CMM 평면 (점이 많을수록 정확)',
+    'CMM 원 스캔 (맞춤 방식 확인) · 진원도 측정기 · V블록+다이얼은 참고용',
+    'CMM 원통 (여러 단면 스캔) · 진원도 측정기',
+    'CMM 단면 스캔 · 투영기/형상측정기로 윤곽 비교',
+    'CMM 곡면 측정 (CAD 비교) · 3D 스캐너',
+    '데이텀 면을 정반에 두고 다이얼/하이트게이지 최대−최소 · CMM',
+    '직각 블록·스퀘어 + 다이얼 · CMM (데이텀 면 기준)',
+    '사인바 + 다이얼 · 각도 게이지 · CMM',
+    'CMM 좌표 측정 (데이텀 설정 필수) → 「위치도 판정」 · Ⓜ면 위치도 게이지',
+    'CMM (데이텀 축 기준 중심점) · 현장에선 흔들림으로 대체하는 경우 많음',
+    'CMM 중간면 · 하이트게이지로 양쪽 면을 재서 차이 ÷ 2',
+    'V블록·센터 지지 + 다이얼, 1회전 최대−최소',
+    '센터 지지 회전 + 다이얼을 축 방향으로 이동하며 전체 최대−최소'
+  ];
+  const symSvg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${SYM_ICON[k]}</svg>`;
+  function renderSymGrid(){
+    let html = '', grp = '';
+    SYMS.forEach((s, i) => {
+      html += `<button type="button" data-i="${i}" onclick="showSym(${i})">${symSvg(s[1])}<span>${s[2].replace(' (동축도)', '').replace('선의 ', '선 ').replace('면의 ', '면 ')}</span></button>`;
+    });
+    id('symGrid').innerHTML = html;
+  }
+  function showSym(i){
+    const s = SYMS[i]; ST.gd.sym = i; saveState();
+    document.querySelectorAll('#symGrid button').forEach(b => b.classList.toggle('on', +b.dataset.i === i));
+    const dat = s[5] === 'y' ? ['y', '데이텀 필요'] : s[5] === 's' ? ['', '데이텀 선택'] : ['n', '데이텀 없음'];
+    const mm = /불가/.test(s[6]) ? 'n' : 'y';
+    id('symCard').innerHTML = `<div class="sh"><div class="ic">${symSvg(s[1])}</div><div><div class="nm">${s[2]}</div><div class="en">${s[0]} 공차 · ${s[3]}</div></div></div>
+      <div class="how"><b>🔧 현장 측정</b>${SYM_HOW[i] || ''}</div>
+      <div class="zone">공차역: ${s[4]}</div>
+      <div class="sym-tags"><span class="${dat[0]}">${dat[1]}</span><span class="${mm}">Ⓜ ${s[6]}</span></div>
+      ${s[7] ? `<div class="tip">💡 ${s[7]}</div>` : ''}`;
+  }
+
+  // -------- 시작 --------
+  /* ==========================================================
+     ⑤ AQL 샘플링 — KS Q ISO 2859-1 표 Ⅰ(시료문자) + 표 Ⅱ-A(보통 검사 1회)
+     표 Ⅱ-A는 (시료문자 순번 + AQL 순번) 대각선마다 Ac/Re가 같고, 사이 칸은 화살표 → 규칙으로 계산
+     ========================================================== */
+  const AQ_T1 = [[8,'AAAAAAB'],[15,'AAAAABC'],[25,'AABBBCD'],[50,'ABBCCDE'],[90,'BBCCCEF'],[150,'BBCDDFG'],[280,'BCDEEGH'],[500,'BCDEFHJ'],
+    [1200,'CCEFGJK'],[3200,'CDEGHKL'],[10000,'CDFGJLM'],[35000,'CDFHKMN'],[150000,'DEGJLNP'],[500000,'DEGJMPQ'],[Infinity,'DEHKNQR']];
+  const AQ_LV = ['S-1','S-2','S-3','S-4','I','II','III'];
+  const AQ_LET = 'ABCDEFGHJKLMNPQR';
+  const AQ_N = [2,3,5,8,13,20,32,50,80,125,200,315,500,800,1250,2000];
+  const AQ_AQLS = ['0.010','0.015','0.025','0.040','0.065','0.10','0.15','0.25','0.40','0.65','1.0','1.5','2.5','4.0','6.5'];
+  const AQ_SHOW = ['0.065','0.10','0.15','0.25','0.40','0.65','1.0','1.5','2.5','4.0','6.5'];
+  const AQ_DIAG = { 14:[0,1], 17:[1,2], 18:[2,3], 19:[3,4], 20:[5,6], 21:[7,8], 22:[10,11], 23:[14,15], 24:[21,22] };
+  function aqCell(i, j){ const s = i + j; if (AQ_DIAG[s]) return AQ_DIAG[s]; return (s < 14 || s === 16) ? 'down' : 'up'; }
+  function aqPlan(li, ai){
+    let i = li;
+    for (let g = 0; g < 20; g++){
+      const c = aqCell(i, ai);
+      if (Array.isArray(c)) return { i, ac: c[0], re: c[1] };
+      i += c === 'down' ? 1 : -1;
+      if (i < 0 || i >= AQ_N.length) return null;
+    }
+    return null;
+  }
+  const aqFmt = n => Number(n).toLocaleString('en-US');
+  function aqState(){ ST.aq = Object.assign({ lot: '', lv: 'II', aql: '1.0' }, ST.aq || {}); return ST.aq; }
+  function aqInit(){
+    const a = aqState();
+    id('aqChips').innerHTML = [500, 1000, 3000, 5000, 10000].map(v => `<button type="button" onclick="aqSetLot(${v})">${aqFmt(v)}</button>`).join('');
+    if (a.lot) id('aq-lot').value = aqFmt(a.lot);
+    if (a.lv.startsWith('S')) id('aqSpecial').style.display = 'grid';
+    aqRender();
+  }
+  function aqToggleSpecial(){ const r = id('aqSpecial'); r.style.display = r.style.display === 'grid' ? 'none' : 'grid'; }
+  function aqSetLot(v){ aqState().lot = String(v); id('aq-lot').value = aqFmt(v); saveState(); aqRender(); }
+  function aqLotInput(){ const raw = id('aq-lot').value.replace(/[^0-9]/g, '').slice(0, 7); aqState().lot = raw; saveState(); aqRender(); }
+  function aqSet(k, v){ aqState()[k] = v; saveState(); aqRender(); }
+  function aqRender(){
+    const a = aqState();
+    const lvName = { I: 'Ⅰ', II: 'Ⅱ', III: 'Ⅲ' };
+    id('aqLv').innerHTML = ['I','II','III'].map(v => `<button type="button" class="${a.lv === v ? 'on' : ''}" onclick="aqSet('lv','${v}')">${lvName[v]} ${v === 'II' ? '일반' : v === 'I' ? '완화' : '강화'}</button>`).join('');
+    id('aqSpecial').innerHTML = ['S-1','S-2','S-3','S-4'].map(v => `<button type="button" class="${a.lv === v ? 'on' : ''}" onclick="aqSet('lv','${v}')">${v}</button>`).join('');
+    id('aqAql').innerHTML = AQ_SHOW.map(v => `<button type="button" class="${a.aql === v ? 'on' : ''}" onclick="aqSet('aql','${v}')">${v}</button>`).join('');
+    const box = id('aqRes');
+    const lot = parseInt(a.lot, 10);
+    const empty = `<div class="g"><div><div class="k">시료수 n</div><div class="v">–</div></div><div><div class="k">합격 Ac</div><div class="v ac">–</div></div><div><div class="k">불합격 Re</div><div class="v re">–</div></div></div>`;
+    box.dataset.ac = '';
+    if (!(lot >= 2)) { box.innerHTML = `<div class="top">로트 크기를 넣으면 시료수와 합격 기준이 나옵니다</div>${empty}`; aqJudge(); return; }
+    const letter = AQ_T1.find(r => lot <= r[0])[1][AQ_LV.indexOf(a.lv)];
+    const li = AQ_LET.indexOf(letter), p = aqPlan(li, AQ_AQLS.indexOf(a.aql));
+    const top = `<div class="top">로트 ${aqFmt(lot)} · ${a.lv.startsWith('S') ? a.lv : '수준 ' + lvName[a.lv]} · AQL ${a.aql} → 시료문자 <b>${letter}</b></div>`;
+    if (!p) { box.innerHTML = top + empty + '<div class="note">표에서 계획을 찾지 못했습니다 · 기준서 확인</div>'; aqJudge(); return; }
+    box.dataset.ac = p.ac;
+    const n = AQ_N[p.i];
+    const okTxt = p.ac === 0 ? '불량이 <b>하나도 없어야</b> 합격, <b>1개라도</b> 나오면 불합격' : `불량 <b>${p.ac}개 이하</b>면 합격, <b>${p.re}개 이상</b>이면 불합격`;
+    if (n >= lot) {
+      box.innerHTML = top + `<div class="full">전수검사 (${aqFmt(lot)}개)</div><div class="say">표의 시료수 ${aqFmt(n)}개가 로트보다 많아 <b>전수검사</b> · ${okTxt}</div>`;
+      aqJudge(); return;
+    }
+    const moved = p.i !== li ? `<div class="note">⚠ 표의 화살표 칸 → ${p.i > li ? '아래' : '위'} 계획(${AQ_LET[p.i]}) 적용 · 시료수 ${AQ_N[li]} → ${n}개</div>` : '';
+    box.innerHTML = top + `<div class="g">
+        <div><div class="k">시료수 n</div><div class="v">${aqFmt(n)}</div><div class="u">개 뽑기</div></div>
+        <div><div class="k">합격 Ac</div><div class="v ac">${p.ac}</div><div class="u">개 이하</div></div>
+        <div><div class="k">불합격 Re</div><div class="v re">${p.re}</div><div class="u">개 이상</div></div></div>
+      <div class="say"><b>${aqFmt(n)}개</b> 뽑아서 ${okTxt}</div>${moved}`;
+    aqJudge();
+  }
+  function aqJudge(){
+    const el = id('aqJudge'), ac = id('aqRes').dataset.ac, d = id('aq-def').value.replace(/[^0-9]/g, '');
+    if (ac === '' || ac === undefined || d === '') { el.className = 'jr'; el.textContent = '시료 검사 후 불량 수 입력'; return; }
+    const ok = Number(d) <= Number(ac);
+    el.className = 'jr ' + (ok ? 'ok' : 'ng');
+    el.textContent = ok ? '✓ 합격 (로트 인수)' : '✕ 불합격 (로트 보류)';
+  }
+
+  loadState();
+  try { hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]') || []; } catch (e) { hist = []; }
+  renderHist(); cRender();
+  setConvCat(CONV[ST.convCat] ? ST.convCat : 'length');
+  id('cpk-usl').value = ST.usl || ''; id('cpk-lsl').value = ST.lsl || '';
+  id('dr-n').value = ST.dr.n || ''; id('dr-d').value = ST.dr.d || ''; id('dr-t').value = ST.dr.t || '';
+  id('cp-cpk').value = ST.cpk || '1.33';
+  setCpkSub(ST.cpkSub || 'data'); setCpSide(ST.cpSide || 'two');
+  renderCpk(); renderRate();
+  POS_IDS.forEach(k => id(k).value = ST.gd.pos[k] != null ? ST.gd.pos[k] : '');
+  featureType = ST.gd.pos.ft === 'shaft' ? 'shaft' : 'hole';
+  posIn = ST.gd.pos.in === 'd' ? 'd' : 'xy';
+  setMmcMode(['none', 'mmc', 'lmc'].includes(ST.gd.pos.mm) ? ST.gd.pos.mm : 'none'); setFeatureType(featureType); setPosIn(posIn);
+  id('fit-nom').value = ST.gd.fit.nom; id('fit-amp').value = ST.gd.fit.amp;
+  P3_IDS.forEach((k, i) => id(k).value = ST.gd.p3[i]);
+  renderSymGrid(); showSym(ST.gd.sym);
+  READY = true;
+  setFit('feat', ST.gd.fit.feat); renderP3(); setGdSub(ST.gd.sub);
+  aqInit();
+  switchTab(['quick','conv','position','cpk','aql'].includes(ST.tab) ? ST.tab : 'quick');
+
+// ============================================================
+// [2026-10-16] 빠른 입력 — 계산기·입력 키패드는 손가락이 닿는 순간 입력
+//  - 기존: click(손 뗄 때) → 빠르게 치면 연타 확대·손가락 밀림·두 손가락 번갈아 치기에서 입력 누락
+//  - 변경: pointerdown 에서 바로 실행 · 그 터치가 뒤따라 만드는 click 은 무시(중복 입력 방지)
+//  - 마우스·키보드(Enter)는 기존 click 그대로
+// ============================================================
+(function () {
+  const SEL = '.ck-grid button, .keypad-grid button';
+  let taps = [];   // 이미 처리한 터치들 (뒤따라오는 click 걸러내기용)
+  document.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse') return;
+    const b = e.target.closest && e.target.closest(SEL);
+    if (!b || b.disabled || typeof b.onclick !== 'function') return;
+    const now = Date.now();
+    taps = taps.filter(t => now - t.t < 1000);
+    taps.push({ t: now, x: e.clientX, y: e.clientY });
+    b.classList.add('tap'); setTimeout(() => b.classList.remove('tap'), 110);
+    try { if (navigator.vibrate) navigator.vibrate(8); } catch (_) {}
+    b.onclick.call(b, e);
+  }, { capture: true, passive: true });
+  document.addEventListener('click', e => {
+    if (!e.isTrusted || e.detail === 0 || !taps.length) return;
+    const now = Date.now();
+    const k = taps.findIndex(t => now - t.t < 1000 && Math.abs(e.clientX - t.x) < 40 && Math.abs(e.clientY - t.y) < 40);
+    if (k < 0) return;
+    taps.splice(k, 1);
+    e.stopPropagation(); e.preventDefault();
+  }, true);
+})();
+</script>
+</body>
+</html>
